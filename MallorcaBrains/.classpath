@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="lib/Utils.jar"/>
+	<classpathentry kind="lib" path="lib/bench-13.jar"/>
+	<classpathentry kind="lib" path="lib/HandEvaluator.jar"/>
+	<classpathentry kind="lib" path="lib/HoldEmShowdown.jar"/>
+	<classpathentry kind="lib" path="lib/JavaHook.jar"/>
+	<classpathentry kind="lib" path="lib/jna-3.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jna.jar"/>
+	<classpathentry kind="lib" path="lib/JOCL-0.1.3a-beta.jar"/>
+	<classpathentry kind="lib" path="lib/MallorcaResources.jar"/>
+	<classpathentry kind="lib" path="lib/meerkat-api.jar"/>
+	<classpathentry kind="lib" path="lib/Mp3Player.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.17-bin.jar"/>
+	<classpathentry kind="lib" path="lib/neuroph-2.6-strip.jar"/>
+	<classpathentry kind="lib" path="lib/neuroph-2.6.jar"/>
+	<classpathentry kind="lib" path="lib/platform-3.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/SplineProject.jar"/>
+	<classpathentry kind="lib" path="lib/swing-layout-1.0.4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
