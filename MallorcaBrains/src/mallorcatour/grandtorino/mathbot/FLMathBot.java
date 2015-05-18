@@ -1,7 +1,7 @@
 package mallorcatour.grandtorino.mathbot;
 
 import java.util.Map;
-import mallorcatour.core.bot.FLActionPreprocessor;
+
 import mallorcatour.game.advice.Advice;
 import mallorcatour.game.core.Card;
 import mallorcatour.game.core.Action;
@@ -9,6 +9,7 @@ import mallorcatour.game.core.PokerStreet;
 import mallorcatour.core.bot.IGameInfo;
 import mallorcatour.core.bot.IPlayer;
 import mallorcatour.core.bot.LimitType;
+import mallorcatour.core.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.core.equilator13.PokerEquilatorBrecher;
 import mallorcatour.game.situation.IDecisionListener;
 import mallorcatour.game.situation.ISpectrumListener;

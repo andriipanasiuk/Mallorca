@@ -30,10 +30,10 @@ public class LocalSituation implements IVector, Serializable {
     private double heroAggresionFrequency = -1;
     private double opponentAggresionFrequency = -1;
     private int heroAggresionActionCount = 0;
-
-
 	private int villainAggresionActionCount = 0;
-    private boolean wasIPreviousAggresive;
+	private int heroActionCount = 0;
+	private int villainActionCount = 0;
+    private boolean wasHeroPreviousAggresive;
     private boolean wasOpponentPreviousAggresive;
     private double stackProportion = -1;
     /**
@@ -85,11 +85,11 @@ public class LocalSituation implements IVector, Serializable {
         List<Number> values = vector.getValues();
         strength = values.get(i++).doubleValue();
         isOnButton = values.get(i++).doubleValue() == 1;
-        heroAggresionFrequency = values.get(i++).doubleValue();
-        opponentAggresionFrequency = values.get(i++).doubleValue();
         heroAggresionActionCount = values.get(i++).intValue();
+        heroActionCount = values.get(i++).intValue();
         villainAggresionActionCount = values.get(i++).intValue();
-        wasIPreviousAggresive = values.get(i++).doubleValue() == 1;
+        villainActionCount = values.get(i++).intValue();
+        wasHeroPreviousAggresive = values.get(i++).doubleValue() == 1;
         wasOpponentPreviousAggresive = values.get(i++).doubleValue() == 1;
         if (limitType == LimitType.NO_LIMIT) {
             potToStackOdds = values.get(i++).doubleValue();
@@ -104,7 +104,7 @@ public class LocalSituation implements IVector, Serializable {
         this.street = other.street;
         this.strength = other.strength;
         this.isOnButton = other.isOnButton;
-        this.wasIPreviousAggresive = other.wasIPreviousAggresive;
+        this.wasHeroPreviousAggresive = other.wasHeroPreviousAggresive;
         this.heroAggresionFrequency = other.heroAggresionFrequency;
         this.wasOpponentPreviousAggresive = other.wasOpponentPreviousAggresive;
         this.opponentAggresionFrequency = other.opponentAggresionFrequency;
@@ -126,10 +126,10 @@ public class LocalSituation implements IVector, Serializable {
         List<Number> result = new ArrayList<Number>();
         result.add(getStrength());
         result.add(isHeroOnButton() ? 1 : 0);
-        result.add(getHeroAggresionFrequency());
-        result.add(getVillainAggresionFrequency());
         result.add(getHeroAggresionActionCount());
+        result.add(getHeroActionCount());
         result.add(getVillainAggresionActionCount());
+        result.add(getVillainActionCount());
         result.add(wasHeroPreviousAggresive() ? 1 : 0);
         result.add(wasVillainPreviousAggresive() ? 1 : 0);
         if (limitType == LimitType.FIXED_LIMIT && street != PREFLOP) {
@@ -184,13 +184,31 @@ public class LocalSituation implements IVector, Serializable {
     /**
      * @return the localAggresion
      */
+    @Deprecated
     public double getHeroAggresionFrequency() {
         return heroAggresionFrequency;
     }
 
-    /**
+    public int getHeroActionCount() {
+		return heroActionCount;
+	}
+
+	public void setHeroActionCount(int heroActionCount) {
+		this.heroActionCount = heroActionCount;
+	}
+
+	public int getVillainActionCount() {
+		return villainActionCount;
+	}
+
+	public void setVillainActionCount(int villainActionCount) {
+		this.villainActionCount = villainActionCount;
+	}
+
+	/**
      * @param localAggresion the localAggresion to set
      */
+	@Deprecated
     public void setLocalAggresion(double localAggresion) {
         this.heroAggresionFrequency = localAggresion;
     }
@@ -198,6 +216,7 @@ public class LocalSituation implements IVector, Serializable {
     /**
      * @return the localOpponentAggresion
      */
+	@Deprecated
     public double getVillainAggresionFrequency() {
         return opponentAggresionFrequency;
     }
@@ -205,6 +224,7 @@ public class LocalSituation implements IVector, Serializable {
     /**
      * @param localOpponentAggresion the localOpponentAggresion to set
      */
+	@Deprecated
     public void setLocalOpponentAggresion(double localOpponentAggresion) {
         this.opponentAggresionFrequency = localOpponentAggresion;
     }
@@ -227,14 +247,14 @@ public class LocalSituation implements IVector, Serializable {
      * @return the wasIPreviousAggresive
      */
     public boolean wasHeroPreviousAggresive() {
-        return wasIPreviousAggresive;
+        return wasHeroPreviousAggresive;
     }
 
     /**
      * @param wasIPreviousAggresive the wasIPreviousAggresive to set
      */
     public void wasHeroPreviousAggresive(boolean wasIPreviousAggresive) {
-        this.wasIPreviousAggresive = wasIPreviousAggresive;
+        this.wasHeroPreviousAggresive = wasIPreviousAggresive;
     }
 
     /**

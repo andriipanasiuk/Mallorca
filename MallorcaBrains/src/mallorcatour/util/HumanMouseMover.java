@@ -8,6 +8,8 @@ import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
+
+import mallorcatour.core.randomizer.UniformRandomizer;
 import mallorcatour.interfaces.IRandomizer;
 
 /**

@@ -7,11 +7,12 @@ package mallorcatour.game.advice;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import mallorcatour.core.randomizer.UniformRandomizer;
 import mallorcatour.game.core.Action;
 import mallorcatour.interfaces.IOutputInterpreter;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.vector.IVector;
-import mallorcatour.util.UniformRandomizer;
 
 /**
  *

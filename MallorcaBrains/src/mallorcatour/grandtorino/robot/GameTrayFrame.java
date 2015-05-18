@@ -10,13 +10,17 @@ package mallorcatour.grandtorino.robot;
  */
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import fellomen.bot.FellOmenFactory;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import mallorcatour.fellomen.bot.FellOmenFactory;
+
 import mallorcatour.grandtorino.bot.GrandSparFactory;
 import mallorcatour.grandtorino.mathbot.DanielxnPostflopBotFactory;
 import mallorcatour.grandtorino.mathbot.MathBotFLFactory;

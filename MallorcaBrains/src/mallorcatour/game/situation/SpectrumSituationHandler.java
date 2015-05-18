@@ -121,8 +121,9 @@ public class SpectrumSituationHandler extends SituationHandler {
             //equities
             result = new LocalSituation(LocalSituation.RIVER, limitType);
         }
-        result.setLocalOpponentAggresion(countOfHeroActions != 0 ? (double) countOfHeroAggressive / countOfHeroActions : 0);
-        result.setLocalAggresion(countOfOppActions != 0 ? (double) countOfOppAggressive / countOfOppActions : 0);
+        // TODO deal with aggression count
+        result.setLocalOpponentAggresion(heroActionCount != 0 ? (double) countOfHeroAggressive / heroActionCount : 0);
+        result.setLocalAggresion(villainActionCount != 0 ? (double) countOfOppAggressive / villainActionCount : 0);
         result.wasOpponentPreviousAggresive(wasHeroPreviousAggressive);
         result.wasHeroPreviousAggresive(wasVillainPreviousAggressive);
         result.setPotOdds(potOdds);
@@ -381,15 +382,15 @@ public class SpectrumSituationHandler extends SituationHandler {
         if (gameInfo.isPreFlop()) {
             if (gameInfo.getButtonName().equals(heroName)
                     && gameInfo.getHeroAmountToCall() == gameInfo.getBigBlindSize() / 2) {
-                return NLGameSolver.onFirstActionPreFlop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                return NLGameSolver.onFirstActionPreFlop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         villainSpectrum, new HoleCards(holeCard1, holeCard2),
                         preflopStrengthMap,/*was villain aggressive*/ false,
                         true, gameInfo.getBigBlindSize());
             } else {
-                return NLGameSolver.onSecondActionPreflop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                return NLGameSolver.onSecondActionPreflop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         gameInfo.getHeroAmountToCall(), villainSpectrum,
                         new HoleCards(holeCard1, holeCard2), preflopStrengthMap,
@@ -398,8 +399,8 @@ public class SpectrumSituationHandler extends SituationHandler {
         } else if (gameInfo.isFlop()) {
             if (gameInfo.getHeroAmountToCall() == 0
                     && !gameInfo.getButtonName().equals(heroName)) {
-                Map<Action, Double> map = NLGameSolver.onFirstActionFlop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = NLGameSolver.onFirstActionFlop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         villainSpectrum, new Flop(flop1, flop2, flop3),
                         new HoleCards(holeCard1, holeCard2), flopStrengthMap,
@@ -410,8 +411,8 @@ public class SpectrumSituationHandler extends SituationHandler {
                 Log.d("\nHero profit: " + profit);
                 return map;
             } else {
-                Map<Action, Double> map = NLGameSolver.onSecondActionFlop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = NLGameSolver.onSecondActionFlop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         gameInfo.getHeroAmountToCall(),
                         villainSpectrum, new Flop(flop1, flop2, flop3),
@@ -425,8 +426,8 @@ public class SpectrumSituationHandler extends SituationHandler {
         } else if (gameInfo.isTurn()) {
             if (gameInfo.getHeroAmountToCall() == 0
                     && !gameInfo.getButtonName().equals(heroName)) {
-                Map<Action, Double> map = NLGameSolver.onFirstActionTurn(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = NLGameSolver.onFirstActionTurn(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         villainSpectrum, new Flop(flop1, flop2, flop3), turn,
                         new HoleCards(holeCard1, holeCard2), turnStrengthMap,
@@ -437,8 +438,8 @@ public class SpectrumSituationHandler extends SituationHandler {
                 Log.d("\nHero profit: " + profit);
                 return map;
             } else {
-                Map<Action, Double> map = NLGameSolver.onSecondActionTurn(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = NLGameSolver.onSecondActionTurn(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         gameInfo.getHeroAmountToCall(),
                         villainSpectrum, new Flop(flop1, flop2, flop3), turn,
@@ -452,8 +453,8 @@ public class SpectrumSituationHandler extends SituationHandler {
         } else if (gameInfo.isRiver()) {
             if (gameInfo.getHeroAmountToCall() == 0
                     && !gameInfo.getButtonName().equals(heroName)) {
-                Map<Action, Double> map = NLGameSolver.onFirstActionRiver(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = NLGameSolver.onFirstActionRiver(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         villainSpectrum, new Flop(flop1, flop2, flop3), turn, river,
                         new HoleCards(holeCard1, holeCard2), riverStrengthMap,
@@ -464,8 +465,8 @@ public class SpectrumSituationHandler extends SituationHandler {
                 Log.d("\nHero profit: " + profit);
                 return map;
             } else {
-                Map<Action, Double> map = NLGameSolver.onSecondActionRiver(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = NLGameSolver.onSecondActionRiver(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(),
                         gameInfo.getHeroAmountToCall(),
                         villainSpectrum, new Flop(flop1, flop2, flop3), turn, river,
@@ -487,8 +488,8 @@ public class SpectrumSituationHandler extends SituationHandler {
         if (gameInfo.isPreFlop()) {
             if (gameInfo.getButtonName().equals(heroName)
                     && gameInfo.getHeroAmountToCall() == gameInfo.getBigBlindSize() / 2) {
-                Map<Action, Double> map = FLGameSolver.onFirstActionPreFlop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onFirstActionPreFlop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), villainSpectrum,
                         new HoleCards(holeCard1, holeCard2),
                         preflopStrengthMap, /*was villain aggressive*/ false,
@@ -498,8 +499,8 @@ public class SpectrumSituationHandler extends SituationHandler {
                 Log.d("\nHero profit: " + profit);
                 return map;
             } else {
-                Map<Action, Double> map = FLGameSolver.onSecondActionPreflop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onSecondActionPreflop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), gameInfo.getHeroAmountToCall(),
                         villainSpectrum, new HoleCards(holeCard1, holeCard2),
                         preflopStrengthMap, gameInfo.getButtonName().equals(heroName),
@@ -512,8 +513,8 @@ public class SpectrumSituationHandler extends SituationHandler {
         } else if (gameInfo.isFlop()) {
             if (gameInfo.getHeroAmountToCall() == 0
                     && !gameInfo.getButtonName().equals(heroName)) {
-                Map<Action, Double> map = FLGameSolver.onFirstActionFlop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onFirstActionFlop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), villainSpectrum,
                         new Flop(flop1, flop2, flop3), new HoleCards(holeCard1, holeCard2),
                         flopStrengthMap, wasVillainPreviousAggressive,
@@ -524,8 +525,8 @@ public class SpectrumSituationHandler extends SituationHandler {
                 Log.d("\nHero profit: " + profit);
                 return map;
             } else {
-                Map<Action, Double> map = FLGameSolver.onSecondActionFlop(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onSecondActionFlop(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), gameInfo.getHeroAmountToCall(),
                         villainSpectrum, new Flop(flop1, flop2, flop3),
                         new HoleCards(holeCard1, holeCard2), flopStrengthMap,
@@ -539,8 +540,8 @@ public class SpectrumSituationHandler extends SituationHandler {
         } else if (gameInfo.isTurn()) {
             if (gameInfo.getHeroAmountToCall() == 0
                     && !gameInfo.getButtonName().equals(heroName)) {
-                Map<Action, Double> map = FLGameSolver.onFirstActionTurn(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onFirstActionTurn(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), villainSpectrum,
                         new Flop(flop1, flop2, flop3), turn,
                         new HoleCards(holeCard1, holeCard2), turnStrengthMap,
@@ -551,8 +552,8 @@ public class SpectrumSituationHandler extends SituationHandler {
                 Log.d("\nHero profit: " + profit);
                 return map;
             } else {
-                Map<Action, Double> map = FLGameSolver.onSecondActionTurn(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onSecondActionTurn(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), gameInfo.getHeroAmountToCall(),
                         villainSpectrum, new Flop(flop1, flop2, flop3), turn,
                         new HoleCards(holeCard1, holeCard2), turnStrengthMap,
@@ -566,8 +567,8 @@ public class SpectrumSituationHandler extends SituationHandler {
         } else if (gameInfo.isRiver()) {
             if (gameInfo.getHeroAmountToCall() == 0
                     && !gameInfo.getButtonName().equals(heroName)) {
-                Map<Action, Double> map = FLGameSolver.onFirstActionRiver(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onFirstActionRiver(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), villainSpectrum,
                         new Flop(flop1, flop2, flop3), turn, river,
                         new HoleCards(holeCard1, holeCard2), riverStrengthMap,
@@ -579,8 +580,8 @@ public class SpectrumSituationHandler extends SituationHandler {
                 Log.d("\nHero profit: " + profit);
                 return map;
             } else {
-                Map<Action, Double> map = FLGameSolver.onSecondActionRiver(countOfHeroActions,
-                        countOfHeroAggressive, countOfOppActions, countOfOppAggressive,
+                Map<Action, Double> map = FLGameSolver.onSecondActionRiver(heroActionCount,
+                        countOfHeroAggressive, villainActionCount, countOfOppAggressive,
                         gameInfo.getPotSize(), gameInfo.getHeroAmountToCall(),
                         villainSpectrum, new Flop(flop1, flop2, flop3), turn, river,
                         new HoleCards(holeCard1, holeCard2), riverStrengthMap,

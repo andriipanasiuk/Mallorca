@@ -22,7 +22,7 @@ public class SituationHandler implements ISituationHandler {
 
     protected IGameInfo gameInfo;  // general game information
     protected Card holeCard1, holeCard2, flop1, flop2, flop3, turn, river;
-    protected int countOfHeroActions, countOfHeroAggressive, countOfOppActions,
+    protected int heroActionCount, countOfHeroAggressive, villainActionCount,
             countOfOppAggressive;
     protected boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
     protected String heroName, villainName;
@@ -75,10 +75,10 @@ public class SituationHandler implements ISituationHandler {
         } else if (gameInfo.isRiver()) {
             result = new LocalSituation(LocalSituation.RIVER, limitType);
         }
-        result.setLocalAggresion(countOfHeroActions != 0 ? (double) countOfHeroAggressive / countOfHeroActions : 0);
-        result.setLocalOpponentAggresion(countOfOppActions != 0 ? (double) countOfOppAggressive / countOfOppActions : 0);
         result.setHeroAggresionActionCount(countOfHeroAggressive);
+        result.setHeroActionCount(heroActionCount);
         result.setVillainAggresionActionCount(countOfOppAggressive);
+        result.setVillainActionCount(villainActionCount);
         result.wasHeroPreviousAggresive(wasHeroPreviousAggressive);
         result.wasOpponentPreviousAggresive(wasVillainPreviousAggressive);
         result.setStrength(strength);
@@ -105,7 +105,7 @@ public class SituationHandler implements ISituationHandler {
         } else if (action.isPassive()) {
             wasHeroPreviousAggressive = false;
         }
-        countOfHeroActions++;
+        heroActionCount++;
     }
 
     /**
@@ -143,9 +143,9 @@ public class SituationHandler implements ISituationHandler {
      */
     public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;
-        countOfHeroActions = 0;
+        heroActionCount = 0;
         countOfHeroAggressive = 0;
-        countOfOppActions = 0;
+        villainActionCount = 0;
         countOfOppAggressive = 0;
         wasHeroPreviousAggressive = false;
         wasVillainPreviousAggressive = false;
@@ -157,11 +157,11 @@ public class SituationHandler implements ISituationHandler {
     public void onVillainActed(Action action, double toCall) {
         if (action.isAggressive()) {
             wasVillainPreviousAggressive = true;
-            countOfOppActions++;
+            villainActionCount++;
             countOfOppAggressive++;
         } else if (action.isPassive()) {
             wasVillainPreviousAggressive = false;
-            countOfOppActions++;
+            villainActionCount++;
         }
     }
 

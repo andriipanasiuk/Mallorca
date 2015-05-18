@@ -13,14 +13,16 @@ package mallorcatour.neuronetworkwrapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+
+import mallorcatour.core.randomizer.UniformRandomizer;
 import mallorcatour.game.core.PokerStreet;
 import mallorcatour.game.hand.Hand;
 import mallorcatour.game.situation.LocalSituation;
 import mallorcatour.game.situation.LocalSituationDistance;
 import mallorcatour.interfaces.IRandomizer;
-import mallorcatour.util.UniformRandomizer;
 import mallorcatour.util.DoubleUtils;
 import mallorcatour.vector.EuclidDistanceMod;
 import mallorcatour.util.FrameUtils;

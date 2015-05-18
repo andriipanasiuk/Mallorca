@@ -75,6 +75,7 @@ public class NoStrengthSituationHandler implements ISituationHandler {
             //equities
             result = new LocalSituation(LocalSituation.RIVER, limitType);
         }
+        // TODO deal with aggression count
         result.setLocalAggresion(countOfHeroActions != 0 ? (double) countOfHeroAggressive / countOfHeroActions : 0);
         result.setLocalOpponentAggresion(countOfOppActions != 0 ? (double) countOfOppAggressive / countOfOppActions : 0);
         result.wasHeroPreviousAggresive(wasHeroPreviousAggressive);

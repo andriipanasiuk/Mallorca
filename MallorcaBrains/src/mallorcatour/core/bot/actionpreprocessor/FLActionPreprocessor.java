@@ -1,5 +1,6 @@
-package mallorcatour.core.bot;
+package mallorcatour.core.bot.actionpreprocessor;
 
+import mallorcatour.core.bot.IGameInfo;
 import mallorcatour.game.core.Action;
 import mallorcatour.interfaces.IActionPreprocessor;
 

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import mallorcatour.core.randomizer.UniformRandomizer;
 import mallorcatour.interfaces.IRandomizer;
 import model.SmoothSpline;
 import utils.MathUtils;

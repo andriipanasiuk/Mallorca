@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.fellomen.bot;
+package fellomen.bot;
 
 import mallorcatour.core.bot.IBotFactory;
 import mallorcatour.core.bot.IPlayer;

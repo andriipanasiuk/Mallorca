@@ -11,6 +11,7 @@
 package mallorcatour.neuronetworkwrapper;
 
 import mallorcatour.vector.IVector;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.util.ArrayList;
@@ -18,16 +19,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
+import mallorcatour.core.randomizer.UniformRandomizer;
 import mallorcatour.game.advice.Advice;
 import mallorcatour.game.advice.SmartAdviceCreator;
 import mallorcatour.game.situation.LocalSituation;
 import mallorcatour.game.situation.LocalSituationDistance;
 import mallorcatour.interfaces.IRandomizer;
-import mallorcatour.util.UniformRandomizer;
 import mallorcatour.util.DoubleUtils;
 import mallorcatour.vector.EuclidDistanceMod;
 import mallorcatour.util.FrameUtils;
@@ -36,6 +39,7 @@ import mallorcatour.util.MyFileWriter;
 import mallorcatour.util.ReaderUtils;
 import mallorcatour.util.StringUtils;
 import mallorcatour.vector.VectorUtils;
+
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.ILearningListener;
 import org.neuroph.nnet.Kohonen;

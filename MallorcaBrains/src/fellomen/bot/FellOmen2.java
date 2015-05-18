@@ -12,13 +12,13 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.*/
-package mallorcatour.fellomen.bot;
+package fellomen.bot;
 
 import java.util.*;
-import mallorcatour.core.bot.FLActionPreprocessor;
 
 import mallorcatour.core.bot.IGameInfo;
 import mallorcatour.core.bot.IPlayer;
+import mallorcatour.core.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.core.equilator13.PokerEquilatorBrecher;
 import mallorcatour.core.equilator13.StreetEquity;
 import mallorcatour.game.advice.Advice;

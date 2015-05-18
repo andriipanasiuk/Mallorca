@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import mallorcatour.core.bot.IPlayer;
 import mallorcatour.core.bot.LimitType;
 import mallorcatour.core.equilator13.PokerEquilatorBrecher;
+import mallorcatour.core.randomizer.UniformRandomizer;
 import mallorcatour.game.core.Action;
 import mallorcatour.game.core.Card;
 import mallorcatour.game.core.Deck;
@@ -39,7 +40,6 @@ import mallorcatour.util.FrameUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
 import mallorcatour.util.SerializatorUtils;
-import mallorcatour.util.UniformRandomizer;
 
 /**
  *

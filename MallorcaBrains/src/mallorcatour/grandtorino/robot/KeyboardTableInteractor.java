@@ -6,6 +6,8 @@ package mallorcatour.grandtorino.robot;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+
+import mallorcatour.core.randomizer.UniformRandomizer;
 import mallorcatour.game.core.Action;
 import mallorcatour.grandtorino.robot.recognizer.PSTableRecognizer;
 import mallorcatour.hookmanager.MouseDragLimiter;
@@ -14,7 +16,6 @@ import mallorcatour.util.Log;
 import mallorcatour.util.RobotUtils;
 import mallorcatour.util.SplineMouseMover;
 import mallorcatour.util.ThreadUtils;
-import mallorcatour.util.UniformRandomizer;
 
 /**
  *

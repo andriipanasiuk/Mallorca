@@ -395,6 +395,7 @@ public class NLGameSolver {
             //equities
             result = new LocalSituation(LocalSituation.RIVER, LimitType.NO_LIMIT);
         }
+        // TODO deal with aggression count
         result.setLocalOpponentAggresion(heroActions != 0 ? (double) heroAggressiveActions / heroActions : 0);
         result.setLocalAggresion(villainActions != 0 ? (double) villainAggressiveActions / villainActions : 0);
         result.wasOpponentPreviousAggresive(wasHeroPreviousAggressive);
