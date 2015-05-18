@@ -7,7 +7,8 @@ package mallorcatour.hhparser;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
-import mallorcatour.game.advice.Advice;
+
+import mallorcatour.core.game.advice.Advice;
 import mallorcatour.util.ReaderUtils;
 
 /**

@@ -14,8 +14,8 @@ package bot;
 import java.util.HashMap;
 import java.util.Map;
 
-import mallorcatour.game.core.Card;
-import mallorcatour.game.core.HoleCards;
+import mallorcatour.core.game.Card;
+import mallorcatour.core.game.HoleCards;
 
 /**
  * Class that parses strings given by the engine and stores values for later use.

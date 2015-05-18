@@ -17,13 +17,14 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import mallorcatour.game.core.Card;
-import mallorcatour.util.Alarm;
-import mallorcatour.grandtorino.robot.recognizer.ITableListener;
-import mallorcatour.grandtorino.robot.recognizer.PSTableObserver;
-import mallorcatour.grandtorino.robot.recognizer.PSTableRecognizer;
-import mallorcatour.hookmanager.KeyboardHookManager;
+
+import mallorcatour.core.game.Card;
+import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
+import mallorcatour.robot.ps.recognizer.PSTableObserver;
+import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
+import mallorcatour.robot.recognizer.ITableListener;
 import mallorcatour.util.Log;
+import mallorcatour.util.mp3player.Alarm;
 
 /**
  *

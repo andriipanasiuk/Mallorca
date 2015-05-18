@@ -4,18 +4,18 @@
  */
 package mallorcatour.hhparser;
 
-import mallorcatour.game.core.PlayerInfo;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import mallorcatour.core.bot.LimitType;
-import mallorcatour.game.core.Card;
-import mallorcatour.game.core.Action;
-import mallorcatour.game.core.Flop;
-import mallorcatour.game.core.HoleCards;
-import mallorcatour.interfaces.IHandHandler;
-import mallorcatour.interfaces.ITournamentHandler;
+import mallorcatour.core.game.Action;
+import mallorcatour.core.game.Card;
+import mallorcatour.core.game.Flop;
+import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.interfaces.IHandHandler;
+import mallorcatour.hhparser.core.ITournamentHandler;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.ReaderUtils;
 import mallorcatour.util.StringUtils;

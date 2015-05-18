@@ -10,14 +10,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.vector.IVector;
+import mallorcatour.core.vector.VectorInterpreter;
+import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.interfaces.IDistanceCalculator;
 import mallorcatour.interfaces.IInputInterpreter;
 import mallorcatour.util.Log;
 import mallorcatour.util.MyFileWriter;
 import mallorcatour.util.ReaderUtils;
-import mallorcatour.vector.IVector;
-import mallorcatour.vector.VectorUtils;
 
 import org.neuroph.core.learning.SupervisedTrainingElement;
 import org.neuroph.core.learning.TrainingElement;

@@ -7,6 +7,8 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 
+import mallorcatour.util.spline.IMouseMover;
+
 public class RobotUtils {
 	private static Robot robot;
 

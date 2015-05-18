@@ -16,12 +16,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import mallorcatour.core.equilator13.EquilatorPreflop;
-import mallorcatour.core.equilator13.PokerEquilatorBrecher;
-import mallorcatour.game.advice.Advice;
-import mallorcatour.game.core.Action;
-import mallorcatour.game.core.Card;
-import mallorcatour.game.core.HoleCards;
+import mallorcatour.core.equilator.brecher.EquilatorPreflop;
+import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
+import mallorcatour.core.game.Action;
+import mallorcatour.core.game.Card;
+import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.advice.Advice;
 
 /**
  * This class is the brains of your bot. Make your calculations here and return

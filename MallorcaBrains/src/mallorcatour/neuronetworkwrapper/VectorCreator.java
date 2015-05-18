@@ -4,8 +4,9 @@
  */
 package mallorcatour.neuronetworkwrapper;
 
+import mallorcatour.core.vector.BaseVector;
+import mallorcatour.core.vector.IVector;
 import mallorcatour.interfaces.IOutputInterpreter;
-import mallorcatour.vector.IVector;
 
 /**
  *

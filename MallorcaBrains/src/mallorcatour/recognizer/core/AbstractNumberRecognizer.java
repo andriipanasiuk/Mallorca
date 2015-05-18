@@ -9,7 +9,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import mallorcatour.grandtorino.controller.PokerPreferences;
+
+import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.IImageProcessor;
 import mallorcatour.util.ImageUtils;

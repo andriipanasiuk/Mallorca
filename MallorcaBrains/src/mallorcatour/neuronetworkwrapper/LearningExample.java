@@ -7,8 +7,9 @@ package mallorcatour.neuronetworkwrapper;
 import java.io.IOException;
 import java.util.Comparator;
 
-import mallorcatour.vector.IVector;
-import mallorcatour.vector.VectorUtils;
+import mallorcatour.core.vector.BaseVector;
+import mallorcatour.core.vector.IVector;
+import mallorcatour.core.vector.VectorUtils;
 
 /**
  *

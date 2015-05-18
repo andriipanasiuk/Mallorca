@@ -11,15 +11,16 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
-import mallorcatour.grandtorino.robot.ActionSynchronizer;
-import mallorcatour.hookmanager.KeyboardHookManager;
+
+import mallorcatour.robot.ActionSynchronizer;
+import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.util.ExecutorUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
 import mallorcatour.util.ReaderUtils;
 import mallorcatour.util.RobotUtils;
-import mallorcatour.util.SplineMouseMover;
 import mallorcatour.util.ThreadUtils;
+import mallorcatour.util.spline.SplineMouseMover;
 
 /**
  *

@@ -16,20 +16,20 @@ package fellomen.bot;
 
 import java.util.*;
 
-import mallorcatour.core.bot.IGameInfo;
-import mallorcatour.core.bot.IPlayer;
-import mallorcatour.core.bot.actionpreprocessor.FLActionPreprocessor;
-import mallorcatour.core.equilator13.PokerEquilatorBrecher;
-import mallorcatour.core.equilator13.StreetEquity;
-import mallorcatour.game.advice.Advice;
-import mallorcatour.game.advice.AdviceCreator;
-import mallorcatour.game.advice.SmartAdviceCreator;
-import mallorcatour.game.advice.SmartPostflopAdviceCreator;
-import mallorcatour.game.advice.SmartRiverAdviceCreator;
-import mallorcatour.game.core.Action;
-import mallorcatour.game.core.Card;
-import mallorcatour.game.core.PokerStreet;
-import mallorcatour.interfaces.IActionPreprocessor;
+import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
+import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.core.equilator.StreetEquity;
+import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
+import mallorcatour.core.game.Action;
+import mallorcatour.core.game.Card;
+import mallorcatour.core.game.PokerStreet;
+import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.AdviceCreator;
+import mallorcatour.core.game.advice.SmartAdviceCreator;
+import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
+import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
+import mallorcatour.core.game.interfaces.IActionPreprocessor;
+import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.util.Log;
 
 //import com.ibot.HandPotential;

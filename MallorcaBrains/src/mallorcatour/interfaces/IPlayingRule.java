@@ -4,9 +4,9 @@
  */
 package mallorcatour.interfaces;
 
-import mallorcatour.core.bot.IGameInfo;
-import mallorcatour.game.core.Action;
-import mallorcatour.game.core.HoleCards;
+import mallorcatour.core.game.Action;
+import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.interfaces.IGameInfo;
 
 /**
  *

@@ -22,12 +22,12 @@ import javax.swing.JToolTip;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
-import mallorcatour.game.core.Card;
-import mallorcatour.game.core.HoleCards;
-import mallorcatour.game.core.Spectrum;
-import mallorcatour.game.core.Card.Suit;
-import mallorcatour.game.core.Card.Value;
-import mallorcatour.util.FrameUtils;
+import mallorcatour.core.game.Card;
+import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.Card.Suit;
+import mallorcatour.core.game.Card.Value;
+import mallorcatour.core.spectrum.Spectrum;
+import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.util.SerializatorUtils;
 
 public class SpectrumFrame extends JFrame {

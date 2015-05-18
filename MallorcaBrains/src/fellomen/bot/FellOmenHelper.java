@@ -11,8 +11,9 @@ import java.io.InputStreamReader;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import mallorcatour.core.equilator13.PokerEquilatorBrecher;
-import mallorcatour.game.core.Card;
+
+import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
+import mallorcatour.core.game.Card;
 import mallorcatour.util.Log;
 
 /**

@@ -1,7 +1,9 @@
 /*    */ package mallorcatour.grandtorino.nn.core;
 /*    */ 
 /*    */ import java.io.InputStream;
-/*    */ import mallorcatour.game.core.IPokerStats;
+
+import mallorcatour.core.game.IPokerStats;
+
 /*    */ import org.neuroph.core.NeuralNetwork;
 /*    */ 
 /*    */ public abstract class AbstractNeurals

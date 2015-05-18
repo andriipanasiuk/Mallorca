@@ -7,9 +7,10 @@ package mallorcatour.neuronetworkwrapper;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import mallorcatour.game.advice.Advice;
-import mallorcatour.game.hand.Hand;
-import mallorcatour.game.situation.LocalSituation;
+
+import mallorcatour.core.game.Hand;
+import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.situation.LocalSituation;
 
 /**
  *

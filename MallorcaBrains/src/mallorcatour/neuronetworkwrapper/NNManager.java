@@ -5,11 +5,12 @@
 package mallorcatour.neuronetworkwrapper;
 
 import java.util.Arrays;
-import mallorcatour.vector.IVector;
 import java.util.List;
+
+import mallorcatour.core.vector.IVector;
+import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.interfaces.IOutputInterpreter;
 import mallorcatour.util.MyFileWriter;
-import mallorcatour.vector.VectorUtils;
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.nnet.Kohonen;

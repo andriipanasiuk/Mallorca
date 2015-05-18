@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 public class RetainColorProcessor implements IImageProcessor {
-	private static final Color DEFAULT_COLOR = Color.BLACK;
 	private final Color color;
 	private final Color bgColor;
 
