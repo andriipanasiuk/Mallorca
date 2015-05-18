@@ -10,7 +10,7 @@ import java.awt.Rectangle;
 import mallorcatour.core.game.Action;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
-import mallorcatour.robot.ps.PSGameRobot;
+import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.util.Log;
 import mallorcatour.util.RobotUtils;
@@ -29,7 +29,7 @@ public class KeyboardTableInteractor extends LoggingTableInteractor {
     private final IRandomizer randomizer;
 
     public KeyboardTableInteractor(String debug, String heroName,
-            PSGameRobot robot, PSTableRecognizer recognizer) {
+            IGameRobot robot, PSTableRecognizer recognizer) {
         super(debug, heroName, robot, recognizer);
         this.randomizer = new UniformRandomizer();
     }
