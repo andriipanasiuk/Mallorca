@@ -47,7 +47,7 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 			remove(cards);
 	}
 
-	public void remove(Card[] cards) {
+	public void remove(Card... cards) {
 		List<HoleCards> cardsForRemove = new ArrayList<>();
 		for (HoleCards holeCards : this) {
 			for (Card card : cards) {
