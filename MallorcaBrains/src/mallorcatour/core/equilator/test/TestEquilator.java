@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Random;
 
 import mallorcatour.core.equilator.StreetEquity;
+import mallorcatour.core.equilator.brecher.EquilatorQuick;
+import mallorcatour.core.equilator.brecher.FlopCombinations;
 import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.unused.PokerEquilatorNew;
 import mallorcatour.core.equilator.unused.PokerEquilatorSpears;
@@ -159,6 +161,36 @@ public class TestEquilator {
         Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
     }
 
+	public static void testQuickSpeed() {
+		Card myCard1;
+		Card myCard2;
+
+		Card flop1 = Card.valueOf("2s");
+		Card flop2 = Card.valueOf("8d");
+		Card flop3 = Card.valueOf("7s");
+
+		List<Card> nonUsed = Deck.getCards();
+		nonUsed = CollectionUtils.subtract(nonUsed, flop1);
+		nonUsed = CollectionUtils.subtract(nonUsed, flop2);
+		nonUsed = CollectionUtils.subtract(nonUsed, flop3);
+
+		FlopCombinations combinations = new FlopCombinations(flop1.intValueForBrecher(),
+				flop2.intValueForBrecher(), flop3.intValueForBrecher());
+		combinations.init();
+		long start = System.currentTimeMillis();
+		for (int i = 0; i < nonUsed.size(); i++) {
+			for (int j = i + 1; j < nonUsed.size(); j++) {
+				myCard1 = nonUsed.get(i);
+				myCard2 = nonUsed.get(j);
+				@SuppressWarnings("unused")
+				StreetEquity equity = EquilatorQuick.equityVsRandomFullPotential(myCard1.intValueForBrecher(),
+						myCard2.intValueForBrecher(), flop1.intValueForBrecher(), flop2.intValueForBrecher(),
+						flop3.intValueForBrecher(), combinations);
+			}
+		}
+		Log.d("Quick's time: " + (System.currentTimeMillis() - start) + " ms");
+	}
+
     public static void checkBrecherCorectness() {
         Card myCard1;
         Card myCard2;
@@ -190,7 +222,8 @@ public class TestEquilator {
         Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
     }
 
-    private static void calculate() {
+    @SuppressWarnings("unused")
+	private static void calculate() {
         Card myCard1 = Card.valueOf("Ad");
         Card myCard2 = Card.valueOf("Ac");
 
@@ -312,19 +345,6 @@ public class TestEquilator {
     }
 
     public static void main(String[] args) {
-//        checkBrecherCorectness();
-        calculate();
-//        equalCombinationsBrecherAndSpears();
-//        testSpearsSpeed();
-//        testPreflop();
-//        equalCombinationsBrecherAndNative();
-//        testBrecherCorectness();
-        //        testBrecherPotentialCorectness();
-//        PokerEquilatorBrecher.time = 0;
-//        testBrecherSpeed();
-//        testBrecherPotentialSpeed();
-//        Log.d("Time: " + PokerEquilatorBrecher.time);
-
-//        equalSpeeds();
+    	testQuickSpeed();
     }
 }

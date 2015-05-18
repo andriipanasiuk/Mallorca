@@ -24,7 +24,7 @@ public class PokerEquilatorBrecher {
 	public static long time = 0;
 	public static long timeCount = 0;
 
-	public static final boolean LOGGING = false;
+	public static boolean LOGGING = false;
 
 	private static long encode(long board, int[] cards) {
 		long result = board;
@@ -34,12 +34,35 @@ public class PokerEquilatorBrecher {
 		return result;
 	}
 
-	public static long encode(int[] brecherCards) {
+	public static long encode(int card1, int card2) {
+		long key = 0;
+		key |= (0x1L << card1);
+		key |= (0x1L << card2);
+		return key;
+	}
+
+	public static long encode(long boardKey, int card) {
+		boardKey |= (0x1L << card);
+		return boardKey;
+	}
+
+	public static long encode(long boardKey, long cardsKey) {
+		boardKey |= cardsKey;
+		return boardKey;
+	}
+
+	public static long encode(int... brecherCards) {
 		long result = 0;
 		for (int i = 0; i < brecherCards.length; i++) {
 			result |= (0x1L << (brecherCards[i]));
 		}
 		return result;
+	}
+
+	public static long decode(long key, int card) {
+		long deck = (0x1L << (card));
+		key &= ~deck;
+		return key;
 	}
 
 	public static int combination(int[] allCards) {
@@ -56,17 +79,23 @@ public class PokerEquilatorBrecher {
 		}
 	}
 
-	public static int combination(long boardKey, int[] holeCards, int how) {
+	public static int combination(long cardsKey, int how) {
 		timeCount++;
 		if (how == 5) {
-			return HandEval.hand5Eval(encode(boardKey, holeCards));
+			return HandEval.hand5Eval(cardsKey);
 		} else if (how == 6) {
-			return HandEval.hand6Eval(encode(boardKey, holeCards));
+			return HandEval.hand6Eval(cardsKey);
 		} else if (how == 7) {
-			return HandEval.hand7Eval(encode(boardKey, holeCards));
+			return HandEval.hand7Eval(cardsKey);
 		} else {
 			throw new RuntimeException();
 		}
+	}
+
+	public static int combination(long boardKey, int[] holeCards, int how) {
+		timeCount++;
+		long cardsKey = encode(boardKey, holeCards);
+		return combination(cardsKey, how);
 	}
 
 	public static double strengthVsRandom(Card heroCard1, Card heroCard2,
