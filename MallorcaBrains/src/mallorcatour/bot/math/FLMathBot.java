@@ -3,9 +3,11 @@ package mallorcatour.bot.math;
 import java.util.Map;
 
 import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
-import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.bot.modeller.FLSpectrumSituationHandler;
 import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
@@ -14,8 +16,6 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.util.Log;
 
 /** 
@@ -34,7 +34,7 @@ public class FLMathBot implements IPlayer {
     private IActionPreprocessor actionPreprocessor;
     private final String DEBUG_PATH;
 
-    public FLMathBot(BaseVillainModeller villainModeller,
+    public FLMathBot(IVillainModeller villainModeller,
             ISpectrumListener spectrumListener,
             IDecisionListener decisionListener, String debug) {
         adviceCreator = new AdviceCreatorFromMap();

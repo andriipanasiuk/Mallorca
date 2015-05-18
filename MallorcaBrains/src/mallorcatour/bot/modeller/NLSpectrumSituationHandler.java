@@ -2,19 +2,20 @@ package mallorcatour.bot.modeller;
 
 import java.util.Map;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.math.NLGameSolver;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
 
 public class NLSpectrumSituationHandler extends BaseSpectrumSituationHandler {
 
-	public NLSpectrumSituationHandler(BaseVillainModeller villainModeller, boolean modelPreflop,
+	public NLSpectrumSituationHandler(IVillainModeller villainModeller, boolean modelPreflop,
 			boolean modelPostflop, ISpectrumListener villainSpectrumListener,
 			IDecisionListener villainDecisionListener, String debug) {
 		super(villainModeller, LimitType.NO_LIMIT, modelPreflop, modelPostflop, villainSpectrumListener,

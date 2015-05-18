@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.math.NLMathBot;
 import mallorcatour.bot.villainobserver.VillainStatistics;
@@ -27,7 +28,6 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.situation.IDecisionListener;
 import mallorcatour.core.game.situation.ShowingSpectrumListener;
 import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.bot.modeller.BaseVillainModeller;

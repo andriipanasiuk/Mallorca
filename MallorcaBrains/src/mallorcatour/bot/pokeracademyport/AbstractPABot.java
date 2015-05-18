@@ -10,10 +10,10 @@ import com.biotools.meerkat.GameInfo;
 import com.biotools.meerkat.Player;
 import com.biotools.meerkat.util.Preferences;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.situation.IDecisionListener;
 import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.Log;

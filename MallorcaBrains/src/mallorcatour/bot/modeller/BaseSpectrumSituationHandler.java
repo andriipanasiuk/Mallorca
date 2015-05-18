@@ -7,6 +7,10 @@ package mallorcatour.bot.modeller;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
+import mallorcatour.bot.interfaces.IPokerNN;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.brecher.EquilatorPreflop;
 import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
@@ -17,9 +21,6 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.IPokerNN;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.core.spectrum.Spectrum;
@@ -45,7 +46,7 @@ public abstract class BaseSpectrumSituationHandler extends SituationHandler {
     private Spectrum randomVillainSpectrum;
     protected final String DEBUG_PATH;
 
-    public BaseSpectrumSituationHandler(BaseVillainModeller villainModeller,
+    public BaseSpectrumSituationHandler(IVillainModeller villainModeller,
             LimitType limitType, boolean modelPreflop, boolean modelPostflop,
             ISpectrumListener villainSpectrumListener,
             IDecisionListener villainDecisionListener,

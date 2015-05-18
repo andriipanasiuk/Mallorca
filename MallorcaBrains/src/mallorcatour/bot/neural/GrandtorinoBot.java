@@ -5,9 +5,12 @@ import java.util.Map.Entry;
 
 import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.IPokerNN;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
-import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.bot.modeller.FLSpectrumSituationHandler;
 import mallorcatour.bot.modeller.NLSpectrumSituationHandler;
 import mallorcatour.bot.preflop.FLPreflopChart;
@@ -21,9 +24,6 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.IPokerNN;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.robot.humanadvisor.IHumanAdvisor;
@@ -51,7 +51,7 @@ public class GrandtorinoBot implements IPlayer {
     private final LimitType limitType;
     private final String DEBUG_PATH;
 
-    public GrandtorinoBot(IPokerNN neuralNetwork, BaseVillainModeller villainModeller,
+    public GrandtorinoBot(IPokerNN neuralNetwork, IVillainModeller villainModeller,
             LimitType limitType, ISpectrumListener spectrumListener,
             IDecisionListener villainDecisionListener, IHumanAdvisor humanAdvisor,
             boolean isHumanAdvisor, boolean modelPreflop, boolean modelPostflop, String debug) {

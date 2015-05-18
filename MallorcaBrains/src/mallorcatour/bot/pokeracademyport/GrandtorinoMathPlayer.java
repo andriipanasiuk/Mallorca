@@ -5,8 +5,8 @@
 package mallorcatour.bot.pokeracademyport;
 
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.FLMathBot;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.Log;
 

@@ -4,11 +4,11 @@
  */
 package mallorcatour.bot.pokeracademyport;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.neural.GrandtorinoBot;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.bot.modeller.BasePokerNN;
 import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.grandtorino.nn.sparbotFL.SparbotNeurals;

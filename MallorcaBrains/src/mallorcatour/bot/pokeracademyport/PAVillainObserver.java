@@ -7,12 +7,12 @@ package mallorcatour.bot.pokeracademyport;
 import java.util.ArrayList;
 import java.util.List;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.villainobserver.IVillainListener;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.IDecisionListener;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.neuronetworkwrapper.LEManager;
 import mallorcatour.neuronetworkwrapper.PokerLearningExample;

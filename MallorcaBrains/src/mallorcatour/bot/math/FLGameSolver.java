@@ -7,6 +7,7 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
@@ -20,9 +21,9 @@ import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.LocalSituationInterpreter;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.grandtorino.nn.danielxn.DanielxnNeurals;
-import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
+
 import org.neuroph.core.NeuralNetwork;
 
 /**
@@ -34,11 +35,11 @@ public class FLGameSolver {
     private final static double NEARLY_ZERO = 0.0001;
     private final static double TURN_POT_COEFF = 4.91;
     private final static double RIVER_POT_COEFF = 3.14;
-    private BaseVillainModeller villainModeller;
+    private IVillainModeller villainModeller;
     private final int MIN_ADDITIONAL_PROFIT = 0;
     private static final double IP_ADDITIONAL_PROFIT_BB = 0.056;
 
-    public FLGameSolver(BaseVillainModeller villainModeller) {
+    public FLGameSolver(IVillainModeller villainModeller) {
         this.villainModeller = villainModeller;
     }
 

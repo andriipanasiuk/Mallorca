@@ -7,13 +7,13 @@ package mallorcatour.bot.modeller;
 import java.util.ArrayList;
 import java.util.List;
 
+import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.SmartAdviceCreator;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
-import mallorcatour.core.game.situation.IPokerNN;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.LocalSituationDistance;
 import mallorcatour.core.game.situation.LocalSituationInterpreter;

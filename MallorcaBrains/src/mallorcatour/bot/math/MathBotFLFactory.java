@@ -5,10 +5,10 @@
 package mallorcatour.bot.math;
 
 import mallorcatour.bot.interfaces.IBotFactory;
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.ISpectrumListener;
-import mallorcatour.bot.modeller.BaseVillainModeller;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.interfaces.IVillainModeller;
 
 /**
  *
@@ -16,7 +16,7 @@ import mallorcatour.bot.modeller.BaseVillainModeller;
  */
 public class MathBotFLFactory implements IBotFactory {
 
-    public IPlayer createBot(BaseVillainModeller modeller, ISpectrumListener spectrumListener, IDecisionListener decisionListener, String debug) {
+    public IPlayer createBot(IVillainModeller modeller, ISpectrumListener spectrumListener, IDecisionListener decisionListener, String debug) {
         return new FLMathBot(modeller, spectrumListener, decisionListener, debug);
     }
 }

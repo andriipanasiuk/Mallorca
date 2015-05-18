@@ -4,9 +4,6 @@
  */
 package mallorcatour.bot.interfaces;
 
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.ISpectrumListener;
-import mallorcatour.bot.modeller.BaseVillainModeller;
 
 /**
  *
@@ -14,6 +11,6 @@ import mallorcatour.bot.modeller.BaseVillainModeller;
  */
 public interface IBotFactory {
 
-    IPlayer createBot(BaseVillainModeller modeller, ISpectrumListener spectrumListener,
+    IPlayer createBot(IVillainModeller modeller, ISpectrumListener spectrumListener,
             IDecisionListener decisionListener, String debug);
 }

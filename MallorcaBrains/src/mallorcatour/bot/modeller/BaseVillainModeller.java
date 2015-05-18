@@ -4,7 +4,7 @@
  */
 package mallorcatour.bot.modeller;
 
-import mallorcatour.bot.villainobserver.IVillainListener;
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
@@ -12,29 +12,27 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.SmartAdviceCreator;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
-import mallorcatour.core.game.situation.IPokerNN;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.LocalSituationInterpreter;
-import mallorcatour.grandtorino.nn.danielxn.DanielxnNeurals;
 import mallorcatour.grandtorino.nn.brazil.BrazilNeurals;
 import mallorcatour.grandtorino.nn.chucky.ChuckyNeurals;
 import mallorcatour.grandtorino.nn.core.AbstractNeurals;
+import mallorcatour.grandtorino.nn.danielxn.DanielxnNeurals;
 import mallorcatour.grandtorino.nn.germany.GermanyNeurals;
-import mallorcatour.bot.modeller.PokerStatsDistance;
-import mallorcatour.bot.modeller.PreflopSpectrumModeller;
 import mallorcatour.grandtorino.nn.pokibratFL.PokibratNeurals;
 import mallorcatour.grandtorino.nn.sparbotFL.SparbotNeurals;
 import mallorcatour.grandtorino.nn.waterhouse.WaterhouseNeurals;
 import mallorcatour.util.Log;
+
 import org.neuroph.core.NeuralNetwork;
 
 /**
  *
  * @author Andrew
  */
-public class BaseVillainModeller implements IPokerNN, IVillainListener {
+public class BaseVillainModeller implements IVillainModeller {
 
-    private static final AbstractNeurals DEFAULT_NL_NEURAL = new DanielxnNeurals();
+	private static final AbstractNeurals DEFAULT_NL_NEURAL = new DanielxnNeurals();
     private static final AbstractNeurals DEFAULT_FL_NEURAL = new SparbotNeurals();
     private static final AbstractNeurals POKIBRAT_FL = new PokibratNeurals();
     private static final AbstractNeurals SPARBOT_FL = new SparbotNeurals();

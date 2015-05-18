@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.interfaces.IBotFactory;
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.ExecutorUtils;

@@ -7,6 +7,7 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
@@ -18,7 +19,6 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
 
@@ -34,9 +34,9 @@ public class NLGameSolver {
     private final static double TURN_POT_COEFF = 10.3;
     private final static double RIVER_POT_COEFF = 8.65;
     private final static double IP_ADDITIONAL_PROFIT_BB = 0.056;
-    private final BaseVillainModeller villainModeller;
+    private final IVillainModeller villainModeller;
 
-    public NLGameSolver(BaseVillainModeller villainModeller) {
+    public NLGameSolver(IVillainModeller villainModeller) {
         this.villainModeller = villainModeller;
     }
 

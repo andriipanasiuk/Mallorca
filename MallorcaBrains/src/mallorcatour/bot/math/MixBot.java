@@ -3,9 +3,12 @@ package mallorcatour.bot.math;
 import java.util.Map;
 
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.IPokerNN;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
-import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.bot.modeller.NLSpectrumSituationHandler;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -14,9 +17,6 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.situation.IDecisionListener;
-import mallorcatour.core.game.situation.IPokerNN;
-import mallorcatour.core.game.situation.ISpectrumListener;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
 
@@ -37,7 +37,7 @@ public class MixBot implements IPlayer {
     private final IPokerNN postflopNN;
     private final BaseSpectrumSituationHandler situationHandler;
 
-    public MixBot(IPokerNN postflopNN, BaseVillainModeller villainModeller,
+    public MixBot(IPokerNN postflopNN, IVillainModeller villainModeller,
             ISpectrumListener listener,
             IDecisionListener decisionListener, String debug) {
         this.postflopNN = postflopNN;
