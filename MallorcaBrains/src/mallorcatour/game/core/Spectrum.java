@@ -1,177 +1,161 @@
-/*     */ package mallorcatour.game.core;
-/*     */ 
-/*     */ import java.io.Serializable;
-/*     */ import java.util.ArrayList;
-/*     */ import java.util.Collections;
-/*     */ import java.util.Comparator;
-/*     */ import java.util.HashMap;
-/*     */ import java.util.Iterator;
-/*     */ import java.util.List;
-/*     */ import java.util.Map;
-/*     */ import java.util.Map.Entry;
-/*     */ import java.util.Set;
-/*     */ 
-/*     */ public class Spectrum
-/*     */   implements Iterable<HoleCards>, Serializable
-/*     */ {
-/*     */   private Map<HoleCards, Double> weights;
-/*     */ 
-/*     */   public Spectrum()
-/*     */   {
-/*  28 */     this.weights = new HashMap();
-/*     */   }
-/*     */ 
-/*     */   public boolean isEmpty() {
-/*  32 */     return this.weights.isEmpty();
-/*     */   }
-/*     */ 
-/*     */   public static Spectrum random() {
-/*  36 */     Spectrum result = new Spectrum();
-/*  37 */     List cards = Deck.getCards();
-/*  38 */     for (int i = 0; i < cards.size(); i++) {
-/*  39 */       for (int j = i + 1; j < cards.size(); j++) {
-/*  40 */         result.weights.put(new HoleCards((Card)cards.get(i), (Card)cards.get(j)), Double.valueOf(1.0D));
-/*     */       }
-/*     */     }
-/*  43 */     return result;
-/*     */   }
-/*     */ 
-/*     */   public void remove(Card card) {
-/*  47 */     List cardsForRemove = new ArrayList();
-/*  48 */     for (HoleCards cards : this) {
-/*  49 */       if (cards.hasCard(card)) {
-/*  50 */         cardsForRemove.add(cards);
-/*     */       }
-/*     */     }
-/*  53 */     for (HoleCards cards : cardsForRemove)
-/*  54 */       remove(cards);
-/*     */   }
-/*     */ 
-/*     */   public void remove(Card[] cards)
-/*     */   {
-/*  59 */     List cardsForRemove = new ArrayList();
-/*  60 */     for (HoleCards holeCards : this) {
-/*  61 */       for (Card card : cards) {
-/*  62 */         if (holeCards.hasCard(card)) {
-/*  63 */           cardsForRemove.add(holeCards);
-/*  64 */           break;
-/*     */         }
-/*     */       }
-/*     */     }
-/*  68 */     for (HoleCards holeCards : cardsForRemove)
-/*  69 */       remove(holeCards);
-/*     */   }
-/*     */ 
-/*     */   public void add(HoleCards cards, double weight)
-/*     */   {
-/*  74 */     if (weight != 0.0D)
-/*  75 */       this.weights.put(cards, Double.valueOf(weight));
-/*     */   }
-/*     */ 
-/*     */   public void add(HoleCards cards)
-/*     */   {
-/*  80 */     this.weights.put(cards, Double.valueOf(1.0D));
-/*     */   }
-/*     */ 
-/*     */   public void remove(HoleCards holeCards) {
-/*  84 */     this.weights.remove(holeCards);
-/*     */   }
-/*     */ 
-/*     */   public void add(String cards)
-/*     */   {
-/*  89 */     Card.Value firstRange = Card.Value.valueOf(cards.charAt(0));
-/*  90 */     Card.Value secondRange = Card.Value.valueOf(cards.charAt(1));
-/*  91 */     boolean all = cards.length() == 2;
-/*     */     Iterator i$;
-/*     */     Card.Suit suit1;
-/*     */     Iterator i$;
-/*  92 */     if (!all) {
-/*  93 */       boolean suited = cards.charAt(2) == 's';
-/*  94 */       if (suited) {
-/*  95 */         for (Card.Suit suit : Card.Suit.getSuits()) {
-/*  96 */           this.weights.put(new HoleCards(new Card(firstRange, suit), new Card(secondRange, suit)), Double.valueOf(1.0D));
-/*     */         }
-/*     */       }
-/*     */       else
-/* 100 */         for (i$ = Card.Suit.getSuits().iterator(); i$.hasNext(); ) { suit1 = (Card.Suit)i$.next();
-/* 101 */           for (Card.Suit suit2 : Card.Suit.getSuits())
-/* 102 */             if (suit1 != suit2)
-/*     */             {
-/* 105 */               this.weights.put(new HoleCards(new Card(firstRange, suit1), new Card(secondRange, suit2)), Double.valueOf(1.0D));
-/*     */             }
-/*     */         }
-/*     */     }
-/*     */     else
-/*     */     {
-/* 111 */       for (i$ = Card.Suit.getSuits().iterator(); i$.hasNext(); ) { suit1 = (Card.Suit)i$.next();
-/* 112 */         for (Card.Suit suit2 : Card.Suit.getSuits())
-/* 113 */           if ((firstRange != secondRange) || (suit1 != suit2))
-/*     */           {
-/* 116 */             this.weights.put(new HoleCards(new Card(firstRange, suit1), new Card(secondRange, suit2)), Double.valueOf(1.0D));
-/*     */           } }
-/*     */     }
-/*     */     Card.Suit suit1;
-/*     */   }
-/*     */ 
-/*     */   public double getWeight(HoleCards cards)
-/*     */   {
-/* 124 */     Double result = (Double)this.weights.get(cards);
-/* 125 */     if (result == null) {
-/* 126 */       return 0.0D;
-/*     */     }
-/* 128 */     return result.doubleValue();
-/*     */   }
-/*     */ 
-/*     */   public double summaryWeight()
-/*     */   {
-/* 133 */     double sum = 0.0D;
-/* 134 */     for (Map.Entry entry : this.weights.entrySet()) {
-/* 135 */       sum += ((Double)entry.getValue()).doubleValue();
-/*     */     }
-/* 137 */     return sum;
-/*     */   }
-/*     */ 
-/*     */   public double maxWeight() {
-/* 141 */     double maxValue = -1.797693134862316E+308D;
-/* 142 */     for (Map.Entry entry : this.weights.entrySet()) {
-/* 143 */       if (maxValue < ((Double)entry.getValue()).doubleValue()) {
-/* 144 */         maxValue = ((Double)entry.getValue()).doubleValue();
-/*     */       }
-/*     */     }
-/* 147 */     return maxValue;
-/*     */   }
-/*     */ 
-/*     */   public Iterator<HoleCards> iterator() {
-/* 151 */     return this.weights.keySet().iterator();
-/*     */   }
-/*     */ 
-/*     */   public int size() {
-/* 155 */     return this.weights.size();
-/*     */   }
-/*     */ 
-/*     */   public String toString()
-/*     */   {
-/* 160 */     Set set = this.weights.entrySet();
-/* 161 */     List list = new ArrayList(set);
-/* 162 */     Collections.sort(list, new Comparator()
-/*     */     {
-/*     */       public int compare(Map.Entry<HoleCards, Double> o1, Map.Entry<HoleCards, Double> o2) {
-/* 165 */         return Double.compare(((Double)o1.getValue()).doubleValue(), ((Double)o2.getValue()).doubleValue());
-/*     */       }
-/*     */     });
-/* 168 */     Collections.reverse(list);
-/* 169 */     StringBuilder result = new StringBuilder();
-/* 170 */     for (Map.Entry item : list) {
-/* 171 */       result.append(item.getKey());
-/* 172 */       result.append(": ");
-/* 173 */       result.append(item.getValue());
-/* 174 */       result.append("\n");
-/*     */     }
-/* 176 */     return result.toString();
-/*     */   }
-/*     */ }
+package mallorcatour.game.core;
 
-/* Location:           /home/andriipanasiuk/workspace-private/mallorcatour/lib/MallorcaResources.jar
- * Qualified Name:     mallorcatour.game.core.Spectrum
- * JD-Core Version:    0.6.2
- */
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class Spectrum implements Iterable<HoleCards>, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Map<HoleCards, Double> weights;
+
+	public Spectrum() {
+		this.weights = new HashMap<>();
+	}
+
+	public boolean isEmpty() {
+		return this.weights.isEmpty();
+	}
+
+	public static Spectrum random() {
+		Spectrum result = new Spectrum();
+		List<Card> cards = Deck.getCards();
+		for (int i = 0; i < cards.size(); i++) {
+			for (int j = i + 1; j < cards.size(); j++) {
+				result.weights.put(new HoleCards((Card) cards.get(i), (Card) cards.get(j)), Double.valueOf(1.0D));
+			}
+		}
+		return result;
+	}
+
+	public void remove(Card card) {
+		List<HoleCards> cardsForRemove = new ArrayList<HoleCards>();
+		for (HoleCards cards : this) {
+			if (cards.hasCard(card)) {
+				cardsForRemove.add(cards);
+			}
+		}
+		for (HoleCards cards : cardsForRemove)
+			remove(cards);
+	}
+
+	public void remove(Card[] cards) {
+		List<HoleCards> cardsForRemove = new ArrayList<>();
+		for (HoleCards holeCards : this) {
+			for (Card card : cards) {
+				if (holeCards.hasCard(card)) {
+					cardsForRemove.add(holeCards);
+					break;
+				}
+			}
+		}
+		for (HoleCards holeCards : cardsForRemove)
+			remove(holeCards);
+	}
+
+	public void add(HoleCards cards, double weight) {
+		if (weight != 0.0D)
+			this.weights.put(cards, Double.valueOf(weight));
+	}
+
+	public void add(HoleCards cards) {
+		this.weights.put(cards, Double.valueOf(1.0D));
+	}
+
+	public void remove(HoleCards holeCards) {
+		this.weights.remove(holeCards);
+	}
+
+	public void add(String cards) {
+		Card.Value firstRange = Card.Value.valueOf(cards.charAt(0));
+		Card.Value secondRange = Card.Value.valueOf(cards.charAt(1));
+		boolean all = cards.length() == 2;
+		if (!all) {
+			boolean suited = cards.charAt(2) == 's';
+			if (suited) {
+				for (Card.Suit suit : Card.Suit.getSuits()) {
+					this.weights.put(new HoleCards(new Card(firstRange, suit), new Card(secondRange, suit)),
+							Double.valueOf(1.0D));
+				}
+			} else
+				for (Card.Suit suit1 : Card.Suit.getSuits()) {
+					for (Card.Suit suit2 : Card.Suit.getSuits())
+						if (suit1 != suit2) {
+							this.weights.put(new HoleCards(new Card(firstRange, suit1), new Card(secondRange, suit2)),
+									Double.valueOf(1.0D));
+						}
+				}
+		} else {
+			for (Card.Suit suit1 : Card.Suit.getSuits()) {
+				for (Card.Suit suit2 : Card.Suit.getSuits())
+					if ((firstRange != secondRange) || (suit1 != suit2)) {
+						this.weights.put(new HoleCards(new Card(firstRange, suit1), new Card(secondRange, suit2)),
+								Double.valueOf(1.0D));
+					}
+			}
+		}
+	}
+
+	public double getWeight(HoleCards cards) {
+		Double result = (Double) this.weights.get(cards);
+		if (result == null) {
+			return 0.0D;
+		}
+		return result.doubleValue();
+	}
+
+	public double summaryWeight() {
+		double sum = 0.0D;
+		for (Map.Entry<HoleCards, Double> entry : this.weights.entrySet()) {
+			sum += ((Double) entry.getValue()).doubleValue();
+		}
+		return sum;
+	}
+
+	public double maxWeight() {
+		double maxValue = Double.MIN_VALUE;
+		for (Map.Entry<HoleCards, Double> entry : this.weights.entrySet()) {
+			if (maxValue < ((Double) entry.getValue()).doubleValue()) {
+				maxValue = ((Double) entry.getValue()).doubleValue();
+			}
+		}
+		return maxValue;
+	}
+
+	public Iterator<HoleCards> iterator() {
+		return this.weights.keySet().iterator();
+	}
+
+	public int size() {
+		return this.weights.size();
+	}
+
+	public String toString() {
+		Set<Map.Entry<HoleCards, Double>> set = this.weights.entrySet();
+		List<Map.Entry<HoleCards, Double>> list = new ArrayList<>(set);
+		Collections.sort(list, new Comparator<Map.Entry<HoleCards, Double>>() {
+			public int compare(Map.Entry<HoleCards, Double> o1, Map.Entry<HoleCards, Double> o2) {
+				return Double.compare(((Double) o1.getValue()).doubleValue(), ((Double) o2.getValue()).doubleValue());
+			}
+
+		});
+		Collections.reverse(list);
+		StringBuilder result = new StringBuilder();
+		for (Map.Entry<HoleCards, Double> item : list) {
+			result.append(item.getKey());
+			result.append(": ");
+			result.append(item.getValue());
+			result.append("\n");
+		}
+		return result.toString();
+	}
+
+}

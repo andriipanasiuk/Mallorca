@@ -4,8 +4,8 @@
  */
 package mallorcatour.game.situation;
 
+import mallorcatour.frames.SpectrumFrame;
 import mallorcatour.game.core.Spectrum;
-import mallorcatour.game.core.SpectrumFrame;
 
 /**
  *

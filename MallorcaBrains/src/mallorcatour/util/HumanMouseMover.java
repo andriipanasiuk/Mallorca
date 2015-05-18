@@ -1,5 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package mallorcatour.util;
@@ -104,7 +103,6 @@ public class HumanMouseMover {
             e = 0;
             a = x - cx;
             b = y - cy;
-//            c = Math.pow(a, 2) + Math.pow(b, 2);
             hypo = Math.round(hypot(a, b));
             if (hypo == 0) {
                 return;
@@ -135,7 +133,6 @@ public class HumanMouseMover {
                 WindMouse(cx, cy, nx, ny, 11.0, 8.0, 10.0 / randSpeed, 12.0 / randSpeed, 10.0 * randSpeed, 10.0 * randSpeed);
                 e = e + 1;
             } while (e != seg);
-//    GetMousePos(cx, cy);
             if (!new Rectangle(x, y, rx, ry).contains(new Point(cx, cy))) {
                 ThreadUtils.sleep(30 + randomizer.getRandom(0, 30));
                 WindMouse(cx, cy, (x + randomizer.getRandom(0, rx)),

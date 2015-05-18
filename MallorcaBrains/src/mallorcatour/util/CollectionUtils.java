@@ -1,62 +1,53 @@
-/*    */ package mallorcatour.util;
-/*    */ 
-/*    */ import java.util.ArrayList;
-/*    */ import java.util.Iterator;
-/*    */ import java.util.List;
-/*    */ import java.util.Map;
-/*    */ import java.util.Map.Entry;
-/*    */ 
-/*    */ public class CollectionUtils
-/*    */ {
-/*    */   public static <T> List<T> subtract(List<T> list1, List<T> list2)
-/*    */   {
-/* 19 */     List result = new ArrayList();
-/* 20 */     for (Iterator i$ = list1.iterator(); i$.hasNext(); ) { Object element = i$.next();
-/* 21 */       if (!list2.contains(element)) {
-/* 22 */         result.add(element);
-/*    */       }
-/*    */     }
-/* 25 */     return result;
-/*    */   }
-/*    */ 
-/*    */   public static <T> List<T> subtract(List<T> list1, T[] list2) {
-/* 29 */     List result = new ArrayList();
-/* 30 */     for (Iterator i$ = list1.iterator(); i$.hasNext(); ) { Object element = i$.next();
-/* 31 */       if (!ArrayUtils.containsElement(list2, element)) {
-/* 32 */         result.add(element);
-/*    */       }
-/*    */     }
-/* 35 */     return result;
-/*    */   }
-/*    */ 
-/*    */   public static <T> List<T> subtract(List<T> list1, T removeElement) {
-/* 39 */     List result = new ArrayList();
-/* 40 */     for (Iterator i$ = list1.iterator(); i$.hasNext(); ) { Object element = i$.next();
-/* 41 */       if (!element.equals(removeElement)) {
-/* 42 */         result.add(element);
-/*    */       }
-/*    */     }
-/* 45 */     return result;
-/*    */   }
-/*    */ 
-/*    */   public static <T> void removeAll(List<T> list, T element) {
-/* 49 */     while (list.contains(element))
-/* 50 */       list.remove(element);
-/*    */   }
-/*    */ 
-/*    */   public static <T> double maxValue(Map<T, Double> map)
-/*    */   {
-/* 55 */     double result = -1.797693134862316E+308D;
-/* 56 */     for (Map.Entry entry : map.entrySet()) {
-/* 57 */       if (((Double)entry.getValue()).doubleValue() > result) {
-/* 58 */         result = ((Double)entry.getValue()).doubleValue();
-/*    */       }
-/*    */     }
-/* 61 */     return result;
-/*    */   }
-/*    */ }
+package mallorcatour.util;
 
-/* Location:           /home/andriipanasiuk/workspace-private/mallorcatour/lib/Utils.jar
- * Qualified Name:     mallorcatour.util.CollectionUtils
- * JD-Core Version:    0.6.2
- */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class CollectionUtils {
+
+	public static <T> List<T> subtract(List<T> list1, List<T> list2) {
+		List<T> result = new ArrayList<>();
+		for (T element : list1) {
+			if (!list2.contains(element)) {
+				result.add(element);
+			}
+		}
+		return result;
+	}
+
+	public static <T> List<T> subtract(List<T> list1, T[] list2) {
+		List<T> result = new ArrayList<>();
+		for (T element : list1) {
+			if (!ArrayUtils.containsElement(list2, element)) {
+				result.add(element);
+			}
+		}
+		return result;
+	}
+
+	public static <T> List<T> subtract(List<T> list1, T removeElement) {
+		List<T> result = new ArrayList<>();
+		for (T element : list1) {
+			if (!element.equals(removeElement)) {
+				result.add(element);
+			}
+		}
+		return result;
+	}
+
+	public static <T> void removeAll(List<T> list, T element) {
+		while (list.contains(element))
+			list.remove(element);
+	}
+
+	public static <T> double maxValue(Map<T, Double> map) {
+		double result = Double.MIN_VALUE;
+		for (Map.Entry<T, Double> entry : map.entrySet()) {
+			if (((Double) entry.getValue()).doubleValue() > result) {
+				result = ((Double) entry.getValue()).doubleValue();
+			}
+		}
+		return result;
+	}
+}

@@ -50,9 +50,8 @@ public class NLPreflopChart implements IPreflopChart {
         vsRaiseChart = new VsRaiseMinPotChart();
     }
 
-    public Action getAction(LocalSituation situation, HoleCards cards) {
-        if (situation.isHeroOnButton() && situation.getHeroAggresionFrequency() == 0
-                && situation.getVillainAggresionFrequency() == 0) {
+	public Action getAction(LocalSituation situation, HoleCards cards) {
+		if (situation.isHeroOnButton() && situation.getHeroActionCount() == 0 && situation.getVillainActionCount() == 0) {
             double bbsInES = convertPotToStackOddsToBBInEffectiveStack(situation.getPotToStackOdds());
             if (bbsInES > minBBsInESForPushFold) {
                 return uoMinPotChart.getAdvice(cards).getAction();
@@ -60,8 +59,9 @@ public class NLPreflopChart implements IPreflopChart {
                 return pushFoldChart.getAction(cards, bbsInES);
             }
         } else if (!situation.isHeroOnButton()
-                && situation.getHeroAggresionFrequency() == 0
-                && situation.getVillainAggresionFrequency() == 1
+                && situation.getHeroActionCount() == 0
+                && situation.getVillainActionCount() == 1
+                && situation.getVillainAggresionActionCount() == 1
                 && !situation.wasHeroPreviousAggresive()
                 && situation.wasVillainPreviousAggresive()
                 && situation.getPotToStackOdds() < 0.4

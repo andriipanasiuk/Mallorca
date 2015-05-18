@@ -1,19 +1,11 @@
-/*    */ package mallorcatour.util;
-/*    */ 
-/*    */ public class ThreadUtils
-/*    */ {
-/*    */   public static void sleep(long millis)
-/*    */   {
-/*    */     try
-/*    */     {
-/* 15 */       Thread.sleep(millis);
-/*    */     } catch (InterruptedException ex) {
-/* 17 */       throw new RuntimeException(ex);
-/*    */     }
-/*    */   }
-/*    */ }
+package mallorcatour.util;
 
-/* Location:           /home/andriipanasiuk/workspace-private/mallorcatour/lib/Utils.jar
- * Qualified Name:     mallorcatour.util.ThreadUtils
- * JD-Core Version:    0.6.2
- */
+public class ThreadUtils {
+	public static void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+}
