@@ -204,9 +204,4 @@ public class EquilatorPreflop {
 		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
 	}
 
-	public static void main(String... args) {
-		double strength = strengthVsRandom(Card.valueOf("As"), Card.valueOf("Ah"));
-		Log.d("Strength: " + strength);
-	}
-
 }

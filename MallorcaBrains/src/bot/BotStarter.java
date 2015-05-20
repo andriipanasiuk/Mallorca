@@ -22,6 +22,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
+import mallorcatour.util.Log;
 
 /**
  * This class is the brains of your bot. Make your calculations here and return
@@ -82,6 +83,7 @@ public class BotStarter implements Bot {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Log.WRITE_TO_ERR = true;
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					BotStarter.class.getResourceAsStream("test.txt")));

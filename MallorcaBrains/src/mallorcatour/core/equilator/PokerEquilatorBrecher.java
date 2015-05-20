@@ -13,7 +13,7 @@ import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.ArrayUtils;
 import mallorcatour.util.Log;
 
-import com.stevebrecher.poker.HandEval;
+import com.stevebrecher.HandEval;
 
 /**
  *
@@ -639,37 +639,4 @@ public class PokerEquilatorBrecher {
 		return result;
 	}
 
-	public static void main(String[] args) {
-		// for (Value value1 : Value.getValues()) {
-		// for (Value value2 : Value.getValues()) {
-		// if (value1.intValue() < value2.intValue()) {
-		// continue;
-		// }
-		// Card c1 = new Card(value1, Suit.CLUBS);
-		// Card c2 = new Card(value2, Suit.DIAMONDS);
-		// Log.d(new HoleCards(c1, c2).hashCodeForValues() + "");
-		// }
-		// }
-		// double stre = calculateStrength(Card.valueOf("As"),
-		// Card.valueOf("Kd"),
-		// Card.valueOf("Jc"), Card.valueOf("Jh"));
-		// Log.d("Preflop strength: " + stre);
-		// generatePreflopTableStrength();
-		Spectrum spectrum = Spectrum.random();
-		Card c1 = Card.valueOf("4s");
-		Card c2 = Card.valueOf("5d");
-		Card f1 = Card.valueOf("Ah");
-		Card f2 = Card.valueOf("6d");
-		Card f3 = Card.valueOf("7d");
-		spectrum.remove(c1);
-		spectrum.remove(c2);
-		long time = System.currentTimeMillis();
-		int[] cards = new int[] { 2, 3, 4, 5, 6, 7, 8 };
-		for (int i = 0; i < 170 * 50 * 50 * 2 * 170; i++) {
-			combination(cards);
-		}
-		Log.d("Time: " + (System.currentTimeMillis() - time));
-		Log.d(strengthOnFlop(c1, c2, f1, f2, f3) + "");
-
-	}
 }

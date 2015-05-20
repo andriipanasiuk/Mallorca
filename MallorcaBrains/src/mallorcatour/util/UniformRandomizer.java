@@ -51,10 +51,4 @@ public class UniformRandomizer implements IRandomizer {
         return result;
     }
 
-    public static void main(String[] args) {
-        IRandomizer randomizer = new UniformRandomizer();
-        for (int i = 0; i < 1000; i++) {
-            Log.d("" + randomizer.getGaussRandom(200, 300));
-        }
-    }
 }

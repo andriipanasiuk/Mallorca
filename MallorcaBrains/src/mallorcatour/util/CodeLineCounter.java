@@ -38,7 +38,7 @@ public class CodeLineCounter {
         return result;
     }
 
-    private static void deleteTempDirectory() {
+    public static void deleteTempDirectory() {
         File dir = new File("temp");
         int count = dir.listFiles().length;
         for (File file : dir.listFiles()) {
@@ -51,7 +51,4 @@ public class CodeLineCounter {
         Log.d("Lines of code: " + calculateCodeLines("C:\\Users\\Andrew\\Documents\\NetBeansProjects\\Utils"));
     }
 
-    public static void main(String[] args) {
-        deleteTempDirectory();
-    }
 }

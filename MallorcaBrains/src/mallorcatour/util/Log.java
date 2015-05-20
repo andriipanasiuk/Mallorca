@@ -1,9 +1,14 @@
 package mallorcatour.util;
 
-
 public class Log {
+	public static boolean WRITE_TO_ERR = false;
+
 	public static void d(String log) {
-		System.out.println(log);
+		if (WRITE_TO_ERR) {
+			System.err.println(log);
+		} else {
+			System.out.println(log);
+		}
 	}
 
 	public static void f(String path, String log) {
