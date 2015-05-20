@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.core.equilator;
+package mallorcatour.core.equilator.spears;
 
 import pokerai.game.eval.spears2p2.StateTableEvaluator;
 

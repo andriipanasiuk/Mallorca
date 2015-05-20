@@ -4,8 +4,8 @@
  */
 package mallorcatour.core.game.situation;
 
-import mallorcatour.core.game.IGameObserver;
-import mallorcatour.core.game.IHeroObserver;
+import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.game.interfaces.IHeroObserver;
 
 /**
  *

@@ -1,8 +1,7 @@
-package mallorcatour.bot.modeller;
+package mallorcatour.bot.math;
 
 import java.util.Map;
 
-import mallorcatour.bot.math.StrengthManager;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.interfaces.IGameInfo;

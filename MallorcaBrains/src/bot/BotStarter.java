@@ -35,7 +35,7 @@ public class BotStarter implements Bot {
 		Card[] table = state.getTable();
 		double strength;
 		if (table.length == 0) {
-			strength = EquilatorPreflop.strengthByFormula(cards.first, cards.second);
+			strength = EquilatorPreflop.strengthVsRandom(cards.first, cards.second);
 		} else {
 			strength = PokerEquilatorBrecher.strengthVsRandom(cards.first, cards.second, table);
 		}

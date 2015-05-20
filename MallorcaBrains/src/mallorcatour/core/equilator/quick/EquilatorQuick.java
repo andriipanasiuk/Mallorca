@@ -137,12 +137,7 @@ public class EquilatorQuick {
 			PokerEquilatorBrecher.combination(array);
 		}
 		Log.d("Time of combination calculation: " + (System.currentTimeMillis() - start) + " ms");
-		start = System.currentTimeMillis();
-		int j;
-		for (long i = 0; i < 1100L * 2*1100 * 50 * 50; i++) {
-			j = combinations.sevenCards[2][3][7][34];
-		}
-		Log.d("Time of combinations.get: " + (System.currentTimeMillis() - start) + " ms");
+		testArrayGet(combinations);
 		start = System.currentTimeMillis();
 		for (int i = 0; i < 1000; i++)
 			equityVsRandomFullPotential(heroCard1, heroCard2, flop1, flop2, flop3, combinations);
@@ -152,5 +147,16 @@ public class EquilatorQuick {
 			PokerEquilatorBrecher.equityVsRandomFullPotential(Card.valueOf(heroCard1), Card.valueOf(heroCard2),
 					new Card[] { Card.valueOf(flop1), Card.valueOf(flop2), Card.valueOf(flop3) });
 		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
+	}
+
+	private static void testArrayGet(FlopCombinations combinations) {
+		long start;
+		start = System.currentTimeMillis();
+		@SuppressWarnings("unused")
+		int j;
+		for (long i = 0; i < 1100L * 2*1100 * 50 * 50; i++) {
+			j = combinations.sevenCards[2][3][7][34];
+		}
+		Log.d("Time of combinations.get: " + (System.currentTimeMillis() - start) + " ms");
 	}
 }

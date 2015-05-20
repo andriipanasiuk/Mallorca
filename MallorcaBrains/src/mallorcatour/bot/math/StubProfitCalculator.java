@@ -3,7 +3,6 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 import java.util.Map;
 
-import mallorcatour.bot.modeller.IProfitCalculator;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.interfaces.IGameInfo;

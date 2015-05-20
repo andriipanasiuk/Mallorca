@@ -14,7 +14,6 @@ import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.math.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
-import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -28,15 +27,18 @@ import mallorcatour.util.DoubleUtils;
 import mallorcatour.util.Log;
 
 /**
- *
+ * Class for observing villain spectrum during the certain hand
+ * 
  * @author Andrew
  */
 public class SpectrumSituationHandler extends SituationHandler {
 
-    protected Spectrum villainSpectrum;
-    private final IPokerNN villainModellingNN;
-    private final boolean modelPreflop, modelPostflop;
-    protected int raisesOnStreet = 0;
+	protected Spectrum villainSpectrum;
+	private final IPokerNN villainModellingNN;
+	private final boolean modelPreflop, modelPostflop;
+    //TODO use for FL
+    @SuppressWarnings("unused")
+	private int raisesOnStreet = 0;
     private final ISpectrumListener villainSpectrumListener;
     private final IDecisionListener villainDecisionListener;
     private final StrengthManager strengthManager;
@@ -71,7 +73,6 @@ public class SpectrumSituationHandler extends SituationHandler {
             villainSpectrum.remove(holeCard2);
             randomVillainSpectrum.remove(holeCard1);
             randomVillainSpectrum.remove(holeCard2);
-
         }
     }
 
@@ -89,22 +90,17 @@ public class SpectrumSituationHandler extends SituationHandler {
         double bankrollAtRisk = gameInfo.getBankRollAtRisk();
         double potOdds = toCall / (toCall + pot);
 
-        if (gameInfo.isPreFlop()) {
-            result = new LocalSituation(LocalSituation.PREFLOP, limitType);
-        } else if (gameInfo.isFlop()) {
-            //equities
-            result = new LocalSituation(LocalSituation.FLOP, limitType);
-            result.setPositivePotential(LocalSituation.DEFAULT_POTENTIAL);
-            result.setNegativePotential(LocalSituation.DEFAULT_POTENTIAL);
-        } else if (gameInfo.isTurn()) {
-            //equities
-            result = new LocalSituation(LocalSituation.TURN, limitType);
-            result.setPositivePotential(LocalSituation.DEFAULT_POTENTIAL);
-            result.setNegativePotential(LocalSituation.DEFAULT_POTENTIAL);
-        } else if (gameInfo.isRiver()) {
-            //equities
-            result = new LocalSituation(LocalSituation.RIVER, limitType);
-        }
+		if (gameInfo.isPreFlop()) {
+			result = new LocalSituation(LocalSituation.PREFLOP, limitType);
+		} else if (gameInfo.isFlop()) {
+			result = new LocalSituation(LocalSituation.FLOP, limitType);
+		} else if (gameInfo.isTurn()) {
+			result = new LocalSituation(LocalSituation.TURN, limitType);
+		} else if (gameInfo.isRiver()) {
+			result = new LocalSituation(LocalSituation.RIVER, limitType);
+		}
+		result.setPositivePotential(LocalSituation.DEFAULT_POTENTIAL);
+		result.setNegativePotential(LocalSituation.DEFAULT_POTENTIAL);
         result.setVillainAggresionActionCount(countOfHeroAggressive);
         result.setVillainActionCount(heroActionCount);
         result.setHeroAggresionActionCount(countOfOppAggressive);
@@ -155,40 +151,36 @@ public class SpectrumSituationHandler extends SituationHandler {
         Log.f(DEBUG_PATH, "Villain situation: " + situation.toString());
     }
 
-	@SuppressWarnings("deprecation")
 	private Map<HoleCards, Advice> calculateVillainAdvices(LocalSituation villainSituation, Action villainAction) {
         Map<HoleCards, Advice> villainAdvices = new HashMap<HoleCards, Advice>();
         Log.f(DEBUG_PATH, "---------------------");
         logVillainSituation(villainSituation, villainAction);
         for (HoleCards villainCards : villainSpectrum) {
 			double strength = 0;
-			// TODO add potentials on preflop and river
+			StreetEquity equity;
 			if (gameInfo.isPreFlop()) {
-				strength = EquilatorPreflop.strengthByFormula(villainCards.first, villainCards.second);
+				equity = strengthManager.preflop.get(villainCards);
             } else if (gameInfo.isFlop()) {
                 if (flop1 == null || flop2 == null || flop3 == null) {
                     throw new NullPointerException();
                 }
-                StreetEquity eq = strengthManager.flop.get(villainCards);
-                strength = eq.strength;
-                villainSituation.setPositivePotential(eq.positivePotential);
-                villainSituation.setNegativePotential(eq.negativePotential);
+                equity = strengthManager.flop.get(villainCards);
             } else if (gameInfo.isTurn()) {
                 if (turn == null) {
                     throw new NullPointerException();
                 }
-                StreetEquity eq = strengthManager.turn.get(villainCards);
-                strength = eq.strength;
-                villainSituation.setPositivePotential(eq.positivePotential);
-                villainSituation.setNegativePotential(eq.negativePotential);
+                equity = strengthManager.turn.get(villainCards);
             } else if (gameInfo.isRiver()) {
                 if (turn == null || river == null) {
                     throw new NullPointerException();
                 }
-                StreetEquity eq = strengthManager.river.get(villainCards);
-                strength = eq.strength;
-            }
+                equity = strengthManager.river.get(villainCards);
+			} else {
+				throw new IllegalStateException("Wrong street: " + gameInfo.getStage());
+			}
             villainSituation.setStrength(strength);
+            villainSituation.setPositivePotential(equity.positivePotential);
+            villainSituation.setNegativePotential(equity.negativePotential);
             Advice advice = null;
             if (villainSituation.getStreet() == LocalSituation.PREFLOP) {
                 advice = villainModellingNN.getAdvice(villainSituation, villainCards);
@@ -224,8 +216,6 @@ public class SpectrumSituationHandler extends SituationHandler {
         }
         super.onHeroActed(action);
     }
-
-    
 
     private void modifyVillainSpectrum(LocalSituation villainSituation,
             Action villainAction) {

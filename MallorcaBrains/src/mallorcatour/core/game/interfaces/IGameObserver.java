@@ -1,6 +1,8 @@
-package mallorcatour.core.game;
+package mallorcatour.core.game.interfaces;
 
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.Action;
+import mallorcatour.core.game.Card;
+import mallorcatour.core.game.PokerStreet;
 
 public interface IGameObserver {
 

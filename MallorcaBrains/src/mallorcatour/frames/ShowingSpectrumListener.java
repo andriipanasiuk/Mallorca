@@ -2,11 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.core.game.situation;
+package mallorcatour.frames;
 
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.frames.SpectrumFrame;
 
 /**
  *

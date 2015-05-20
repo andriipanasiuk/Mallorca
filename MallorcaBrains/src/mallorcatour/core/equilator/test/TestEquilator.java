@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Random;
 
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
-import mallorcatour.core.equilator.PokerEquilatorSpears;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.quick.EquilatorQuick;
 import mallorcatour.core.equilator.quick.FlopCombinations;
+import mallorcatour.core.equilator.spears.PokerEquilatorSpears;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.spectrum.Spectrum;

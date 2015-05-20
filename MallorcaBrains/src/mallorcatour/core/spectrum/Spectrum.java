@@ -13,8 +13,6 @@ import java.util.Set;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
-import mallorcatour.core.game.Card.Suit;
-import mallorcatour.core.game.Card.Value;
 
 public class Spectrum implements Iterable<HoleCards>, Serializable {
 	/**

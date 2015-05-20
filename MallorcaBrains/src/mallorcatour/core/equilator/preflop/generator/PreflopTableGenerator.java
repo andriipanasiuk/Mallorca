@@ -1,6 +1,6 @@
 package mallorcatour.core.equilator.preflop.generator;
 
-import mallorcatour.core.equilator.PokerEquilatorSpears;
+import mallorcatour.core.equilator.spears.PokerEquilatorSpears;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.Card.Suit;

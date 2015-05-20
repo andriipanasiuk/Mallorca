@@ -6,7 +6,6 @@ package mallorcatour.hhparser.core;
 
 import java.util.Date;
 
-import mallorcatour.core.game.interfaces.IHandHandler;
 
 /**
  *

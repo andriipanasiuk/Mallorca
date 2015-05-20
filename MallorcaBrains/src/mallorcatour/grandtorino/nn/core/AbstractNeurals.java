@@ -2,7 +2,7 @@ package mallorcatour.grandtorino.nn.core;
 
 import java.io.InputStream;
 
-import mallorcatour.core.game.IPokerStats;
+import mallorcatour.core.game.interfaces.IPokerStats;
 
 import org.neuroph.core.NeuralNetwork;
 

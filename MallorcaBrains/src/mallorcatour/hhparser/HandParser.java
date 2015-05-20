@@ -7,6 +7,7 @@ package mallorcatour.hhparser;
 import java.util.ArrayList;
 
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.BaseGameInfo;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.Hand;
@@ -14,7 +15,6 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PlayerAction;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.BaseGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.hhparser.core.HandManager;

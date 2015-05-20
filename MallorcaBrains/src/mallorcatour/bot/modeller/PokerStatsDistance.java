@@ -4,7 +4,7 @@
  */
 package mallorcatour.bot.modeller;
 
-import mallorcatour.core.game.IPokerStats;
+import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.interfaces.IDistanceCalculator;
 
 /**

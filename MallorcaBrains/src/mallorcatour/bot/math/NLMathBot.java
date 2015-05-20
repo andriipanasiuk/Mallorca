@@ -9,7 +9,6 @@ import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.modeller.BasePokerNN;
 import mallorcatour.bot.modeller.BaseVillainModeller;
-import mallorcatour.bot.modeller.IProfitCalculator;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;

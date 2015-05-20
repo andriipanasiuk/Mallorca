@@ -1,4 +1,4 @@
-package mallorcatour.core.game;
+package mallorcatour.core.game.interfaces;
 
 public interface IPokerStats {
 	public double getAggressionFactor();

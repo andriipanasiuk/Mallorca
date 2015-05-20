@@ -12,7 +12,6 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PlayerInfo;
-import mallorcatour.core.game.interfaces.IHandHandler;
 
 /**
  *

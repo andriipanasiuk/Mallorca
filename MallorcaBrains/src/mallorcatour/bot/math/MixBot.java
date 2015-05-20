@@ -8,8 +8,6 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
-import mallorcatour.bot.modeller.IProfitCalculator;
-import mallorcatour.bot.modeller.NLProfitCalculator;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -59,6 +57,7 @@ public class MixBot implements IPlayer {
      * @param c2 your second hole card
      * @param seat your seat number at the table
      */
+    @Override
     public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
         situationHandler.onHoleCards(c1, c2, heroName, villainName);
         this.heroCard1 = c1;
@@ -71,6 +70,7 @@ public class MixBot implements IPlayer {
      * Requests an Action from the player
      * Called when it is the Player's turn to act.
      */
+    @Override
     public Action getAction() {
         Advice advice;
         Action action = null;
@@ -105,6 +105,7 @@ public class MixBot implements IPlayer {
     /**
      * A new betting round has started.
      */
+    @Override
     public void onStageEvent(PokerStreet street) {
     	strengthManager.onStageEvent(street);
         situationHandler.onStageEvent(street);
@@ -124,6 +125,7 @@ public class MixBot implements IPlayer {
     /**
      * An villain action has been observed.
      */
+    @Override
     public void onVillainActed(Action action, double toCall) {
     	strengthManager.onVillainActed(action, toCall);
         situationHandler.onVillainActed(action, toCall);

@@ -28,7 +28,6 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.situation.ShowingSpectrumListener;
 import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.robot.PlayerInfo;

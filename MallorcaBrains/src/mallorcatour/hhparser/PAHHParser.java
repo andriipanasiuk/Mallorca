@@ -14,7 +14,7 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PlayerInfo;
-import mallorcatour.core.game.interfaces.IHandHandler;
+import mallorcatour.hhparser.core.IHandHandler;
 import mallorcatour.hhparser.core.ITournamentHandler;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.ReaderUtils;

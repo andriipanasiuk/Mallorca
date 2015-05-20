@@ -5,7 +5,7 @@
 package mallorcatour.bot.interfaces;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.IGameObserver;
+import mallorcatour.core.game.interfaces.IGameObserver;
 
 /**
  *

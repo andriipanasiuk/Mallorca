@@ -9,10 +9,10 @@ import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
-import mallorcatour.core.game.IGameObserver;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IGameObserver;
 
 /**
  *
