@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.bot.interfaces.IVillainModeller;
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
-import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;

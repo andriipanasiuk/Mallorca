@@ -7,9 +7,9 @@ package mallorcatour.hhparser.core;
 
 import java.util.List;
 
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
-import mallorcatour.core.equilator.brecher.EquilatorPreflop;
-import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.PlayerAction;
 import mallorcatour.core.game.PlayerInfo;
@@ -25,8 +25,7 @@ public class HandManager {
 
     public static double getPreflopStrength(Hand hand, String player) {
         PlayerInfo playerInfo = hand.getPlayerInfo(player);
-        return EquilatorPreflop.strengthByFormula(playerInfo.getHoleCards().first,
-                playerInfo.getHoleCards().second);
+		return EquilatorPreflop.strengthVsRandom(playerInfo.getHoleCards().first, playerInfo.getHoleCards().second);
     }
 
     public static StreetEquity getFlopEquity(Hand hand, String player) {
@@ -53,7 +52,7 @@ public class HandManager {
 
     public static double preflopEquity(Hand hand, String player) {
         PlayerInfo playerInfo = hand.getPlayerInfo(player);
-        return EquilatorPreflop.strengthByFormula(playerInfo.getHoleCards().first,
+        return EquilatorPreflop.strengthVsRandom(playerInfo.getHoleCards().first,
                 playerInfo.getHoleCards().second);
     }
 

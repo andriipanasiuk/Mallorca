@@ -9,7 +9,7 @@ import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
 import mallorcatour.bot.modeller.FLSpectrumSituationHandler;
-import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;

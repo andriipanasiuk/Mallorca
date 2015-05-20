@@ -1,8 +1,10 @@
-package mallorcatour.core.equilator.brecher;
+package mallorcatour.core.equilator.quick;
 
-import static mallorcatour.core.equilator.brecher.PokerEquilatorBrecher.LOGGING;
-import static mallorcatour.core.equilator.brecher.PokerEquilatorBrecher.encode;
+import static mallorcatour.core.equilator.PokerEquilatorBrecher.LOGGING;
+import static mallorcatour.core.equilator.PokerEquilatorBrecher.encode;
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
+import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.util.Log;
 
@@ -136,12 +138,39 @@ public class EquilatorQuick {
 		int flop2 = 23;
 		int flop3 = 25;
 
-		PokerEquilatorBrecher.LOGGING = true;
+		PokerEquilatorBrecher.LOGGING = false;
 		FlopCombinations combinations = new FlopCombinations(flop1, flop2, flop3);
 		combinations.init();
 		long start = System.currentTimeMillis();
+		long key=encode(2, 3, 7, 34);
+		for (int i = 0; i < 10*1100 * 50 * 50; i++) {
+			combinations.sevenCards.get(key);
+		}
+		Log.d("Time map.get: " + (System.currentTimeMillis() - start) + " ms");
+		int[][][][] combArray = new int[52][52][52][52];
+		start = System.currentTimeMillis();
+		for (int i = 0; i < 10*1100 * 50 * 50; i++) {
+			int a = combArray[2][3][7][34];
+		}
+		Log.d("Time array get: " + (System.currentTimeMillis() - start) + " ms");
+		start = System.currentTimeMillis();
+		int[] array = new int[]{2,3,7,34,flop1, flop2, flop3};
+		for (long i = 0; i < 1100 * 50 * 50; i++) {
+			PokerEquilatorBrecher.combination(array);
+		}
+		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
+		start = System.currentTimeMillis();
+//		for (int i = 0; i < 10; i++)
+//			equityVsRandomFullPotential(heroCard1, heroCard2, flop1, flop2, flop3, combinations);
+//		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
+		start = System.currentTimeMillis();
 		for (int i = 0; i < 10; i++)
-			equityVsRandomFullPotential(heroCard1, heroCard2, flop1, flop2, flop3, combinations);
+			PokerEquilatorBrecher.equityVsRandomFullPotential(Card.valueOf(heroCard1), 
+					Card.valueOf(heroCard2),
+					new Card[]{
+					Card.valueOf(flop1), 
+					Card.valueOf(flop2), 
+					Card.valueOf(flop3)});
 		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
 	}
 }

@@ -4,8 +4,8 @@
  */
 package mallorcatour.core.game.situation;
 
-import mallorcatour.core.equilator.brecher.EquilatorPreflop;
-import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;

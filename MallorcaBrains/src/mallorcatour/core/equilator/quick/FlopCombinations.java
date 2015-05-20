@@ -1,7 +1,7 @@
-package mallorcatour.core.equilator.brecher;
+package mallorcatour.core.equilator.quick;
 
-import static mallorcatour.core.equilator.brecher.PokerEquilatorBrecher.combination;
-import static mallorcatour.core.equilator.brecher.PokerEquilatorBrecher.encode;
+import static mallorcatour.core.equilator.PokerEquilatorBrecher.combination;
+import static mallorcatour.core.equilator.PokerEquilatorBrecher.encode;
 
 import java.util.HashMap;
 import java.util.Map;

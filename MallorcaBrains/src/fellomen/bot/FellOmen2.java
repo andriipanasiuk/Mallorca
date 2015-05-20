@@ -18,8 +18,8 @@ import java.util.*;
 
 import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
-import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;

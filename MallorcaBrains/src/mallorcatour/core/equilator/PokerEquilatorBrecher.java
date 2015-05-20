@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.core.equilator.brecher;
+package mallorcatour.core.equilator;
 
-import mallorcatour.core.equilator.StreetEquity;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.Flop;
@@ -398,7 +398,7 @@ public class PokerEquilatorBrecher {
 		return result;
 	}
 
-	private static StreetEquity equityVsRandomFullPotential(Card heroCard1,
+	public static StreetEquity equityVsRandomFullPotential(Card heroCard1,
 			Card heroCard2, Card[] boardCards) {
 		boolean positive = false, drawBoolean;
 		int boardSize = boardCards.length;

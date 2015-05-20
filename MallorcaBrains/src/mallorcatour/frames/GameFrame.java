@@ -20,7 +20,7 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.math.NLMathBot;
 import mallorcatour.bot.villainobserver.VillainStatistics;
-import mallorcatour.core.equilator.brecher.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
