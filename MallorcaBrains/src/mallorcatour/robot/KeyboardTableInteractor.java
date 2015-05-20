@@ -13,9 +13,9 @@ import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.util.Log;
-import mallorcatour.util.RobotUtils;
 import mallorcatour.util.ThreadUtils;
 import mallorcatour.util.UniformRandomizer;
+import mallorcatour.util.robot.RobotUtils;
 import mallorcatour.util.spline.SplineMouseMover;
 
 /**

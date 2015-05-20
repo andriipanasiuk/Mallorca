@@ -8,8 +8,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import mallorcatour.util.ImageUtils;
 import mallorcatour.util.ReaderUtils;
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

@@ -11,7 +11,7 @@ import java.util.Map;
 
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
-import mallorcatour.util.ImageUtils;
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

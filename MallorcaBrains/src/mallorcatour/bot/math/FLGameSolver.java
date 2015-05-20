@@ -7,6 +7,7 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.interfaces.IGameSolver;
 import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
@@ -30,7 +31,8 @@ import org.neuroph.core.NeuralNetwork;
  *
  * @author Andrew
  */
-public class FLGameSolver {
+//TODO add real implementation of IGameSolver methods
+public class FLGameSolver implements IGameSolver {
 
     private final static double NEARLY_ZERO = 0.0001;
     private final static double TURN_POT_COEFF = 4.91;
@@ -465,4 +467,75 @@ public class FLGameSolver {
         c = nn.getLayerAt(2).getNeuronsCount();
         Log.d("Count: " + c);
     }
+
+	@Override
+	public Map<Action, Double> onSecondActionPreflop(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
+			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Action, Double> onSecondActionFlop(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
+			Flop flop, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton,
+			double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Action, Double> onSecondActionTurn(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
+			Flop flop, Card turn, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
+			boolean isHeroOnButton, double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Action, Double> onSecondActionRiver(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
+			Flop flop, Card turn, Card river, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
+			boolean isHeroOnButton, double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Action, Double> onFirstActionPreFlop(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum,
+			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive,
+			boolean isHeroOnButton, double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Action, Double> onFirstActionFlop(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
+			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive,
+			boolean isHeroOnButton, double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Action, Double> onFirstActionTurn(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
+			Card turn, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
+			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Action, Double> onFirstActionRiver(int heroActions, int heroAggressiveActions, int villainActions,
+			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
+			Card turn, Card river, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
+			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

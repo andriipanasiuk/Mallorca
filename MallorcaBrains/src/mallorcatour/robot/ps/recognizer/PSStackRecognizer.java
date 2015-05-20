@@ -11,8 +11,8 @@ import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.recognizer.core.AbstractNumberRecognizer;
 import mallorcatour.robot.recognizer.assets.IDigitAssets;
 import mallorcatour.robot.recognizer.assets.ITableAssets;
-import mallorcatour.util.IImageProcessor;
-import mallorcatour.util.ImageUtils;
+import mallorcatour.util.robot.IImageProcessor;
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

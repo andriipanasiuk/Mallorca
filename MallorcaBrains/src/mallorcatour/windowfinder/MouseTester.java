@@ -18,8 +18,8 @@ import mallorcatour.util.ExecutorUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
 import mallorcatour.util.ReaderUtils;
-import mallorcatour.util.RobotUtils;
 import mallorcatour.util.ThreadUtils;
+import mallorcatour.util.robot.RobotUtils;
 import mallorcatour.util.spline.SplineMouseMover;
 
 /**

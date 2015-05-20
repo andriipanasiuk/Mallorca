@@ -16,8 +16,8 @@ import mallorcatour.core.game.Deck;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.robot.recognizer.assets.ICardAssets;
 import mallorcatour.util.DateUtils;
-import mallorcatour.util.ImageUtils;
 import mallorcatour.util.Log;
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

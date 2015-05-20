@@ -33,8 +33,8 @@ import mallorcatour.util.ExecutorUtils;
 import mallorcatour.util.IRectangleHolder;
 import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
-import mallorcatour.util.RecognizerUtils;
 import mallorcatour.util.ThreadUtils;
+import mallorcatour.util.robot.RecognizerUtils;
 
 /**
  *

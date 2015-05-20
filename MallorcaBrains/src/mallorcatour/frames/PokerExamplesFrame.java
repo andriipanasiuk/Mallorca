@@ -24,7 +24,6 @@ import mallorcatour.core.game.situation.LocalSituationDistance;
 import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.EuclidDistanceMod;
 import mallorcatour.core.vector.VectorUtils;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.neuronetworkwrapper.LEManager;
 import mallorcatour.neuronetworkwrapper.PokerExamples;
@@ -34,6 +33,7 @@ import mallorcatour.util.MyFileWriter;
 import mallorcatour.util.SerializatorUtils;
 import mallorcatour.util.StringUtils;
 import mallorcatour.util.UniformRandomizer;
+import mallorcatour.util.frames.FrameUtils;
 
 /**
  *

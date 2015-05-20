@@ -5,7 +5,8 @@
 package mallorcatour.robot.recognizer.assets;
 
 import java.awt.image.BufferedImage;
-import mallorcatour.util.ImageUtils;
+
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

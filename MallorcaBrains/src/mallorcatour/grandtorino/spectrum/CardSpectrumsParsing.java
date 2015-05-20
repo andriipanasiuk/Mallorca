@@ -14,9 +14,9 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.Card.Suit;
 import mallorcatour.core.game.Card.Value;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.ImageUtils;
 import mallorcatour.util.Log;
-import mallorcatour.util.RecognizerUtils;
+import mallorcatour.util.robot.ImageUtils;
+import mallorcatour.util.robot.RecognizerUtils;
 
 /**
  * Класс для вычисления спектра из окна Poker Academy

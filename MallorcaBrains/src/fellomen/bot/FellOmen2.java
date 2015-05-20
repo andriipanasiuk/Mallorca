@@ -256,7 +256,8 @@ public class FellOmen2 implements IPlayer {
         }
     }
 
-    public void onHandStarted(IGameInfo gameInfo, long handNumber) {
+    @Override
+    public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;
     }
 
@@ -402,4 +403,9 @@ public class FellOmen2 implements IPlayer {
     public static void main(String[] arf) {
         new FellOmen2("debug.txt").testActionTableParsing();
     }
+
+	@Override
+	public void onHandEnded() {
+		//do nothing
+	}
 }

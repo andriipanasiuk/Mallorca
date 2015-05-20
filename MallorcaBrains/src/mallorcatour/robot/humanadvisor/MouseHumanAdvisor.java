@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.frames.HumanActionFrame;
-import mallorcatour.util.RobotUtils;
+import mallorcatour.util.robot.RobotUtils;
 import mallorcatour.util.spline.SplineMouseMover;
 
 /**

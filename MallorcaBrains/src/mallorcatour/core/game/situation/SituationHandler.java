@@ -9,6 +9,7 @@ import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.IGameObserver;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
@@ -17,7 +18,7 @@ import mallorcatour.core.game.interfaces.IGameInfo;
  *
  * @author Andrew
  */
-public class SituationHandler implements ISituationHandler {
+public class SituationHandler implements ISituationHandler, IGameObserver {
 
     protected IGameInfo gameInfo;  // general game information
     protected Card holeCard1, holeCard2, flop1, flop2, flop3, turn, river;
@@ -32,13 +33,11 @@ public class SituationHandler implements ISituationHandler {
         this.limitType = limitType;
     }
 
-    /**
-     * An event called to tell us our hole cards and seat number
-     * @param c1 your first hole card
-     * @param c2 your second hole card
-     * @param seat your seat number at the table
-     */
-    public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
+    /* (non-Javadoc)
+	 * @see mallorcatour.core.game.situation.IGameObserver#onHoleCards(mallorcatour.core.game.Card, mallorcatour.core.game.Card, java.lang.String, java.lang.String)
+	 */
+    @Override
+	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
         this.holeCard1 = c1;
         this.holeCard2 = c2;
 		StreetEquity equity = EquilatorPreflop.equityVsRandom(holeCard1,
@@ -97,7 +96,11 @@ public class SituationHandler implements ISituationHandler {
         return result;
     }
 
-    public void onHeroActed(Action action) {
+    /* (non-Javadoc)
+	 * @see mallorcatour.core.game.situation.IGameObserver#onHeroActed(mallorcatour.core.game.Action)
+	 */
+    @Override
+	public void onHeroActed(Action action) {
         if (action.isAggressive()) {
             wasHeroPreviousAggressive = true;
             countOfHeroAggressive++;
@@ -107,10 +110,11 @@ public class SituationHandler implements ISituationHandler {
         heroActionCount++;
     }
 
-    /**
-     * A new betting round has started.
-     */
-    public void onStageEvent(PokerStreet street) {
+    /* (non-Javadoc)
+	 * @see mallorcatour.core.game.situation.IGameObserver#onStageEvent(mallorcatour.core.game.PokerStreet)
+	 */
+    @Override
+	public void onStageEvent(PokerStreet street) {
         if (street == PokerStreet.FLOP) {
             flop1 = gameInfo.getBoard().get(0);
             flop2 = gameInfo.getBoard().get(1);
@@ -136,11 +140,11 @@ public class SituationHandler implements ISituationHandler {
         }
     }
 
-    /**
-     * A new game has been started.
-     * @param gi the game stat information
-     */
-    public void onHandStarted(IGameInfo gameInfo) {
+    /* (non-Javadoc)
+	 * @see mallorcatour.core.game.situation.IGameObserver#onHandStarted(mallorcatour.core.game.interfaces.IGameInfo)
+	 */
+    @Override
+	public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;
         heroActionCount = 0;
         countOfHeroAggressive = 0;
@@ -150,10 +154,11 @@ public class SituationHandler implements ISituationHandler {
         wasVillainPreviousAggressive = false;
     }
 
-    /**
-     * An villain action has been observed.
-     */
-    public void onVillainActed(Action action, double toCall) {
+    /* (non-Javadoc)
+	 * @see mallorcatour.core.game.situation.IGameObserver#onVillainActed(mallorcatour.core.game.Action, double)
+	 */
+    @Override
+	public void onVillainActed(Action action, double toCall) {
         if (action.isAggressive()) {
             wasVillainPreviousAggressive = true;
             villainActionCount++;
@@ -164,11 +169,11 @@ public class SituationHandler implements ISituationHandler {
         }
     }
 
-    public void beforeHeroAction() {
-        //do nothing
-    }
-
-    public void onHandEnded() {
+    /* (non-Javadoc)
+	 * @see mallorcatour.core.game.situation.IGameObserver#onHandEnded()
+	 */
+    @Override
+	public void onHandEnded() {
         //do nothing
     }
 }

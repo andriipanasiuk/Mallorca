@@ -27,8 +27,8 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.Card.Suit;
 import mallorcatour.core.game.Card.Value;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.util.SerializatorUtils;
+import mallorcatour.util.frames.FrameUtils;
 
 public class SpectrumFrame extends JFrame {
 	/**

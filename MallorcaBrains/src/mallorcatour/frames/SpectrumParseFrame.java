@@ -11,9 +11,9 @@
 package mallorcatour.frames;
 
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.grandtorino.spectrum.CardSpectrumsParsing;
 import mallorcatour.util.SerializatorUtils;
+import mallorcatour.util.frames.FrameUtils;
 
 /**
  *

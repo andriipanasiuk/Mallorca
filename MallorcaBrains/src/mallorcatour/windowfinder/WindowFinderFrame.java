@@ -26,10 +26,10 @@ import java.awt.image.BufferedImage;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.ps.recognizer.PSTableObserver;
 import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.ImageUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
 import mallorcatour.util.ThreadUtils;
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

@@ -32,7 +32,6 @@ import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.EuclidDistanceMod;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.neuronetworkwrapper.LEManager;
 import mallorcatour.neuronetworkwrapper.LearningExample;
@@ -43,6 +42,7 @@ import mallorcatour.util.MyFileWriter;
 import mallorcatour.util.ReaderUtils;
 import mallorcatour.util.StringUtils;
 import mallorcatour.util.UniformRandomizer;
+import mallorcatour.util.frames.FrameUtils;
 
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.ILearningListener;

@@ -10,7 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.util.Log;
@@ -124,7 +126,31 @@ public class HUGameInfo implements IGameInfo {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+	public PlayerInfo getPlayer(String name) {
+    	throw new UnsupportedOperationException();
+	}
+
     public int getNumRaises() {
         return gameInfo.getNumRaises();
     }
+
+	@Override
+	public Flop getFlop() {
+		//TODO implement
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Card getTurn() {
+		//TODO implement
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Card getRiver() {
+		//TODO implement
+		throw new UnsupportedOperationException();
+	}
+
 }

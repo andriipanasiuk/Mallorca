@@ -19,8 +19,8 @@ import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.util.IRectangleHolder;
 import mallorcatour.util.Log;
-import mallorcatour.util.RecognizerUtils;
 import mallorcatour.util.ThreadUtils;
+import mallorcatour.util.robot.RecognizerUtils;
 
 /**
  *

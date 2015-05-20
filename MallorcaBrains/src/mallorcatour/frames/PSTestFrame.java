@@ -15,13 +15,13 @@ import java.io.BufferedReader;
 import java.util.List;
 
 import mallorcatour.core.game.Card;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.robot.ps.recognizer.PSCardRecognizer;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.robot.recognizer.assets.MinSizeCardAssets;
-import mallorcatour.util.ImageUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.ReaderUtils;
+import mallorcatour.util.frames.FrameUtils;
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

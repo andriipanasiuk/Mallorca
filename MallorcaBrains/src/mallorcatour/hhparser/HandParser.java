@@ -176,7 +176,6 @@ public class HandParser {
         LocalSituation situation = handler.onHeroSituation();
         situations.add(situation);
         learningExamples.add(new PokerLearningExample(situation, createFromAction(action)));
-        handler.beforeHeroAction();
         processPot(action);
         heroPreviousAction = action;
         handler.onHeroActed(action);

@@ -8,11 +8,13 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
-import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
-import mallorcatour.bot.modeller.NLSpectrumSituationHandler;
+import mallorcatour.bot.modeller.IProfitCalculator;
+import mallorcatour.bot.modeller.NLProfitCalculator;
+import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
@@ -28,22 +30,25 @@ import mallorcatour.util.Log;
 public class MixBot implements IPlayer {
 
     private IGameInfo gameInfo;  // general game information
-    @SuppressWarnings("unused")
 	private String heroName, villainName;
     private Card heroCard1, heroCard2;
     private final IActionPreprocessor actionPreprocessor;
     private final BaseAdviceCreatorFromMap adviceCreator;
     private final String DEBUG_PATH;
     private final IPokerNN postflopNN;
-    private final BaseSpectrumSituationHandler situationHandler;
+    private final SpectrumSituationHandler situationHandler;
+    private final StrengthManager strengthManager;
+    private final IProfitCalculator profitCalculator;
 
     public MixBot(IPokerNN postflopNN, IVillainModeller villainModeller,
             ISpectrumListener listener,
             IDecisionListener decisionListener, String debug) {
         this.postflopNN = postflopNN;
-        adviceCreator = new AdviceCreatorFromMap();
-        situationHandler = new NLSpectrumSituationHandler(villainModeller,
-                true, false, listener, decisionListener, debug);
+		adviceCreator = new AdviceCreatorFromMap();
+		strengthManager = new StrengthManager();
+		profitCalculator = new NLProfitCalculator(villainModeller);
+		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, false, listener,
+				decisionListener, strengthManager, debug);
         actionPreprocessor = new NLActionPreprocessor();
         this.DEBUG_PATH = debug;
     }
@@ -70,21 +75,22 @@ public class MixBot implements IPlayer {
         Advice advice;
         Action action = null;
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
+        LocalSituation situation = situationHandler.onHeroSituation();
         if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
             Log.f(DEBUG_PATH, "Villain is sitting out");
             double percent = 0.5;
             action = Action.createRaiseAction(percent
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
         } else if (gameInfo.isPostFlop()) {
-            LocalSituation situation = situationHandler.onHeroSituation();
             advice = postflopNN.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
             action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
         } else {
-            //preflop
-            Map<Action, Double> map = situationHandler.getProfitMap();
-            Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
+			// preflop
+			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1,
+					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
+			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
             advice = adviceCreator.create(map);
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
@@ -100,6 +106,7 @@ public class MixBot implements IPlayer {
      * A new betting round has started.
      */
     public void onStageEvent(PokerStreet street) {
+    	strengthManager.onStageEvent(street);
         situationHandler.onStageEvent(street);
     }
 
@@ -107,8 +114,10 @@ public class MixBot implements IPlayer {
      * A new game has been started.
      * @param gi the game stat information
      */
-    public void onHandStarted(IGameInfo gameInfo, long handNumber) {
+    @Override
+    public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;
+        strengthManager.onHandStarted(gameInfo);
         situationHandler.onHandStarted(gameInfo);
     }
 
@@ -116,6 +125,14 @@ public class MixBot implements IPlayer {
      * An villain action has been observed.
      */
     public void onVillainActed(Action action, double toCall) {
+    	strengthManager.onVillainActed(action, toCall);
         situationHandler.onVillainActed(action, toCall);
     }
+
+	@Override
+	public void onHandEnded() {
+		strengthManager.onHandEnded();
+		situationHandler.onHandEnded();
+	}
+
 }

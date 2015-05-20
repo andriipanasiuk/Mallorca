@@ -4,8 +4,6 @@
  */
 package mallorcatour.robot.controller;
 
-import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
-import br.com.wagnerpaz.javahook.NativeKeyboardListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +18,8 @@ import mallorcatour.robot.PlayerInfo;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.util.Log;
 import mp3player.Mp3Player;
+import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
+import br.com.wagnerpaz.javahook.NativeKeyboardListener;
 
 /**
  *
@@ -78,7 +78,7 @@ public class HUGameController implements IGameController {
                     alreadyTakenCards.add(card);
                 }
             }
-            gameInfo.boardCards = alreadyTakenCards;
+            gameInfo.board = alreadyTakenCards;
             if (boardCards.size() == 3) {
                 Log.f(DEBUG_PATH, "\nFLOP: " + boardCards + " Pot: " + pot + "\n");
                 player.onStageEvent(PokerStreet.FLOP);
@@ -120,6 +120,7 @@ public class HUGameController implements IGameController {
         return result;
     }
 
+	@Override
     public Action onMyAction(List<Card> boardCards, double pot) {
         sendVillainActions(boardCards, pot);
         Action heroAction;
@@ -278,14 +279,14 @@ public class HUGameController implements IGameController {
                 < 0.1 * gameInfo.bigBlind * 2;
     }
 
-    public void onNewHand(long handNumber, List<PlayerInfo> players,
-            Card holeCard1, Card holeCard2, List<Card> board, double pot,
-            LimitType limitType) {
-        villainPreviousAction = null;
-        currentStreet = calculateStreet(board);
+	@Override
+	public void onNewHand(long handNumber, List<PlayerInfo> players, Card holeCard1, Card holeCard2, List<Card> board,
+			double pot, LimitType limitType) {
+		villainPreviousAction = null;
+		currentStreet = calculateStreet(board);
         alreadyTakenCards = new ArrayList<Card>();
         gameInfo = new HUGameInfo();
-        player.onHandStarted(gameInfo, handNumber);
+        player.onHandStarted(gameInfo);
         //player infos
         gameInfo.heroInfo = getHero(players);
         gameInfo.villainInfo = getVillain(players);

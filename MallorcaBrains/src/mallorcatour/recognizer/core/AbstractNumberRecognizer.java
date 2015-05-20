@@ -12,8 +12,8 @@ import java.util.List;
 
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.util.DateUtils;
-import mallorcatour.util.IImageProcessor;
-import mallorcatour.util.ImageUtils;
+import mallorcatour.util.robot.IImageProcessor;
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

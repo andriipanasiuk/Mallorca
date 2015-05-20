@@ -29,7 +29,6 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.situation.ShowingSpectrumListener;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.robot.PlayerInfo;
@@ -41,6 +40,7 @@ import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
 import mallorcatour.util.SerializatorUtils;
 import mallorcatour.util.UniformRandomizer;
+import mallorcatour.util.frames.FrameUtils;
 
 /**
  * Frame for playing with bot.

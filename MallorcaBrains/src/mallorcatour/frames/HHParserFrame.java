@@ -25,7 +25,6 @@ import mallorcatour.core.game.situation.NoStrengthSituationHandler;
 import mallorcatour.core.game.situation.PotSituationHandler;
 import mallorcatour.core.game.situation.ProfitSituationHandler;
 import mallorcatour.core.game.situation.SituationHandler;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.hhparser.AdviceReader;
 import mallorcatour.hhparser.HandParser;
 import mallorcatour.hhparser.LoggingTournamentHandler;
@@ -44,6 +43,7 @@ import mallorcatour.util.OnExceptionListener;
 import mallorcatour.util.Pair;
 import mallorcatour.util.ReaderUtils;
 import mallorcatour.util.SerializatorUtils;
+import mallorcatour.util.frames.FrameUtils;
 
 /**
  *

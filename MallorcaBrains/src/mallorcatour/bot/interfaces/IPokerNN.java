@@ -15,5 +15,8 @@ import mallorcatour.core.game.situation.LocalSituation;
  */
 public interface IPokerNN {
 
-    Advice getAdvice(LocalSituation situation, HoleCards cards);
+	/**
+	 * Return advice for action in any situation with hole cards.
+	 */
+	Advice getAdvice(LocalSituation situation, HoleCards cards);
 }

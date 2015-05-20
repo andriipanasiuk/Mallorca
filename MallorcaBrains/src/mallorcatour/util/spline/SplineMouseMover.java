@@ -14,8 +14,8 @@ import java.util.List;
 
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.util.Log;
-import mallorcatour.util.RobotUtils;
 import mallorcatour.util.UniformRandomizer;
+import mallorcatour.util.robot.RobotUtils;
 import model.SmoothSpline;
 import utils.MathUtils;
 

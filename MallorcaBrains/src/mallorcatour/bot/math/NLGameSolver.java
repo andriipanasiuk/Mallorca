@@ -7,6 +7,7 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.interfaces.IGameSolver;
 import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
@@ -26,7 +27,7 @@ import mallorcatour.util.Log;
  *
  * @author Andrew
  */
-public class NLGameSolver {
+public class NLGameSolver implements IGameSolver {
 
     private final static double NEARLY_ZERO = 0.0001;
     private final static double DEFAULT_POSITIVE_POTENTIAL = 0.1;
@@ -40,7 +41,11 @@ public class NLGameSolver {
         this.villainModeller = villainModeller;
     }
 
-    public Map<Action, Double> onSecondActionPreflop(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionPreflop(int, int, int, int, double, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.HoleCards, java.util.Map, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onSecondActionPreflop(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, double toCall,
             Spectrum villainSpectrum, HoleCards heroCards,
@@ -52,7 +57,11 @@ public class NLGameSolver {
                 strengthMap, isHeroOnButton, PokerStreet.PREFLOP, bigBlind);
     }
 
-    public Map<Action, Double> onSecondActionFlop(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionFlop(int, int, int, int, double, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.Flop, mallorcatour.core.game.HoleCards, java.util.Map, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onSecondActionFlop(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, double toCall,
             Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
@@ -63,7 +72,11 @@ public class NLGameSolver {
                 strengthMap, isHeroOnButton, PokerStreet.FLOP, bigBlind);
     }
 
-    public Map<Action, Double> onSecondActionTurn(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionTurn(int, int, int, int, double, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.Flop, mallorcatour.core.game.Card, mallorcatour.core.game.HoleCards, java.util.Map, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onSecondActionTurn(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, double toCall,
             Spectrum villainSpectrum, Flop flop, Card turn, HoleCards heroCards,
@@ -75,7 +88,11 @@ public class NLGameSolver {
                 heroCards, strengthMap, isHeroOnButton, PokerStreet.TURN, bigBlind);
     }
 
-    public Map<Action, Double> onSecondActionRiver(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionRiver(int, int, int, int, double, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.Flop, mallorcatour.core.game.Card, mallorcatour.core.game.Card, mallorcatour.core.game.HoleCards, java.util.Map, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onSecondActionRiver(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, double toCall,
             Spectrum villainSpectrum, Flop flop, Card turn, Card river,
@@ -145,7 +162,11 @@ public class NLGameSolver {
         return result;
     }
 
-    public Map<Action, Double> onFirstActionPreFlop(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionPreFlop(int, int, int, int, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.HoleCards, java.util.Map, boolean, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onFirstActionPreFlop(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, Spectrum villainSpectrum,
             HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
@@ -176,7 +197,11 @@ public class NLGameSolver {
         return result;
     }
 
-    public Map<Action, Double> onFirstActionFlop(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionFlop(int, int, int, int, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.Flop, mallorcatour.core.game.HoleCards, java.util.Map, boolean, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onFirstActionFlop(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, Spectrum villainSpectrum,
             Flop flop, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
@@ -187,7 +212,11 @@ public class NLGameSolver {
                 isHeroOnButton, PokerStreet.FLOP, bigBlind);
     }
 
-    public Map<Action, Double> onFirstActionTurn(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionTurn(int, int, int, int, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.Flop, mallorcatour.core.game.Card, mallorcatour.core.game.HoleCards, java.util.Map, boolean, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onFirstActionTurn(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, Spectrum villainSpectrum,
             Flop flop, Card turn, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
@@ -199,7 +228,11 @@ public class NLGameSolver {
                 isHeroOnButton, PokerStreet.TURN, bigBlind);
     }
 
-    public Map<Action, Double> onFirstActionRiver(int heroActions, int heroAggressiveActions,
+    /* (non-Javadoc)
+	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionRiver(int, int, int, int, double, double, mallorcatour.core.spectrum.Spectrum, mallorcatour.core.game.Flop, mallorcatour.core.game.Card, mallorcatour.core.game.Card, mallorcatour.core.game.HoleCards, java.util.Map, boolean, boolean, double)
+	 */
+    @Override
+	public Map<Action, Double> onFirstActionRiver(int heroActions, int heroAggressiveActions,
             int villainActions, int villainAggressiveActions,
             double effectiveStack, double pot, Spectrum villainSpectrum,
             Flop flop, Card turn, Card river, HoleCards heroCards,

@@ -7,6 +7,7 @@ package mallorcatour.robot.controller;
 import java.util.List;
 
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
@@ -23,7 +24,7 @@ public class HUGameInfo implements IGameInfo {
     PokerStreet street;
     double ante = 0;
     double smallBlind, bigBlind;
-    List<Card> boardCards;
+    List<Card> board;
     double pot;
     //on preflop
     double effectiveStack;
@@ -70,7 +71,7 @@ public class HUGameInfo implements IGameInfo {
     }
 
     public List<Card> getBoard() {
-        return boardCards;
+        return board;
     }
 
     public double getPotSize() {
@@ -127,7 +128,27 @@ public class HUGameInfo implements IGameInfo {
         return limitType;
     }
 
-    public List<mallorcatour.core.game.PlayerInfo> getPlayers() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+	public List<mallorcatour.core.game.PlayerInfo> getPlayers() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public mallorcatour.core.game.PlayerInfo getPlayer(String name) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+	
+	@Override
+	public Flop getFlop() {
+		return new Flop(board.get(0), board.get(1), board.get(2));
+	}
+
+	@Override
+	public Card getTurn() {
+		return board.get(3);
+	}
+
+	@Override
+	public Card getRiver() {
+		return board.get(4);
+	}
 }

@@ -1,4 +1,4 @@
-package mallorcatour.frames.util;
+package mallorcatour.util.frames;
 
 import java.awt.Component;
 import java.io.File;

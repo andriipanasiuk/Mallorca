@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.util.robot;
 
 import java.awt.AWTException;
 import java.awt.Point;

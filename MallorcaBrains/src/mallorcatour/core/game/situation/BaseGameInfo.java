@@ -7,6 +7,7 @@ package mallorcatour.core.game.situation;
 import java.util.List;
 
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
@@ -112,4 +113,29 @@ public class BaseGameInfo implements IGameInfo {
     public List<PlayerInfo> getPlayers() {
         return players;
     }
+
+	@Override
+	public PlayerInfo getPlayer(String name) {
+		for (PlayerInfo info : players) {
+			if (info.getName().equals(name)) {
+				return info;
+			}
+		}
+		throw new IllegalArgumentException("There is no player with name: " + name);
+	}
+
+	@Override
+	public Flop getFlop() {
+		return new Flop(board.get(0), board.get(1), board.get(2));
+	}
+
+	@Override
+	public Card getTurn() {
+		return board.get(3);
+	}
+
+	@Override
+	public Card getRiver() {
+		return board.get(4);
+	}
 }

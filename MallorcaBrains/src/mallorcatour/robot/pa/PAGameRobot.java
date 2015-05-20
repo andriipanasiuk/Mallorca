@@ -18,11 +18,11 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.ImageUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
-import mallorcatour.util.RecognizerUtils;
-import mallorcatour.util.RobotUtils;
+import mallorcatour.util.robot.ImageUtils;
+import mallorcatour.util.robot.RecognizerUtils;
+import mallorcatour.util.robot.RobotUtils;
 
 /**
  *

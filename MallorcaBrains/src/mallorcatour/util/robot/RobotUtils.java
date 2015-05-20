@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.util.robot;
 
 import java.awt.AWTException;
 import java.awt.Point;
@@ -7,6 +7,7 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 
+import mallorcatour.util.Log;
 import mallorcatour.util.spline.IMouseMover;
 
 public class RobotUtils {

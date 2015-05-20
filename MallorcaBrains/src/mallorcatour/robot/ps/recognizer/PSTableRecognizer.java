@@ -29,10 +29,10 @@ import mallorcatour.robot.recognizer.assets.MinSizePotDigitAssets;
 import mallorcatour.robot.recognizer.assets.MinSizeStackDigitAssets;
 import mallorcatour.robot.recognizer.assets.MinSizeTableAssets;
 import mallorcatour.util.DateUtils;
-import mallorcatour.util.ImageUtils;
-import mallorcatour.util.ImageUtils.SearchedImage;
+import mallorcatour.util.robot.ImageUtils;
+import mallorcatour.util.robot.RecognizerUtils;
+import mallorcatour.util.robot.ImageUtils.SearchedImage;
 import mallorcatour.util.Log;
-import mallorcatour.util.RecognizerUtils;
 
 /**
  *

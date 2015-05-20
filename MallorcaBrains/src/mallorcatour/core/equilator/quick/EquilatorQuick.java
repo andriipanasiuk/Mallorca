@@ -1,11 +1,9 @@
 package mallorcatour.core.equilator.quick;
 
 import static mallorcatour.core.equilator.PokerEquilatorBrecher.LOGGING;
-import static mallorcatour.core.equilator.PokerEquilatorBrecher.encode;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Card;
-import mallorcatour.core.game.Deck;
 import mallorcatour.util.Log;
 
 public class EquilatorQuick {
@@ -22,31 +20,27 @@ public class EquilatorQuick {
 	public static StreetEquity equityVsRandomFullPotential(int heroCard1, int heroCard2, int flop1, int flop2,
 			int flop3, FlopCombinations combinations) {
 		boolean positive = false, drawBoolean;
-		int[] nonUsedCards = Deck.getIntCardsForBrecher();
 
+		int deckSize = 52;
 		int count = 0, wins = 0, draw = 0;
 		double countPositive = 0, winsPositive = 0;
 		double countNegative = 0, winsNegative = 0;
-		long heroCardsKey = encode(heroCard1, heroCard2);
-		long heroTurnCardsKey, heroRiverCardsKey;
-		long oppCardsKey, oppTurnCardsKey, oppRiverCardsKey;
-		int heroFlopCombination = combinations.fiveCards.get(heroCardsKey);
-		for (int opponentCard1 = 0; opponentCard1 < nonUsedCards.length; opponentCard1++) {
+		int heroFlopCombination = combinations.get(heroCard1, heroCard2);
+		for (int opponentCard1 = 0; opponentCard1 < deckSize; opponentCard1++) {
 			if (heroCard1 == opponentCard1 || heroCard2 == opponentCard1 || flop1 == opponentCard1
 					|| flop2 == opponentCard1 || flop3 == opponentCard1) {
 				continue;
 			}
-			for (int opponentCard2 = opponentCard1 + 1; opponentCard2 < nonUsedCards.length; opponentCard2++) {
+			for (int opponentCard2 = opponentCard1 + 1; opponentCard2 < deckSize; opponentCard2++) {
 				if (heroCard1 == opponentCard2 || heroCard2 == opponentCard2 || flop1 == opponentCard2
 						|| flop2 == opponentCard2 || flop3 == opponentCard2) {
 					continue;
 				}
-				oppCardsKey = encode(opponentCard1, opponentCard2);
-				int opponentCombinationWithoutAdditional = combinations.fiveCards.get(oppCardsKey);
-				if (heroFlopCombination < opponentCombinationWithoutAdditional) {
+				int opponentFlopCombination = combinations.get(opponentCard1, opponentCard2);
+				if (heroFlopCombination < opponentFlopCombination) {
 					positive = true;
 					drawBoolean = false;
-				} else if (heroFlopCombination > opponentCombinationWithoutAdditional) {
+				} else if (heroFlopCombination > opponentFlopCombination) {
 					positive = false;
 					wins++;
 					drawBoolean = false;
@@ -57,7 +51,7 @@ public class EquilatorQuick {
 				count++;
 				int heroCombination;
 				int opponentCombination;
-				for (int turn = 0; turn < nonUsedCards.length; turn++) {
+				for (int turn = 0; turn < deckSize; turn++) {
 					if (heroCard1 == turn || heroCard2 == turn) {
 						continue;
 					}
@@ -67,9 +61,7 @@ public class EquilatorQuick {
 					if (flop1 == turn || flop2 == turn || flop3 == turn) {
 						continue;
 					}
-					oppTurnCardsKey = encode(oppCardsKey, turn);
-					heroTurnCardsKey = encode(heroCardsKey, turn);
-					for (int river = 0; river < nonUsedCards.length; river++) {
+					for (int river = 0; river < deckSize; river++) {
 						if (heroCard1 == river || heroCard2 == river) {
 							continue;
 						}
@@ -82,10 +74,8 @@ public class EquilatorQuick {
 						if (river == turn) {
 							continue;
 						}
-						heroRiverCardsKey = encode(heroTurnCardsKey, river);
-						oppRiverCardsKey = encode(oppTurnCardsKey, river);
-						heroCombination = combinations.sevenCards.get(heroRiverCardsKey);
-						opponentCombination = combinations.sevenCards.get(oppRiverCardsKey);
+						heroCombination = combinations.get(heroCard1, heroCard2, turn, river);
+						opponentCombination = combinations.get(opponentCard1, opponentCard2, turn, river);
 
 						if (drawBoolean) {
 							countPositive += 0.5;
@@ -123,8 +113,8 @@ public class EquilatorQuick {
 			Log.d("WinsNegative = " + winsNegative + " CountNegative = " + countNegative);
 		}
 		StreetEquity result = new StreetEquity();
-		result.positivePotential = (countPositive != 0) ? (double) winsPositive / countPositive : 1;
-		result.negativePotential = (countNegative != 0) ? (double) winsNegative / countNegative : 1;
+		result.positivePotential = (countPositive != 0) ? winsPositive / countPositive : 0;
+		result.negativePotential = (countNegative != 0) ? winsNegative / countNegative : 0;
 		result.strength = ((double) draw / 2 + wins) / count;
 		result.draw = (double) draw / count;
 		return result;
@@ -142,35 +132,25 @@ public class EquilatorQuick {
 		FlopCombinations combinations = new FlopCombinations(flop1, flop2, flop3);
 		combinations.init();
 		long start = System.currentTimeMillis();
-		long key=encode(2, 3, 7, 34);
-		for (int i = 0; i < 10*1100 * 50 * 50; i++) {
-			combinations.sevenCards.get(key);
-		}
-		Log.d("Time map.get: " + (System.currentTimeMillis() - start) + " ms");
-		int[][][][] combArray = new int[52][52][52][52];
-		start = System.currentTimeMillis();
-		for (int i = 0; i < 10*1100 * 50 * 50; i++) {
-			int a = combArray[2][3][7][34];
-		}
-		Log.d("Time array get: " + (System.currentTimeMillis() - start) + " ms");
-		start = System.currentTimeMillis();
-		int[] array = new int[]{2,3,7,34,flop1, flop2, flop3};
+		int[] array = new int[] { 2, 3, 7, 34, flop1, flop2, flop3 };
 		for (long i = 0; i < 1100 * 50 * 50; i++) {
 			PokerEquilatorBrecher.combination(array);
 		}
+		Log.d("Time of combination calculation: " + (System.currentTimeMillis() - start) + " ms");
+		start = System.currentTimeMillis();
+		int j;
+		for (long i = 0; i < 1100L * 2*1100 * 50 * 50; i++) {
+			j = combinations.sevenCards[2][3][7][34];
+		}
+		Log.d("Time of combinations.get: " + (System.currentTimeMillis() - start) + " ms");
+		start = System.currentTimeMillis();
+		for (int i = 0; i < 1000; i++)
+			equityVsRandomFullPotential(heroCard1, heroCard2, flop1, flop2, flop3, combinations);
 		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
 		start = System.currentTimeMillis();
-//		for (int i = 0; i < 10; i++)
-//			equityVsRandomFullPotential(heroCard1, heroCard2, flop1, flop2, flop3, combinations);
-//		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
-		start = System.currentTimeMillis();
 		for (int i = 0; i < 10; i++)
-			PokerEquilatorBrecher.equityVsRandomFullPotential(Card.valueOf(heroCard1), 
-					Card.valueOf(heroCard2),
-					new Card[]{
-					Card.valueOf(flop1), 
-					Card.valueOf(flop2), 
-					Card.valueOf(flop3)});
+			PokerEquilatorBrecher.equityVsRandomFullPotential(Card.valueOf(heroCard1), Card.valueOf(heroCard2),
+					new Card[] { Card.valueOf(flop1), Card.valueOf(flop2), Card.valueOf(flop3) });
 		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
 	}
 }

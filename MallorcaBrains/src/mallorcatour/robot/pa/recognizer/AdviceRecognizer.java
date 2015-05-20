@@ -9,9 +9,9 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.util.ImageUtils;
 import mallorcatour.util.Log;
-import mallorcatour.util.RecognizerUtils;
+import mallorcatour.util.robot.ImageUtils;
+import mallorcatour.util.robot.RecognizerUtils;
 
 /**
  *

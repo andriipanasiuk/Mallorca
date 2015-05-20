@@ -7,15 +7,17 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
-import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
-import mallorcatour.bot.modeller.FLSpectrumSituationHandler;
+import mallorcatour.bot.modeller.IProfitCalculator;
+import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
 
 /** 
@@ -26,20 +28,24 @@ import mallorcatour.util.Log;
 public class FLMathBot implements IPlayer {
 
     private BaseAdviceCreatorFromMap adviceCreator;
-    private IGameInfo gameInfo;  // general game information
-    private BaseSpectrumSituationHandler situationHandler;
-    @SuppressWarnings("unused")
+    private IGameInfo gameInfo;
+    private final SpectrumSituationHandler situationHandler;
+    private final IProfitCalculator profitCalculator;
 	private String heroName, villainName;
     private Card heroCard1, heroCard2;
     private IActionPreprocessor actionPreprocessor;
+    private final StrengthManager strengthManager; 
     private final String DEBUG_PATH;
 
     public FLMathBot(IVillainModeller villainModeller,
             ISpectrumListener spectrumListener,
             IDecisionListener decisionListener, String debug) {
-        adviceCreator = new AdviceCreatorFromMap();
-        situationHandler = new FLSpectrumSituationHandler(villainModeller, 
-        		true, true, spectrumListener, decisionListener, debug);
+		adviceCreator = new AdviceCreatorFromMap();
+		strengthManager = new StrengthManager();
+		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.FIXED_LIMIT, true, true,
+				spectrumListener, decisionListener, strengthManager, debug);
+        //TODO change to real profit calculator
+        profitCalculator = new StubProfitCalculator();
         actionPreprocessor = new FLActionPreprocessor();
         this.DEBUG_PATH = debug;
     }
@@ -51,6 +57,7 @@ public class FLMathBot implements IPlayer {
      * @param seat your seat number at the table
      */
     public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
+    	strengthManager.onHoleCards(c1, c2, heroName, villainName);
         situationHandler.onHoleCards(c1, c2, heroName, villainName);
         this.heroCard1 = c1;
         this.heroCard2 = c2;
@@ -65,16 +72,18 @@ public class FLMathBot implements IPlayer {
     public Action getAction() {
         Advice advice;
         Action action = null;
+        LocalSituation situation = situationHandler.onHeroSituation();
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
         if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
             Log.f(DEBUG_PATH, "Villain is sitting out");
             double percent = 0.5;
             action = Action.createRaiseAction(percent
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
-        } else {
-            Map<Action, Double> map = situationHandler.getProfitMap();
-            Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
-            saveSpectrum();
+		} else {
+			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1,
+					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
+			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
+			saveSpectrum();
             advice = adviceCreator.create(map);
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
@@ -117,6 +126,7 @@ public class FLMathBot implements IPlayer {
      * A new betting round has started.
      */
     public void onStageEvent(PokerStreet street) {
+    	strengthManager.onStageEvent(street);
         situationHandler.onStageEvent(street);
     }
 
@@ -124,8 +134,10 @@ public class FLMathBot implements IPlayer {
      * A new game has been started.
      * @param gi the game stat information
      */
-    public void onHandStarted(IGameInfo gameInfo, long handNumber) {
+    @Override
+    public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;
+        strengthManager.onHandStarted(gameInfo);
         situationHandler.onHandStarted(gameInfo);
     }
 
@@ -133,6 +145,13 @@ public class FLMathBot implements IPlayer {
      * An villain action has been observed.
      */
     public void onVillainActed(Action action, double toCall) {
+    	strengthManager.onVillainActed(action, toCall);
         situationHandler.onVillainActed(action, toCall);
     }
+
+	@Override
+	public void onHandEnded() {
+		strengthManager.onHandEnded();
+		situationHandler.onHandEnded();
+	}
 }

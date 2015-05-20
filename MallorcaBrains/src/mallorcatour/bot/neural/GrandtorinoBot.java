@@ -10,9 +10,9 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
-import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
-import mallorcatour.bot.modeller.FLSpectrumSituationHandler;
-import mallorcatour.bot.modeller.NLSpectrumSituationHandler;
+import mallorcatour.bot.math.StrengthManager;
+import mallorcatour.bot.modeller.NLProfitCalculator;
+import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.FLPreflopChart;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
@@ -38,12 +38,13 @@ public class GrandtorinoBot implements IPlayer {
 
     private final static double MIN_VALUE_FOR_CALL_DECISION = 10;
     private final static double MIN_VALUE_FOR_BET_DECISION = 10;
-    @SuppressWarnings("unused")
 	private String heroName, villainName;
     private Card heroCard1, heroCard2;
     private boolean isHumanAdvisor;
     private IGameInfo gameInfo;  // general game information
-    private final BaseSpectrumSituationHandler situationHandler;
+    private final SpectrumSituationHandler situationHandler;
+    private final NLProfitCalculator profitCalculator;
+    private final StrengthManager strengthManager;
     private final IPokerNN pokerNN;
     private final IPreflopChart preflopBot;
     private final IHumanAdvisor humanAdvisor;
@@ -58,21 +59,19 @@ public class GrandtorinoBot implements IPlayer {
         this.pokerNN = neuralNetwork;
         this.limitType = limitType;
         this.DEBUG_PATH = debug;
-        if (limitType == LimitType.NO_LIMIT) {
+        profitCalculator = new NLProfitCalculator(villainModeller);
+		strengthManager = new StrengthManager();
+		situationHandler = new SpectrumSituationHandler(villainModeller, limitType, modelPreflop, modelPostflop,
+				spectrumListener, villainDecisionListener, strengthManager, DEBUG_PATH);
+		if (limitType == LimitType.NO_LIMIT) {
             actionPreprocessor = new NLActionPreprocessor();
-            preflopBot = new NLPreflopChart();
-            situationHandler = new NLSpectrumSituationHandler(villainModeller,
-            		modelPreflop, modelPostflop, spectrumListener,
-            		villainDecisionListener, DEBUG_PATH);
-        } else {
-            actionPreprocessor = new FLActionPreprocessor();
-            preflopBot = new FLPreflopChart();
-            situationHandler = new FLSpectrumSituationHandler(villainModeller,
-            		modelPreflop, modelPostflop, spectrumListener,
-            		villainDecisionListener, DEBUG_PATH);
-        }
-        this.isHumanAdvisor = isHumanAdvisor;
-        this.humanAdvisor = humanAdvisor;
+			preflopBot = new NLPreflopChart();
+		} else {
+			actionPreprocessor = new FLActionPreprocessor();
+			preflopBot = new FLPreflopChart();
+		}
+		this.isHumanAdvisor = isHumanAdvisor;
+		this.humanAdvisor = humanAdvisor;
     }
 
     /**
@@ -82,6 +81,7 @@ public class GrandtorinoBot implements IPlayer {
      * @param seat your seat number at the table
      */
     public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
+    	strengthManager.onHoleCards(c1, c2, heroName, villainName);
         situationHandler.onHoleCards(c1, c2, heroName, villainName);
         heroCard1 = c1;
         heroCard2 = c2;
@@ -127,7 +127,7 @@ public class GrandtorinoBot implements IPlayer {
                 Log.f(DEBUG_PATH, "Action: " + action.toString());
                 //check river action with MathBot
                 if (limitType == LimitType.NO_LIMIT) {
-                    action = checkRiverAction(action);
+                    action = checkRiverAction(action, situation);
                 }
             }
         }
@@ -136,37 +136,35 @@ public class GrandtorinoBot implements IPlayer {
         return action;
     }
 
-    private Action checkRiverAction(Action action) {
-        //check if we have positive EV for call on river
-        if (gameInfo.isRiver() && gameInfo.getHeroAmountToCall() > 0) {
-            Map<Action, Double> map = situationHandler.getProfitMap();
-            if (action.isFold()) {
-                for (Entry<Action, Double> entry : map.entrySet()) {
-                    if (entry.getKey().isPassive()
-                            && entry.getValue() >= MIN_VALUE_FOR_CALL_DECISION) {
-                        return Action.callAction(gameInfo.getHeroAmountToCall());
-                    }
-                }
-            } else if (action.isPassive()) {
-                for (Entry<Action, Double> entry : map.entrySet()) {
-                    if (entry.getKey().isPassive()
-                            && entry.getValue() < MIN_VALUE_FOR_CALL_DECISION) {
-                        return Action.foldAction();
-                    }
-                }
-            }
-        } //check if we have positive EV for bet
-        else if (gameInfo.isRiver() && gameInfo.getHeroAmountToCall() == 0) {
-            Map<Action, Double> map = situationHandler.getProfitMap();
-            if (action.isAggressive()) {
-                for (Entry<Action, Double> entry : map.entrySet()) {
-                    if (entry.getKey().isAggressive()
-                            && entry.getValue() < MIN_VALUE_FOR_BET_DECISION) {
-                        return Action.checkAction();
-                    }
-                }
-            }
-        }
+	private Action checkRiverAction(Action action, LocalSituation situation) {
+		// check if we have positive EV for call on river
+		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1, heroCard2,
+				situationHandler.getVillainSpectrum(), strengthManager);
+		if (gameInfo.isRiver()) {
+			if (gameInfo.getHeroAmountToCall() > 0) {
+				if (action.isFold()) {
+					for (Entry<Action, Double> entry : map.entrySet()) {
+						if (entry.getKey().isPassive() && entry.getValue() >= MIN_VALUE_FOR_CALL_DECISION) {
+							return Action.callAction(gameInfo.getHeroAmountToCall());
+						}
+					}
+				} else if (action.isPassive()) {
+					for (Entry<Action, Double> entry : map.entrySet()) {
+						if (entry.getKey().isPassive() && entry.getValue() < MIN_VALUE_FOR_CALL_DECISION) {
+							return Action.foldAction();
+						}
+					}
+				}
+			} else {
+				if (action.isAggressive()) {
+					for (Entry<Action, Double> entry : map.entrySet()) {
+						if (entry.getKey().isAggressive() && entry.getValue() < MIN_VALUE_FOR_BET_DECISION) {
+							return Action.checkAction();
+						}
+					}
+				}
+			}
+		}
         return action;
     }
 
@@ -174,6 +172,7 @@ public class GrandtorinoBot implements IPlayer {
      * A new betting round has started.
      */
     public void onStageEvent(PokerStreet street) {
+    	strengthManager.onStageEvent(street);
         situationHandler.onStageEvent(street);
     }
 
@@ -181,8 +180,10 @@ public class GrandtorinoBot implements IPlayer {
      * A new game has been started.
      * @param gameInfo the game start information
      */
-    public void onHandStarted(IGameInfo gameInfo, long handNumber) {
+    @Override
+    public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;
+        strengthManager.onHandStarted(gameInfo);
         situationHandler.onHandStarted(gameInfo);
     }
 
@@ -192,4 +193,9 @@ public class GrandtorinoBot implements IPlayer {
     public void onVillainActed(Action action, double toCall) {
         situationHandler.onVillainActed(action, toCall);
     }
+
+	@Override
+	public void onHandEnded() {
+		//do nothing
+	}
 }

@@ -6,7 +6,8 @@ package mallorcatour.robot.pa.recognizer;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import mallorcatour.util.ImageUtils;
+
+import mallorcatour.util.robot.ImageUtils;
 
 /**
  *

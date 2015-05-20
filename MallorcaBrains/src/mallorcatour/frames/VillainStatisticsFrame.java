@@ -17,11 +17,11 @@ import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorInterpreter;
-import mallorcatour.frames.util.FrameUtils;
 import mallorcatour.neuronetworkwrapper.PokerLearningExample;
 import mallorcatour.util.DoubleUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.SerializatorUtils;
+import mallorcatour.util.frames.FrameUtils;
 
 /**
  *

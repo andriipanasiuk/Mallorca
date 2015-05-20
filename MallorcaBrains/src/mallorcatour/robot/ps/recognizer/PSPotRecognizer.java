@@ -8,8 +8,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import mallorcatour.recognizer.core.AbstractNumberRecognizer;
 import mallorcatour.robot.recognizer.assets.IDigitAssets;
-import mallorcatour.util.IImageProcessor;
-import mallorcatour.util.RetainColorProcessor;
+import mallorcatour.util.robot.IImageProcessor;
+import mallorcatour.util.robot.RetainColorProcessor;
 
 /**
  *

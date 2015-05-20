@@ -8,14 +8,15 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.modeller.BasePokerNN;
-import mallorcatour.bot.modeller.BaseSpectrumSituationHandler;
 import mallorcatour.bot.modeller.BaseVillainModeller;
-import mallorcatour.bot.modeller.NLSpectrumSituationHandler;
+import mallorcatour.bot.modeller.IProfitCalculator;
+import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
@@ -33,10 +34,11 @@ public class NLMathBot implements IPlayer {
 
     private BaseAdviceCreatorFromMap adviceCreator;
     private IGameInfo gameInfo;  // general game information
-    private BaseSpectrumSituationHandler situationHandler;
-    @SuppressWarnings("unused")
+    private SpectrumSituationHandler situationHandler;
+    private StrengthManager strengthManager;
 	private String heroName, villainName;
     private IPokerNN preflopPokerNN;
+    private IProfitCalculator profitCalculator;
     private IPreflopChart preflopBot;
     private Card heroCard1, heroCard2;
     private IActionPreprocessor actionPreprocessor;
@@ -45,10 +47,11 @@ public class NLMathBot implements IPlayer {
     public NLMathBot(BaseVillainModeller villainModeller,
             ISpectrumListener listener,
             IDecisionListener decisionListener, String debug) {
-        adviceCreator = new AdviceCreatorFromMap();
-        situationHandler = new NLSpectrumSituationHandler(villainModeller, 
-        		true, true, listener, decisionListener, debug);
-        preflopPokerNN = new BasePokerNN(new DanielxnNeurals(), true);
+		adviceCreator = new AdviceCreatorFromMap();
+		strengthManager = new StrengthManager();
+		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, true, listener,
+				decisionListener, strengthManager, debug);
+		preflopPokerNN = new BasePokerNN(new DanielxnNeurals(), true);
         preflopBot = new NLPreflopChart();
         actionPreprocessor = new NLActionPreprocessor();
         this.DEBUG_PATH = debug;
@@ -73,6 +76,7 @@ public class NLMathBot implements IPlayer {
      * Called when it is the Player's turn to act.
      */
     public Action getAction() {
+    	LocalSituation situation = situationHandler.onHeroSituation();
         Advice advice;
         Action action = null;
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
@@ -81,17 +85,17 @@ public class NLMathBot implements IPlayer {
             double percent = 0.5;
             action = Action.createRaiseAction(percent
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
-        } else if (gameInfo.isPostFlop()) {
-            Map<Action, Double> map = situationHandler.getProfitMap();
-            Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
-            advice = adviceCreator.create(map);
+		} else if (gameInfo.isPostFlop()) {
+			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1,
+					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
+			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
+			advice = adviceCreator.create(map);
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
             Log.f(DEBUG_PATH, "Action: " + action.toString());
             action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
         } else //preflop
         {
-            LocalSituation situation = situationHandler.onHeroSituation();
             Log.f(DEBUG_PATH, "Preflop: " + situation.toString());
             if (gameInfo.isPreFlop() && gameInfo.getBankRoll(villainName) != IGameInfo.SITTING_OUT) {
                 action = preflopBot.getAction(situation, new HoleCards(heroCard1, heroCard2));
@@ -115,6 +119,7 @@ public class NLMathBot implements IPlayer {
      * A new betting round has started.
      */
     public void onStageEvent(PokerStreet street) {
+    	strengthManager.onStageEvent(street);
         situationHandler.onStageEvent(street);
     }
 
@@ -122,8 +127,10 @@ public class NLMathBot implements IPlayer {
      * A new game has been started.
      * @param gi the game stat information
      */
-    public void onHandStarted(IGameInfo gameInfo, long handNumber) {
+    @Override
+    public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;
+        strengthManager.onHandStarted(gameInfo);
         situationHandler.onHandStarted(gameInfo);
     }
 
@@ -131,6 +138,13 @@ public class NLMathBot implements IPlayer {
      * An villain action has been observed.
      */
     public void onVillainActed(Action action, double toCall) {
+    	strengthManager.onVillainActed(action, toCall);
         situationHandler.onVillainActed(action, toCall);
     }
+
+	@Override
+	public void onHandEnded() {
+		strengthManager.onHandEnded();
+		situationHandler.onHandEnded();
+	}
 }
