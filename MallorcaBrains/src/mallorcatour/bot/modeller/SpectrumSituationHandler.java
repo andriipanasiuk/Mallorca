@@ -155,6 +155,7 @@ public class SpectrumSituationHandler extends SituationHandler {
         Log.f(DEBUG_PATH, "Villain situation: " + situation.toString());
     }
 
+	@SuppressWarnings("deprecation")
 	private Map<HoleCards, Advice> calculateVillainAdvices(LocalSituation villainSituation, Action villainAction) {
         Map<HoleCards, Advice> villainAdvices = new HashMap<HoleCards, Advice>();
         Log.f(DEBUG_PATH, "---------------------");

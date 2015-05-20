@@ -19,13 +19,9 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.core.game.situation.LocalSituationInterpreter;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.grandtorino.nn.danielxn.DanielxnNeurals;
 import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
-
-import org.neuroph.core.NeuralNetwork;
 
 /**
  *
@@ -420,52 +416,6 @@ public class FLGameSolver implements IGameSolver {
     }
 
     public static void main(String[] args) {
-        {
-            NeuralNetwork nn = NeuralNetwork.load("bots/sparbot/preflop.mlp");
-            LocalSituation result = new LocalSituation(LocalSituation.PREFLOP, LimitType.FIXED_LIMIT);
-            result.setStrength(0.1);
-            result.setLocalOpponentAggresion(0.5);
-            result.setLocalAggresion(0.5);
-            result.wasOpponentPreviousAggresive(true);
-            result.wasHeroPreviousAggresive(true);
-            result.setPotOdds(0.25);
-            result.isOnButton(false);
-            result.setFLPotSize(0.2);
-            result.canRaise(true);
-
-            Log.d("Vector dimension: " + result.getValues().size());
-
-            nn.setInput(new LocalSituationInterpreter().createInput(result));
-            int c = nn.getLayerAt(0).getNeuronsCount();
-            Log.d("Count: " + c);
-            c = nn.getLayerAt(1).getNeuronsCount();
-            Log.d("Count: " + c);
-            c = nn.getLayerAt(2).getNeuronsCount();
-            Log.d("Count: " + c);
-        }
-        NeuralNetwork nn = new DanielxnNeurals().getPreflopNN();
-        
-        LocalSituation result = new LocalSituation(LocalSituation.PREFLOP, LimitType.NO_LIMIT);
-        result.setStrength(0.1);
-        result.setLocalOpponentAggresion(0.5);
-        result.setLocalAggresion(0.5);
-        result.wasOpponentPreviousAggresive(true);
-        result.wasHeroPreviousAggresive(true);
-        result.setPotOdds(0.25);
-        result.setPotToStackOdds(0.3);
-        result.isOnButton(false);
-        result.setFLPotSize(0.2);
-        result.canRaise(true);
-
-        Log.d("Vector dimension: " + result.getValues().size());
-
-        nn.setInput(new LocalSituationInterpreter().createInput(result));
-        int c = nn.getLayerAt(0).getNeuronsCount();
-        Log.d("Count: " + c);
-        c = nn.getLayerAt(1).getNeuronsCount();
-        Log.d("Count: " + c);
-        c = nn.getLayerAt(2).getNeuronsCount();
-        Log.d("Count: " + c);
     }
 
 	@Override

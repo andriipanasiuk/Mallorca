@@ -9,8 +9,6 @@ import java.util.Map;
 
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.robot.controller.PokerPreferences;
-import mallorcatour.util.Log;
 
 /**
  * Preflop chart for unopened when potToStack odds less than 0.1

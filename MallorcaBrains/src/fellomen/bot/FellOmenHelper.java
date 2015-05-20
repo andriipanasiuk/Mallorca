@@ -519,9 +519,9 @@ class FellOmenHelper {
         int archiveIndex = 1;
         String path = null;
         while (archiveIndex < 8) {
-            try {
+        	try {
+            	JarFile jf = new JarFile(path);
                 path = STRATEGY_ARCHIVES_PATH + archiveIndex + ".zip";
-                JarFile jf = new JarFile(path);
                 Enumeration<JarEntry> entries = jf.entries();
                 JarEntry je;
                 String neededPath = archiveIndex + "/" + fileName;
@@ -539,6 +539,7 @@ class FellOmenHelper {
                     actionMatrix = readArrayFromStream(size, is);
                     Log.f(DEBUG, "Time of finding and parsing action file: "
                             + (System.currentTimeMillis() - start) + " ms");
+                    jf.close();
                     return actionMatrix;
                 }
             } catch (Exception e) {

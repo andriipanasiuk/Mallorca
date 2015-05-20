@@ -17,12 +17,10 @@ import mallorcatour.core.game.advice.Advice;
 public class AggroAdviceCreatorFromMap extends BaseAdviceCreatorFromMap {
 
     public Advice create(Map<Action, Double> map) {
-        double fold = 0, passive = 0;
+        double passive = 0;
         Double aggressive = null;
         for (Entry<Action, Double> entry : map.entrySet()) {
-            if (entry.getKey().isFold()) {
-                fold = entry.getValue();
-            } else if (entry.getKey().isPassive()) {
+            if (entry.getKey().isPassive()) {
                 passive = entry.getValue();
             } else if (entry.getKey().isAggressive()) {
                 aggressive = entry.getValue();

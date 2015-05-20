@@ -71,7 +71,8 @@ public class PAVillainObserver implements IVillainObserver, IDecisionListener {
         return currentVillain;
     }
 
-    private void learnPreflopNN(VillainStatistics villainStatistics) {
+    @SuppressWarnings("deprecation")
+	private void learnPreflopNN(VillainStatistics villainStatistics) {
         NeuralNetwork nn = new MultiLayerPerceptron(7, 10, 3);
         List<PokerLearningExample> examples = villainStatistics.getExamples();
         List<PokerLearningExample> preflopExamples = new ArrayList<PokerLearningExample>();

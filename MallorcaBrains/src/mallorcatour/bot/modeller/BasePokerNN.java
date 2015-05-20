@@ -28,12 +28,12 @@ import org.neuroph.core.NeuralNetwork;
 /**
  *
  * Poker neural network that uses multi-layer perceptrons learned on hands from
- * PA bot Guru. This NN does not use global parameters (see IGlobalSituation).
+ * one of PA bots. This NN does not use global parameters (see IGlobalSituation).
  * But before using of multi-layer perceptron this network looking for the same
  * situation from situation files. If there are few(count of situations and
  * the degree of similarity are defined in this class) same situations
  * result will be the average output of these situations. If there are not
- * network uses output of multi-layer perceptrons. As interpreter (see
+ * it uses output of multi-layer perceptrons. As interpreter (see
  * IOutputInterpreter) of output vector and creating advice from it this class
  * uses SmartAdviceCreator for flop and turn and special advice creators for
  * preflop and river.
