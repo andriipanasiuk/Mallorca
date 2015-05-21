@@ -20,100 +20,99 @@ import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
 
 /**
- *
+ * 
  * @author Andrew
  */
 public class TestEquilator {
 
-    public static void testBrecherCorectness() {
-        Card myCard1;
-        Card myCard2;
+	public static void testBrecherCorectness() {
+		Card myCard1;
+		Card myCard2;
 
-        Card boardCard1 = Card.valueOf("3s");
-        Card boardCard2 = Card.valueOf("8d");
-        Card boardCard3 = Card.valueOf("7s");
-        Card boardCard4 = Card.valueOf("Js");
+		Card boardCard1 = Card.valueOf("3s");
+		Card boardCard2 = Card.valueOf("8d");
+		Card boardCard3 = Card.valueOf("7s");
+		Card boardCard4 = Card.valueOf("Js");
 
-        List<Card> nonUsed = Deck.getCards();
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
+		List<Card> nonUsed = Deck.getCards();
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
 
-        long start = System.nanoTime();
-        for (int i = 0; i < nonUsed.size(); i++) {
-            for (int j = i + 1; j < nonUsed.size(); j++) {
-                myCard1 = nonUsed.get(i);
-                myCard2 = nonUsed.get(j);
-                double oldEquity = PokerEquilatorBrecher.strengthVsRandom(myCard1, myCard2,
-                        new Card[]{boardCard1, boardCard2, boardCard3, boardCard4});
-                double equity = PokerEquilatorBrecher.strengthVsRandom(myCard1, myCard2,
-                        new Card[]{boardCard1, boardCard2, boardCard3, boardCard4});
-                if (Double.compare(oldEquity, equity) != 0) {
-                    throw new RuntimeException("Strength failed. Old value: " + oldEquity
-                            + " New value: " + equity
-                            + " Cards: " + myCard1 + " " + myCard2);
-                }
-            }
-        }
-        Log.d("Time: " + (System.nanoTime() - start) + " ns");
-    }
+		long start = System.nanoTime();
+		for (int i = 0; i < nonUsed.size(); i++) {
+			for (int j = i + 1; j < nonUsed.size(); j++) {
+				myCard1 = nonUsed.get(i);
+				myCard2 = nonUsed.get(j);
+				double oldEquity = PokerEquilatorBrecher.strengthVsRandom(myCard1, myCard2, new Card[] { boardCard1,
+						boardCard2, boardCard3, boardCard4 });
+				double equity = PokerEquilatorBrecher.strengthVsRandom(myCard1, myCard2, new Card[] { boardCard1,
+						boardCard2, boardCard3, boardCard4 });
+				if (Double.compare(oldEquity, equity) != 0) {
+					throw new RuntimeException("Strength failed. Old value: " + oldEquity + " New value: " + equity
+							+ " Cards: " + myCard1 + " " + myCard2);
+				}
+			}
+		}
+		Log.d("Time: " + (System.nanoTime() - start) + " ns");
+	}
 
-    public static void testBrecherPotentialSpeed() {
-        Card myCard1;
-        Card myCard2;
+	public static void testBrecherPotentialSpeed() {
+		Card myCard1;
+		Card myCard2;
 
-        Card boardCard1 = Card.valueOf("3s");
-        Card boardCard2 = Card.valueOf("8d");
-        Card boardCard3 = Card.valueOf("7s");
-        Card boardCard4 = Card.valueOf("Js");
+		Card boardCard1 = Card.valueOf("3s");
+		Card boardCard2 = Card.valueOf("8d");
+		Card boardCard3 = Card.valueOf("7s");
+		Card boardCard4 = Card.valueOf("Js");
 
-        List<Card> nonUsed = Deck.getCards();
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
+		List<Card> nonUsed = Deck.getCards();
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
 
-        long start = System.nanoTime();
-        for (int i = 0; i < nonUsed.size(); i++) {
-            for (int j = i + 1; j < nonUsed.size(); j++) {
-                myCard1 = nonUsed.get(i);
-                myCard2 = nonUsed.get(j);
-                @SuppressWarnings("unused")
-				StreetEquity equity = PokerEquilatorBrecher.equityOnTurn(myCard1, myCard2,
-                        boardCard1, boardCard2, boardCard3, boardCard4);
-            }
-        }
-        Log.d("Time: " + (System.nanoTime() - start) + " ns");
-    }
+		long start = System.nanoTime();
+		for (int i = 0; i < nonUsed.size(); i++) {
+			for (int j = i + 1; j < nonUsed.size(); j++) {
+				myCard1 = nonUsed.get(i);
+				myCard2 = nonUsed.get(j);
+				@SuppressWarnings("unused")
+				StreetEquity equity = PokerEquilatorBrecher.equityOnTurn(myCard1, myCard2, boardCard1, boardCard2,
+						boardCard3, boardCard4);
+			}
+		}
+		Log.d("Time: " + (System.nanoTime() - start) + " ns");
+	}
 
-    public static void testBrecherSpeed() {
-        Card myCard1;
-        Card myCard2;
+	public static void testBrecherSpeed() {
+		Card myCard1;
+		Card myCard2;
 
-        Card boardCard1 = Card.valueOf("2s");
-        Card boardCard2 = Card.valueOf("8d");
-        Card boardCard3 = Card.valueOf("7s");
-        Card boardCard4 = Card.valueOf("Js");
+		Card boardCard1 = Card.valueOf("2s");
+		Card boardCard2 = Card.valueOf("8d");
+		Card boardCard3 = Card.valueOf("7s");
+		Card boardCard4 = Card.valueOf("Js");
 
-        List<Card> nonUsed = Deck.getCards();
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
+		List<Card> nonUsed = Deck.getCards();
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
 
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < nonUsed.size(); i++) {
-            for (int j = i + 1; j < nonUsed.size(); j++) {
-                myCard1 = nonUsed.get(i);
-                myCard2 = nonUsed.get(j);
-                @SuppressWarnings("unused")
-				double equity = PokerEquilatorBrecher.strengthVsRandom(myCard1, myCard2,
-                        new Card[]{boardCard1, boardCard2, boardCard3, boardCard4});
-            }
-        }
-        Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
-    }
+		long start = System.currentTimeMillis();
+		for (int i = 0; i < nonUsed.size(); i++) {
+			for (int j = i + 1; j < nonUsed.size(); j++) {
+				myCard1 = nonUsed.get(i);
+				myCard2 = nonUsed.get(j);
+				@SuppressWarnings("unused")
+				double equity = PokerEquilatorBrecher.strengthVsRandom(myCard1, myCard2, new Card[] { boardCard1,
+						boardCard2, boardCard3, boardCard4 });
+			}
+		}
+		Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
+	}
 
 	public static void testQuickSpeed() {
 		Card myCard1;
@@ -128,8 +127,8 @@ public class TestEquilator {
 		nonUsed = CollectionUtils.subtract(nonUsed, flop2);
 		nonUsed = CollectionUtils.subtract(nonUsed, flop3);
 
-		FlopCombinations combinations = new FlopCombinations(flop1.intValueForBrecher(),
-				flop2.intValueForBrecher(), flop3.intValueForBrecher());
+		FlopCombinations combinations = new FlopCombinations(flop1.intValueForBrecher(), flop2.intValueForBrecher(),
+				flop3.intValueForBrecher());
 		combinations.init();
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < nonUsed.size(); i++) {
@@ -145,140 +144,122 @@ public class TestEquilator {
 		Log.d("Quick's time: " + (System.currentTimeMillis() - start) + " ms");
 	}
 
-    public static void checkBrecherCorectness() {
-        Card myCard1;
-        Card myCard2;
+	public static void checkBrecherCorectness() {
+		Card myCard1;
+		Card myCard2;
 
-        Card boardCard1 = Card.valueOf("2s");
-        Card boardCard2 = Card.valueOf("8d");
-        Card boardCard3 = Card.valueOf("7s");
-//        Card boardCard4 = Card.valueOf("Js");
-//        Card boardCard5 = Card.valueOf("Qd");
+		Card boardCard1 = Card.valueOf("2s");
+		Card boardCard2 = Card.valueOf("8d");
+		Card boardCard3 = Card.valueOf("7s");
+		// Card boardCard4 = Card.valueOf("Js");
+		// Card boardCard5 = Card.valueOf("Qd");
 
-        List<Card> nonUsed = Deck.getCards();
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
-//        nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
-//        nonUsed = CollectionUtils.subtract(nonUsed, boardCard5);
+		List<Card> nonUsed = Deck.getCards();
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
+		// nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
+		// nonUsed = CollectionUtils.subtract(nonUsed, boardCard5);
 
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < nonUsed.size(); i++) {
-            for (int j = i + 1; j < nonUsed.size(); j++) {
-                myCard1 = nonUsed.get(i);
-                myCard2 = nonUsed.get(j);
-                StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2,
-                        boardCard1, boardCard2, boardCard3, true);
-                Log.d("Equity: " + equity.strength + " " + equity.positivePotential
-                        + " " + equity.negativePotential);
-            }
-        }
-        Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
-    }
+		long start = System.currentTimeMillis();
+		for (int i = 0; i < nonUsed.size(); i++) {
+			for (int j = i + 1; j < nonUsed.size(); j++) {
+				myCard1 = nonUsed.get(i);
+				myCard2 = nonUsed.get(j);
+				StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2, boardCard1, boardCard2,
+						boardCard3, true);
+				Log.d("Equity: " + equity.strength + " " + equity.positivePotential + " " + equity.negativePotential);
+			}
+		}
+		Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
+	}
 
-    @SuppressWarnings("unused")
+	@SuppressWarnings("unused")
 	private static void calculate() {
-        Card myCard1 = Card.valueOf("Ad");
-        Card myCard2 = Card.valueOf("Ac");
+		Card myCard1 = Card.valueOf("Ad");
+		Card myCard2 = Card.valueOf("Ac");
 
-        Card boardCard1 = Card.valueOf("2s");
-        Card boardCard2 = Card.valueOf("8d");
-        Card boardCard3 = Card.valueOf("7s");
+		Card boardCard1 = Card.valueOf("2s");
+		Card boardCard2 = Card.valueOf("8d");
+		Card boardCard3 = Card.valueOf("7s");
 
-        List<Card> nonUsed = Deck.getCards();
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
-        nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
+		List<Card> nonUsed = Deck.getCards();
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard1);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard2);
+		nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
 
-        long start = System.currentTimeMillis();
-        StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2,
-                boardCard1, boardCard2, boardCard3, true);
-        Log.d("Equity: " + equity.strength + " " + equity.positivePotential
-                + " " + equity.negativePotential);
-        Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
-    }
+		long start = System.currentTimeMillis();
+		StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2, boardCard1, boardCard2,
+				boardCard3, true);
+		Log.d("Equity: " + equity.strength + " " + equity.positivePotential + " " + equity.negativePotential);
+		Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
+	}
 
-    public static void equalCombinationsBrecherAndSpears() {
-        int tests = 1000000;
-        for (int i = 0; i < tests; i++) {
-            int[] cardsForSpears1 = dealCards(6);
-            int[] cardsForSpears2 = dealCards(6);
-            int[] cardsForBrecher1 = toBrecher(cardsForSpears1);
-            int[] cardsForBrecher2 = toBrecher(cardsForSpears2);
+	public static void equalCombinationsBrecherAndSpears() {
+		int tests = 1000000;
+		for (int i = 0; i < tests; i++) {
+			int[] cardsForSpears1 = dealCards(6);
+			int[] cardsForSpears2 = dealCards(6);
+			int[] cardsForBrecher1 = toBrecher(cardsForSpears1);
+			int[] cardsForBrecher2 = toBrecher(cardsForSpears2);
 
-            long combinationNative1 = PokerEquilatorSpears.combination(cardsForSpears1);
-            long combinationNative2 = PokerEquilatorSpears.combination(cardsForSpears2);
-            long combinationBrecher1 = PokerEquilatorBrecher.combination(cardsForBrecher1);
-            long combinationBrecher2 = PokerEquilatorBrecher.combination(cardsForBrecher2);
-            double sign1 = Math.signum(combinationNative1 - combinationNative2);
-            double sign2 = Math.signum(combinationBrecher1 - combinationBrecher2);
-            if (sign1 * sign2 <= 0 && (sign1 != 0 || sign2 != 0)) {
-                Log.d("Cards1: " + toString(cardsForSpears1)
-                        + " Cards2: " + toString(cardsForSpears2));
-                Log.d("Combination spears 1: " + combinationNative1);
-                Log.d("Combination spears 2: " + combinationNative2);
-                Log.d("Combination brecher 1: " + combinationBrecher1);
-                Log.d("Combination brecher 2: " + combinationBrecher2);
-                PokerEquilatorSpears.combination(cardsForSpears1);
-                PokerEquilatorSpears.combination(cardsForSpears2);
-                PokerEquilatorBrecher.combination(cardsForBrecher1);
-                PokerEquilatorBrecher.combination(cardsForBrecher2);
-                throw new RuntimeException();
-            }
-        }
-        Log.d("Brecher's and Spears well done!");
-    }
+			long combinationNative1 = PokerEquilatorSpears.combination(cardsForSpears1);
+			long combinationNative2 = PokerEquilatorSpears.combination(cardsForSpears2);
+			long combinationBrecher1 = PokerEquilatorBrecher.combination(cardsForBrecher1);
+			long combinationBrecher2 = PokerEquilatorBrecher.combination(cardsForBrecher2);
+			double sign1 = Math.signum(combinationNative1 - combinationNative2);
+			double sign2 = Math.signum(combinationBrecher1 - combinationBrecher2);
+			if (sign1 * sign2 <= 0 && (sign1 != 0 || sign2 != 0)) {
+				Log.d("Cards1: " + toString(cardsForSpears1) + " Cards2: " + toString(cardsForSpears2));
+				Log.d("Combination spears 1: " + combinationNative1);
+				Log.d("Combination spears 2: " + combinationNative2);
+				Log.d("Combination brecher 1: " + combinationBrecher1);
+				Log.d("Combination brecher 2: " + combinationBrecher2);
+				PokerEquilatorSpears.combination(cardsForSpears1);
+				PokerEquilatorSpears.combination(cardsForSpears2);
+				PokerEquilatorBrecher.combination(cardsForBrecher1);
+				PokerEquilatorBrecher.combination(cardsForBrecher2);
+				throw new RuntimeException();
+			}
+		}
+		Log.d("Brecher's and Spears well done!");
+	}
 
-    private static String toString(int[] cards) {
-        String result = "";
-        for (int card : cards) {
-            result += Card.valueOf(card);
-            result += ", ";
-        }
-        return result;
-    }
+	private static String toString(int[] cards) {
+		String result = "";
+		for (int card : cards) {
+			result += Card.valueOf(card);
+			result += ", ";
+		}
+		return result;
+	}
 
-    private static int[] toBrecher(int[] cards) {
-        int[] result = new int[cards.length];
-        for (int i = 0; i < cards.length; i++) {
-            result[i] = cards[i] % 4 * 13 + cards[i] / 4;
-        }
-        return result;
-    }
+	private static int[] toBrecher(int[] cards) {
+		int[] result = new int[cards.length];
+		for (int i = 0; i < cards.length; i++) {
+			result[i] = cards[i] % 4 * 13 + cards[i] / 4;
+		}
+		return result;
+	}
 
-    private static int[] dealCards(int how) {
-        int[] result = new int[how];
-        int count = 0;
-        Random random = new Random();
-        while (count < how) {
-            int card = Deck.getIntCards()[random.nextInt(52)];
-            if (!ArrayUtils.containsElement(result, card)) {
-                result[count++] = card;
-            }
-        }
-        return result;
-    }
+	private static int[] dealCards(int how) {
+		int[] result = new int[how];
+		int count = 0;
+		Random random = new Random();
+		while (count < how) {
+			int card = Deck.getIntCards()[random.nextInt(52)];
+			if (!ArrayUtils.containsElement(result, card)) {
+				result[count++] = card;
+			}
+		}
+		return result;
+	}
 
-    public static void testPreflop() {
-        Card card1 = Card.valueOf("As");
-        Card card2 = Card.valueOf("Kd");
-        double strength = PokerEquilatorBrecher.strengthVsSpectrum(card1, card2,
-                new Card[]{}, Spectrum.random());
-        Log.d("Strength: " + strength);
-    }
-
-	public static void testFlushDro() {
+	public static void testPreflop() {
 		Card card1 = Card.valueOf("As");
-    	Card card2 = Card.valueOf("Ks");
-    	Card flop1 = Card.valueOf("Qd");
-    	Card flop2 = Card.valueOf("Td");
-		Card flop3 = Card.valueOf("8s");
-		PokerEquilatorBrecher.LOGGING = false;
-		StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(card1, card2, flop1, flop2, flop3, false);
-		System.out.println(equity);
-    }
+		Card card2 = Card.valueOf("Kd");
+		double strength = PokerEquilatorBrecher.strengthVsSpectrum(card1, card2, new Card[] {}, Spectrum.random());
+		Log.d("Strength: " + strength);
+	}
 
-    public static void main(String[] args) {
-    	testFlushDro();
-    }
 }

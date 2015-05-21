@@ -28,20 +28,23 @@ public class SituationHandler implements ISituationHandler, IGameObserver {
     protected String heroName, villainName;
     private double strength, positivePotential, negativePotential;
     protected LimitType limitType;
+    private final boolean needFullPotentialOnFlop;
 
     public SituationHandler(LimitType limitType) {
         this.limitType = limitType;
+        needFullPotentialOnFlop = false;
     }
 
-    /* (non-Javadoc)
-	 * @see mallorcatour.core.game.situation.IGameObserver#onHoleCards(mallorcatour.core.game.Card, mallorcatour.core.game.Card, java.lang.String, java.lang.String)
-	 */
+	public SituationHandler(LimitType limitType, boolean needFullPotentialOnFlop) {
+		this.limitType = limitType;
+		this.needFullPotentialOnFlop = needFullPotentialOnFlop;
+	}
+
     @Override
 	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
         this.holeCard1 = c1;
-        this.holeCard2 = c2;
-		StreetEquity equity = EquilatorPreflop.equityVsRandom(holeCard1,
-				holeCard2);
+		this.holeCard2 = c2;
+		StreetEquity equity = EquilatorPreflop.equityVsRandom(holeCard1, holeCard2);
 		strength = equity.strength;
 		positivePotential = equity.positivePotential;
 		negativePotential = equity.negativePotential;
@@ -91,14 +94,12 @@ public class SituationHandler implements ISituationHandler, IGameObserver {
         return result;
     }
 
+    @Override
     public LocalSituation onHeroSituation() {
         LocalSituation result = getHeroSituation();
         return result;
     }
 
-    /* (non-Javadoc)
-	 * @see mallorcatour.core.game.situation.IGameObserver#onHeroActed(mallorcatour.core.game.Action)
-	 */
     @Override
 	public void onHeroActed(Action action) {
         if (action.isAggressive()) {
@@ -110,17 +111,18 @@ public class SituationHandler implements ISituationHandler, IGameObserver {
         heroActionCount++;
     }
 
-    /* (non-Javadoc)
-	 * @see mallorcatour.core.game.situation.IGameObserver#onStageEvent(mallorcatour.core.game.PokerStreet)
-	 */
     @Override
 	public void onStageEvent(PokerStreet street) {
         if (street == PokerStreet.FLOP) {
             flop1 = gameInfo.getBoard().get(0);
             flop2 = gameInfo.getBoard().get(1);
-            flop3 = gameInfo.getBoard().get(2);
-            StreetEquity flopEquity = PokerEquilatorBrecher.equityOnFlop(holeCard1,
-                    holeCard2, flop1, flop2, flop3);
+			flop3 = gameInfo.getBoard().get(2);
+			StreetEquity flopEquity;
+			if (needFullPotentialOnFlop) {
+				flopEquity = PokerEquilatorBrecher.equityOnFlopFull(holeCard1, holeCard2, flop1, flop2, flop3, true);
+			} else {
+				flopEquity = PokerEquilatorBrecher.equityOnFlop(holeCard1, holeCard2, flop1, flop2, flop3);
+			}
             strength = flopEquity.strength;
             positivePotential = flopEquity.positivePotential;
             negativePotential = flopEquity.negativePotential;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.hhparser;
+package mallorcatour.neuronetworkwrapper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,9 +13,10 @@ import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.hhparser.AdviceReader;
+import mallorcatour.hhparser.HandParser;
+import mallorcatour.hhparser.TournamentParser;
 import mallorcatour.hhparser.core.Tournament;
-import mallorcatour.neuronetworkwrapper.LEManager;
-import mallorcatour.neuronetworkwrapper.PokerLearningExample;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.MyFileWriter;
