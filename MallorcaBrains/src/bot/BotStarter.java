@@ -35,6 +35,8 @@ public class BotStarter implements Bot {
 		} else {
 			strength = PokerEquilatorBrecher.strengthVsRandom(cards.first, cards.second, table);
 		}
+		Log.d("Strength: " + strength);
+		Log.d("To call: " + state.getAmountToCall());
 		Advice advice;
 		if (state.getAmountToCall() == 0) {
 			if (strength < 0.25) {
@@ -65,7 +67,13 @@ public class BotStarter implements Bot {
 
 	static PokerMove convert(Action action, BotState state) {
 		if (action.isAggressive()) {
-			int amount = (int) (0.66 * (state.getPot() + state.getAmountToCall()));
+			double coeff;
+			if (state.getAmountToCall() == 0) {
+				coeff = 0.7;
+			} else {
+				coeff = 1;
+			}
+			int amount = (int) (coeff * (state.getPot() + state.getAmountToCall()));
 			return new PokerMove(state.getMyName(), "raise", amount);
 		} else if (action.isPassive()) {
 			return new PokerMove(state.getMyName(), "call", 0);

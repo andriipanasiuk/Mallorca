@@ -340,7 +340,7 @@ public class FellOmen2 implements IPlayer {
             flopBoardIndex = FellOmenHelper.getFlopBoardIndex(flop1, flop2, flop3);
             Log.f(DEBUG, "Flop board index: " + flopBoardIndex);
             flopEquity = PokerEquilatorBrecher.equityOnFlopFull(
-                    holeCard1, holeCard2, flop1, flop2, flop3);
+                    holeCard1, holeCard2, flop1, flop2, flop3, true);
         } else if (street == PokerStreet.TURN) {
             flop1 = board.get(0);
             flop2 = board.get(1);

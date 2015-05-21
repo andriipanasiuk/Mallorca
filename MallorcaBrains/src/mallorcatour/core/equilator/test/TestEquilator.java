@@ -4,7 +4,6 @@
  */
 package mallorcatour.core.equilator.test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -169,7 +168,7 @@ public class TestEquilator {
                 myCard1 = nonUsed.get(i);
                 myCard2 = nonUsed.get(j);
                 StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2,
-                        boardCard1, boardCard2, boardCard3);
+                        boardCard1, boardCard2, boardCard3, true);
                 Log.d("Equity: " + equity.strength + " " + equity.positivePotential
                         + " " + equity.negativePotential);
             }
@@ -193,7 +192,7 @@ public class TestEquilator {
 
         long start = System.currentTimeMillis();
         StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2,
-                boardCard1, boardCard2, boardCard3);
+                boardCard1, boardCard2, boardCard3, true);
         Log.d("Equity: " + equity.strength + " " + equity.positivePotential
                 + " " + equity.negativePotential);
         Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
@@ -270,12 +269,12 @@ public class TestEquilator {
 
 	public static void testFlushDro() {
 		Card card1 = Card.valueOf("As");
-    	Card card2 = Card.valueOf("Kd");
-    	Card flop1 = Card.valueOf("Ks");
+    	Card card2 = Card.valueOf("Ks");
+    	Card flop1 = Card.valueOf("Qd");
     	Card flop2 = Card.valueOf("Td");
-		Card flop3 = Card.valueOf("8c");
-		PokerEquilatorBrecher.LOGGING = true;
-		StreetEquity equity = PokerEquilatorBrecher.equityOnFlop(card1, card2, flop1, flop2, flop3);
+		Card flop3 = Card.valueOf("8s");
+		PokerEquilatorBrecher.LOGGING = false;
+		StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(card1, card2, flop1, flop2, flop3, false);
 		System.out.println(equity);
     }
 

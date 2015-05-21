@@ -95,8 +95,12 @@ public final class HandEval {
 
 	private static final int[] loEvalOrNo8Low	= new int[ARRAY_SIZE]; // 5 bits set in LS 8 bits, or NO_8_LOW */
 
-	private static int flushAndOrStraight7(final int ranks, final int c, final int d, final int h, final int s) {
+	private static int flushAndOrStraight7(final int ranks, final int c, final int d, final int h, final int s,
+			boolean flush) {
 
+		if (!flush) {
+			return straightValue[ranks];
+		}
 		int	i, j;
 		
 		if ((j = nbrOfRanks[c]) > 7 - 5) {
@@ -132,7 +136,7 @@ public final class HandEval {
 	 * @param hand bit mask with one bit set for each of 7 cards.
 	 * @return the value of the best 5-card high poker hand.
 	 */
-	public static int hand7Eval(long hand) {
+	public static int hand7Eval(long hand, boolean flush) {
 		int i, j, ranks;
 
 		/* 
@@ -208,7 +212,7 @@ public final class HandEval {
 		 * or two pair and three singletons,
 		 * or trips and four singletons
 		 */
-			if ((i = flushAndOrStraight7(ranks, c, d, h, s)) != 0)
+			if ((i = flushAndOrStraight7(ranks, c, d, h, s, flush)) != 0)
 				return i;
 			i = c ^ d ^ h ^ s; // the bits of the trips, if any, and singletons
 			if (nbrOfRanks[i] != 5) {
@@ -226,7 +230,7 @@ public final class HandEval {
 		 * flush and/or straight,
 		 * or one pair and three kickers and two nonplaying singletons
 		 */
-			if ((i = flushAndOrStraight7(ranks, c, d, h, s)) != 0)
+			if ((i = flushAndOrStraight7(ranks, c, d, h, s, flush)) != 0)
 				return i;
 			i = c ^ d ^ h ^ s; /* the bits of the five singletons */
 			return PAIR | hiBotRank[ranks ^ i] | hi3RanksMask[i];
@@ -235,7 +239,7 @@ public final class HandEval {
 		/*
 		 * flush and/or straight or no pair
 		 */
-			if ((i = flushAndOrStraight7(ranks, c, d, h, s)) != 0)
+			if ((i = flushAndOrStraight7(ranks, c, d, h, s, flush)) != 0)
 				return i;
 			return /* NO_PAIR | */ hi5RanksMask[ranks];
 
@@ -341,10 +345,11 @@ public final class HandEval {
 	    return 0; /* never reached, but avoids compiler warning */
 	}
 
-	private static int flushAndOrStraight6(final int ranks, final int c, final int d, final int h, final int s) {
-
+	private static int flushAndOrStraight6(final int ranks, final int c, final int d, final int h, final int s, boolean flush) {
+		if (!flush) {
+			return straightValue[ranks];
+		}
 		int	i, j;
-		
 		if ((j = nbrOfRanks[c]) > 6 - 5) {
 			// there's either a club flush or no flush
 			if (j >= 5)
@@ -378,7 +383,7 @@ public final class HandEval {
 	 * @param hand bit mask with one bit set for each of 6 cards.
 	 * @return the value of the best 5-card high poker hand.
 	 */
-	public static int hand6Eval(long hand) {
+	public static int hand6Eval(long hand, boolean flush) {
 
 		final int c = (int)hand & 0x1FFF;
 		final int d = ((int)hand >>> 13) & 0x1FFF;
@@ -442,13 +447,13 @@ public final class HandEval {
 			case 5:	/* flush and/or straight,
 					   or one pair and three kickers and
 					    one non-playing singleton */
-				if ((i = flushAndOrStraight6(ranks, c, d, h, s)) != 0)
+				if ((i = flushAndOrStraight6(ranks, c, d, h, s, flush)) != 0)
 					return i;
 	                i = c ^ d ^ h ^ s; /* the bits of the four singletons */
 	                return PAIR | hiBotRank[ranks ^ i] | hi3RanksMask[i];
 
 			case 6:	/* flush and/or straight or no pair */
-				if ((i = flushAndOrStraight6(ranks, c, d, h, s)) != 0)
+				if ((i = flushAndOrStraight6(ranks, c, d, h, s, flush)) != 0)
 					return i;
 	                return /* NO_PAIR | */ hi5RanksMask[ranks];
 
@@ -462,7 +467,7 @@ public final class HandEval {
 	 * @param hand bit mask with one bit set for each of 5 cards.
 	 * @return the value of the hand.
 	 */
-	public static int hand5Eval(long hand) {
+	public static int hand5Eval(long hand, boolean flush) {
 	
 		final int c = (int)hand & 0x1FFF;
 		final int d = ((int)hand >>> 13) & 0x1FFF;
@@ -504,29 +509,31 @@ public final class HandEval {
 	                i = c ^ d ^ h ^ s; /* kicker bits */
 	                return PAIR | hiBotRank[ranks ^ i] | i;
 
-	        case 5: /* flush and/or straight, or no pair */
-					if ((i = straightValue[ranks]) == 0)
-						i = ranks;
-					if (c != 0) {			/* if any clubs... */
-						if (c != ranks)		/*   if no club flush... */
-							return i; }		/*      return straight or no pair value */
-					else
-						if (d != 0) {
-							if (d != ranks)
-								return i; }
-						else
-							if (h != 0) {
-								if (h != ranks)
-									return i; }
-						/*	else s == ranks: spade flush */
-					/* There is a flush */
-					if (i == ranks)
-						/* no straight */
-						return FLUSH | ranks;
-					else
-						return (STRAIGHT_FLUSH - STRAIGHT) + i;
+	    case 5: /* flush and/or straight, or no pair */
+			if ((i = straightValue[ranks]) == 0)
+				i = ranks;
+			if (c != 0) { /* if any clubs... */
+				if (c != ranks) /* if no club flush... */
+					return i;
+			} /* return straight or no pair value */
+			else if (d != 0) {
+				if (d != ranks)
+					return i;
+			} else if (h != 0) {
+				if (h != ranks)
+					return i;
+			}
+			/* else s == ranks: spade flush */
+			/* There is a flush */
+			if (!flush) {
+				return i;
+			}
+			if (i == ranks) {
+				/* no straight */
+				return FLUSH | ranks;
+			} else
+				return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		}
-
 	    return 0; /* never reached, but avoids compiler warning */
 	}
 

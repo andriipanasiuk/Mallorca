@@ -65,27 +65,27 @@ public class PokerEquilatorBrecher {
 	}
 
 	public static int combination(int[] allCards) {
+		return combination(allCards, true);
+	}
+
+	public static int combination(int[] allCards, boolean flush) {
 		timeCount++;
 		long key = encode(allCards);
-		if (allCards.length == 5) {
-			return HandEval.hand5Eval(key);
-		} else if (allCards.length == 6) {
-			return HandEval.hand6Eval(key);
-		} else if (allCards.length == 7) {
-			return HandEval.hand7Eval(key);
-		} else {
-			throw new RuntimeException();
-		}
+		return combination(key, allCards.length, flush);
 	}
 
 	public static int combination(long cardsKey, int how) {
+		return combination(cardsKey, how, true);
+	}
+
+	public static int combination(long cardsKey, int how, boolean flush) {
 		timeCount++;
 		if (how == 5) {
-			return HandEval.hand5Eval(cardsKey);
+			return HandEval.hand5Eval(cardsKey, flush);
 		} else if (how == 6) {
-			return HandEval.hand6Eval(cardsKey);
+			return HandEval.hand6Eval(cardsKey, flush);
 		} else if (how == 7) {
-			return HandEval.hand7Eval(cardsKey);
+			return HandEval.hand7Eval(cardsKey, flush);
 		} else {
 			throw new RuntimeException();
 		}
@@ -185,9 +185,9 @@ public class PokerEquilatorBrecher {
 	}
 
 	public static StreetEquity equityOnFlopFull(Card card1, Card card2,
-			Card flop1, Card flop2, Card flop3) {
+			Card flop1, Card flop2, Card flop3, boolean flush) {
 		return equityVsRandomFullPotential(card1, card2, new Card[] {
-				flop1, flop2, flop3 });
+				flop1, flop2, flop3 }, flush);
 	}
 
 	public static StreetEquity equityOnTurn(Card myCard1, Card myCard2,
@@ -380,7 +380,7 @@ public class PokerEquilatorBrecher {
 	}
 
 	public static StreetEquity equityVsRandomFullPotential(Card heroCard1,
-			Card heroCard2, Card[] boardCards) {
+			Card heroCard2, Card[] boardCards, boolean flush) {
 		boolean positive = false, drawBoolean;
 		int boardSize = boardCards.length;
 		if (boardSize != 3) {
@@ -411,7 +411,7 @@ public class PokerEquilatorBrecher {
 		int count = 0, wins = 0, draw = 0;
 		double countPositive = 0, winsPositive = 0;
 		double countNegative = 0, winsNegative = 0;
-		int myCombinationWithoutAdditional = combination(allHeroCardsWithoutAdditional);
+		int myCombinationWithoutAdditional = combination(allHeroCardsWithoutAdditional, flush);
 		for (int f = 0; f < nonUsedCards.length; f++) {
 			int opponentCard1 = nonUsedCards[f];
 			if (ArrayUtils.containsElement(allHeroCardsWithoutAdditional,
@@ -428,9 +428,8 @@ public class PokerEquilatorBrecher {
 				allOpponentCardsWithoutAdditional[1] = opponentCard2;
 				allOpponentCards[0] = opponentCard1;
 				allOpponentCards[1] = opponentCard2;
-				int opponentCombinationWithoutAdditional = combination(allOpponentCardsWithoutAdditional);
+				int opponentCombinationWithoutAdditional = combination(allOpponentCardsWithoutAdditional, flush);
 				if (myCombinationWithoutAdditional < opponentCombinationWithoutAdditional) {
-					Log.d(Card.valueOfBrecher(opponentCard1) + " " + Card.valueOfBrecher(opponentCard2));
 					positive = true;
 					drawBoolean = false;
 				} else if (myCombinationWithoutAdditional > opponentCombinationWithoutAdditional) {
@@ -467,8 +466,8 @@ public class PokerEquilatorBrecher {
 						}
 						allHeroCards[3 + boardSize] = river;
 						allOpponentCards[3 + boardSize] = river;
-						myCombination = combination(allHeroCards);
-						opponentCombination = combination(allOpponentCards);
+						myCombination = combination(allHeroCards, flush);
+						opponentCombination = combination(allOpponentCards, flush);
 						// compare the calculated or cached combinations
 						if (drawBoolean) {
 							countPositive += 0.5;

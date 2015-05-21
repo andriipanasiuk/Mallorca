@@ -3,7 +3,6 @@ package mallorcatour.core.equilator.quick;
 import static mallorcatour.core.equilator.PokerEquilatorBrecher.LOGGING;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
-import mallorcatour.core.game.Card;
 import mallorcatour.util.Log;
 
 public class EquilatorQuick {
@@ -141,11 +140,6 @@ public class EquilatorQuick {
 		start = System.currentTimeMillis();
 		for (int i = 0; i < 1000; i++)
 			equityVsRandomFullPotential(heroCard1, heroCard2, flop1, flop2, flop3, combinations);
-		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
-		start = System.currentTimeMillis();
-		for (int i = 0; i < 10; i++)
-			PokerEquilatorBrecher.equityVsRandomFullPotential(Card.valueOf(heroCard1), Card.valueOf(heroCard2),
-					new Card[] { Card.valueOf(flop1), Card.valueOf(flop2), Card.valueOf(flop3) });
 		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
 	}
 
