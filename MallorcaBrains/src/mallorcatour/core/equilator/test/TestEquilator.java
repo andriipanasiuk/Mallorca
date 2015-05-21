@@ -4,6 +4,7 @@
  */
 package mallorcatour.core.equilator.test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -167,7 +168,7 @@ public class TestEquilator {
             for (int j = i + 1; j < nonUsed.size(); j++) {
                 myCard1 = nonUsed.get(i);
                 myCard2 = nonUsed.get(j);
-                StreetEquity equity = PokerEquilatorBrecher.fullEquityOnFlop(myCard1, myCard2,
+                StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2,
                         boardCard1, boardCard2, boardCard3);
                 Log.d("Equity: " + equity.strength + " " + equity.positivePotential
                         + " " + equity.negativePotential);
@@ -191,7 +192,7 @@ public class TestEquilator {
         nonUsed = CollectionUtils.subtract(nonUsed, boardCard3);
 
         long start = System.currentTimeMillis();
-        StreetEquity equity = PokerEquilatorBrecher.fullEquityOnFlop(myCard1, myCard2,
+        StreetEquity equity = PokerEquilatorBrecher.equityOnFlopFull(myCard1, myCard2,
                 boardCard1, boardCard2, boardCard3);
         Log.d("Equity: " + equity.strength + " " + equity.positivePotential
                 + " " + equity.negativePotential);
@@ -267,7 +268,28 @@ public class TestEquilator {
         Log.d("Strength: " + strength);
     }
 
+	public static void testFlushDro() {
+		Card card1 = Card.valueOf("As");
+    	Card card2 = Card.valueOf("Kd");
+    	Card flop1 = Card.valueOf("Ks");
+    	Card flop2 = Card.valueOf("Td");
+		Card flop3 = Card.valueOf("8c");
+		PokerEquilatorBrecher.LOGGING = true;
+		StreetEquity equity = PokerEquilatorBrecher.equityOnFlop(card1, card2, flop1, flop2, flop3);
+		System.out.println(equity);
+    }
+
     public static void main(String[] args) {
-    	testQuickSpeed();
+    	int comb;
+    	int[] array = Card.convertToIntBrecherArray("KsTd8c2s5c");
+    	Log.d(Arrays.toString(array));
+    	comb = PokerEquilatorBrecher.combination(array);
+    	Log.d(comb+"");
+    	comb = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray("KsTd8c2s6c"));
+    	Log.d(comb+"");
+    	comb = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray("KsTd8c2s4c"));
+    	Log.d(comb+"");
+    	comb = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray("KsTd8c2s7c"));
+    	Log.d(comb+"");
     }
 }

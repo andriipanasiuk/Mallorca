@@ -11,13 +11,8 @@
 
 package bot;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
-import mallorcatour.core.equilator.preflop.EquilatorPreflop;
+import mallorcatour.core.equilator.preflop.simple.EquilatorPreflopSimple;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -36,7 +31,7 @@ public class BotStarter implements Bot {
 		Card[] table = state.getTable();
 		double strength;
 		if (table.length == 0) {
-			strength = EquilatorPreflop.strengthVsRandom(cards.first, cards.second);
+			strength = EquilatorPreflopSimple.strengthByFormula(cards.first, cards.second);
 		} else {
 			strength = PokerEquilatorBrecher.strengthVsRandom(cards.first, cards.second, table);
 		}
@@ -84,16 +79,6 @@ public class BotStarter implements Bot {
 	 */
 	public static void main(String[] args) {
 		Log.WRITE_TO_ERR = true;
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					BotStarter.class.getResourceAsStream("test.txt")));
-			String line = reader.readLine();
-			System.err.println(line);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		BotParser parser = new BotParser(new BotStarter());
 		parser.run();
 	}

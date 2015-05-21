@@ -14,6 +14,7 @@ import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.math.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -251,10 +252,8 @@ public class SpectrumSituationHandler extends SituationHandler {
 
     private String logVillainSpectrum() {
         String log = null;
-        if (gameInfo.isPreFlop()) {
-            log = "Strength: "
-                    + PokerEquilatorBrecher.strengthVsSpectrum(new HoleCards(holeCard1, holeCard2),
-                    new Card[]{}, villainSpectrum);
+		if (gameInfo.isPreFlop()) {
+			log = "Strength: " + EquilatorPreflop.strengthVsSpectrum(holeCard1, holeCard2, villainSpectrum);
         } else if (gameInfo.isFlop()) {
             StreetEquity equity = PokerEquilatorBrecher.equityVsSpectrum(new HoleCards(holeCard1, holeCard2),
                     new Card[]{flop1, flop2, flop3}, villainSpectrum);

@@ -104,6 +104,28 @@ public final class Card implements Comparable<Card>, Serializable {
 		return result;
 	}
 
+	public static int[] convertToIntArray(String cards) {
+		if (cards.length() % 2 == 1) {
+			throw new IllegalArgumentException();
+		}
+		int[] result = new int[cards.length() / 2];
+		for (int i = 0; i < cards.length() / 2; i++) {
+			result[i] = Card.valueOf(cards.substring(i * 2, i * 2 + 2)).intValue();
+		}
+		return result;
+	}
+
+	public static int[] convertToIntBrecherArray(String cards) {
+		if (cards.length() % 2 == 1) {
+			throw new IllegalArgumentException();
+		}
+		int[] result = new int[cards.length() / 2];
+		for (int i = 0; i < cards.length() / 2; i++) {
+			result[i] = Card.valueOf(cards.substring(i * 2, i * 2 + 2)).intValueForBrecher();
+		}
+		return result;
+	}
+
 	public static int[] convertToIntArray(List<Card> cards) {
 		int[] result = new int[cards.size()];
 		for (int i = 0; i < cards.size(); i++) {

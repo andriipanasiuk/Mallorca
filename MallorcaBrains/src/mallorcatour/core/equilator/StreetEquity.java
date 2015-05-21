@@ -25,4 +25,9 @@ public class StreetEquity {
         double realEquity = (strength) * (1 - negative) + (1 - strength) * positive;
         return realEquity;
     }
+
+    @Override
+	public String toString() {
+		return "Strength: " + strength + "\n" + "Positive: " + positivePotential + "\nNegative: " + negativePotential;
+	}
 }

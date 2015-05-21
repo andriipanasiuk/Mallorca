@@ -12,8 +12,6 @@ public class EquilatorPreflop {
 
 	public static boolean LOGGING = false;
 	private static final String PREFLOP_STRENGTH_TABLE_PATH = "preflop.eql";
-	private static int MAX_PREFLOP_STRENGTH = EquilatorPreflop.preflopStrengthForSorted(
-			Card.valueOf("Ah"), Card.valueOf("Ac"));
 	public static double[][] preflopStrength = new double[170][170];
 
 	static {
@@ -108,32 +106,8 @@ public class EquilatorPreflop {
 		return preflopStrength[heroHash][villainHash];
 	}
 
-	public static double preflopStrength(int heroHash, int villainHash) {
+	private static double preflopStrength(int heroHash, int villainHash) {
 		return preflopStrength[heroHash][villainHash];
-	}
-
-	/**
-	 * Calculates preflop strength based on formula.
-	 * 
-	 * @param holeCard1
-	 * @param holeCard2
-	 * @deprecated use this{@link #strengthVsRandom(Card, Card)} instead
-	 * @return
-	 */
-	@Deprecated
-	public static double strengthByFormula(Card holeCard1, Card holeCard2) {
-		if (holeCard1.compareTo(holeCard2) == 0) {
-			throw new IllegalArgumentException(
-					"Hole cards must not be equals. " + "First: "
-							+ holeCard1 + "; second: " + holeCard2);
-		}
-		int strength;
-		if (holeCard1.compareTo(holeCard2) > 0) {
-			strength = EquilatorPreflop.preflopStrengthForSorted(holeCard1, holeCard2);
-		} else {
-			strength = EquilatorPreflop.preflopStrengthForSorted(holeCard2, holeCard1);
-		}
-		return ((double) strength) / (MAX_PREFLOP_STRENGTH);
 	}
 
 	public static double strengthVsRandom(Card heroCard1, Card heroCard2) {
@@ -155,27 +129,6 @@ public class EquilatorPreflop {
 		}
 		Log.d("Calculated vs " + log + " villain cards");
 		return ((double) wins) / count;
-	}
-
-	/**
-	 * First card must be bigger than the second
-	 * @param holeCard1
-	 * @param holeCard2
-	 * @return
-	 */
-	private static int preflopStrengthForSorted(Card holeCard1, Card holeCard2) {
-		if (!holeCard1.sameValue(holeCard2)) {
-			if (!holeCard1.isSuitedWith(holeCard2)) {
-				return holeCard1.getValue().intValue() * 2
-						+ holeCard2.getValue().intValue();
-			} else {
-				return holeCard1.getValue().intValue() * 2
-						+ holeCard2.getValue().intValue() + 2;
-			}
-		} else {
-			return holeCard1.getValue().intValue() * 2
-					+ holeCard2.getValue().intValue() + 22;
-		}
 	}
 
 	static void testMain() {

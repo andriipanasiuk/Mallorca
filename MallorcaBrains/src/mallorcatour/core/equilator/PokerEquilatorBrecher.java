@@ -4,7 +4,6 @@
  */
 package mallorcatour.core.equilator;
 
-import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.Flop;
@@ -13,7 +12,7 @@ import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.ArrayUtils;
 import mallorcatour.util.Log;
 
-import com.stevebrecher.HandEval;
+import com.stevebrecher.poker.HandEval;
 
 /**
  *
@@ -148,57 +147,46 @@ public class PokerEquilatorBrecher {
 		return ((double) draw / 2 + wins) / count;
 	}
 
-	public static double strengthVsSpectrum(Card heroCard1, Card heroCard2,
-			Card[] boardCards, Spectrum opponentSpectrum) {
-		if (boardCards.length == 0) {
-			return EquilatorPreflop.strengthVsSpectrum(heroCard1,
-					heroCard2, opponentSpectrum);
-		} else {
-			int boardSize = boardCards.length;
-			int[] allMyCards = new int[2 + boardSize];
-			int[] allOpponentCards = new int[2 + boardSize];
-			allMyCards[0] = heroCard1.intValueForBrecher();
-			allMyCards[1] = heroCard2.intValueForBrecher();
-			for (int i = 0; i < boardSize; i++) {
-				allMyCards[2 + i] = boardCards[i].intValueForBrecher();
-				allOpponentCards[2 + i] = boardCards[i].intValueForBrecher();
-			}
-			//
-			double count = 0, wins = 0, draw = 0;
-			int myCombination = combination(allMyCards);
-
-			for (HoleCards opponentHoleCards : opponentSpectrum) {
-				Card opponentCard1 = opponentHoleCards.first;
-				Card opponentCard2 = opponentHoleCards.second;
-				allOpponentCards[0] = opponentCard1.intValueForBrecher();
-				allOpponentCards[1] = opponentCard2.intValueForBrecher();
-				double frequency = opponentSpectrum
-						.getWeight(opponentHoleCards);
-				int opponentCombination;
-				opponentCombination = combination(allOpponentCards);
-				if (myCombination > opponentCombination) {
-					wins += frequency;
-				} else if (myCombination < opponentCombination) {
-				} else {
-					draw += frequency;
-				}
-				count += frequency;
-			}
-			// Log.d("equityVsRandom() wins = " + wins + " draw = " + draw +
-			// " count = " + count);
-			return ((double) draw / 2 + wins) / count;
+	public static double strengthVsSpectrum(Card heroCard1, Card heroCard2, Card[] boardCards, Spectrum opponentSpectrum) {
+		int boardSize = boardCards.length;
+		int[] allMyCards = new int[2 + boardSize];
+		int[] allOpponentCards = new int[2 + boardSize];
+		allMyCards[0] = heroCard1.intValueForBrecher();
+		allMyCards[1] = heroCard2.intValueForBrecher();
+		for (int i = 0; i < boardSize; i++) {
+			allMyCards[2 + i] = boardCards[i].intValueForBrecher();
+			allOpponentCards[2 + i] = boardCards[i].intValueForBrecher();
 		}
+		//
+		double count = 0, wins = 0, draw = 0;
+		int myCombination = combination(allMyCards);
+
+		for (HoleCards opponentHoleCards : opponentSpectrum) {
+			Card opponentCard1 = opponentHoleCards.first;
+			Card opponentCard2 = opponentHoleCards.second;
+			allOpponentCards[0] = opponentCard1.intValueForBrecher();
+			allOpponentCards[1] = opponentCard2.intValueForBrecher();
+			double frequency = opponentSpectrum.getWeight(opponentHoleCards);
+			int opponentCombination;
+			opponentCombination = combination(allOpponentCards);
+			if (myCombination > opponentCombination) {
+				wins += frequency;
+			} else if (myCombination < opponentCombination) {
+			} else {
+				draw += frequency;
+			}
+			count += frequency;
+		}
+		return ((double) draw / 2 + wins) / count;
 	}
 
-	public static StreetEquity equityOnFlop(Card myCard1, Card myCard2,
-			Card flop1, Card flop2, Card flop3) {
-		return equityVsRandom(myCard1, myCard2, new Card[] { flop1, flop2,
-				flop3 });
+	public static StreetEquity equityOnFlop(Card card1, Card card2, Card flop1, Card flop2, Card flop3) {
+		return equityVsRandom(card1, card2, new Card[] { flop1, flop2, flop3 });
 	}
 
-	public static StreetEquity fullEquityOnFlop(Card myCard1, Card myCard2,
+	public static StreetEquity equityOnFlopFull(Card card1, Card card2,
 			Card flop1, Card flop2, Card flop3) {
-		return equityVsRandomFullPotential(myCard1, myCard2, new Card[] {
+		return equityVsRandomFullPotential(card1, card2, new Card[] {
 				flop1, flop2, flop3 });
 	}
 
@@ -264,15 +252,8 @@ public class PokerEquilatorBrecher {
 				flop3, turn, river }, spektr);
 	}
 
-	public static double strengthVsSpectrum(HoleCards heroCards, Card[] board,
-			Spectrum spectrum) {
-		if (board.length == 0) {
-			return EquilatorPreflop.strengthVsSpectrum(heroCards.first, heroCards.second,
-					spectrum);
-		} else {
-			return strengthVsSpectrum(heroCards.first, heroCards.second, board,
-					spectrum);
-		}
+	public static double strengthVsSpectrum(HoleCards heroCards, Card[] board, Spectrum spectrum) {
+		return strengthVsSpectrum(heroCards.first, heroCards.second, board, spectrum);
 	}
 
 	private static StreetEquity equityVsRandom(Card heroCard1, Card heroCard2,
@@ -404,7 +385,7 @@ public class PokerEquilatorBrecher {
 		int boardSize = boardCards.length;
 		if (boardSize != 3) {
 			throw new IllegalArgumentException(
-					"For full potential must be 3 baord cards");
+					"For full potential must be 3 board cards");
 		}
 		int[] allHeroCards = new int[2 + boardSize + 2];
 		int[] allOpponentCards = new int[2 + boardSize + 2];
@@ -449,6 +430,7 @@ public class PokerEquilatorBrecher {
 				allOpponentCards[1] = opponentCard2;
 				int opponentCombinationWithoutAdditional = combination(allOpponentCardsWithoutAdditional);
 				if (myCombinationWithoutAdditional < opponentCombinationWithoutAdditional) {
+					Log.d(Card.valueOfBrecher(opponentCard1) + " " + Card.valueOfBrecher(opponentCard2));
 					positive = true;
 					drawBoolean = false;
 				} else if (myCombinationWithoutAdditional > opponentCombinationWithoutAdditional) {

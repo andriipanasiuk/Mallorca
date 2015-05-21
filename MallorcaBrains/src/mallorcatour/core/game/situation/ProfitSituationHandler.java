@@ -5,7 +5,7 @@
 package mallorcatour.core.game.situation;
 
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
-import mallorcatour.core.equilator.preflop.EquilatorPreflop;
+import mallorcatour.core.equilator.preflop.simple.EquilatorPreflopSimple;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
@@ -63,8 +63,8 @@ public class ProfitSituationHandler implements ISituationHandler {
             hasFlop = true;
             double pot = gameInfo.getPotSize();
             PlayerInfo villainInfo = getVillainInfo();
-            double heroPreflopStrength = EquilatorPreflop.strengthByFormula(heroCard1, heroCard2);
-            double villainPreflopStrength = EquilatorPreflop.strengthByFormula(
+            double heroPreflopStrength = EquilatorPreflopSimple.strengthByFormula(heroCard1, heroCard2);
+            double villainPreflopStrength = EquilatorPreflopSimple.strengthByFormula(
                     villainInfo.getHoleCards().first, villainInfo.getHoleCards().second);
             expectedProfit = pot * heroPreflopStrength / (heroPreflopStrength + villainPreflopStrength) - (pot / 2);
         }

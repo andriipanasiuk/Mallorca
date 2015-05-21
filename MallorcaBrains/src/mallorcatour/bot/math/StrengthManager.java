@@ -25,15 +25,11 @@ public class StrengthManager implements IGameObserver {
 	private Spectrum randomVillainSpectrum;
 	private IGameInfo gameInfo;
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
 		preflop = new HashMap<HoleCards, StreetEquity>();
 		for (HoleCards holeCards : randomVillainSpectrum) {
-			//TODO calculate potentials for preflop with new method
-			double strength = EquilatorPreflop.strengthByFormula(holeCards.first, holeCards.second);
-			StreetEquity eq = new StreetEquity();
-			eq.strength = strength;
+			StreetEquity eq = EquilatorPreflop.equityVsRandom(holeCards.first, holeCards.second);
 			preflop.put(holeCards, eq);
 		}
 	}
