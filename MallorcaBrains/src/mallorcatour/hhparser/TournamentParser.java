@@ -21,10 +21,8 @@ import mallorcatour.neuronetworkwrapper.PokerLearningExample;
  */
 public class TournamentParser {
 
-    public static List<PokerLearningExample> parseLocalSituations(Tournament tournament,
-            String heroName) {
-        return parseLocalSituations(tournament, heroName,
-                new SituationHandler(LimitType.NO_LIMIT));
+	public static List<PokerLearningExample> parseLocalSituations(Tournament tournament, String heroName) {
+		return parseLocalSituations(tournament, heroName, new SituationHandler(LimitType.NO_LIMIT, true));
     }
 
     public static List<PokerLearningExample> parseLocalSituations(

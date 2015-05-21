@@ -62,7 +62,7 @@ public class GrandtorinoBot implements IPlayer {
         profitCalculator = new NLProfitCalculator(villainModeller);
 		strengthManager = new StrengthManager();
 		situationHandler = new SpectrumSituationHandler(villainModeller, limitType, modelPreflop, modelPostflop,
-				spectrumListener, villainDecisionListener, strengthManager, DEBUG_PATH);
+				spectrumListener, villainDecisionListener, strengthManager, true, DEBUG_PATH);
 		if (limitType == LimitType.NO_LIMIT) {
             actionPreprocessor = new NLActionPreprocessor();
 			preflopBot = new NLPreflopChart();

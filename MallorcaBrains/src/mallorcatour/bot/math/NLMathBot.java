@@ -43,13 +43,12 @@ public class NLMathBot implements IPlayer {
     private IActionPreprocessor actionPreprocessor;
     private final String DEBUG_PATH;
 
-    public NLMathBot(BaseVillainModeller villainModeller,
-            ISpectrumListener listener,
-            IDecisionListener decisionListener, String debug) {
+	public NLMathBot(BaseVillainModeller villainModeller, ISpectrumListener listener,
+			IDecisionListener decisionListener, String debug) {
 		adviceCreator = new AdviceCreatorFromMap();
 		strengthManager = new StrengthManager();
 		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, true, listener,
-				decisionListener, strengthManager, debug);
+				decisionListener, strengthManager, true, debug);
 		preflopPokerNN = new BasePokerNN(new DanielxnNeurals(), true);
         preflopBot = new NLPreflopChart();
         actionPreprocessor = new NLActionPreprocessor();

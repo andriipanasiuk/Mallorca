@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+
 import javax.swing.JOptionPane;
 
 import mallorcatour.core.game.Hand;
@@ -28,13 +29,13 @@ import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.AdviceReader;
 import mallorcatour.hhparser.HandParser;
 import mallorcatour.hhparser.LoggingTournamentHandler;
-import mallorcatour.hhparser.NNConverter;
 import mallorcatour.hhparser.PAHHParser;
 import mallorcatour.hhparser.PSHHParser;
 import mallorcatour.hhparser.core.BaseHandHandler;
 import mallorcatour.hhparser.core.BaseTournamentHandler;
 import mallorcatour.hhparser.core.HandManager;
 import mallorcatour.hhparser.core.Tournament;
+import mallorcatour.neuronetworkwrapper.NNConverter;
 import mallorcatour.neuronetworkwrapper.PokerExamples;
 import mallorcatour.neuronetworkwrapper.PokerLearningExample;
 import mallorcatour.util.ExecutorUtils;
@@ -216,7 +217,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseTournamentsWithHandler(new SituationHandler(LimitType.NO_LIMIT));
+                parseTournamentsWithHandler(new SituationHandler(LimitType.NO_LIMIT, true));
             }
         });
     }//GEN-LAST:event_jMenuItem1ActionPerformed

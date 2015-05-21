@@ -49,15 +49,23 @@ public class SpectrumSituationHandler extends SituationHandler {
 	public SpectrumSituationHandler(IVillainModeller villainModeller, LimitType limitType, boolean modelPreflop,
 			boolean modelPostflop, ISpectrumListener villainSpectrumListener,
 			IDecisionListener villainDecisionListener, StrengthManager strengthManager, String debug) {
-		super(limitType);
+		this(villainModeller, limitType, modelPreflop, modelPostflop, villainSpectrumListener, villainDecisionListener,
+				strengthManager, false, debug);
+	}
+
+	public SpectrumSituationHandler(IVillainModeller villainModeller, LimitType limitType, boolean modelPreflop,
+			boolean modelPostflop, ISpectrumListener villainSpectrumListener,
+			IDecisionListener villainDecisionListener, StrengthManager strengthManager, boolean needFullFlopPotential,
+			String debug) {
+		super(limitType, needFullFlopPotential);
 		this.DEBUG_PATH = debug;
-        this.modelPreflop = modelPreflop;
-        this.modelPostflop = modelPostflop;
-        this.villainModellingNN = villainModeller;
-        this.villainSpectrumListener = villainSpectrumListener;
-        this.villainDecisionListener = villainDecisionListener;
-        this.strengthManager = strengthManager;
-    }
+		this.modelPreflop = modelPreflop;
+		this.modelPostflop = modelPostflop;
+		this.villainModellingNN = villainModeller;
+		this.villainSpectrumListener = villainSpectrumListener;
+		this.villainDecisionListener = villainDecisionListener;
+		this.strengthManager = strengthManager;
+	}
 
     /**
      * An event called to tell us our hole cards 

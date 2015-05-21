@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
 
@@ -16,7 +17,7 @@ import mallorcatour.core.vector.VectorUtils;
  *
  * @author Andrew
  */
-public class LocalSituation implements IVector, Serializable {
+public class LocalSituation implements IVector, Serializable, IAggressionInfo {
 
     public static final double DEFAULT_POTENTIAL = 0.1;
     private final static long serialVersionUID = -762999739785198026L;
@@ -50,7 +51,8 @@ public class LocalSituation implements IVector, Serializable {
     private double negativePotential = DEFAULT_POTENTIAL;
     private LimitType limitType;
 
-    public int getHeroAggresionActionCount() {
+    @Override
+	public int getHeroAggresionActionCount() {
     	return heroAggresionActionCount;
     }
     
@@ -58,7 +60,8 @@ public class LocalSituation implements IVector, Serializable {
     	this.heroAggresionActionCount = heroAggresionActionCount;
     }
     
-    public int getVillainAggresionActionCount() {
+    @Override
+	public int getVillainAggresionActionCount() {
     	return villainAggresionActionCount;
     }
     
@@ -185,12 +188,14 @@ public class LocalSituation implements IVector, Serializable {
     /**
      * @return the localAggresion
      */
-    @Deprecated
+    @Override
+	@Deprecated
     public double getHeroAggresionFrequency() {
         return heroAggresionFrequency;
     }
 
-    public int getHeroActionCount() {
+    @Override
+	public int getHeroActionCount() {
 		return heroActionCount;
 	}
 
@@ -198,6 +203,7 @@ public class LocalSituation implements IVector, Serializable {
 		this.heroActionCount = heroActionCount;
 	}
 
+	@Override
 	public int getVillainActionCount() {
 		return villainActionCount;
 	}
@@ -217,6 +223,7 @@ public class LocalSituation implements IVector, Serializable {
     /**
      * @return the localOpponentAggresion
      */
+	@Override
 	@Deprecated
     public double getVillainAggresionFrequency() {
         return opponentAggresionFrequency;
@@ -233,28 +240,30 @@ public class LocalSituation implements IVector, Serializable {
     /**
      * @return the wasOpponentPreviousAggresive
      */
-    public boolean wasVillainPreviousAggresive() {
+    @Override
+	public boolean wasVillainPreviousAggresive() {
         return wasOpponentPreviousAggresive;
     }
 
     /**
      * @param wasOpponentPreviousAggresive the wasOpponentPreviousAggresive to set
      */
-    public void wasOpponentPreviousAggresive(boolean wasOpponentPreviousAggresive) {
+	public void wasOpponentPreviousAggresive(boolean wasOpponentPreviousAggresive) {
         this.wasOpponentPreviousAggresive = wasOpponentPreviousAggresive;
     }
 
     /**
      * @return the wasIPreviousAggresive
      */
-    public boolean wasHeroPreviousAggresive() {
+    @Override
+	public boolean wasHeroPreviousAggresive() {
         return wasHeroPreviousAggresive;
     }
 
     /**
      * @param wasIPreviousAggresive the wasIPreviousAggresive to set
      */
-    public void wasHeroPreviousAggresive(boolean wasIPreviousAggresive) {
+	public void wasHeroPreviousAggresive(boolean wasIPreviousAggresive) {
         this.wasHeroPreviousAggresive = wasIPreviousAggresive;
     }
 

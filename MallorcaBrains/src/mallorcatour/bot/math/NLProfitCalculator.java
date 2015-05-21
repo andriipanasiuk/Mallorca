@@ -6,8 +6,8 @@ import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
@@ -21,7 +21,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 	private final NLGameSolver gameSolver;
 
 	@Override
-	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, String heroName, LocalSituation situation,
+	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, String heroName, IAggressionInfo situation,
 			Card holeCard1, Card holeCard2, Spectrum villainSpectrum, StrengthManager strengthManager) {
 		int heroActionCount = situation.getHeroActionCount();
 		int countOfHeroAggressive = situation.getHeroAggresionActionCount();
