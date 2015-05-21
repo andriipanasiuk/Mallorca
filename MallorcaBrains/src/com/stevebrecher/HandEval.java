@@ -6,106 +6,46 @@ package com.stevebrecher;
  * All of the methods are thread-safe.
  * <p>
  * Each evaluation method takes a single parameter representing a hand of five to
- * seven cards represented within a long (64 bits).  The long is considered as
- * composed of four 16-bit fields, one for each suit.  The ordering of these
- * 16-bit fields within the long, i.e., the correspondence of each to a specific
- * suit, is immaterial.  Within each suit's 16-bit field, the least-significant
- * 13 bits (masked by 0x1FFF) are flags representing the presence of ranks in
- * that suit, where bit 0 set (0x0001) for a deuce, ..., bit 12 set (0x1000) for
- * an ace.  The values of the unused most-significant three bits within each
- * 16-bit suit field are immaterial.
+ * seven cards represented in four 13-bit masks, one mask per suit, in
+ * the low-order 52 bits of a long (64 bits). In each mask, bit 0 set
+ * (0x0001) for a deuce, ..., bit 12 set (0x1000) for an ace. Each mask
+ * denotes the ranks present in one of the suits. The ordering of the
+ * 13-bit suit fields is immaterial.
  * <p>
  * A hand parameter can be built by encoding a {@link CardSet} or by bitwise
  * OR-ing, or adding, the encoded values of individual {@link Card}s.  These
  * encodings are returned by an {@link #encode encode} method.
  * <p>
- * Different methods are used for high and for lowball evaluation.
+ * Different methods are called for high and for lowball evaluation.  The
+ * return value format below is the same except:&nbsp;&nbsp;For low evaluation, as for
+ * wheels in high evaluation, Ace is rank 1 and its mask bit is the LS bit;
+ * otherwise Ace is rank 14, mask bit 0x1000, and the deuce's mask bit is
+ * the LS bit.  8-or-better low evaluation methods may also return {@link #NO_8_LOW}.
  * <p>
- * For high evaluation if results R1 > R2, hand 1 beats hand 2;
- * for lowball evaluation if results R1 > R2, hand 2 beats hand 1.
+ * For high evaulation, if results R1 > R2 then hand 1 beats hand 2;<br>
+ * For low evaluation, if results R1 > R2 then hand 2 beats hand 1.
  * <p>
- * Evaluation result in 32 bits = 0x0V0RRRRR where V, R are
- * hex digits or "nybbles" (half-bytes).
- * <p>
+ * Each evaluation method's return value is an int; 32 bits = 0x0VTBKKKK
+ * where each letter refers to a 4-bit nybble:<pre>
  * V nybble = category code ranging from {@link HandCategory#NO_PAIR}<code>.ordinal()</code>
  *                                    to {@link HandCategory#STRAIGHT_FLUSH}<code>.ordinal()</code>
- * <p>
- * The R nybbles are the significant ranks (0..12), where 0 is the deuce
- * in a high result (Ace is 12, 0xC), and for lowball 0 is the Ace
- * (King is 0xC).  The Rs may be considered to consist of Ps for ranks
- * which determine the primary value of the hand, and Ks for kickers
- * where applicable.  Ordering is left-to-right:  first the Ps, then
- * any Ks, then padding with 0s.  Because 0 is a valid rank, to
- * interpret a result you must know how many ranks are significant,
- * which is a function of the hand category and whether high or lowball.
- * Examples: for a one-pair hand there are four significant ranks,
- * that of the pair and of the three kickers; for a straight, there is
- * one significant rank, that of the highest in the hand.
- * <p>
- * Common-card (board) games are assumed in determining the number of
- * significant ranks.  For example, a kicker value is returned for quads even
- * though it wouldn't be significant in a draw game.
- * <p><pre>
- * Examples of ...Eval method results (high where not indicated):
- *  Royal flush: 0x080C0000
- *  Four of a kind, Queens, with a 5 kicker:  0x070A3000
- *  Threes full of eights:  0x06016000
- *  Straight to the five (wheel): 0x04030000 (high)
- *  Straight to the five (wheel): 0x04040000 (lowball)
- *  One pair, deuces (0x0), with A65: 0x0100C430 (high)
- *  One pair, deuces (0x1), with 65A: 0x01015400 (lowball)
- *  No pair, KJT85: 0x000B9863
- *  Razz, wheel:  0x00043210</pre>
- * For the eight-or-better lowball ..._Eval functions, the result is
- * either as above or the constant {@link #NO_8_LOW}.  NO_8_LOW > any other
- * ..._Eval function result.
- * <p>
- * @version 2010Jun25.1
+ * T nybble = rank (2..14) of top pair for two pair, 0 otherwise
+ * B nybble = rank (1..14) of quads or trips (including full house trips),
+ *              or rank of high card (5..14) in straight or straight flush,
+ *              or rank of bottom pair for two pair (hence the symbol "B"),
+ *              or rank of pair for one pair,
+ *              or 0 otherwise
+ * KKKK mask = 16-bit mask with...
+ *              5 bits set for no pair or (non-straight-)flush
+ *              3 bits set for kickers with pair,
+ *              2 bits set for kickers with trips,
+ *              1 bit set for pair within full house or kicker with quads
+ *                            or kicker with two pair
+ *              or 0 otherwise</pre>
+ * @version 2008Apr27.0
  * @author Steve Brecher
  *
  */
-// 2010Jun25.1
-//		Fix handRazzEval return for full house for AAAABBB rank pattern (make the
-//			lower rank the trips rank and the other the pair rank rather than vice-versa).
-// 2010Jun25.0
-//		Fix hand7Eval return value for quads+trips (case 2 of its switch).
-//		Fix kicker ordering for handRazzEval one pair for AABBCCD rank pattern.
-// 2010Jun24.0
-//		Fix one pair value returned by handAto5LoEval.
-// 2010Jun23.1
-//		In Omaha8LowEval add short circuits to avoid evaluation if board has fewer than 3 8OB cards
-//			and for pairs of hole cards which are not both 8OB.
-// 2010Jun23.0
-//		Fix Omaha8LowEval to use previous algorithm, but separately on each pair of hole cards.
-// 2010Jun22.2
-//		Fix coding error in Omaha8LowEval that would return incorrect result when
-//			third and fourth hole cards make the best 8OB low.
-// 2010Jun22.1
-//		Omaha8LowEval rewritten with different interface.  Previous algorithmic trick
-//			to avoid brute force of six (4C2) computations didn't work.
-//		lo3_8OBMask array omitted -- no longer used.
-// 2010Jun22.0
-//		Fix initialization of lo3_8OBMask and loMaskOrNo8Low.
-// 2010Jun21.4
-//		Change name of method from hand5Ato5LoEval to handAto5LoEval.
-// 2010Jun21.3
-//		Fix return value of hand8LowEval.
-//		Fix bit-wise rotation of parameter fields in low eval methods: "^"s to "&"s.
-// 2010Jun21.2
-//		Fix initialization of straightValue[0x100F], i.e., wheel.
-//		Fix return values for A5432 and A5432 flush in hand2to7LoEval.
-// 2010Jun21.1
-//		Fix loop initialization in initializer block to fix eval result rank values.
-// 2010Jun21.0
-//		Fix deconstruction of most eval method parameters into suit fields.
-// 2010Jun20.1
-//		Fix return value of hand2to7LoEval for an A5432 flush.  This method was
-//		introduced in 2010.Jun20.0.
-// 2010Jun20.0
-//		Conform method parameters and results to C version: CHANGED API and fewer arrays.
-// 2010Jun19.0
-//		fix rotations of ace bits from bit 13 to bit 0 in
-//		handRazzEval, hand5Ato5LoEval, ranksMaskLo, hand8LowEval
 // 2008Apr27.0
 //		fix hand6Eval's calls to flushAndOrStraight6
 // 2006Dec05.0
@@ -114,65 +54,46 @@ package com.stevebrecher;
 public final class HandEval {
 
 	private HandEval() {}	// no instances
-	
-	/**
-	 * Returns a value which can be used in building a parameter to one of the HandEval evaluation methods.
-	 * @param card a {@link Card}
-	 * @return a value which may be bitwise OR'ed or added to other such
-	 * values to build a parameter to one of the HandEval evaluation methods.
-	 */
-	/*
-	public static long encode(final Card card) {
-		return 0x1L << (card.suitOf().ordinal()*16 + card.rankOf().ordinal());
-	}
-	 */
-	/**
-	 * Returns a value which can be used as a parameter to one of the HandEval evaluation methods.
-	 * @param cs a {@link CardSet}
-	 * @return a value which can be used as a parameter to one of the HandEval evaluation methods.
-	 * The value may also be bitwise OR'ed or added to other such
-	 * values to build an evaluation method parameter.
-	 */
-	/*
-	public static long encode(final CardSet cs) {
-		long result = 0;
-		for (Card c : cs)
-			result |= encode(c);
-		return result;
-	}
-	*/
+
 	public static enum HandCategory { NO_PAIR, PAIR, TWO_PAIR, THREE_OF_A_KIND, STRAIGHT,
 							FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH; }
 
-	private static final int   RANK_SHIFT_1		= 4;
-	private static final int   RANK_SHIFT_2		= RANK_SHIFT_1 + 4;
-	private static final int   RANK_SHIFT_3		= RANK_SHIFT_2 + 4;
-	private static final int   RANK_SHIFT_4		= RANK_SHIFT_3 + 4;
-	public static final int    VALUE_SHIFT		= RANK_SHIFT_4 + 8;
+	private static final int   BOT_SHIFT	= 16;
+	private static final int   TOP_SHIFT	= BOT_SHIFT + 4;
+	private static final int   VALUE_SHIFT	= TOP_SHIFT + 4;
 
-	private static final int   NO_PAIR			= 0;
-	private static final int   PAIR				= NO_PAIR			+ (1 << VALUE_SHIFT);
-	private static final int   TWO_PAIR			= PAIR				+ (1 << VALUE_SHIFT);
-	private static final int   THREE_OF_A_KIND	= TWO_PAIR			+ (1 << VALUE_SHIFT);
-	private static final int   STRAIGHT			= THREE_OF_A_KIND	+ (1 << VALUE_SHIFT);
-	private static final int   FLUSH			= STRAIGHT			+ (1 << VALUE_SHIFT);
-	private static final int   FULL_HOUSE		= FLUSH				+ (1 << VALUE_SHIFT);
-	private static final int   FOUR_OF_A_KIND	= FULL_HOUSE		+ (1 << VALUE_SHIFT);
-	private static final int   STRAIGHT_FLUSH	= FOUR_OF_A_KIND	+ (1 << VALUE_SHIFT);
+// javac doesn't propagate NO_PAIR (==0) so doesn't constant-fold it out of bitwise-or expressions
+//	private static final int   NO_PAIR			= HandCategory.NO_PAIR.ordinal() << VALUE_SHIFT;
+	private static final int   PAIR				= HandCategory.PAIR.ordinal() << VALUE_SHIFT;
+	private static final int   TWO_PAIR			= HandCategory.TWO_PAIR.ordinal() << VALUE_SHIFT;
+	private static final int   THREE_OF_A_KIND	= HandCategory.THREE_OF_A_KIND.ordinal() << VALUE_SHIFT;
+	private static final int   STRAIGHT			= HandCategory.STRAIGHT.ordinal() << VALUE_SHIFT;
+	private static final int   FLUSH			= HandCategory.FLUSH.ordinal() << VALUE_SHIFT;
+	private static final int   FULL_HOUSE		= HandCategory.FULL_HOUSE.ordinal() << VALUE_SHIFT;
+	private static final int   FOUR_OF_A_KIND	= HandCategory.FOUR_OF_A_KIND.ordinal() << VALUE_SHIFT;
+	private static final int   STRAIGHT_FLUSH	= HandCategory.STRAIGHT_FLUSH.ordinal() << VALUE_SHIFT;
+
+	/* Arrays for which index is bit mask of card ranks in hand: */
+	private static final int   ARRAY_SIZE		= 0x1FC0 + 1;			// all combos of up to 7 of LS 13 bits on
+
+	private static final int[] straightValue	= new int[ARRAY_SIZE];	// STRAIGHT | (straight's high card rank (5..14) << BOT_SHIFT); 0 if no straight
+	private static final int[] nbrOfRanks		= new int[ARRAY_SIZE];	// count of bits set
+	private static final int[] hiTopRankTWO_PAIR = new int[ARRAY_SIZE];	// TWO_PAIR | ((rank (2..kA) of the highest bit set) << TOP_SHIFT)
+	private static final int[] hiBotRank		= new int[ARRAY_SIZE];	// (rank (2..kA) of the highest bit set) << BOT_SHIFT
+	private static final int[] hiRankMask		= new int[ARRAY_SIZE];	// all bits except highest reset
+	private static final int[] hi2RanksMask		= new int[ARRAY_SIZE];	// all bits except highest 2 reset
+	private static final int[] hi3RanksMask		= new int[ARRAY_SIZE];	// all bits except highest 3 reset
+	private static final int[] hi5RanksMask		= new int[ARRAY_SIZE];	// all bits except highest 5 reset
+
+	private static final int[] lo5RanksMask		= new int[ARRAY_SIZE]; // all bits except lowest 5 8-or-better reset; 0 if not at least 5 8-or-better bits set
+	private static final int[] lo3RanksMask		= new int[ARRAY_SIZE]; // all bits except lowest 3 8-or-better reset; 0 if not at least 3 8-or-better bits set
 
 	/**
 	 *  Greater than any return value of the HandEval evaluation methods.
 	 */
 	public static final int NO_8_LOW = STRAIGHT_FLUSH + (1 << VALUE_SHIFT);
 
-	private static final int   ARRAY_SIZE		= 0x1FC0 + 1;			// all combos of up to 7 of LS 13 bits on
-	/* Arrays for which index is bit mask of card ranks in hand: */
-	private static final int[] straightValue	= new int[ARRAY_SIZE];	// Value(STRAIGHT) | (straight's high card rank-2 (3..12) << RANK_SHIFT_4); 0 if no straight
-	private static final int[] nbrOfRanks		= new int[ARRAY_SIZE];	// count of bits set
-	private static final int[] hiRank			= new int[ARRAY_SIZE];	// 4-bit card rank of highest bit set, right justified
-	private static final int[] hiUpTo5Ranks		= new int[ARRAY_SIZE];	// 4-bit card ranks of highest (up to) 5 bits set, right-justified
-	private static final int[] loMaskOrNo8Low	= new int[ARRAY_SIZE];	// low-order 5 of the low-order 8 bits set, or NO_8_LOW; Ace is LS bit.
-	private static final int[] lo3_8OBRanksMask	= new int[ARRAY_SIZE];	// bits other than lowest 3 8-or-better reset; Ace is LS bit.
+	private static final int[] loEvalOrNo8Low	= new int[ARRAY_SIZE]; // 5 bits set in LS 8 bits, or NO_8_LOW */
 
 	private static int flushAndOrStraight7(final int ranks, final int c, final int d, final int h, final int s) {
 
@@ -182,30 +103,30 @@ public final class HandEval {
 			// there's either a club flush or no flush
 			if (j >= 5)
 				if ((i = straightValue[c]) == 0)
-					return FLUSH | hiUpTo5Ranks[c];
+					return FLUSH | hi5RanksMask[c];
 				else
 					return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		} else if ((j += (i = nbrOfRanks[d])) > 7 - 5) {
 			if (i >= 5)
 				if ((i = straightValue[d]) == 0)
-					return FLUSH | hiUpTo5Ranks[d];
+					return FLUSH | hi5RanksMask[d];
 				else
 					return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		} else if ((j += (i = nbrOfRanks[h])) > 7 - 5) {
 			if (i >= 5)
 				if ((i = straightValue[h]) == 0)
-					return FLUSH | hiUpTo5Ranks[h];
+					return FLUSH | hi5RanksMask[h];
 				else
 					return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		} else
 			/* total cards in other suits <= 7-5: spade flush: */
 			if ((i = straightValue[s]) == 0)
-				return FLUSH | hiUpTo5Ranks[s];
+				return FLUSH | hi5RanksMask[s];
 			else
 				return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		return straightValue[ranks];
-	}	
-	
+	}
+
 	/**
 	 * Returns the value of the best 5-card high poker hand from 7 cards.
 	 * @param hand bit mask with one bit set for each of 7 cards.
@@ -215,14 +136,15 @@ public final class HandEval {
 		int i, j, ranks;
 
 		/* 
-		 * The parameter contains four 16-bit fields; in each, the low-order
-		 * 13 bits are significant.  Get the respective fields into variables.
+		 * The low-order 52 bits of hand contains four 13-bit fields, one
+		 * field per suit.  The high-order 12 bits are clear.   Get the
+		 * respective fields into variables.
 		 * We don't care which suit is which; we arbitrarily call them c,d,h,s.
 		 */
 		final int c = (int)hand & 0x1FFF;
-		final int d = ((int)hand >>> 16) & 0x1FFF;
-		final int h = (int)(hand >>> 32) & 0x1FFF;
-		final int s = (int)(hand >>> 48) & 0x1FFF;
+		final int d = ((int)hand >>> 13) & 0x1FFF;
+		final int h = (int)(hand >>> 26) & 0x1FFF;
+		final int s = (int)(hand >>> 39);
 
 		switch (nbrOfRanks[ranks = c | d | h | s]) {
 
@@ -231,7 +153,7 @@ public final class HandEval {
 		 * quads with trips kicker
 		 */
 			i = c & d & h & s; /* bit for quads */
-			return FOUR_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) | (hiRank[i ^ ranks] << RANK_SHIFT_3);
+			return FOUR_OF_A_KIND | hiBotRank[i] | (i ^ ranks);
 
 		case 3:
 		/*
@@ -248,13 +170,13 @@ public final class HandEval {
 							if (nbrOfRanks[i = d & h] != 2)
 								if (nbrOfRanks[i = d & s] != 2)
 									i = h & s; /* bits for the trips */
-				return FULL_HOUSE | (hiUpTo5Ranks[i] << RANK_SHIFT_3);
+				return FULL_HOUSE | hiBotRank[i] | (i ^ hiRankMask[i]);
 			}
 			if ((j = c & d & h & s) != 0) /* bit for quads */
 				/* quads with pair and singleton */
-				return FOUR_OF_A_KIND | (hiRank[j] << RANK_SHIFT_4) | (hiRank[ranks ^ j] << RANK_SHIFT_3);
+				return FOUR_OF_A_KIND | hiBotRank[j] | (hiRankMask[ranks ^ j]);
 			/* trips and pair (full house) with non-playing pair */
-			return FULL_HOUSE | (hiRank[i] << RANK_SHIFT_4) | (hiRank[ranks ^ i] << RANK_SHIFT_3);
+			return FULL_HOUSE | hiBotRank[i] | (hiRankMask[ranks ^ i]);
 
 		case 4:
 		/*
@@ -265,18 +187,20 @@ public final class HandEval {
 			i = c ^ d ^ h ^ s; // the bit(s) of the trips, if any, and singleton(s)
 			if (nbrOfRanks[i] == 1) {
 				/* three pair and singleton */
-				j = hiUpTo5Ranks[ranks ^ i];	/* ranks of the three pairs */
-				return TWO_PAIR | ((j & 0x0FF0) << RANK_SHIFT_2) | (hiRank[i | (1 << (j & 0x000F))] << RANK_SHIFT_2);
+				j = ranks ^ i; /* the three bits for the pairs */
+				ranks = hiRankMask[j]; /* bit for the top pair */
+				j ^= ranks; /* bits for the two bottom pairs */
+				return hiTopRankTWO_PAIR[ranks] | hiBotRank[j] | hiRankMask[(hiRankMask[j] ^ j) | i];
 			}
 			if ((j = c & d & h & s) == 0) {
 				// trips and pair (full house) and two non-playing singletons
 				i ^= ranks; /* bit for the pair */
 				if ((j = (c & d) & (~i)) == 0)
 					j = (h & s) & (~i); /* bit for the trips */
-				return FULL_HOUSE | (hiRank[j] << RANK_SHIFT_4) | (hiRank[i] << RANK_SHIFT_3);
+				return FULL_HOUSE | hiBotRank[j] | i;
 			}
 			// quads with singleton kicker and two non-playing singletons
-			return FOUR_OF_A_KIND | (hiRank[j] << RANK_SHIFT_4) | (hiRank[i] << RANK_SHIFT_3);
+			return FOUR_OF_A_KIND | hiBotRank[j] | (hiRankMask[i]);
 
 		case 5:
 		/*
@@ -287,14 +211,15 @@ public final class HandEval {
 			if ((i = flushAndOrStraight7(ranks, c, d, h, s)) != 0)
 				return i;
 			i = c ^ d ^ h ^ s; // the bits of the trips, if any, and singletons
-			if (nbrOfRanks[i] != 5)
+			if (nbrOfRanks[i] != 5) {
 				/* two pair and three singletons */
-				return TWO_PAIR | (hiUpTo5Ranks[i ^ ranks] << RANK_SHIFT_3) | (hiRank[i] << RANK_SHIFT_2);
+				j = i ^ ranks; /* the two bits for the pairs */
+				return hiTopRankTWO_PAIR[j] | hiBotRank[hiRankMask[j] ^ j] | hiRankMask[i];
+			}
 			/* trips and four singletons */
 			if ((j = c & d) == 0)
 				j = h & s;
-			// j has trips bit
-			return THREE_OF_A_KIND | (hiRank[j] << RANK_SHIFT_4) | (hiUpTo5Ranks[i ^ j] & 0x0FF00);
+			return THREE_OF_A_KIND | hiBotRank[j] | (hi2RanksMask[i ^ j]);
 
 		case 6:
 		/*
@@ -304,7 +229,7 @@ public final class HandEval {
 			if ((i = flushAndOrStraight7(ranks, c, d, h, s)) != 0)
 				return i;
 			i = c ^ d ^ h ^ s; /* the bits of the five singletons */
-			return PAIR | (hiRank[ranks ^ i] << RANK_SHIFT_4) | ((hiUpTo5Ranks[i] & 0x0FFF00) >> RANK_SHIFT_1);
+			return PAIR | hiBotRank[ranks ^ i] | hi3RanksMask[i];
 
 		case 7:
 		/*
@@ -312,7 +237,7 @@ public final class HandEval {
 		 */
 			if ((i = flushAndOrStraight7(ranks, c, d, h, s)) != 0)
 				return i;
-			return  NO_PAIR | hiUpTo5Ranks[ranks];
+			return /* NO_PAIR | */ hi5RanksMask[ranks];
 
 		} /* end switch */
 
@@ -329,10 +254,10 @@ public final class HandEval {
 
 		// each of the following extracts a 13-bit field from hand and
 		// rotates it left to position the ace in the least significant bit
-		final int c = (((int)hand & 0x0FFF) << 1)  + (((int)hand & 0x1000) >> 12);
-		final int d = (((int)hand >> 15) & 0x1FFE) + (((int)hand & (0x1000 << 16)) >> 28);
-		final int h = ((int)(hand >> 31) & 0x1FFE) + (int)((hand & (0x1000L << 32)) >> 44);
-		final int s = ((int)(hand >> 47) & 0x1FFE) + (int)((hand & (0x1000L << 48)) >> 60);
+		final int c = (((int)hand & 0x1FFF) << 1) + (((int)hand ^ 0x1000) >> 12);
+		final int d = (((int)hand >> 12) & 0x3FFE) + (((int)hand ^ (0x1000 << 13)) >> 25);
+		final int h = ((int)(hand >> 25) & 0x3FFE) + (int)((hand ^ (0x1000L << 26)) >> 38);
+		final int s = ((int)(hand >> 38) & 0x3FFE) + (int)((hand ^ (0x1000L << 39)) >> 51);
 
 		final int ranks = c | d | h | s;
 		int i, j;
@@ -345,9 +270,9 @@ public final class HandEval {
 			j = i ^ ranks; /* bit for trips */
 			// it can't matter in comparison of results from a 52-card deck,
 			// but we return the correct value per relative ranks
-			if (i < j)
-				return FULL_HOUSE | (hiRank[i] << RANK_SHIFT_4) | (hiRank[j] << RANK_SHIFT_3);
-			return FULL_HOUSE | (hiRank[j] << RANK_SHIFT_4) | (hiRank[i] << RANK_SHIFT_3);
+			if (i > j)
+				return FULL_HOUSE | hiBotRank[i] | (j);
+			return FULL_HOUSE | hiBotRank[j] | (i);
 
 		case 3:
 			/*
@@ -364,14 +289,17 @@ public final class HandEval {
 							if (nbrOfRanks[i = d & h] != 2)
 								if (nbrOfRanks[i = d & s] != 2)
 									i = h & s; /* bits for the trips */
-				return TWO_PAIR | (hiUpTo5Ranks[i] << RANK_SHIFT_3) | (hiRank[ranks ^ i] << RANK_SHIFT_2);
+				return hiTopRankTWO_PAIR[i] | hiBotRank[i ^ hiRankMask[i]] | (ranks ^ i);
 			}
-			if ((j = c & d & h & s) != 0)  /* bit for quads */
+			if ((j = c & d & h & s) != 0) { /* bit for quads */
 				/* AAAABBC -- two pair */
-				return TWO_PAIR | (hiUpTo5Ranks[ranks ^ i] << RANK_SHIFT_3) | (hiRank[i] << RANK_SHIFT_2);
+				j = ranks ^ i; /* bits for pairs */
+				return hiTopRankTWO_PAIR[j] | hiBotRank[j ^ hiRankMask[j]] | i;
+			}
 			/* AAABBCC -- two pair w/ kicker = highest rank */
-			i = hiUpTo5Ranks[ranks]; /* 00KPP */
-			return TWO_PAIR | ((i | (i << RANK_SHIFT_3)) & 0x0FFF00);	// TWO_PAIR | (KPPKPP & 0x0FFF00)
+			i = hiRankMask[ranks]; /* kicker bit */
+			j = ranks ^ i; /* pairs bits */
+			return hiTopRankTWO_PAIR[j] | hiBotRank[j ^ hiRankMask[j]] | i;
 
 		case 4:
 			/*
@@ -382,11 +310,10 @@ public final class HandEval {
 			i = c ^ d ^ h ^ s; /* the bit(s) of the trips, if any,
 			 and singleton(s) */
 			if (nbrOfRanks[i] == 1) {
-				/* AABBCCD -- one pair, C with ABD; D's bit is in i */
-				j = ranks ^ i;	// ABC bits
-				int k = hiUpTo5Ranks[j] & 0x0000F;	// C rank
-				i |= j ^ (1 << (k));	// ABD bits
-				return PAIR | (k << RANK_SHIFT_4) | (hiUpTo5Ranks[i] << RANK_SHIFT_1);
+				/* AABBCCD -- one pair (C with ABD) */
+				/* D's bit is in i */
+				j = hi2RanksMask[ranks ^ i] | i; /* kickers */
+				return PAIR | hiBotRank[ranks ^ j] | j;
 			}
 			if ((j = c & d & h & s) == 0) {
 				/* AAABBCD -- one pair (A or B) */
@@ -394,23 +321,20 @@ public final class HandEval {
 				if ((j = (c & d) & (~i)) == 0)
 					j = (h & s) & (~i); /* bit for A */
 				if (i < j)
-					return PAIR | (hiRank[i] << RANK_SHIFT_4) | (hiUpTo5Ranks[ranks ^ i] << RANK_SHIFT_1);
-				return PAIR | (hiRank[j] << RANK_SHIFT_4) | (hiUpTo5Ranks[ranks ^ j] << RANK_SHIFT_1);
+					return PAIR | hiBotRank[i] | (ranks ^ i);
+				return PAIR | hiBotRank[j] | (ranks ^ j);
 			}
-			/* AAAABCD -- one pair (A); j has A's bit */
-			return PAIR | (hiRank[j] << RANK_SHIFT_4) | (hiUpTo5Ranks[i] << RANK_SHIFT_1);
+			/* AAAABCD -- one pair (A) */
+			return PAIR | hiBotRank[j] | i;
 
 		case 5:
-			return NO_PAIR |  hiUpTo5Ranks[ranks];
+			return /* NO_PAIR | */ranks;
 
 		case 6:
-			i = ranks ^ (1 << hiRank[ranks]);
-			return NO_PAIR |  hiUpTo5Ranks[i];
+			return /* NO_PAIR | */lo5RanksMask[ranks];
 
 		case 7:
-			i = ranks ^ (1 << hiRank[ranks]);
-			i ^= (1 << hiRank[i]);
-			return NO_PAIR |  hiUpTo5Ranks[i];
+			return /* NO_PAIR | */lo5RanksMask[ranks];
 
 		} /* end switch */
 
@@ -425,25 +349,25 @@ public final class HandEval {
 			// there's either a club flush or no flush
 			if (j >= 5)
 				if ((i = straightValue[c]) == 0)
-					return FLUSH | hiUpTo5Ranks[c];
+					return FLUSH | hi5RanksMask[c];
 				else
 					return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		} else if ((j += (i = nbrOfRanks[d])) > 6 - 5) {
 			if (i >= 5)
 				if ((i = straightValue[d]) == 0)
-					return FLUSH | hiUpTo5Ranks[d];
+					return FLUSH | hi5RanksMask[d];
 				else
 					return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		} else if ((j += (i = nbrOfRanks[h])) > 6 - 5) {
 			if (i >= 5)
 				if ((i = straightValue[h]) == 0)
-					return FLUSH | hiUpTo5Ranks[h];
+					return FLUSH | hi5RanksMask[h];
 				else
 					return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		} else
 			/* total cards in other suits <= N-5: spade flush: */
 			if ((i = straightValue[s]) == 0)
-				return FLUSH | hiUpTo5Ranks[s];
+				return FLUSH | hi5RanksMask[s];
 			else
 				return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		return straightValue[ranks];
@@ -457,12 +381,12 @@ public final class HandEval {
 	public static int hand6Eval(long hand) {
 
 		final int c = (int)hand & 0x1FFF;
-		final int d = ((int)hand >>> 16) & 0x1FFF;
-		final int h = (int)(hand >>> 32) & 0x1FFF;
-		final int s = (int)(hand >>> 48) & 0x1FFF;
+		final int d = ((int)hand >>> 13) & 0x1FFF;
+		final int h = (int)(hand >>> 26) & 0x1FFF;
+		final int s = (int)(hand >>> 39);
 
 		final int ranks = c | d | h | s;
-		int i, j;
+		int i, j, k;
 
 	    switch (nbrOfRanks[ranks]) {
 
@@ -471,50 +395,62 @@ public final class HandEval {
 					/* bits for trips, if any: */
 	                if ((nbrOfRanks[i = c ^ d ^ h ^ s]) != 0)
 	                    /* two trips (full house) */
-	                	return FULL_HOUSE | (hiUpTo5Ranks[i] << RANK_SHIFT_3);
+						return FULL_HOUSE | hiBotRank[i]
+								| (i ^ hiRankMask[i]);
 					/* quads with pair kicker */
 	                i = c & d & h & s;  /* bit for quads */
-	                return FOUR_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) | (hiRank[i ^ ranks] << RANK_SHIFT_3);
+	                return FOUR_OF_A_KIND | hiBotRank[i]
+								| (i ^ ranks);
 
 			case 3:	/* quads with singleton kicker and non-playing singleton,
 					   or full house with non-playing singleton,
 					   or two pair with non-playing pair */
-					if ((c ^ d ^ h ^ s) == 0)
+					if ((c ^ d ^ h ^ s) == 0) {
 						/* no trips or singletons:  three pair */
-						return TWO_PAIR | (hiUpTo5Ranks[ranks] << RANK_SHIFT_2);
+						i = hiRankMask[ranks];	/* bit for the top pair */
+						k = ranks ^ i;				/* bits for the bottom two pairs */
+						j = hiRankMask[k];	/* bit for the middle pair */
+						return hiTopRankTWO_PAIR[i]
+							| hiBotRank[j] | (k ^ j); }
 					if ((i = c & d & h & s) == 0) {
 						/* full house with singleton */
 						if ((i = c & d & h) == 0)
 							if ((i = c & d & s) == 0)
 								if ((i = c & h & s) == 0)
 									i = d & h & s; /* bit of trips */
-						j = c ^ d ^ h ^ s; /* the bits of the trips and singleton */
-						return FULL_HOUSE | (hiRank[i] << RANK_SHIFT_4) | (hiRank[j ^ ranks] << RANK_SHIFT_3); }
+						j = c ^ d ^ h ^ s; /* the bits of the trips
+											  and singleton */
+						return FULL_HOUSE | hiBotRank[i]
+								| (j ^ ranks); }
 					/* quads with kicker and singleton */
-					return FOUR_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) | (hiRank[i ^ ranks] << RANK_SHIFT_3);
+					return FOUR_OF_A_KIND | hiBotRank[i]
+							| (hiRankMask[i ^ ranks]);
 
 			case 4:	/* trips and three singletons,
 					   or two pair and two singletons */
-					if ((i = c ^ d ^ h ^ s) != ranks)
+					if ((i = c ^ d ^ h ^ s) != ranks) {
 						/* two pair and two singletons */
-						return TWO_PAIR | (hiUpTo5Ranks[i ^ ranks] << RANK_SHIFT_3) | (hiRank[i] << RANK_SHIFT_2);
+	                    j = i ^ ranks;  /* the two bits for the pairs */
+	                    return hiTopRankTWO_PAIR[j]
+	                            | hiBotRank[hiRankMask[j] ^ j] | hiRankMask[i]; }
 					/* trips and three singletons */
 					if ((i = c & d) == 0)
 						i = h & s; /* bit of trips */
-					return THREE_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) | ((hiUpTo5Ranks[ranks ^ i] & 0x00FF0) << RANK_SHIFT_1);
+					return THREE_OF_A_KIND | hiBotRank[i]
+							| (hi2RanksMask[i ^ ranks]);
 
 			case 5:	/* flush and/or straight,
 					   or one pair and three kickers and
 					    one non-playing singleton */
-					if ((i = flushAndOrStraight6(ranks, c, d, h, s)) != 0)
-						return i;
+				if ((i = flushAndOrStraight6(ranks, c, d, h, s)) != 0)
+					return i;
 	                i = c ^ d ^ h ^ s; /* the bits of the four singletons */
-	                return PAIR | (hiRank[ i ^ ranks] << RANK_SHIFT_4) | (hiUpTo5Ranks[i] & 0x0FFF0);
+	                return PAIR | hiBotRank[ranks ^ i] | hi3RanksMask[i];
 
 			case 6:	/* flush and/or straight or no pair */
-					if ((i = flushAndOrStraight6(ranks, c, d, h, s)) != 0)
-						return i;
-	                return NO_PAIR |  hiUpTo5Ranks[ranks];
+				if ((i = flushAndOrStraight6(ranks, c, d, h, s)) != 0)
+					return i;
+	                return /* NO_PAIR | */ hi5RanksMask[ranks];
 
 	        } /* end switch */
 
@@ -529,12 +465,12 @@ public final class HandEval {
 	public static int hand5Eval(long hand) {
 	
 		final int c = (int)hand & 0x1FFF;
-		final int d = ((int)hand >>> 16) & 0x1FFF;
-		final int h = (int)(hand >>> 32) & 0x1FFF;
-		final int s = (int)(hand >>> 48) & 0x1FFF;
+		final int d = ((int)hand >>> 13) & 0x1FFF;
+		final int h = (int)(hand >>> 26) & 0x1FFF;
+		final int s = (int)(hand >>> 39);
 
 		final int ranks = c | d | h | s;
-		int i;
+		int i, j;
 
 		switch (nbrOfRanks[ranks]) {
 
@@ -542,32 +478,35 @@ public final class HandEval {
 	                i = c & d;				/* any two suits */
 	                if ((i & h & s) == 0) { /* no bit common to all suits */
 	                    i = c ^ d ^ h ^ s;  /* trips bit */
-	                    return FULL_HOUSE | (hiRank[i] << RANK_SHIFT_4) | (hiRank[i ^ ranks] << RANK_SHIFT_3); }
+	                    return FULL_HOUSE | hiBotRank[i] | (i ^ ranks); }
 	                else
 	                    /* the quads bit must be present in each suit mask,
 	                       but the kicker bit in no more than one; so we need
 	                       only AND any two suit masks to get the quad bit: */
-	                    return FOUR_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) | (hiRank[i ^ ranks] << RANK_SHIFT_3);
+	                    return FOUR_OF_A_KIND | hiBotRank[i] | (i ^ ranks);
 
 	        case 3: /* trips and two kickers,
 	                   or two pair and kicker */
 	                if ((i = c ^ d ^ h ^ s) == ranks) {
 	                    /* trips and two kickers */
-	                    if ((i = c & d) == 0)
-	                    	if ((i = c & h) == 0)
-	                    			i = d & h;
-	                    return THREE_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) 
-	                        | (hiUpTo5Ranks[i ^ ranks] << RANK_SHIFT_2); }
+	                    if ((i = c & d) != 0)
+	                        return THREE_OF_A_KIND | hiBotRank[i] | (i ^ ranks);
+	                    if ((i = c & h) != 0)
+	                        return THREE_OF_A_KIND | hiBotRank[i] | (i ^ ranks);
+	                    i = d & h;
+	                    return THREE_OF_A_KIND | hiBotRank[i]
+	                        | (i ^ ranks); }
 	                /* two pair and kicker; i has kicker bit */
-	                return TWO_PAIR | (hiUpTo5Ranks[i ^ ranks] << RANK_SHIFT_3) | (hiRank[i] << RANK_SHIFT_2);
+	                j = i ^ ranks;      /* j has pairs bits */
+	                return hiTopRankTWO_PAIR[j] | hiBotRank[j ^ hiRankMask[j]] | i;
 
 	        case 4: /* pair and three kickers */
 	                i = c ^ d ^ h ^ s; /* kicker bits */
-	                return PAIR | (hiRank[ranks ^ i] << RANK_SHIFT_4) | (hiUpTo5Ranks[i] << RANK_SHIFT_1);
+	                return PAIR | hiBotRank[ranks ^ i] | i;
 
 	        case 5: /* flush and/or straight, or no pair */
 					if ((i = straightValue[ranks]) == 0)
-						i = hiUpTo5Ranks[ranks];
+						i = ranks;
 					if (c != 0) {			/* if any clubs... */
 						if (c != ranks)		/*   if no club flush... */
 							return i; }		/*      return straight or no pair value */
@@ -581,9 +520,9 @@ public final class HandEval {
 									return i; }
 						/*	else s == ranks: spade flush */
 					/* There is a flush */
-					if (i < STRAIGHT)
+					if (i == ranks)
 						/* no straight */
-						return FLUSH | i;
+						return FLUSH | ranks;
 					else
 						return (STRAIGHT_FLUSH - STRAIGHT) + i;
 		}
@@ -592,41 +531,21 @@ public final class HandEval {
 	}
 
 	/**
-	 * Returns the Deuce-to-Seven low (Kansas City lowball) value of a 5-card poker hand.
-	 * @param hand bit mask with one bit set for each of 5 cards.
-	 * @return the value of the hand.
-	 */
-	public static int hand2to7LoEval(long hand) {
-
-		final int WHEEL_EVAL		= 0x04030000;
-		final int WHEEL_FLUSH_EVAL	= 0x08030000;
-		final int NO_PAIR_ACE_HIGH	= 0x000C3210;
-		
-		int	result = hand5Eval(hand);
-		if (result == WHEEL_EVAL)
-			return NO_PAIR_ACE_HIGH;
-		if (result == WHEEL_FLUSH_EVAL)
-			return FLUSH | NO_PAIR_ACE_HIGH;
-		return result;
-		
-	}
-
-	/**
 	 * Returns the Ace-to-5 value of a 5-card low poker hand.
 	 * @param hand bit mask with one bit set for each of 5 cards.
 	 * @return the Ace-to-5 low value of the hand.
 	 */
-	public static int handAto5LoEval(long hand) {
+	public static int hand5Ato5LoEval(long hand) {
 
 		// each of the following extracts a 13-bit field from hand and
 		// rotates it left to position the ace in the least significant bit
-		final int c = (((int)hand & 0x0FFF) << 1)  + (((int)hand & 0x1000) >> 12);
-		final int d = (((int)hand >> 15) & 0x1FFE) + (((int)hand & (0x1000 << 16)) >> 28);
-		final int h = ((int)(hand >> 31) & 0x1FFE) + (int)((hand & (0x1000L << 32)) >> 44);
-		final int s = ((int)(hand >> 47) & 0x1FFE) + (int)((hand & (0x1000L << 48)) >> 60);
+		final int c = (((int)hand & 0x1FFF) << 1) + (((int)hand ^ 0x1000) >> 12);
+		final int d = (((int)hand >> 12) & 0x3FFE) + (((int)hand ^ (0x1000 << 13)) >> 25);
+		final int h = ((int)(hand >> 25) & 0x3FFE) + (int)((hand ^ (0x1000L << 26)) >> 38);
+		final int s = ((int)(hand >> 38) & 0x3FFE) + (int)((hand ^ (0x1000L << 39)) >> 51);
 
 		final int ranks = c | d | h | s;
-		int i;
+		int i, j;
 
 		switch (nbrOfRanks[ranks]) {
 
@@ -634,31 +553,34 @@ public final class HandEval {
 	                i = c & d;				/* any two suits */
 	                if ((i & h & s) == 0) { /* no bit common to all suits */
 	                    i = c ^ d ^ h ^ s;  /* trips bit */
-	                    return FULL_HOUSE | (hiRank[i] << RANK_SHIFT_4) | (hiRank[i ^ ranks] << RANK_SHIFT_3); }
+	                    return FULL_HOUSE | hiBotRank[i] | (i ^ ranks); }
 	                else
 	                    /* the quads bit must be present in each suit mask,
 	                       but the kicker bit in no more than one; so we need
 	                       only AND any two suit masks to get the quad bit: */
-	                    return FOUR_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) | (hiRank[i ^ ranks] << RANK_SHIFT_3);
+	                    return FOUR_OF_A_KIND | hiBotRank[i] | (i ^ ranks);
 
 	        case 3: /* trips and two kickers,
 	                   or two pair and kicker */
 	                if ((i = c ^ d ^ h ^ s) == ranks) {
 	                    /* trips and two kickers */
-	                    if ((i = c & d) == 0)
-	                    	if ((i = c & h) == 0)
-	                    		i = d & h;
-	                    return THREE_OF_A_KIND | (hiRank[i] << RANK_SHIFT_4) 
-	                        | (hiUpTo5Ranks[i ^ ranks] << RANK_SHIFT_2); }
+	                    if ((i = c & d) != 0)
+	                        return THREE_OF_A_KIND | hiBotRank[i] | (i ^ ranks);
+	                    if ((i = c & h) != 0)
+	                        return THREE_OF_A_KIND | hiBotRank[i] | (i ^ ranks);
+	                    i = d & h;
+	                    return THREE_OF_A_KIND | hiBotRank[i]
+	                        | (i ^ ranks); }
 	                /* two pair and kicker; i has kicker bit */
-	                return TWO_PAIR | (hiUpTo5Ranks[i ^ ranks] << RANK_SHIFT_3) | (hiRank[i] << RANK_SHIFT_2);
+	                j = i ^ ranks;      /* j has pairs bits */
+	                return hiTopRankTWO_PAIR[j] | hiBotRank[j ^ hiRankMask[j]] | i;
 
 	        case 4: /* pair and three kickers */
 	                i = c ^ d ^ h ^ s; /* kicker bits */
-	                return PAIR | (hiRank[ranks ^ i] << RANK_SHIFT_4) | (hiUpTo5Ranks[i] << RANK_SHIFT_1);
+	                return PAIR | hiBotRank[ranks ^ i] | i;
 
 	        case 5: /* no pair */
-					return hiUpTo5Ranks[ranks];
+					return ranks;
 		}
 
 	    return 0; /* never reached, but avoids compiler warning */
@@ -672,9 +594,9 @@ public final class HandEval {
 	public static int ranksMask(long hand) {
 		
 		return (	((int)hand & 0x1FFF)
-				|	(((int)hand >>> 16) & 0x1FFF)
-				|	((int)(hand >>> 32) & 0x1FFF)
-				|	((int)(hand >>> 48) & 0x1FFF)
+				|	(((int)hand >>> 13) & 0x1FFF)
+				|	((int)(hand >>> 26) & 0x1FFF)
+				|	(int)(hand >>> 39)
 			   );		
 	}
 
@@ -685,10 +607,10 @@ public final class HandEval {
 	 */
 	public static int ranksMaskLo(long hand) {
 		
-		return (	((((int)hand & 0x0FFF) << 1)  + (((int)hand & 0x1000) >> 12))
-				|	((((int)hand >> 15) & 0x1FFE) + (((int)hand & (0x1000  << 16)) >> 28))
-				|	(((int)(hand >> 31) & 0x1FFE) + (int)((hand & (0x1000L << 32)) >> 44))
-				|	(((int)(hand >> 47) & 0x1FFE) + (int)((hand & (0x1000L << 48)) >> 60))
+		return (	((((int)hand & 0x1FFF) << 1) + (((int)hand ^ 0x1000) >> 12))
+				|	((((int)hand >> 12) & 0x3FFE) + (((int)hand ^ (0x1000 << 13)) >> 25))
+				|	(((int)(hand >> 25) & 0x3FFE) + (int)((hand ^ (0x1000L << 26)) >> 38))
+				|	(((int)(hand >> 38) & 0x3FFE) + (int)((hand ^ (0x1000L << 39)) >> 51))
 			   );		
 	}
 
@@ -698,59 +620,42 @@ public final class HandEval {
 	 * @return the 8-or-better low value of <code>hand</code> or {@link #NO_8_LOW}.
 	 */
 	public static int hand8LowEval(long hand) {
-		
-		int result = loMaskOrNo8Low[ranksMaskLo(hand)];
-		return result == NO_8_LOW ? NO_8_LOW : hiUpTo5Ranks[result];
-	}
 
-	private static int Omaha8LowMaskEval(int twoHolesMask, int boardMask) {
-	    return loMaskOrNo8Low[lo3_8OBRanksMask[boardMask & ~twoHolesMask] | twoHolesMask];
+		return loEvalOrNo8Low[
+		        /* rotate each 13-bit suit field left to put Ace in LS bit */
+				((((int)hand & 0x1FFF) << 1) + (((int)hand ^ 0x1000) >> 12))
+				| ((((int)hand >> 12) & 0x3FFE) + (((int)hand ^ (0x1000 << 13)) >> 25))
+				| (((int)(hand >> 25) & 0x3FFE) + (int)((hand ^ (0x1000L << 26)) >> 38))
+				| (((int)(hand >> 38) & 0x3FFE) + (int)((hand ^ (0x1000L << 39)) >> 51))
+			   ];
 	}
 
 	/**
-	 * Returns the 8-or-better low value of a 5-card poker hand comprised of three board
-	 * cards and two hole cards or {@link #NO_8_LOW}.
-	 * @param holeCards CardSet of four hole cards.
-	 * @param boardCards CardSet of at least three board cards.
-	 * @return the 8-or-better low value or {@link #NO_8_LOW}.
+	 * Returns the 8-or-better low value of the best hand from hole cards and 3 board cards or {@link #NO_8_LOW}.
+	 * @param holeRanks bit mask of the rank(s) of hole cards (Ace is LS bit).
+	 * @param boardRanks bit mask of the rank(s) of board cards (Ace is LS bit).
+	 * @return the 8-or-better low value of the best hand from hole cards and 3 board cards or {@link #NO_8_LOW}.
+	 * @see #ranksMaskLo
 	 */
-	/*
-	public static int Omaha8LowEval(CardSet holeCards, CardSet boardCards) {
-		
-		int board = ranksMaskLo(encode(boardCards));
-		if (lo3_8OBRanksMask[board] == 0)
-			return NO_8_LOW;
-		int hole8OB[] = new int[4];
-		int i, hole8OBCount = 0;
-		for (Card c : holeCards)
-			if ((i = ranksMaskLo(encode(c))) <= 0x0080)	// hole card rank <= 8?
-				hole8OB[hole8OBCount++] = i;
-		int result = NO_8_LOW;
-		if (hole8OBCount >= 2) {
-    		if ((i = Omaha8LowMaskEval(hole8OB[0] | hole8OB[1], board)) < result)
-    				result = i;
-    		if (hole8OBCount >= 3 ) {
-        		if ((i = Omaha8LowMaskEval(hole8OB[0] | hole8OB[2], board)) < result)
-        			result = i;
-        		if ((i = Omaha8LowMaskEval(hole8OB[1] | hole8OB[2], board)) < result)
-        			result = i;
-        		if (hole8OBCount == 4) {
-            		if ((i = Omaha8LowMaskEval(hole8OB[0] | hole8OB[3], board)) < result)
-            			result = i;
-            		if ((i = Omaha8LowMaskEval(hole8OB[1] | hole8OB[3], board)) < result)
-            			result = i;
-            		if ((i = Omaha8LowMaskEval(hole8OB[2] | hole8OB[3], board)) < result)
-            			result = i;
-        		}
-    		}
-		}
-		return result == NO_8_LOW ? NO_8_LOW : hiUpTo5Ranks[result];
+	public static int Omaha8LowEval(int holeRanks, int boardRanks) {
+		return loEvalOrNo8Low[lo3RanksMask[boardRanks & ~holeRanks] | holeRanks];
 	}
-	*/
+
 
 // The following exports of accessors to arrays used by the
 // evaluation routines may be uncommented if needed.
 	
+//	/**
+//	 * Returns the parameter with all bits except its highest-order bit cleared.
+//	 * @param mask an int in the range 0..0x1FC0 (8128).
+//	 * @return the parameter with all bits except its highest-order bit cleared.
+//	 * @throws IndexOutOfBoundsException if mask < 0 || mask > 0x1FC0.
+//	 */
+//	public static int hiCardMask(int mask)
+//	{
+//	    return hiRankMask[mask];
+//	}
+//
 //	/**
 //	 * Returns the number of bits set in mask.
 //	 * @param mask an int in the range 0..0x1FC0 (8128).
@@ -770,52 +675,64 @@ public final class HandEval {
 //	 */
 //	public static int rankOfHiCard(int mask)
 //	{
-//	    return hiRank[mask] + 2;
+//	    return hiBotRank[mask] >> BOT_SHIFT;
 //	}
 
 	/** ********** Initialization ********************** */
 
 	private static final int ACE_RANK	= 14;
 
-	private static final int A5432		= 0x0000100F; // A5432
+	private static final int WHEEL		= 0x0000100F; // A5432
 
 	// initializer block
 	static {
-		int mask, bitCount, ranks;
+		int mask, bitCount;
 		int shiftReg, i;
 		int value;
 
 		for (mask = 1; mask < ARRAY_SIZE; ++mask) {
-			bitCount = ranks = 0;
+			bitCount = 0;
 			shiftReg = mask;
-			for (i = ACE_RANK - 2; i >= 0; --i, shiftReg <<= 1)
+			for (i = ACE_RANK - 1; i > 0; --i, shiftReg <<= 1)
 				if ((shiftReg & 0x1000) != 0)
-					if (++bitCount <= 5) {
-						ranks <<= RANK_SHIFT_1;
-						ranks += i;
-						if (bitCount == 1)
-							hiRank[mask] = i;
+					switch (++bitCount) {
+					case 1:
+						hiTopRankTWO_PAIR[mask] = TWO_PAIR | ((i + 1) << TOP_SHIFT);
+						hiBotRank[mask] = (i + 1) << BOT_SHIFT;
+						hiRankMask[mask] = 0x1000 >> (ACE_RANK - 1 - i);
+						break;
+					case 2:
+						hi2RanksMask[mask] = (shiftReg & 0x03FFF000) >> (ACE_RANK - 1 - i);
+						break;
+					case 3:
+						hi3RanksMask[mask] = (shiftReg & 0x03FFF000) >> (ACE_RANK - 1 - i);
+						break;
+					case 5:
+						hi5RanksMask[mask] = (shiftReg & 0x03FFF000) >> (ACE_RANK - 1 - i);
 					}
-			hiUpTo5Ranks[mask] = ranks;
 			nbrOfRanks[mask] = bitCount;
 
-			loMaskOrNo8Low[mask] = NO_8_LOW;
-			bitCount = value = 0;
-			shiftReg = mask;
-			/* For the purpose of this loop, Ace is low; it's in the LS bit */
+			bitCount = 0;
+			/* rotate the 13 bits left to get ace into LS bit */
+			/* we don't need to mask the low 13 bits of the result */
+			/* as we're going to look only at the low order 8 bits */
+			shiftReg = (mask << 1) + ((mask ^ 0x1000) >> 12);
+			value = 0;
 			for (i = 0; i < 8; ++i, shiftReg >>= 1)
 				if ((shiftReg & 1) != 0) {
 					value |= (1 << i); /* undo previous shifts, copy bit */
-					if (++bitCount == 3)
-						lo3_8OBRanksMask[mask] = value;
-					if (bitCount == 5) {
-						loMaskOrNo8Low[mask] = value;
-						break; }
+					if (++bitCount == 5) {
+						lo5RanksMask[mask] = value;
+						break;
+					}
+					if (bitCount == 3)
+						lo3RanksMask[mask] = value;
 				}
+			loEvalOrNo8Low[mask] = (bitCount == 5) ? value : NO_8_LOW;
 		}
 		for (mask = 0x1F00/* A..T */; mask >= 0x001F/* 6..2 */; mask >>= 1)
 			setStraight(mask);
-		setStraight(A5432); /* A,5..2 */
+		setStraight(WHEEL); /* A,5..2 */
 	}
 
 	private static void setStraight(int ts) {
@@ -827,10 +744,10 @@ public final class HandEval {
 				for (j = 0x1000; j > 0; j >>= 1) {
 					es = ts | i | j; /* 5 straight bits plus up to two other bits */
 					if (straightValue[es] == 0)
-						if (ts == A5432)
-							straightValue[es] = STRAIGHT | ((5-2) << RANK_SHIFT_4);
+						if (ts == WHEEL)
+							straightValue[es] = STRAIGHT | (5 << BOT_SHIFT);
 						else
-							straightValue[es] = STRAIGHT | (hiRank[ts] << RANK_SHIFT_4);
+							straightValue[es] = STRAIGHT | hiBotRank[ts];
 				}
 		}
 }

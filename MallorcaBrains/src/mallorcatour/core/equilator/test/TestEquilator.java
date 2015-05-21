@@ -280,16 +280,6 @@ public class TestEquilator {
     }
 
     public static void main(String[] args) {
-    	int comb;
-    	int[] array = Card.convertToIntBrecherArray("KsTd8c2s5c");
-    	Log.d(Arrays.toString(array));
-    	comb = PokerEquilatorBrecher.combination(array);
-    	Log.d(comb+"");
-    	comb = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray("KsTd8c2s6c"));
-    	Log.d(comb+"");
-    	comb = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray("KsTd8c2s4c"));
-    	Log.d(comb+"");
-    	comb = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray("KsTd8c2s7c"));
-    	Log.d(comb+"");
+    	testFlushDro();
     }
 }

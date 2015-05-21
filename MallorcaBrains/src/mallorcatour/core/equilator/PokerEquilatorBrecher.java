@@ -12,7 +12,7 @@ import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.ArrayUtils;
 import mallorcatour.util.Log;
 
-import com.stevebrecher.poker.HandEval;
+import com.stevebrecher.HandEval;
 
 /**
  *
