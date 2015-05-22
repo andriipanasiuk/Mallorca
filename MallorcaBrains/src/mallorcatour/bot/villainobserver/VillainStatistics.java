@@ -23,7 +23,7 @@ public class VillainStatistics implements Serializable, IPokerStats {
     private static final long serialVersionUID = 1L;
     private String name;
     private int handsCount;
-    private NeuralNetwork preflopNN;
+    private NeuralNetwork<?> preflopNN;
     private boolean isPreflopLearned;
     private List<PokerLearningExample> situations;
     // pair of (aggressive action) / (aggressive actions + call actions)
@@ -46,7 +46,7 @@ public class VillainStatistics implements Serializable, IPokerStats {
         isPreflopLearned = false;
     }
 
-    public NeuralNetwork getPrefloNeuralNetwork() {
+    public NeuralNetwork<?> getPrefloNeuralNetwork() {
         return preflopNN;
     }
 
@@ -58,7 +58,7 @@ public class VillainStatistics implements Serializable, IPokerStats {
         return handsCount;
     }
 
-    public void setPreflopNeuralNetwork(NeuralNetwork nn) {
+    public void setPreflopNeuralNetwork(NeuralNetwork<?> nn) {
         this.preflopNN = nn;
     }
 

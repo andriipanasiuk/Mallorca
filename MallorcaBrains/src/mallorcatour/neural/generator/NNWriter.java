@@ -9,17 +9,18 @@ public class NNWriter {
 
 	public static void weightsToJavaClass(MyFileWriter writer, NeuralNetwork<?> nn, String name) {
 		Layer[] layers = nn.getLayers();
-		writer.append("public class " + name + "NN {\n");
-		writer.append("private static double[] layerSizeArray = new double[" + layers.length + "];\n");
-		writer.append("static {\n");
+		writer.append("public class " + name + "NeuralInfo implements INeuralInfo {\n");
+		writer.append("private int[] layerSizeArray = new int[] ");
+		writer.append("{");
 		for (int i = 0; i < layers.length; i++) {
 			Layer layer = layers[i];
-			writer.append("layerSizeArray[" + i + "] = ");
 			writer.append(String.valueOf(layer.getNeuronsCount()));
-			writer.append(";\n");
+			if(i!= layers.length -1){
+				writer.append(", ");
+			}
 		}
-		writer.append("}\n");
-		writer.append("private static double[] weights = new double[] {");
+		writer.append("};\n");
+		writer.append("private double[] weights = new double[] {");
 		Double[] weights = nn.getWeights();
 		for (int i = 0; i < weights.length; i++) {
 			double weight = weights[i];
@@ -32,6 +33,14 @@ public class NNWriter {
 			}
 		}
 		writer.append("};\n");
-		writer.append("}");
+
+		writer.append("public int[] getLayerSizes() {\n");
+		writer.append("return layerSizeArray;\n");
+		writer.append("}\n");
+
+		writer.append("public double[] getWeights() {\n");
+		writer.append("return weights;\n");
+		writer.append("}\n");
+		writer.append("}\n");
 	}
 }

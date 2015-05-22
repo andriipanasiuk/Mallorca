@@ -43,9 +43,7 @@ import org.neuroph.core.NeuralNetwork;
 public class BasePokerNN implements IPokerNN {
 
     private AbstractNeurals neurals;
-    //neural networks
-    private NeuralNetwork preflopNN, flopNN, turnNN, riverNN;
-    //list of situations
+    private NeuralNetwork<?> preflopNN, flopNN, turnNN, riverNN;
     private List<PokerLearningExample> allSituations;
     private List<PokerLearningExample> preflopSituations, flopSituations,
             turnSituations, riverSituations;
@@ -90,7 +88,7 @@ public class BasePokerNN implements IPokerNN {
         riverSituations = new ArrayList<PokerLearningExample>();
 
         for (PokerLearningExample situation : allSituations) {
-            int street = situation.getSituation().getStreet();
+            int street = situation.getInput().getStreet();
             if (street == LocalSituation.PREFLOP) {
                 preflopSituations.add(situation);
             } else if (street == LocalSituation.FLOP) {
@@ -106,7 +104,7 @@ public class BasePokerNN implements IPokerNN {
 
     public Advice getAdvice(LocalSituation situation, HoleCards cards) {
         List<PokerLearningExample> examplesForUse = null;
-        NeuralNetwork nnForUse = null;
+        NeuralNetwork<?> nnForUse = null;
         AdviceCreator adviceCreator = null;
         boolean canRaise = situation.canRaise();
         int street = situation.getStreet();

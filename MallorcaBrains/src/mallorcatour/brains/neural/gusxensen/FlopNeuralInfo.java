@@ -1,13 +1,10 @@
-package mallorcatour.bot.neural.gusxensen;
+package mallorcatour.brains.neural.gusxensen;
 
-public class FlopNN {
-	private static double[] layerSizeArray = new double[3];
-	static {
-		layerSizeArray[0] = 13;
-		layerSizeArray[1] = 26;
-		layerSizeArray[2] = 3;
-	}
-	private static double[] weights = new double[] { -468.97786440106546, -72.0645339490218, 193.96979375152313,
+import mallorcatour.neural.core.INeuralInfo;
+
+public class FlopNeuralInfo implements INeuralInfo {
+	private int[] layerSizeArray = new int[] { 13, 26, 3 };
+	private double[] weights = new double[] { -468.97786440106546, -72.0645339490218, 193.96979375152313,
 			173.63360035302273, 42.33095924511223, 120.22942985497573, -139.08704962421785, 98.00293125902535,
 			56.72890376111885, 42.12974227071153, -78.46233190188259, -91.86725935338522, -41.59729566968004,
 			31.309692601487207, -19.375472797235417, 30.429466653879967, 34.75959202673831, 10.895225303418378,
@@ -88,4 +85,12 @@ public class FlopNN {
 			1.283546016546468, 0.29275883812128045, 0.40378242424264743, 0.043089830669767834, 0.7765278958397192,
 			0.36410994427516596, -0.04147824637977497, -3.287047487525235, 1.066526292648299, -4.679804782178381,
 			-1.2845930490353614, -1.1212774973782442, -0.05606089584028304, -1.4551464027238648, -0.21091926537098443 };
+
+	public int[] getLayerSizes() {
+		return layerSizeArray;
+	}
+
+	public double[] getWeights() {
+		return weights;
+	}
 }

@@ -38,7 +38,7 @@ public class HumanMouseMover {
     public void WindMouse(double xs, double ys, double xe, double ye, double gravity,
             double wind, double minWait, double maxWait, double maxStep, double targetArea) {
 
-        double veloX = 0, veloY = 0, windX = 0, windY = 0, veloMag, dist, randomDist, lastDist, step;
+        double veloX = 0, veloY = 0, windX = 0, windY = 0, veloMag, dist, randomDist, step;
         int lastX, lastY;
         double sqrt2, sqrt3, sqrt5;
 
@@ -80,7 +80,6 @@ public class HumanMouseMover {
             }
             step = hypot(xs - lastX, ys - lastY);
             ThreadUtils.sleep(Math.round((maxWait - minWait) * (step / maxStep) + minWait));
-            lastDist = dist;
         }
         if (Math.round(xe) != Math.round(xs)
                 || (Math.round(ye) != Math.round(ys))) {
@@ -97,7 +96,7 @@ public class HumanMouseMover {
         int cx = 0, cy = 0;
         double randSpeed = 0;
         long seg, e, f, g, nx, ny, hypo;
-        double a, b, c;
+        double a, b;
         boolean miss;
         if (useLaptopMouse) {
             miss = (Math.random() * LMouse_MissChance == 0);

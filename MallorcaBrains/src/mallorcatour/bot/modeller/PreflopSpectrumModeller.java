@@ -18,8 +18,7 @@ import org.neuroph.core.NeuralNetwork;
  */
 public class PreflopSpectrumModeller {
 
-    public Advice getAdvice(final LocalSituation situation, HoleCards cards,
-            NeuralNetwork preflopNN) {
+	public Advice getAdvice(LocalSituation situation, HoleCards cards, NeuralNetwork<?> preflopNN) {
         if (situation.getStreet() != LocalSituation.PREFLOP) {
             throw new IllegalArgumentException();
         }

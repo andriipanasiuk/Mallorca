@@ -76,7 +76,7 @@ public class PAVillainObserver implements IVillainObserver, IDecisionListener {
         List<PokerLearningExample> examples = villainStatistics.getExamples();
         List<PokerLearningExample> preflopExamples = new ArrayList<PokerLearningExample>();
         for (PokerLearningExample example : examples) {
-            if (example.getSituation().getStreet() == LocalSituation.PREFLOP) {
+            if (example.getInput().getStreet() == LocalSituation.PREFLOP) {
                 preflopExamples.add(example);
             }
         }
