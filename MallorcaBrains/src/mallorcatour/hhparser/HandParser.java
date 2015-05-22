@@ -137,7 +137,11 @@ public class HandParser {
         gameInfo = new BaseGameInfo();
         gameInfo.players = hand.getPlayers();
         initPot(hand);
-        gameInfo.buttonName = hand.getButtonPlayer();
+		if (heroName.equals(hand.getButtonPlayer())) {
+			gameInfo.onButton = true;
+		} else {
+			gameInfo.onButton = false;
+		}
         gameInfo.street = PokerStreet.PREFLOP;
         gameInfo.raisesOnStreet[gameInfo.street.intValue()] = 1;
         //recognizing hole cards

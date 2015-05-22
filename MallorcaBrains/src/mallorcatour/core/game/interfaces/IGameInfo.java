@@ -44,7 +44,7 @@ public interface IGameInfo {
 
     public double getPotSize();
 
-    public String getButtonName();
+    public boolean onButton();
 
     public double getHeroAmountToCall();
 

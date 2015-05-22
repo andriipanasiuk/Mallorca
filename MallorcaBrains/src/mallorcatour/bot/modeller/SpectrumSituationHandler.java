@@ -93,7 +93,7 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	private LocalSituation getVillainSituationWithoutStrength(double villainToCall) {
 		LocalSituation result = null;
 		boolean isOnButton;
-		if (villainName.equals(gameInfo.getButtonName())) {
+		if (!gameInfo.onButton()) {
 			isOnButton = true;
 		} else {
 			isOnButton = false;

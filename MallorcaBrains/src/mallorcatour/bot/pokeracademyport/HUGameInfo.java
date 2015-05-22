@@ -97,10 +97,6 @@ public class HUGameInfo implements IGameInfo {
         return gameInfo.getMainPotSize();
     }
 
-    public String getButtonName() {
-        return gameInfo.getPlayer(gameInfo.getButtonSeat()).getName();
-    }
-
     public double getHeroAmountToCall() {
         return gameInfo.getPlayer(heroSeat).getAmountToCall();
     }
@@ -151,6 +147,11 @@ public class HUGameInfo implements IGameInfo {
 	public Card getRiver() {
 		//TODO implement
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean onButton() {
+		return gameInfo.getPlayer(heroSeat).isButton();
 	}
 
 }

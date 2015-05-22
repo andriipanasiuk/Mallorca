@@ -45,7 +45,7 @@ public class ProfitSituationHandler implements ISituationHandler {
         heroCard2 = c2;
         profit = -1;
         this.villainName = villainName;
-        if (gameInfo.getButtonName().equals(heroName)) {
+        if (gameInfo.onButton()) {
             heroToCall = gameInfo.getBigBlindSize() / 2;
         } else {
             heroToCall = 0;

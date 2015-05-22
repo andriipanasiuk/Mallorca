@@ -46,12 +46,7 @@ public class NoStrengthSituationHandler implements ISituationHandler {
 
     private LocalSituation getHeroSituation() {
         LocalSituation result = null;
-        boolean isOnButton;
-        if (heroName.equals(gameInfo.getButtonName())) {
-            isOnButton = true;
-        } else {
-            isOnButton = false;
-        }
+        boolean isOnButton = gameInfo.onButton();
         //potOdds
         double toCall = gameInfo.getHeroAmountToCall();
         double pot = gameInfo.getPotSize();

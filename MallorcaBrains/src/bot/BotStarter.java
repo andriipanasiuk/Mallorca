@@ -75,7 +75,7 @@ public class BotStarter implements Bot {
 			} else {
 				coeff = 1;
 			}
-			int amount = (int) (coeff * (state.getPot() + state.getAmountToCall()));
+			int amount = (int) (coeff * (state.getPotSize() + state.getAmountToCall()));
 			return new PokerMove(state.getMyName(), "raise", amount);
 		} else if (action.isPassive()) {
 			return new PokerMove(state.getMyName(), "call", 0);

@@ -266,7 +266,7 @@ public class FellOmen2 implements IPlayer {
         this.holeCard2 = card2;
         this.heroName = heroName;
         this.villainName = villainName;
-        this.onButton = heroName.equals(gameInfo.getButtonName());
+        this.onButton = gameInfo.onButton();
     }
 
     private void checkPreflopHistory() {

@@ -78,14 +78,6 @@ public class HUGameInfo implements IGameInfo {
         return pot;
     }
 
-    public String getButtonName() {
-        if (heroInfo.isOnButton()) {
-            return heroInfo.getName();
-        } else {
-            return villainInfo.getName();
-        }
-    }
-
     public double getHeroAmountToCall() {
         double betDifference = villainInfo.getBet() - heroInfo.getBet();
         if (betDifference <= 0) {
@@ -150,5 +142,10 @@ public class HUGameInfo implements IGameInfo {
 	@Override
 	public Card getRiver() {
 		return board.get(4);
+	}
+
+	@Override
+	public boolean onButton() {
+		return heroInfo.isOnButton();
 	}
 }

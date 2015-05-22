@@ -18,13 +18,13 @@ public class BaseGameInfo implements IGameInfo {
 	public int[] raisesOnStreet = new int[4];
     public List<PlayerInfo> players;
     public PokerStreet street;
-    public String buttonName;
     public boolean canHeroRaise;
     public double pot;
     public double bigBlind;
     public double heroAmountToCall;
     public List<Card> board;
     public double bankrollAtRisk;
+	public boolean onButton;
 
     public BaseGameInfo() {
         for (int i = 0; i < 4; i++) {
@@ -66,10 +66,6 @@ public class BaseGameInfo implements IGameInfo {
 
     public double getPotSize() {
         return pot;
-    }
-
-    public String getButtonName() {
-        return buttonName;
     }
 
     public double getHeroAmountToCall() {
@@ -132,5 +128,10 @@ public class BaseGameInfo implements IGameInfo {
 	@Override
 	public Card getRiver() {
 		return board.get(4);
+	}
+
+	@Override
+	public boolean onButton() {
+		return onButton;
 	}
 }

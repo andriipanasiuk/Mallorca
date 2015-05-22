@@ -12,13 +12,12 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.interfaces.IGameObserver;
 
 /**
  *
  * @author Andrew
  */
-public class SituationHandler implements ISituationHandler, IGameObserver {
+public class SituationHandler implements ISituationHandler {
 
     protected IGameInfo gameInfo;  // general game information
     protected Card holeCard1, holeCard2, flop1, flop2, flop3, turn, river;
@@ -54,12 +53,7 @@ public class SituationHandler implements ISituationHandler, IGameObserver {
 
     private LocalSituation getHeroSituation() {
         LocalSituation result = null;
-        boolean isOnButton;
-        if (heroName.equals(gameInfo.getButtonName())) {
-            isOnButton = true;
-        } else {
-            isOnButton = false;
-        }
+        boolean isOnButton  = gameInfo.onButton();
         double toCall = gameInfo.getHeroAmountToCall();
         double pot = gameInfo.getPotSize();
         double effectiveStack = gameInfo.getBankRollAtRisk();
@@ -153,9 +147,6 @@ public class SituationHandler implements ISituationHandler, IGameObserver {
         wasVillainPreviousAggressive = false;
     }
 
-    /* (non-Javadoc)
-	 * @see mallorcatour.core.game.situation.IGameObserver#onVillainActed(mallorcatour.core.game.Action, double)
-	 */
     @Override
 	public void onVillainActed(Action action, double toCall) {
         if (action.isAggressive()) {
@@ -168,9 +159,6 @@ public class SituationHandler implements ISituationHandler, IGameObserver {
         }
     }
 
-    /* (non-Javadoc)
-	 * @see mallorcatour.core.game.situation.IGameObserver#onHandEnded()
-	 */
     @Override
 	public void onHandEnded() {
         //do nothing

@@ -72,6 +72,7 @@ public class GrandtorinoBot implements IPlayer {
 	 * @param seat
 	 *            your seat number at the table
 	 */
+	@Override
 	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
 		situationHandler.onHoleCards(c1, c2, heroName, villainName);
 		heroCard1 = c1;
@@ -147,7 +148,9 @@ public class GrandtorinoBot implements IPlayer {
 	/**
 	 * An villain action has been observed.
 	 */
+	@Override
 	public void onVillainActed(Action action, double toCall) {
+		//TODO remove to call from here
 		situationHandler.onVillainActed(action, toCall);
 	}
 
