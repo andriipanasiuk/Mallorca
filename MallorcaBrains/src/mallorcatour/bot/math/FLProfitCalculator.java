@@ -22,7 +22,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 	}
 
 	@Override
-	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, String heroName, IAggressionInfo situation,
+	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, IAggressionInfo situation,
 			Card holeCard1, Card holeCard2, Spectrum villainSpectrum, StrengthManager strengthManager) {
 		Log.d("getFLProfitMap. Pot: " + gameInfo.getPotSize());
 		int heroActionCount  =situation.getHeroActionCount();

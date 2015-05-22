@@ -22,7 +22,7 @@ public class NoStrengthSituationHandler implements ISituationHandler {
     protected int countOfHeroActions, countOfHeroAggressive, countOfOppActions,
             countOfOppAggressive;
     protected boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
-    protected String heroName, villainName;
+    protected String villainName;
     private double strength, positivePotential, negativePotential;
     protected LimitType limitType;
 
@@ -36,8 +36,7 @@ public class NoStrengthSituationHandler implements ISituationHandler {
      * @param c2 your second hole card
      * @param seat your seat number at the table
      */
-    public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
-        this.heroName = heroName;
+    public void onHoleCards(Card c1, Card c2, String villainName) {
         this.villainName = villainName;
         strength = -1;
         positivePotential = LocalSituation.DEFAULT_POTENTIAL;
@@ -52,8 +51,6 @@ public class NoStrengthSituationHandler implements ISituationHandler {
         double pot = gameInfo.getPotSize();
         double effectiveStack = gameInfo.getBankRollAtRisk();
         double potOdds = toCall / (toCall + pot);
-        double stackProportion = gameInfo.getBankRoll(heroName)
-                / (gameInfo.getBankRoll(heroName) + gameInfo.getBankRoll(villainName));
 
         if (gameInfo.isPreFlop()) {
             result = new LocalSituation(LocalSituation.PREFLOP, limitType);
@@ -77,7 +74,6 @@ public class NoStrengthSituationHandler implements ISituationHandler {
         result.wasHeroPreviousAggresive(wasHeroPreviousAggressive);
         result.wasOpponentPreviousAggresive(wasVillainPreviousAggressive);
         result.setStrength(strength);
-        result.setStackProportion(stackProportion);
         result.setPotOdds(potOdds);
         result.isOnButton(isOnButton);
         result.setPotToStackOdds((pot + toCall) / (pot + toCall + effectiveStack));

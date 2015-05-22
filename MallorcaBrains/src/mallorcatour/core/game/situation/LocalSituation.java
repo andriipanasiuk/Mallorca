@@ -341,13 +341,6 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
     }
 
     /**
-     * @return the stackProportion
-     */
-    public double getStackProportion() {
-        return stackProportion;
-    }
-
-    /**
      * @param stackProportion the stackProportion to set
      */
     public void setStackProportion(double stackProportion) {

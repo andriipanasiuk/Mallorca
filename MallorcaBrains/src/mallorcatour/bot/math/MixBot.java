@@ -27,8 +27,7 @@ import mallorcatour.util.Log;
  */
 public class MixBot implements IPlayer {
 
-    private IGameInfo gameInfo;  // general game information
-	private String heroName, villainName;
+    private IGameInfo gameInfo;;
     private Card heroCard1, heroCard2;
     private final IActionPreprocessor actionPreprocessor;
     private final BaseAdviceCreatorFromMap adviceCreator;
@@ -58,12 +57,10 @@ public class MixBot implements IPlayer {
      * @param seat your seat number at the table
      */
     @Override
-    public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
-        situationHandler.onHoleCards(c1, c2, heroName, villainName);
+    public void onHoleCards(Card c1, Card c2, String villainName) {
+        situationHandler.onHoleCards(c1, c2, villainName);
         this.heroCard1 = c1;
         this.heroCard2 = c2;
-        this.heroName = heroName;
-        this.villainName = villainName;
     }
 
     /**
@@ -76,7 +73,7 @@ public class MixBot implements IPlayer {
         Action action = null;
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
         LocalSituation situation = situationHandler.onHeroSituation();
-        if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
+        if (gameInfo.isVillainSitOut()) {
             Log.f(DEBUG_PATH, "Villain is sitting out");
             double percent = 0.5;
             action = Action.createRaiseAction(percent
@@ -85,16 +82,16 @@ public class MixBot implements IPlayer {
             advice = postflopNN.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
-            action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+            action = actionPreprocessor.preprocessAction(action, gameInfo);
         } else {
 			// preflop
-			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1,
+			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1,
 					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
             advice = adviceCreator.create(map);
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
-            action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+            action = actionPreprocessor.preprocessAction(action, gameInfo);
         }
         Log.f(DEBUG_PATH, "Action: " + action.toString());
         Log.f(DEBUG_PATH, "=========  End  =========");

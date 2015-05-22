@@ -155,7 +155,7 @@ public class HandParser {
         gameInfo.board = board;
         //callbacks
         handler.onHandStarted(gameInfo);
-        handler.onHoleCards(holeCard1, holeCard2, heroName, villainName);
+        handler.onHoleCards(holeCard1, holeCard2, villainName);
     }
 
     private void onVillainAction(Action action, double toCall) {

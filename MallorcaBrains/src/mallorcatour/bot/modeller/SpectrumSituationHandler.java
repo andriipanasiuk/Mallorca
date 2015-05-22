@@ -77,9 +77,9 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	 *            your second hole card
 	 */
 	@Override
-	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
-		super.onHoleCards(c1, c2, heroName, villainName);
-		strengthManager.onHoleCards(c1, c2, heroName, villainName);
+	public void onHoleCards(Card c1, Card c2, String villainName) {
+		super.onHoleCards(c1, c2, villainName);
+		strengthManager.onHoleCards(c1, c2, villainName);
 		villainSpectrum = Spectrum.random();
 		randomVillainSpectrum = Spectrum.random();
 		if (modelPreflop) {

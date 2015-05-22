@@ -31,7 +31,6 @@ public class FLMathBot implements IPlayer {
     private IGameInfo gameInfo;
     private final SpectrumSituationHandler situationHandler;
     private final IProfitCalculator profitCalculator;
-	private String heroName, villainName;
     private Card heroCard1, heroCard2;
     private IActionPreprocessor actionPreprocessor;
     private final StrengthManager strengthManager; 
@@ -56,13 +55,11 @@ public class FLMathBot implements IPlayer {
      * @param c2 your second hole card
      * @param seat your seat number at the table
      */
-    public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
-    	strengthManager.onHoleCards(c1, c2, heroName, villainName);
-        situationHandler.onHoleCards(c1, c2, heroName, villainName);
+    public void onHoleCards(Card c1, Card c2, String villainName) {
+    	strengthManager.onHoleCards(c1, c2, villainName);
+        situationHandler.onHoleCards(c1, c2, villainName);
         this.heroCard1 = c1;
         this.heroCard2 = c2;
-        this.heroName = heroName;
-        this.villainName = villainName;
     }
 
     /**
@@ -74,13 +71,13 @@ public class FLMathBot implements IPlayer {
         Action action = null;
         LocalSituation situation = situationHandler.onHeroSituation();
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
-        if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
+        if (gameInfo.isVillainSitOut()) {
             Log.f(DEBUG_PATH, "Villain is sitting out");
             double percent = 0.5;
             action = Action.createRaiseAction(percent
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
 		} else {
-			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1,
+			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1,
 					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
 			saveSpectrum();
@@ -88,7 +85,7 @@ public class FLMathBot implements IPlayer {
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
             Log.f(DEBUG_PATH, "Action: " + action.toString());
-            action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+            action = actionPreprocessor.preprocessAction(action, gameInfo);
             if (gameInfo.isRiver()) {
                 action = checkRiver(action);
             }

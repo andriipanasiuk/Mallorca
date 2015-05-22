@@ -15,6 +15,6 @@ package bot;
 
 public interface Bot {
 
-	public PokerMove getMove(BotState state, Long timeOut);
+	public PokerMove getMove(AiGamesController state, Long timeOut);
 
 }

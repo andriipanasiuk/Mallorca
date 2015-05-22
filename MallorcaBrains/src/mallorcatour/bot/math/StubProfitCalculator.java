@@ -13,7 +13,7 @@ import mallorcatour.core.spectrum.Spectrum;
 public class StubProfitCalculator implements IProfitCalculator{
 
 	@Override
-	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, String heroName, IAggressionInfo situation,
+	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, IAggressionInfo situation,
 			Card holeCard1, Card holeCard2, Spectrum villainSpectrum, StrengthManager strengthManager) {
 		Map<Action, Double> result = new HashMap<>();
 		result.put(Action.foldAction(), 1D);

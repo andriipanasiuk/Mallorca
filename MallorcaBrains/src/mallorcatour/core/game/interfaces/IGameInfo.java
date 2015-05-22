@@ -18,8 +18,6 @@ import mallorcatour.core.game.PokerStreet;
  */
 public interface IGameInfo {
 
-    public static int SITTING_OUT = -2;
-
     public double getBigBlindSize();
 
     public PokerStreet getStage();
@@ -48,8 +46,6 @@ public interface IGameInfo {
 
     public double getHeroAmountToCall();
 
-    public double getBankRoll(String name);
-
     public double getBankRollAtRisk();
 
     public boolean canHeroRaise();
@@ -58,7 +54,7 @@ public interface IGameInfo {
 
     public LimitType getLimitType();
 
-    List<PlayerInfo> getPlayers();
-
     PlayerInfo getPlayer(String name);
+
+	boolean isVillainSitOut();
 }

@@ -26,14 +26,12 @@ public class NLRiverActionChecker implements IActionChecker {
 	}
 
 	@Override
-	public Action checkAction(Action action, LocalSituation situation, IGameInfo gameInfo, Spectrum villainSpectrum,
-			String heroName) {
+	public Action checkAction(Action action, LocalSituation situation, IGameInfo gameInfo, HoleCards cards,
+			Spectrum villainSpectrum) {
 		if (!gameInfo.isRiver() || gameInfo.getLimitType() != LimitType.NO_LIMIT) {
 			return action;
 		}
-		HoleCards cards;
-		cards = gameInfo.getPlayer(heroName).getHoleCards();
-		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, cards.first,
+		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, cards.first,
 				cards.second, villainSpectrum, strengthManager);
 		if (gameInfo.getHeroAmountToCall() > 0) {
 			if (action.isFold()) {

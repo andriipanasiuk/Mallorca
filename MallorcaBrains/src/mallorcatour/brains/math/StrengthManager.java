@@ -38,7 +38,7 @@ public class StrengthManager implements IGameObserver {
 		this.needFlopFullPotential = needFlopFullPotential;
 	}
 	@Override
-	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
+	public void onHoleCards(Card c1, Card c2, String villainName) {
 		preflop = new HashMap<HoleCards, StreetEquity>();
 		for (HoleCards holeCards : randomSpectrum) {
 			StreetEquity eq = EquilatorPreflop.equityVsRandom(holeCards.first, holeCards.second);

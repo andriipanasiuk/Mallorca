@@ -11,7 +11,7 @@ import mallorcatour.core.spectrum.Spectrum;
 
 public interface IProfitCalculator {
 
-	Map<Action, Double> getProfitMap(IGameInfo gameInfo, String heroName, IAggressionInfo situation, Card holeCard1,
+	Map<Action, Double> getProfitMap(IGameInfo gameInfo, IAggressionInfo situation, Card holeCard1,
 			Card holeCard2, Spectrum villainSpectrum, StrengthManager strengthManager);
 
 }

@@ -46,7 +46,7 @@ public class PotSituationHandler implements ISituationHandler {
      * @param c2 your second hole card
      * @param seat your seat number at the table
      */
-    public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
+    public void onHoleCards(Card c1, Card c2, String villainName) {
     }
 
     public LocalSituation onHeroSituation() {

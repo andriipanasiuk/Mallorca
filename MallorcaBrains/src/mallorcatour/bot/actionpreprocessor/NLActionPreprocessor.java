@@ -11,12 +11,12 @@ import mallorcatour.core.game.interfaces.IGameInfo;
  */
 public class NLActionPreprocessor implements IActionPreprocessor {
 
-    public Action preprocessAction(Action action, IGameInfo gameInfo,
-            String villainName) {
+	@Override
+    public Action preprocessAction(Action action, IGameInfo gameInfo) {
         double toCall = gameInfo.getHeroAmountToCall();
         double pot = gameInfo.getPotSize();
         double effectiveStack = gameInfo.getBankRollAtRisk();
-        if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
+        if (gameInfo.isVillainSitOut()) {
             return Action.createRaiseAction(toCall, pot, Double.MAX_VALUE);
         }
         if (action.isAllin()) {

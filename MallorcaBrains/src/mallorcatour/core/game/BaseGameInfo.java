@@ -134,4 +134,9 @@ public class BaseGameInfo implements IGameInfo {
 	public boolean onButton() {
 		return onButton;
 	}
+
+	@Override
+	public boolean isVillainSitOut() {
+		return false;
+	}
 }

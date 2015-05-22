@@ -22,7 +22,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 	private final NLGameSolver gameSolver;
 
 	@Override
-	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, String heroName, IAggressionInfo situation,
+	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, IAggressionInfo situation,
 			Card holeCard1, Card holeCard2, Spectrum villainSpectrum, StrengthManager strengthManager) {
 		int heroActionCount = situation.getHeroActionCount();
 		int countOfHeroAggressive = situation.getHeroAggresionActionCount();

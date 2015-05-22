@@ -12,6 +12,5 @@ import mallorcatour.core.game.Action;
  */
 public interface IActionPreprocessor {
 
-    Action preprocessAction(Action action, IGameInfo gameInfo,
-            String villainName);
+    Action preprocessAction(Action action, IGameInfo gameInfo);
 }

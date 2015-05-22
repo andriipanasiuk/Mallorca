@@ -13,7 +13,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.robot.PlayerInfo;
+import mallorcatour.robot.ExtPlayerInfo;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.interfaces.IGameController;
 import mallorcatour.util.Log;
@@ -34,7 +34,8 @@ public class HUGameController implements IGameController {
     //values must be reseted after new hand
     private List<Card> alreadyTakenCards;
     private Action heroPreviousAction, villainPreviousAction;
-    private long currentHandNumber = -1;
+    @SuppressWarnings("unused")
+	private long currentHandNumber = -1;
     private final String DEBUG_PATH;
     private final String heroName;
 
@@ -44,8 +45,8 @@ public class HUGameController implements IGameController {
         this.heroName = heroName;
     }
 
-    private PlayerInfo getHero(List<PlayerInfo> players) {
-        for (PlayerInfo playerInfo : players) {
+    private ExtPlayerInfo getHero(List<ExtPlayerInfo> players) {
+        for (ExtPlayerInfo playerInfo : players) {
             if (playerInfo.getName().equals(heroName)) {
                 return playerInfo;
             }
@@ -53,8 +54,8 @@ public class HUGameController implements IGameController {
         throw new RuntimeException();
     }
 
-    private PlayerInfo getVillain(List<PlayerInfo> players) {
-        for (PlayerInfo playerInfo : players) {
+    private ExtPlayerInfo getVillain(List<ExtPlayerInfo> players) {
+        for (ExtPlayerInfo playerInfo : players) {
             if (!playerInfo.getName().equals(heroName)) {
                 return playerInfo;
             }
@@ -62,8 +63,8 @@ public class HUGameController implements IGameController {
         throw new RuntimeException();
     }
 
-    private double getBigBlind(List<PlayerInfo> players) {
-        for (PlayerInfo playerInfo : players) {
+    private double getBigBlind(List<ExtPlayerInfo> players) {
+        for (ExtPlayerInfo playerInfo : players) {
             if (!playerInfo.isOnButton()) {
                 return playerInfo.getBet();
             }
@@ -108,10 +109,10 @@ public class HUGameController implements IGameController {
         }
     }
 
-    private double getEffectiveStack(List<PlayerInfo> players) {
+    private double getEffectiveStack(List<ExtPlayerInfo> players) {
         double result = Double.POSITIVE_INFINITY;
         double playerAllStack;
-        for (PlayerInfo playerInfo : players) {
+        for (ExtPlayerInfo playerInfo : players) {
             playerAllStack = playerInfo.getBet() + playerInfo.getStack();
             if (playerAllStack < result) {
                 result = playerAllStack;
@@ -280,7 +281,7 @@ public class HUGameController implements IGameController {
     }
 
 	@Override
-	public void onNewHand(long handNumber, List<PlayerInfo> players, Card holeCard1, Card holeCard2, List<Card> board,
+	public void onNewHand(long handNumber, List<ExtPlayerInfo> players, Card holeCard1, Card holeCard2, List<Card> board,
 			double pot, LimitType limitType) {
 		villainPreviousAction = null;
 		currentStreet = calculateStreet(board);
@@ -303,15 +304,15 @@ public class HUGameController implements IGameController {
             heroPreviousAction = Action.checkAction();
             gameInfo.pot = pot;
         }
-        gameInfo.effectiveStack = getEffectiveStack(players);
-        gameInfo.bankrollAtRisk = gameInfo.effectiveStack - gameInfo.bigBlind;
+        double effectiveStack = getEffectiveStack(players);
+        gameInfo.bankrollAtRisk = effectiveStack - gameInfo.bigBlind;
         gameInfo.limitType = limitType;
         gameInfo.raisesOnStreet[PokerStreet.PREFLOP.intValue()] = 1;
         //logging
         Log.f(DEBUG_PATH, "\n<--------------------->");
         Log.f(DEBUG_PATH, "Hand number: " + handNumber + "\n");
         String smallBlindLog = "", bigBlindLog = "";
-        for (PlayerInfo playerInfo : players) {
+        for (ExtPlayerInfo playerInfo : players) {
             String log;
             if (playerInfo.isOnButton()) {
                 log = playerInfo.getName() + "* " + playerInfo.getStack()
@@ -328,8 +329,7 @@ public class HUGameController implements IGameController {
         Log.f(DEBUG_PATH, smallBlindLog);
         Log.f(DEBUG_PATH, bigBlindLog);
 
-        player.onHoleCards(holeCard1, holeCard2, heroName,
-                gameInfo.villainInfo.getName());
+        player.onHoleCards(holeCard1, holeCard2, gameInfo.villainInfo.getName());
         if (currentStreet == PokerStreet.PREFLOP) {
             player.onStageEvent(currentStreet);
         }

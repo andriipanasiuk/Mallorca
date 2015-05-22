@@ -24,7 +24,7 @@ public class SituationHandler implements ISituationHandler {
     protected int heroActionCount, countOfHeroAggressive, villainActionCount,
             countOfOppAggressive;
     protected boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
-    protected String heroName, villainName;
+    protected String villainName;
     private double strength, positivePotential, negativePotential;
     protected LimitType limitType;
     private final boolean needFullPotentialOnFlop;
@@ -40,14 +40,13 @@ public class SituationHandler implements ISituationHandler {
 	}
 
     @Override
-	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
+	public void onHoleCards(Card c1, Card c2, String villainName) {
         this.holeCard1 = c1;
 		this.holeCard2 = c2;
 		StreetEquity equity = EquilatorPreflop.equityVsRandom(holeCard1, holeCard2);
 		strength = equity.strength;
 		positivePotential = equity.positivePotential;
 		negativePotential = equity.negativePotential;
-        this.heroName = heroName;
         this.villainName = villainName;
     }
 
@@ -58,8 +57,6 @@ public class SituationHandler implements ISituationHandler {
         double pot = gameInfo.getPotSize();
         double effectiveStack = gameInfo.getBankRollAtRisk();
         double potOdds = toCall / (toCall + pot);
-        double stackProportion = gameInfo.getBankRoll(heroName)
-                / (gameInfo.getBankRoll(heroName) + gameInfo.getBankRoll(villainName));
 
         if (gameInfo.isPreFlop()) {
             result = new LocalSituation(LocalSituation.PREFLOP, limitType);
@@ -79,7 +76,6 @@ public class SituationHandler implements ISituationHandler {
         result.setStrength(strength);
         result.setPositivePotential(positivePotential);
         result.setNegativePotential(negativePotential);
-        result.setStackProportion(stackProportion);
         result.setPotOdds(potOdds);
         result.isOnButton(isOnButton);
         result.setPotToStackOdds((pot + toCall) / (pot + toCall + effectiveStack));

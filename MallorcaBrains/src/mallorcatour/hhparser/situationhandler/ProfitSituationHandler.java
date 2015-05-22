@@ -40,7 +40,7 @@ public class ProfitSituationHandler implements ISituationHandler {
      * @param c2 your second hole card
      * @param seat your seat number at the table
      */
-    public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
+    public void onHoleCards(Card c1, Card c2, String villainName) {
         heroCard1 = c1;
         heroCard2 = c2;
         profit = -1;
@@ -122,12 +122,7 @@ public class ProfitSituationHandler implements ISituationHandler {
     }
 
     private PlayerInfo getVillainInfo() {
-        PlayerInfo villainInfo = null;
-        for (PlayerInfo player : gameInfo.getPlayers()) {
-            if (player.getName().equals(villainName)) {
-                villainInfo = player;
-            }
-        }
+        PlayerInfo villainInfo = gameInfo.getPlayer(villainName);
         return villainInfo;
     }
 

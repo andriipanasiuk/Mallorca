@@ -11,7 +11,7 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.robot.PlayerInfo;
+import mallorcatour.robot.ExtPlayerInfo;
 
 /**
  *
@@ -19,18 +19,16 @@ import mallorcatour.robot.PlayerInfo;
  */
 public class HUGameInfo implements IGameInfo {
 
-    LimitType limitType;
-    int[] raisesOnStreet = new int[4];
-    PokerStreet street;
-    double ante = 0;
-    double smallBlind, bigBlind;
-    List<Card> board;
-    double pot;
-    //on preflop
-    double effectiveStack;
-    //player infos
-    PlayerInfo heroInfo, villainInfo;
-    double bankrollAtRisk;
+    public LimitType limitType;
+    public int[] raisesOnStreet = new int[4];
+    public PokerStreet street;
+    public double bigBlind;
+    public List<Card> board;
+    public double pot;
+    public double amountToCall;
+    public ExtPlayerInfo heroInfo, villainInfo;
+    public double bankrollAtRisk;
+	public static final int SITTING_OUT = -2;
 
     public HUGameInfo() {
         for (int i = 0; i < 4; i++) {
@@ -62,10 +60,6 @@ public class HUGameInfo implements IGameInfo {
         return street == PokerStreet.RIVER;
     }
 
-    public double getSmallBlindSize() {
-        return smallBlind;
-    }
-
     public double getBigBlindSize() {
         return bigBlind;
     }
@@ -87,7 +81,7 @@ public class HUGameInfo implements IGameInfo {
         }
     }
 
-    private PlayerInfo getPlayerInfo(String name) {
+    private ExtPlayerInfo getPlayerInfo(String name) {
         if (heroInfo.getName().equals(name)) {
             return heroInfo;
         } else {
@@ -99,6 +93,12 @@ public class HUGameInfo implements IGameInfo {
         return getPlayerInfo(name).getStack();
     }
 
+    @Override
+    public boolean isVillainSitOut(){
+    	return villainInfo.getStack() == HUGameInfo.SITTING_OUT;
+    }
+
+    @Override
     public double getBankRollAtRisk() {
         return bankrollAtRisk;
     }
@@ -116,19 +116,16 @@ public class HUGameInfo implements IGameInfo {
         return raisesOnStreet[street.intValue()];
     }
 
+    @Override
     public LimitType getLimitType() {
         return limitType;
     }
 
-	public List<mallorcatour.core.game.PlayerInfo> getPlayers() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
 	@Override
 	public mallorcatour.core.game.PlayerInfo getPlayer(String name) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public Flop getFlop() {
 		return new Flop(board.get(0), board.get(1), board.get(2));

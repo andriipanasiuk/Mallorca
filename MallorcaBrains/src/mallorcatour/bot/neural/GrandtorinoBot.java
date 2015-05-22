@@ -30,7 +30,6 @@ import mallorcatour.util.Log;
  */
 public class GrandtorinoBot implements IPlayer {
 
-	private String heroName, villainName;
 	private Card heroCard1, heroCard2;
 	private boolean isHumanAdvisor;
 	private IGameInfo gameInfo;;
@@ -73,12 +72,10 @@ public class GrandtorinoBot implements IPlayer {
 	 *            your seat number at the table
 	 */
 	@Override
-	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
-		situationHandler.onHoleCards(c1, c2, heroName, villainName);
+	public void onHoleCards(Card c1, Card c2, String villainName) {
+		situationHandler.onHoleCards(c1, c2, villainName);
 		heroCard1 = c1;
 		heroCard2 = c2;
-		this.heroName = heroName;
-		this.villainName = villainName;
 	}
 
 	/**
@@ -93,7 +90,7 @@ public class GrandtorinoBot implements IPlayer {
 		Log.f(DEBUG_PATH, "Situation: " + VectorUtils.toString(situation));
 
 		Action action = null;
-		if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
+		if (gameInfo.isVillainSitOut()) {
 			Log.f(DEBUG_PATH, "Villain is sitting out");
 			double percent = 0.5;
 			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()),
@@ -107,7 +104,7 @@ public class GrandtorinoBot implements IPlayer {
 			if (gameInfo.isPreFlop()) {
 				action = preflopBot.getAction(situation, new HoleCards(heroCard1, heroCard2));
 				if (action != null) {
-					action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+					action = actionPreprocessor.preprocessAction(action, gameInfo);
 				}
 			}
 			// if there is no preflop OR action is no in chart
@@ -115,10 +112,10 @@ public class GrandtorinoBot implements IPlayer {
 				Advice advice = advisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
 				Log.f(DEBUG_PATH, "Advice: " + advice.toString());
 				action = advice.getAction();
-				action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+				action = actionPreprocessor.preprocessAction(action, gameInfo);
 				Log.f(DEBUG_PATH, "Action: " + action.toString());
-				action = actionChecker.checkAction(action, situation, gameInfo,
-						villainSpectrumHandler.getVillainSpectrum(), heroName);
+				action = actionChecker.checkAction(action, situation, gameInfo, new HoleCards(heroCard1, heroCard2),
+						villainSpectrumHandler.getVillainSpectrum());
 			}
 		}
 		Log.f(DEBUG_PATH, "===============  End  ==============");
@@ -150,7 +147,7 @@ public class GrandtorinoBot implements IPlayer {
 	 */
 	@Override
 	public void onVillainActed(Action action, double toCall) {
-		//TODO remove to call from here
+		// TODO remove to call from here
 		situationHandler.onVillainActed(action, toCall);
 	}
 

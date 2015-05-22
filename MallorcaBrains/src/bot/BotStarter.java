@@ -11,78 +11,19 @@
 
 package bot;
 
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.bot.interfaces.IDecisionListener;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.neural.NeuralBotFactory;
+import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
-import mallorcatour.core.game.Action;
-import mallorcatour.core.game.Card;
-import mallorcatour.core.game.HoleCards;
-import mallorcatour.core.game.advice.Advice;
 import mallorcatour.util.Log;
 
 /**
  * This class is the brains of your bot. Make your calculations here and return
  * the best move with GetMove
  */
-public class BotStarter implements Bot {
-
-	@Override
-	public PokerMove getMove(BotState state, Long timeOut) {
-		HoleCards cards = state.getHand();
-		Card[] table = state.getTable();
-		double strength;
-		if (table.length == 0) {
-			strength = EquilatorPreflop.strengthVsRandom(cards.first, cards.second);
-		} else {
-			strength = PokerEquilatorBrecher.strengthVsRandom(cards.first, cards.second, table);
-		}
-		Log.d("Strength: " + strength);
-		Log.d("To call: " + state.getAmountToCall());
-		Advice advice;
-		if (state.getAmountToCall() == 0) {
-			if (strength < 0.25) {
-				advice = Advice.create(0, 0.9, 0.1);
-			} else if (strength < 0.5) {
-				advice = Advice.create(0, 0.75, 0.25);
-			} else if (strength < 0.75) {
-				advice = Advice.create(0, 0.4, 0.6);
-			} else {
-				advice = Advice.create(0, 0.2, 0.8);
-			}
-		} else {
-			if (strength < 0.3) {
-				advice = Advice.create(1, 0, 0);
-			} else if (strength < 0.5) {
-				advice = Advice.create(0, 1, 0);
-			} else if (strength < 0.6) {
-				advice = Advice.create(0, 0.8, 0.2);
-			} else if (strength < 0.8) {
-				advice = Advice.create(0, 0.5, 0.5);
-			} else {
-				advice = Advice.create(0, 0.2, 0.8);
-			}
-		}
-		Action action = advice.getAction();
-		Log.d("Action: " + action);
-		return convert(action, state);
-	}
-
-	static PokerMove convert(Action action, BotState state) {
-		if (action.isAggressive()) {
-			double coeff;
-			if (state.getAmountToCall() == 0) {
-				coeff = 0.7;
-			} else {
-				coeff = 1;
-			}
-			int amount = (int) (coeff * (state.getPotSize() + state.getAmountToCall()));
-			return new PokerMove(state.getMyName(), "raise", amount);
-		} else if (action.isPassive()) {
-			return new PokerMove(state.getMyName(), "call", 0);
-		} else {
-			return new PokerMove(state.getMyName(), "fold", 0);
-		}
-	}
+public class BotStarter {
 
 	/**
 	 * @param args
@@ -90,7 +31,9 @@ public class BotStarter implements Bot {
 	public static void main(String[] args) {
 		Log.WRITE_TO_ERR = true;
 		EquilatorPreflop.loadFrom = LoadFrom.CODE;
-		BotParser parser = new BotParser(new BotStarter());
+		NeuralBotFactory factory = new NeuralBotFactory();
+		BotParser parser = new BotParser(factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+				IDecisionListener.EMPTY, ""));
 		parser.run();
 	}
 

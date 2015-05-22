@@ -30,7 +30,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.interfaces.IRandomizer;
-import mallorcatour.robot.PlayerInfo;
+import mallorcatour.robot.ExtPlayerInfo;
 import mallorcatour.robot.controller.HUGameControllerExt;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.util.DateUtils;
@@ -49,7 +49,7 @@ public class GameFrame extends javax.swing.JFrame {
 
     private HUGameControllerExt controller;
     private long currentHandNumber = -1;
-    private PlayerInfo heroInfo, villainInfo;
+    private ExtPlayerInfo heroInfo, villainInfo;
     //temporary. Robot must recognize limit type from table
     private final LimitType limitType;
     private List<Card> nonUsedCards;
@@ -83,9 +83,6 @@ public class GameFrame extends javax.swing.JFrame {
         villainModeller = new VillainModel(limitType, DEBUG_PATH);
         IPlayer player = new NLMathBot(villainModeller,
                 spectrumListener, IDecisionListener.EMPTY, DEBUG_PATH);
-//        IPlayer player = new GrandtorinoBot(new BasePokerNN(new SparbotNNPathes(), 20),
-//                villainModellingNN, LimitType.FIXED_LIMIT,
-//                spectrumListener, IDecisionListener.EMPTY);
         controller = new HUGameControllerExt(player,
                 PokerPreferences.DEFAULT_HERO_NAME,DEBUG_PATH);
         executor = ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY);
@@ -114,8 +111,8 @@ public class GameFrame extends javax.swing.JFrame {
 
         //button
         boolean heroOnButton = currentHandNumber % 2 == 1;
-        heroInfo = new PlayerInfo(PokerPreferences.DEFAULT_HERO_NAME, heroOnButton);
-        villainInfo = new PlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME, !heroOnButton);
+        heroInfo = new ExtPlayerInfo(PokerPreferences.DEFAULT_HERO_NAME, heroOnButton);
+        villainInfo = new ExtPlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME, !heroOnButton);
         //
         botDealerButton.setVisible(false);
         myDealerButton.setVisible(false);
@@ -143,7 +140,7 @@ public class GameFrame extends javax.swing.JFrame {
         boardCards = new ArrayList<Card>();
         updateUI();
         controller.onNewHand(currentHandNumber,
-                Arrays.asList(new PlayerInfo[]{heroInfo, villainInfo}),
+                Arrays.asList(new ExtPlayerInfo[]{heroInfo, villainInfo}),
                 botCard1, botCard2, boardCards, pot, limitType);
         dealButton.setVisible(false);
         if (heroInfo.isOnButton()) {

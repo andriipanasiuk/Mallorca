@@ -21,7 +21,7 @@ import mallorcatour.robot.ChatTracker;
 import mallorcatour.robot.HumanColorTableInteractor;
 import mallorcatour.robot.ITableInteractor;
 import mallorcatour.robot.KeyboardTableInteractor;
-import mallorcatour.robot.PlayerInfo;
+import mallorcatour.robot.ExtPlayerInfo;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.robot.hardwaremanager.MouseClickLimiter;
 import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
@@ -49,7 +49,7 @@ public class PSGameRobot implements IGameRobot, ITableListener {
     private long currentHandNumber = -1;
     private boolean paused = true;
     private boolean isGameStarted = false;
-    private PlayerInfo heroInfo, villainInfo;
+    private ExtPlayerInfo heroInfo, villainInfo;
     private ITableInteractor tableInteractor;
     private final ExecutorService executor;
     private final PSTableRecognizer tableRecognizer;
@@ -164,8 +164,8 @@ public class PSGameRobot implements IGameRobot, ITableListener {
             boolean heroOnButton = tableRecognizer.isHeroOnButton();
             boolean villainOnButton = !heroOnButton;
             //creating new player infos
-            heroInfo = new PlayerInfo(heroName, heroOnButton);
-            villainInfo = new PlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME, villainOnButton);
+            heroInfo = new ExtPlayerInfo(heroName, heroOnButton);
+            villainInfo = new ExtPlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME, villainOnButton);
         }
         //recognizing board cards
         List<Card> boardCards = tableRecognizer.getBoardCards();
@@ -213,7 +213,7 @@ public class PSGameRobot implements IGameRobot, ITableListener {
             }
             currentHandNumber = handNumber;
             controller.onNewHand(currentHandNumber,
-                    Arrays.asList(new PlayerInfo[]{heroInfo, villainInfo}),
+                    Arrays.asList(new ExtPlayerInfo[]{heroInfo, villainInfo}),
                     holeCard1, holeCard2, boardCards, pot, limitType);
         }
 

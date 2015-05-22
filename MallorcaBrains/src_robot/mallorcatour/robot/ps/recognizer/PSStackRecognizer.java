@@ -7,8 +7,8 @@ package mallorcatour.robot.ps.recognizer;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.recognizer.core.AbstractNumberRecognizer;
+import mallorcatour.robot.controller.HUGameInfo;
 import mallorcatour.robot.recognizer.assets.IDigitAssets;
 import mallorcatour.robot.recognizer.assets.ITableAssets;
 import mallorcatour.util.robot.IImageProcessor;
@@ -56,7 +56,7 @@ class PSStackRecognizer extends AbstractNumberRecognizer {
 
     public int getStack(BufferedImage image) {
         if (ImageUtils.isPartOf(image, tableAssets.getSitoutImage(), STACK_PREPROCESSOR) != null) {
-            return IGameInfo.SITTING_OUT;
+            return HUGameInfo.SITTING_OUT;
         }
         return getNumber(image);
 

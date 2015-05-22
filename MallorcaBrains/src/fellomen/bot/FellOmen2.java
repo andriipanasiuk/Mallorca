@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.*/
 package fellomen.bot;
 
-import java.util.*;
+import java.util.List;
 
 import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.interfaces.IPlayer;
@@ -43,7 +43,7 @@ import mallorcatour.util.Log;
 public class FellOmen2 implements IPlayer {
     // constants used:
 
-    private String heroName, villainName;
+    private String heroName;
     private IGameInfo gameInfo;
     private Card holeCard1, holeCard2;
     private Card flop1, flop2, flop3, turn, river;
@@ -261,11 +261,9 @@ public class FellOmen2 implements IPlayer {
         this.gameInfo = gameInfo;
     }
 
-    public void onHoleCards(Card card1, Card card2, String heroName, String villainName) {
+    public void onHoleCards(Card card1, Card card2, String villainName) {
         this.holeCard1 = card1;
         this.holeCard2 = card2;
-        this.heroName = heroName;
-        this.villainName = villainName;
         this.onButton = gameInfo.onButton();
     }
 
@@ -294,7 +292,7 @@ public class FellOmen2 implements IPlayer {
         Log.f(DEBUG, "=========  Decision-making  =========");
         Advice advice;
         Action action;
-        if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
+        if (gameInfo.isVillainSitOut()) {
             Log.f(DEBUG, "Villain is sitting out");
             double percent = 0.5;
             action = Action.createRaiseAction(percent
@@ -322,7 +320,7 @@ public class FellOmen2 implements IPlayer {
             }
             Log.f(DEBUG, "Advice: " + advice.toString());
             action = advice.getAction();
-            action = preprocessor.preprocessAction(action, gameInfo, heroName);
+            action = preprocessor.preprocessAction(action, gameInfo);
         }
         Log.f(DEBUG, "Action: " + action.toString());
         Log.f(DEBUG, "===============  End  ==============");

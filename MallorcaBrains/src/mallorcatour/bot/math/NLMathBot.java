@@ -33,10 +33,9 @@ import mallorcatour.util.Log;
 public class NLMathBot implements IPlayer {
 
     private BaseAdviceCreatorFromMap adviceCreator;
-    private IGameInfo gameInfo;  // general game information
+    private IGameInfo gameInfo;;
     private SpectrumSituationHandler situationHandler;
     private StrengthManager strengthManager;
-	private String heroName, villainName;
     private IAdvisor preflopAdvisor;
     private IProfitCalculator profitCalculator;
     private IPreflopChart preflopBot;
@@ -63,12 +62,10 @@ public class NLMathBot implements IPlayer {
      * @param c2 your second hole card
      * @param seat your seat number at the table
      */
-    public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
-        situationHandler.onHoleCards(c1, c2, heroName, villainName);
+    public void onHoleCards(Card c1, Card c2, String villainName) {
+        situationHandler.onHoleCards(c1, c2, villainName);
         this.heroCard1 = c1;
         this.heroCard2 = c2;
-        this.heroName = heroName;
-        this.villainName = villainName;
     }
 
     /**
@@ -80,34 +77,34 @@ public class NLMathBot implements IPlayer {
         Advice advice;
         Action action = null;
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
-        if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
+        if (gameInfo.isVillainSitOut()) {
             Log.f(DEBUG_PATH, "Villain is sitting out");
             double percent = 0.5;
             action = Action.createRaiseAction(percent
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
 		} else if (gameInfo.isPostFlop()) {
-			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1,
+			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1,
 					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
 			advice = adviceCreator.create(map);
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
             Log.f(DEBUG_PATH, "Action: " + action.toString());
-            action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+            action = actionPreprocessor.preprocessAction(action, gameInfo);
         } else //preflop
         {
             Log.f(DEBUG_PATH, "Preflop: " + situation.toString());
-            if (gameInfo.isPreFlop() && gameInfo.getBankRoll(villainName) != IGameInfo.SITTING_OUT) {
+            if (gameInfo.isPreFlop() && gameInfo.isVillainSitOut()) {
                 action = preflopBot.getAction(situation, new HoleCards(heroCard1, heroCard2));
                 if (action != null) {
-                    action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+                    action = actionPreprocessor.preprocessAction(action, gameInfo);
                 }
             }
             if (action == null) {
                 advice = preflopAdvisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
                 action = advice.getAction();
                 Log.f(DEBUG_PATH, "Advice: " + advice.toString());
-                action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
+                action = actionPreprocessor.preprocessAction(action, gameInfo);
             }
         }
         Log.f(DEBUG_PATH, "=========  End  =========");

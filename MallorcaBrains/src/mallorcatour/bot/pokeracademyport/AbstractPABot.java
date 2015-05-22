@@ -71,7 +71,6 @@ public abstract class AbstractPABot implements Player {
             seat++;
         }
         this.villainName = paGameInfo.getPlayerName(seat);
-        String heroName = paGameInfo.getPlayerName(heroSeat);
         Log.f(DEBUG_PATH, "Count of raises: " + paGameInfo.getNumRaises());
         Log.f(DEBUG_PATH, "Hero seat: " + heroSeat);
         Log.f(DEBUG_PATH, "Villain seat: " + seat);
@@ -81,7 +80,7 @@ public abstract class AbstractPABot implements Player {
         getRealBot().onHandStarted(gi);
         getRealBot().onHoleCards(CardAdapter.createFromPACard(card1),
                 CardAdapter.createFromPACard(card2),
-                heroName, villainName);
+                villainName);
     }
 
     public Action getAction() {

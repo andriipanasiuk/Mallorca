@@ -154,4 +154,9 @@ public class HUGameInfo implements IGameInfo {
 		return gameInfo.getPlayer(heroSeat).isButton();
 	}
 
+	@Override
+	public boolean isVillainSitOut() {
+		return false;
+	}
+
 }

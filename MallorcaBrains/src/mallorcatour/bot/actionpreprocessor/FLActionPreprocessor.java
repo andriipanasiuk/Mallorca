@@ -11,10 +11,9 @@ import mallorcatour.core.game.interfaces.IGameInfo;
  */
 public class FLActionPreprocessor implements IActionPreprocessor {
 
-    public Action preprocessAction(Action action, IGameInfo gameInfo,
-            String villainName) {
+    public Action preprocessAction(Action action, IGameInfo gameInfo) {
         double toCall = gameInfo.getHeroAmountToCall();
-        if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
+        if (gameInfo.isVillainSitOut()) {
             return Action.createRaiseAction(gameInfo.getBigBlindSize(), -1);
         }
         if (action.isFold()) {
