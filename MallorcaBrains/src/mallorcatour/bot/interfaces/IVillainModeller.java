@@ -8,6 +8,6 @@ import mallorcatour.brains.IAdvisor;
  * @author andriipanasiuk
  *
  */
-public interface IVillainModeller extends IAdvisor, IVillainListener{
+public interface IVillainModeller extends IAdvisor, IVillainListener {
 	
 }

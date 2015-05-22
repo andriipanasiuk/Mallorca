@@ -1,19 +1,16 @@
 package mallorcatour.bot.neural;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
-import mallorcatour.bot.math.NLProfitCalculator;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.FLPreflopChart;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
+import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.StrengthManager;
 import mallorcatour.core.game.Action;
@@ -36,31 +33,27 @@ import mallorcatour.util.Log;
  */
 public class GrandtorinoBot implements IPlayer {
 
-    private final static double MIN_VALUE_FOR_CALL_DECISION = 10;
-    private final static double MIN_VALUE_FOR_BET_DECISION = 10;
-	private String heroName, villainName;
+    private String heroName, villainName;
     private Card heroCard1, heroCard2;
     private boolean isHumanAdvisor;
     private IGameInfo gameInfo;  // general game information
     private final SpectrumSituationHandler situationHandler;
-    private final NLProfitCalculator profitCalculator;
     private final StrengthManager strengthManager;
     private final IAdvisor advisor;
+    private final IActionChecker actionChecker;
     private final IPreflopChart preflopBot;
     private final IHumanAdvisor humanAdvisor;
     private final IActionPreprocessor actionPreprocessor;
-    private final LimitType limitType;
     private final String DEBUG_PATH;
 
     public GrandtorinoBot(IAdvisor neuralNetwork, IVillainModeller villainModeller,
-            LimitType limitType, ISpectrumListener spectrumListener,
+            IActionChecker actionChecker, StrengthManager strengthManager, LimitType limitType, ISpectrumListener spectrumListener,
             IDecisionListener villainDecisionListener, IHumanAdvisor humanAdvisor,
             boolean isHumanAdvisor, boolean modelPreflop, boolean modelPostflop, String debug) {
         this.advisor = neuralNetwork;
-        this.limitType = limitType;
         this.DEBUG_PATH = debug;
-        strengthManager = new StrengthManager(false);
-        profitCalculator = new NLProfitCalculator(villainModeller);
+        this.actionChecker = actionChecker;
+        this.strengthManager = strengthManager;
 		situationHandler = new SpectrumSituationHandler(villainModeller, limitType, modelPreflop, modelPostflop,
 				spectrumListener, villainDecisionListener, strengthManager, true, DEBUG_PATH);
 		if (limitType == LimitType.NO_LIMIT) {
@@ -93,6 +86,7 @@ public class GrandtorinoBot implements IPlayer {
      * Requests an Action from the player
      * Called when it is the hero's turn to act.
      */
+    @Override
     public Action getAction() {
         LocalSituation situation = situationHandler.onHeroSituation();
 
@@ -100,7 +94,6 @@ public class GrandtorinoBot implements IPlayer {
         Log.f(DEBUG_PATH, "Situation: " + VectorUtils.toString(situation));
 
         Action action = null;
-        //if villain is sitting out
         if (gameInfo.getBankRoll(villainName) == IGameInfo.SITTING_OUT) {
             Log.f(DEBUG_PATH, "Villain is sitting out");
             double percent = 0.5;
@@ -124,47 +117,13 @@ public class GrandtorinoBot implements IPlayer {
                 Log.f(DEBUG_PATH, "Advice: " + advice.toString());
                 action = advice.getAction();
                 action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);
-                Log.f(DEBUG_PATH, "Action: " + action.toString());
-                //check river action with MathBot
-                if (limitType == LimitType.NO_LIMIT) {
-                    action = checkRiverAction(action, situation);
-                }
-            }
+				Log.f(DEBUG_PATH, "Action: " + action.toString());
+				action = actionChecker.checkAction(action, situation, gameInfo, situationHandler.getVillainSpectrum(),
+						heroName);
+			}
         }
         Log.f(DEBUG_PATH, "===============  End  ==============");
         situationHandler.onHeroActed(action);
-        return action;
-    }
-
-	private Action checkRiverAction(Action action, LocalSituation situation) {
-		// check if we have positive EV for call on river
-		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, heroName, situation, heroCard1, heroCard2,
-				situationHandler.getVillainSpectrum(), strengthManager);
-		if (gameInfo.isRiver()) {
-			if (gameInfo.getHeroAmountToCall() > 0) {
-				if (action.isFold()) {
-					for (Entry<Action, Double> entry : map.entrySet()) {
-						if (entry.getKey().isPassive() && entry.getValue() >= MIN_VALUE_FOR_CALL_DECISION) {
-							return Action.callAction(gameInfo.getHeroAmountToCall());
-						}
-					}
-				} else if (action.isPassive()) {
-					for (Entry<Action, Double> entry : map.entrySet()) {
-						if (entry.getKey().isPassive() && entry.getValue() < MIN_VALUE_FOR_CALL_DECISION) {
-							return Action.foldAction();
-						}
-					}
-				}
-			} else {
-				if (action.isAggressive()) {
-					for (Entry<Action, Double> entry : map.entrySet()) {
-						if (entry.getKey().isAggressive() && entry.getValue() < MIN_VALUE_FOR_BET_DECISION) {
-							return Action.checkAction();
-						}
-					}
-				}
-			}
-		}
         return action;
     }
 

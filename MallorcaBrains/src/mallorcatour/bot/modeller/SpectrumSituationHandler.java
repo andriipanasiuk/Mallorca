@@ -10,6 +10,7 @@ import java.util.Map;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
+import mallorcatour.bot.math.IVillainSpectrumHandler;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
@@ -32,7 +33,7 @@ import mallorcatour.util.Log;
  * 
  * @author Andrew
  */
-public class SpectrumSituationHandler extends SituationHandler {
+public class SpectrumSituationHandler extends SituationHandler implements IVillainSpectrumHandler {
 
 	protected Spectrum villainSpectrum;
 	private final IAdvisor villainModellingNN;
@@ -128,6 +129,7 @@ public class SpectrumSituationHandler extends SituationHandler {
         return result;
     }
 
+    @Override
     public Spectrum getVillainSpectrum() {
         return villainSpectrum;
     }
