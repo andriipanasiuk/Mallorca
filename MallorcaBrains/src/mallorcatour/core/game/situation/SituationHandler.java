@@ -64,6 +64,8 @@ public class SituationHandler implements ISituationHandler {
             result = new LocalSituation(LocalSituation.TURN, limitType);
         } else if (gameInfo.isRiver()) {
             result = new LocalSituation(LocalSituation.RIVER, limitType);
+		} else {
+			throw new IllegalStateException("Incorrect street value");
         }
         result.setHeroAggresionActionCount(countOfHeroAggressive);
         result.setHeroActionCount(heroActionCount);

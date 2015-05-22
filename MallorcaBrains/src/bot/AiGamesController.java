@@ -117,6 +117,7 @@ public class AiGamesController {
 			} else {
 				throw new IllegalArgumentException("Not correct count of board cards");
 			}
+			gameInfo.street = street;
 			observer.onStageEvent(street);
 		} else {
 			System.err.printf("Unknown match command: %s %s\n", key, value);
@@ -150,6 +151,7 @@ public class AiGamesController {
 			} else if (key.equals("post")) {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
 			} else if (key.equals("hand")) { // Your cards
+				gameInfo.street = PokerStreet.PREFLOP;
 				Card[] cards = parseCards(amount);
 				observer.onHoleCards(cards[0], cards[1], villainName);
 			} else if (key.equals("wins")) {
