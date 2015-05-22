@@ -32,17 +32,12 @@ public class BaseVector implements IVector {
         return values;
     }
 
-    public static IVector valueOf(String vector) {
+    public static BaseVector valueOf(String vector) {
         final List<Number> result = new ArrayList<Number>();
         String[] numbers = vector.split(NUMBER_SEPARATOR);
         for (String number : numbers) {
             result.add(Double.parseDouble(number));
         }
-        return new IVector() {
-
-            public List<Number> getValues() {
-                return result;
-            }
-        };
+        return new BaseVector(result);
     }
 }

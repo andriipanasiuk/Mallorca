@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.neuronetworkwrapper;
+package mallorcatour.neural.core;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,9 +23,9 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 public class NNManager {
 
     public static <T extends IVector> double errorOnExamples(NeuralNetwork neuralNetwork,
-            List<LearningExample> examples, IOutputInterpreter<T> creator) {
+            List<? extends ILearningExample> examples, IOutputInterpreter<T> creator) {
         double error = 0;
-        for (LearningExample example : examples) {
+        for (ILearningExample example : examples) {
             error += errorOnExample(neuralNetwork, example, creator);
         }
         error /= examples.size();
@@ -33,7 +33,7 @@ public class NNManager {
     }
 
     public static double errorOnExamples(NeuralNetwork neuralNetwork,
-            List<LearningExample> examples) {
+            List<? extends ILearningExample> examples) {
         return errorOnExamples(neuralNetwork, examples, new VectorCreator());
     }
 
@@ -43,7 +43,7 @@ public class NNManager {
     }
 
     public static <T extends IVector> double errorOnExample(NeuralNetwork neuralNetwork,
-            LearningExample example, IOutputInterpreter<T> creator) {
+            ILearningExample example, IOutputInterpreter<T> creator) {
         neuralNetwork.setInput(LEManager.createInputArray(example));
         neuralNetwork.calculate();
         double[] realOutput = neuralNetwork.getOutput();
@@ -58,7 +58,7 @@ public class NNManager {
         return error;
     }
 
-    public static int[] createErrorSample(NeuralNetwork nn,
+    public static int[] createErrorSample(NeuralNetwork<?> nn,
             List<LearningExample> examples, double sectionSize, double maxError) {
         return createErrorSample(nn, examples, sectionSize, maxError, new VectorCreator());
     }

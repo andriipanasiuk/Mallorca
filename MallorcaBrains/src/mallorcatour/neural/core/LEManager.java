@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.neuronetworkwrapper;
+package mallorcatour.neural.core;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,6 +20,7 @@ import mallorcatour.util.MyFileWriter;
 import mallorcatour.util.ReaderUtils;
 
 import org.neuroph.core.data.DataSet;
+import org.neuroph.core.data.DataSetRow;
 
 /**
  *
@@ -27,6 +28,18 @@ import org.neuroph.core.data.DataSet;
  */
 public class LEManager {
 
+	private static class DataSetRowAdapter extends DataSetRow {
+
+	    /**
+		 * 
+		 */
+		private static final long serialVersionUID = -4694537850146601716L;
+
+		public DataSetRowAdapter(ILearningExample<?, ?> learningExample) {
+	        super(LEManager.createInputArray(learningExample.getInput()),
+	                LEManager.createInputArray(learningExample.getOutput()));
+	    }
+	}
     private final static VectorInterpreter VECTOR_INTERPRETER =
             new VectorInterpreter(true);
 
@@ -44,11 +57,11 @@ public class LEManager {
 
     public static void toFile(MyFileWriter writer, IVector inputVector,
             IVector outputVector) {
-        writer.addToFile(new LearningExample(inputVector, outputVector).toString(), true);
+        writer.addToFile(LearningExample.toString(inputVector, outputVector), true);
     }
 
-    public static void toFile(MyFileWriter fileWriter, List<? extends LearningExample> examples) {
-        for (LearningExample example : examples) {
+    public static void toFile(MyFileWriter fileWriter, List<? extends ILearningExample> examples) {
+        for (ILearningExample example : examples) {
             fileWriter.addToFile(example.toString(), true);
         }
     }
@@ -85,7 +98,7 @@ public class LEManager {
      * @return
      */
     public static DataSet createTrainingSet(
-            List<? extends LearningExample> examples) {
+            List<? extends ILearningExample<?, ?>> examples) {
         if (examples.isEmpty()) {
             throw new IllegalArgumentException("List of examples must be not empty");
         }
@@ -93,8 +106,8 @@ public class LEManager {
         int output = examples.get(0).getOutputDimension();
 
 		DataSet result = new DataSet(input, output);
-        for (LearningExample example : examples) {
-            result.addRow(new SupervisedTrainingElementAdapter(example));
+        for (ILearningExample<?, ?> example : examples) {
+            result.addRow(new DataSetRowAdapter(example));
         }
         return result;
     }
@@ -110,11 +123,11 @@ public class LEManager {
         int output = example.getOutputDimension();
 
 		DataSet result = new DataSet(input, output);
-        result.addRow(new SupervisedTrainingElementAdapter(example));
+        result.addRow(new DataSetRowAdapter(example));
         return result;
     }
 
-    public static double[] createInputArray(LearningExample example) {
+    public static double[] createInputArray(ILearningExample example) {
         return createInputArray(example.getInput());
     }
 
@@ -127,10 +140,10 @@ public class LEManager {
         return interpreter.createInput(vector);
     }
 
-    public static double[] getAverageOutput(List<? extends LearningExample> examples) {
+    public static double[] getAverageOutput(List<? extends ILearningExample<?, ?>> examples) {
         int dimension = examples.get(0).getOutput().getValues().size();
         double[] output = new double[dimension];
-        for (LearningExample example : examples) {
+        for (ILearningExample<?, ?> example : examples) {
             int i = 0;
             for (Number value : example.getOutput().getValues()) {
                 output[i++] += value.doubleValue();

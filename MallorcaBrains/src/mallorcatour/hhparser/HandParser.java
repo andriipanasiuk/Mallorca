@@ -20,7 +20,8 @@ import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.hhparser.core.HandManager;
 
 import java.util.List;
-import mallorcatour.neuronetworkwrapper.PokerLearningExample;
+
+import mallorcatour.neural.core.PokerLearningExample;
 
 /**
  *

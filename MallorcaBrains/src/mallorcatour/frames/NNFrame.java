@@ -33,9 +33,11 @@ import mallorcatour.core.vector.EuclidDistanceMod;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.interfaces.IRandomizer;
-import mallorcatour.neuronetworkwrapper.LEManager;
-import mallorcatour.neuronetworkwrapper.LearningExample;
-import mallorcatour.neuronetworkwrapper.NNManager;
+import mallorcatour.neural.core.ILearningExample;
+import mallorcatour.neural.core.LEManager;
+import mallorcatour.neural.core.LearningExample;
+import mallorcatour.neural.core.NNManager;
+import mallorcatour.neural.generator.NNWriter;
 import mallorcatour.util.DoubleUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.MyFileWriter;
@@ -61,7 +63,7 @@ public class NNFrame extends javax.swing.JFrame {
     private Kohonen kohonenNN;
     private MultiLayerPerceptron multiLayerPerceptron;
     private LearningExample selectedExample;
-    private List<LearningExample> learningExamples, controlExamples, sameExamples;
+    private List<ILearningExample<?,?>> learningExamples, controlExamples, sameExamples;
     private DefaultListModel learningExamplesModel, controlExamplesModel,
             clusterNumberModel, sameExamplesModel;
     private DefaultTableModel clusterTableModel;
@@ -1172,7 +1174,7 @@ public class NNFrame extends javax.swing.JFrame {
         });
         jMenu5.add(jMenuItem22);
 
-        jMenuItem9.setText("Save weights...");
+        jMenuItem9.setText("Save weights as .java...");
         jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem9ActionPerformed(evt);
@@ -1233,13 +1235,13 @@ public class NNFrame extends javax.swing.JFrame {
         }
         allExamples.addAll(newExamples);
         if (controlExamples == null) {
-            controlExamples = new ArrayList<LearningExample>();
+            controlExamples = new ArrayList<>();
         }
         if (learningExamples == null) {
-            learningExamples = new ArrayList<LearningExample>();
+            learningExamples = new ArrayList<>();
         }
         if (sameExamples == null) {
-            sameExamples = new ArrayList<LearningExample>();
+            sameExamples = new ArrayList<>();
         }
         sameExamples.clear();
         Random gen = new Random(System.nanoTime());
@@ -1421,8 +1423,8 @@ public class NNFrame extends javax.swing.JFrame {
         double foldSum = 0, passiveSum = 0, aggressiveSum = 0;
         List<IVector> clusterVectors = new ArrayList<IVector>();
         double distanceSum = 0;
-        double distance;
-        for (LearningExample example : learningExamples) {
+		double distance;
+		for (ILearningExample<?, ?> example : learningExamples) {
             IVector vector = forInputs ? example.getInput() : example.getOutput();
             int cluster = NNManager.getCluster(kohonenNN, vector);
             if (cluster == clusterNumberList.getSelectedIndex()) {
@@ -1503,7 +1505,7 @@ public class NNFrame extends javax.swing.JFrame {
         Collections.sort(learningExamples, LearningExample.inputComparator(
                 StringUtils.parseIntArray(columns, ",")));
         learningExamplesModel.clear();
-        for (LearningExample example : learningExamples) {
+        for (ILearningExample example : learningExamples) {
             learningExamplesModel.addElement(example);
         }
     }//GEN-LAST:event_jButton12ActionPerformed
@@ -1511,7 +1513,7 @@ public class NNFrame extends javax.swing.JFrame {
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
         Collections.shuffle(learningExamples);
         learningExamplesModel.clear();
-        for (LearningExample example : learningExamples) {
+        for (ILearningExample example : learningExamples) {
             learningExamplesModel.addElement(example);
         }
     }//GEN-LAST:event_jButton13ActionPerformed
@@ -1519,7 +1521,7 @@ public class NNFrame extends javax.swing.JFrame {
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
         learningExamplesModel.clear();
         Collections.reverse(learningExamples);
-        for (LearningExample example : learningExamples) {
+        for (ILearningExample example : learningExamples) {
             learningExamplesModel.addElement(example);
         }
     }//GEN-LAST:event_jButton14ActionPerformed
@@ -1645,7 +1647,7 @@ public class NNFrame extends javax.swing.JFrame {
         if (path == null) {
             return;
         }
-        learningExamples = new ArrayList<LearningExample>();
+        learningExamples = new ArrayList<>();
         int input = Integer.parseInt(JOptionPane.showInputDialog("Input size"));
         BufferedReader reader = ReaderUtils.initReader(path);
         String buffer = ReaderUtils.readLine(reader);
@@ -1672,7 +1674,7 @@ public class NNFrame extends javax.swing.JFrame {
         }
         Log.d("Count of examples: " + learningExamples.size());
         learningExamplesModel.clear();
-        for (LearningExample example : learningExamples) {
+        for (ILearningExample example : learningExamples) {
             learningExamplesModel.addElement(example);
         }
     }//GEN-LAST:event_jMenuItem3ActionPerformed
@@ -1776,11 +1778,13 @@ public class NNFrame extends javax.swing.JFrame {
     }
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
-        String path = FrameUtils.openFileChooser(this);
-        if (path == null) {
-            return;
-        }
-        NNManager.weightsToFile(multiLayerPerceptron, path);
+        String path = FrameUtils.openFileChooser(this, "./");
+		if (path == null) {
+			return;
+		}
+		MyFileWriter writer = MyFileWriter.prepareForWriting(path, false);
+		NNWriter.weightsToJavaClass(writer, multiLayerPerceptron, "Flop");
+		writer.endWriting();
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
@@ -1898,7 +1902,7 @@ public class NNFrame extends javax.swing.JFrame {
         Collections.sort(sameExamples, LearningExample.inputComparator(
                 StringUtils.parseIntArray(columns, ",")));
         sameExamplesModel.clear();
-        for (LearningExample example : sameExamples) {
+        for (ILearningExample example : sameExamples) {
             sameExamplesModel.addElement(example);
         }
     }//GEN-LAST:event_jButton17ActionPerformed

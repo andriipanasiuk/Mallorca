@@ -17,7 +17,7 @@ import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorInterpreter;
-import mallorcatour.neuronetworkwrapper.PokerLearningExample;
+import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.util.DoubleUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.SerializatorUtils;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.neuronetworkwrapper;
+package mallorcatour.neural.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +16,7 @@ import mallorcatour.core.game.situation.LocalSituation;
  *
  * @author Andrew
  */
-public class PokerLearningExample extends LearningExample implements Serializable {
+public class PokerLearningExample implements ILearningExample<LocalSituation, Advice>, Serializable {
 
     private final static long serialVersionUID = 1L;
     private LocalSituation situation;
@@ -28,12 +28,10 @@ public class PokerLearningExample extends LearningExample implements Serializabl
     }
 
     public PokerLearningExample(LocalSituation situation) {
-        super(situation);
         this.situation = situation;
     }
 
     public PokerLearningExample(LocalSituation situation, Advice advice) {
-        super(situation, advice);
         this.situation = situation;
         this.advice = advice;
     }
@@ -41,8 +39,9 @@ public class PokerLearningExample extends LearningExample implements Serializabl
     /**
      * @return the situation
      */
+    @Deprecated
     public LocalSituation getSituation() {
-        return situation;
+        return getInput();
     }
 
     /**
@@ -50,14 +49,14 @@ public class PokerLearningExample extends LearningExample implements Serializabl
      */
     public void setSituation(LocalSituation situation) {
         this.situation = situation;
-        inputVector = situation;
     }
 
     /**
      * @return the advice
      */
+    @Deprecated
     public Advice getAdvice() {
-        return advice;
+        return getOutput();
     }
 
     /**
@@ -65,7 +64,6 @@ public class PokerLearningExample extends LearningExample implements Serializabl
      */
     public void setAdvice(Advice advice) {
         this.advice = advice;
-        outputVector = advice;
     }
 
     /**
@@ -84,12 +82,31 @@ public class PokerLearningExample extends LearningExample implements Serializabl
 
     @Override
     public String toString() {
-        return new LearningExample(situation, advice).toString();
+        return LearningExample.toString(situation, advice);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        inputVector = situation;
-        outputVector = advice;
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		// TODO check correct work
+		in.defaultReadObject();
+	}
+
+	@Override
+	public LocalSituation getInput() {
+		return situation;
+	}
+
+	@Override
+	public Advice getOutput() {
+		return advice;
+	}
+
+	@Override
+	public int getInputDimension() {
+        return getInput().getValues().size();
+    }
+
+    @Override
+	public int getOutputDimension() {
+        return getOutput().getValues().size();
     }
 }

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.neuronetworkwrapper;
+package mallorcatour.neural.core;
 
 import java.io.File;
 import java.util.ArrayList;

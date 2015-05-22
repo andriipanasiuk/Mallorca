@@ -18,6 +18,16 @@ public class MyFileWriter {
 		return new MyFileWriter(path, append);
 	}
 
+	public void append(String append) {
+		if (this.fileWriter == null)
+			throw new IllegalArgumentException("You need prepare file to writing first!");
+		try {
+			this.fileWriter.append(append);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	public void addToFile(String addString, boolean toNewLine) {
 		if (this.fileWriter == null)
 			throw new IllegalArgumentException("You need prepare file to writing first!");
