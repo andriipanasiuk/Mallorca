@@ -21,7 +21,7 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;
-import mallorcatour.robot.controller.HUGameInfo;
+import mallorcatour.core.game.BaseGameInfo;
 import mallorcatour.util.Log;
 
 /**

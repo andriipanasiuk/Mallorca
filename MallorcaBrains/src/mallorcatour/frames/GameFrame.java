@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.NLMathBot;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
@@ -29,6 +30,8 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.bot.modeller.VillainModel;
+import mallorcatour.bot.neural.NeuralBotFactory;
+import mallorcatour.brains.IAdvisor;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.robot.ExtPlayerInfo;
 import mallorcatour.robot.controller.HUGameControllerExt;
@@ -81,15 +84,15 @@ public class GameFrame extends javax.swing.JFrame {
         DEBUG_PATH = PokerPreferences.DEBUG_PATTERN
                 + DateUtils.getDate(false) + ".txt";
         villainModeller = new VillainModel(limitType, DEBUG_PATH);
-        IPlayer player = new NLMathBot(villainModeller,
-                spectrumListener, IDecisionListener.EMPTY, DEBUG_PATH);
-        controller = new HUGameControllerExt(player,
-                PokerPreferences.DEFAULT_HERO_NAME,DEBUG_PATH);
-        executor = ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY);
-        this.limitType = limitType;
-        enableActionButtons(false);
-        myDealerButton.setVisible(false);
-        botDealerButton.setVisible(false);
+		NeuralBotFactory factory = new NeuralBotFactory();
+		IPlayer player = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
+				"debug.txt");
+		controller = new HUGameControllerExt(player, PokerPreferences.DEFAULT_HERO_NAME, DEBUG_PATH);
+		executor = ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY);
+		this.limitType = limitType;
+		enableActionButtons(false);
+		myDealerButton.setVisible(false);
+		botDealerButton.setVisible(false);
 
         spectrumListener.setShow(showSpectrum);
         botCardsVisibleToggleButton.getModel().setPressed(true);

@@ -1,8 +1,11 @@
-package mallorcatour.brains.neural;
+package mallorcatour.brains.similar;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import mallorcatour.brains.neural.IPokerNeurals;
+import mallorcatour.brains.neural.ISituationData;
+import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
