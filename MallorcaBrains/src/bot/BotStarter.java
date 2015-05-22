@@ -12,7 +12,8 @@
 package bot;
 
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
-import mallorcatour.core.equilator.preflop.simple.EquilatorPreflopSimple;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -31,7 +32,7 @@ public class BotStarter implements Bot {
 		Card[] table = state.getTable();
 		double strength;
 		if (table.length == 0) {
-			strength = EquilatorPreflopSimple.strengthByFormula(cards.first, cards.second);
+			strength = EquilatorPreflop.strengthVsRandom(cards.first, cards.second);
 		} else {
 			strength = PokerEquilatorBrecher.strengthVsRandom(cards.first, cards.second, table);
 		}
@@ -62,6 +63,7 @@ public class BotStarter implements Bot {
 			}
 		}
 		Action action = advice.getAction();
+		Log.d("Action: " + action);
 		return convert(action, state);
 	}
 
@@ -87,6 +89,7 @@ public class BotStarter implements Bot {
 	 */
 	public static void main(String[] args) {
 		Log.WRITE_TO_ERR = true;
+		EquilatorPreflop.loadFrom = LoadFrom.CODE;
 		BotParser parser = new BotParser(new BotStarter());
 		parser.run();
 	}

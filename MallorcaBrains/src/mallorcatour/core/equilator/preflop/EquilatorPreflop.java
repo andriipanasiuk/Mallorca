@@ -10,13 +10,21 @@ import mallorcatour.util.SerializatorUtils;
 
 public class EquilatorPreflop {
 
+	public static enum LoadFrom {
+		FILE, CODE
+	}
+	public static LoadFrom loadFrom = LoadFrom.CODE;
 	public static boolean LOGGING = false;
 	private static final String PREFLOP_STRENGTH_TABLE_PATH = "preflop.eql";
 	public static double[][] preflopStrength = new double[170][170];
 
 	static {
-		preflopStrength = SerializatorUtils.load(
-				EquilatorPreflop.class.getResourceAsStream(PREFLOP_STRENGTH_TABLE_PATH), double[][].class);
+		if (loadFrom == LoadFrom.FILE) {
+			preflopStrength = SerializatorUtils.load(
+					EquilatorPreflop.class.getResourceAsStream(PREFLOP_STRENGTH_TABLE_PATH), double[][].class);
+		} else if (loadFrom == LoadFrom.CODE) {
+			preflopStrength = PreflopGenerated.preflopStrength;
+		}
 	}
 
 	private static int combination(Card card1, Card card2) {
@@ -129,32 +137,6 @@ public class EquilatorPreflop {
 		}
 		Log.d("Calculated vs " + log + " villain cards");
 		return ((double) wins) / count;
-	}
-
-	static void testMain() {
-		int[] deck = Deck.getIntCards();
-		for (int i = 0; i < deck.length; i++) {
-			for (int j = i+1; j < deck.length; j++) {
-				Card card1 = Card.valueOf(deck[i]);
-				Card card2 = Card.valueOf(deck[j]);
-				Log.d(card1 + " " + card2);
-				equityVsRandom(card1, card2);
-			}
-		}
-	}
-
-	static void testSpeed() {
-		int[] deck = Deck.getIntCards();
-		LOGGING = false;
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < deck.length; i++) {
-			for (int j = i+1; j < deck.length; j++) {
-				Card card1 = Card.valueOf(deck[i]);
-				Card card2 = Card.valueOf(deck[j]);
-				equityVsRandom(card1, card2);
-			}
-		}
-		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
 	}
 
 }

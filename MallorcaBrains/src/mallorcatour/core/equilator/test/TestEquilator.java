@@ -9,12 +9,12 @@ import java.util.Random;
 
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.quick.EquilatorQuick;
 import mallorcatour.core.equilator.quick.FlopCombinations;
 import mallorcatour.core.equilator.spears.PokerEquilatorSpears;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
-import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.ArrayUtils;
 import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
@@ -256,10 +256,39 @@ public class TestEquilator {
 	}
 
 	public static void testPreflop() {
-		Card card1 = Card.valueOf("As");
-		Card card2 = Card.valueOf("Kd");
-		double strength = PokerEquilatorBrecher.strengthVsSpectrum(card1, card2, new Card[] {}, Spectrum.random());
+		Card card1 = Card.valueOf("Ks");
+		Card card2 = Card.valueOf("Ad");
+		double strength = EquilatorPreflop.strengthVsRandom(card1, card2);
 		Log.d("Strength: " + strength);
 	}
 
+	static void testSpeed() {
+		int[] deck = Deck.getIntCards();
+		EquilatorPreflop.LOGGING = false;
+		long start = System.currentTimeMillis();
+		for (int i = 0; i < deck.length; i++) {
+			for (int j = i+1; j < deck.length; j++) {
+				Card card1 = Card.valueOf(deck[i]);
+				Card card2 = Card.valueOf(deck[j]);
+				EquilatorPreflop.equityVsRandom(card1, card2);
+			}
+		}
+		Log.d("Time: " + (System.currentTimeMillis() - start) + " ms");
+	}
+
+	static void testPreflopMain() {
+		int[] deck = Deck.getIntCards();
+		for (int i = 0; i < deck.length; i++) {
+			for (int j = i+1; j < deck.length; j++) {
+				Card card1 = Card.valueOf(deck[i]);
+				Card card2 = Card.valueOf(deck[j]);
+				Log.d(card1 + " " + card2);
+				EquilatorPreflop.equityVsRandom(card1, card2);
+			}
+		}
+	}
+
+	public static void main(String... args){
+		testPreflop();
+	}
 }
