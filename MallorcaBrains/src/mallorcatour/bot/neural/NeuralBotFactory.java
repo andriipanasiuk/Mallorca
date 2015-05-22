@@ -2,16 +2,16 @@ package mallorcatour.bot.neural;
 
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
+import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.math.IVillainSpectrumHandler;
+import mallorcatour.bot.interfaces.IVillainSpectrumHandler;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.SituationHandler;
-import mallorcatour.robot.humanadvisor.IHumanAdvisor;
 
 public class NeuralBotFactory implements IBotFactory {
 
@@ -21,7 +21,7 @@ public class NeuralBotFactory implements IBotFactory {
 		GusXensen player = new GusXensen();
 		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true);
 		return new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), handler,
-				IVillainSpectrumHandler.DEFAULT, IActionChecker.EMPTY, LimitType.NO_LIMIT, IHumanAdvisor.EMPTY, false,
+				IVillainSpectrumHandler.DEFAULT, IActionChecker.EMPTY, LimitType.NO_LIMIT, IExternalAdvisor.EMPTY, false,
 				debug);
 	}
 

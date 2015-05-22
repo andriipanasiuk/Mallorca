@@ -4,6 +4,7 @@
  */
 package mallorcatour.robot.humanadvisor;
 
+import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.util.ExecutorUtils;
@@ -13,9 +14,9 @@ import mallorcatour.util.OnExceptionListener;
  *
  * @author Andrew
  */
-public abstract class AbstractHumanAdvisor implements IHumanAdvisor {
+public abstract class AbstractHumanAdvisor implements IExternalAdvisor {
 
-    public Action getHumanAction(final IGameInfo gameInfo) {
+    public Action getAction(final IGameInfo gameInfo) {
         final Action[] result = new Action[1];
         final Object lock = new Object();
         final IActionHolder holder = new IActionHolder() {

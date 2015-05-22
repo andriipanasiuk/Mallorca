@@ -9,7 +9,7 @@ import java.util.Map;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.math.IVillainSpectrumHandler;
+import mallorcatour.bot.interfaces.IVillainSpectrumHandler;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;

@@ -13,9 +13,13 @@ public class Log {
 	}
 
 	public static void f(String path, String log) {
-		MyFileWriter fileWriter = MyFileWriter.prepareForWriting(path, true);
-		fileWriter.addToFile(log, true);
-		fileWriter.endWriting();
+		if (WRITE_TO_ERR) {
+			System.err.println(log);
+		} else {
+			MyFileWriter fileWriter = MyFileWriter.prepareForWriting(path, true);
+			fileWriter.addToFile(log, true);
+			fileWriter.endWriting();
+		}
 	}
 
 	public static void f(String log) {

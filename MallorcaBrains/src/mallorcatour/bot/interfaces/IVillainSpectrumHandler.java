@@ -1,4 +1,4 @@
-package mallorcatour.bot.math;
+package mallorcatour.bot.interfaces;
 
 import mallorcatour.core.spectrum.Spectrum;
 

@@ -2,8 +2,9 @@ package mallorcatour.bot.neural;
 
 import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
+import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.math.IVillainSpectrumHandler;
+import mallorcatour.bot.interfaces.IVillainSpectrumHandler;
 import mallorcatour.bot.preflop.FLPreflopChart;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
@@ -20,7 +21,6 @@ import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorUtils;
-import mallorcatour.robot.humanadvisor.IHumanAdvisor;
 import mallorcatour.util.Log;
 
 /**
@@ -39,13 +39,13 @@ public class GrandtorinoBot implements IPlayer {
 	private final IAdvisor advisor;
 	private final IActionChecker actionChecker;
 	private final IPreflopChart preflopBot;
-	private final IHumanAdvisor humanAdvisor;
+	private final IExternalAdvisor humanAdvisor;
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
 
 	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
 			IVillainSpectrumHandler villainSpectrumHandler, IActionChecker actionChecker, LimitType limitType,
-			IHumanAdvisor humanAdvisor, boolean isHumanAdvisor, String debug) {
+			IExternalAdvisor humanAdvisor, boolean isHumanAdvisor, String debug) {
 		this.advisor = neuralNetwork;
 		this.DEBUG_PATH = debug;
 		this.actionChecker = actionChecker;
@@ -99,7 +99,7 @@ public class GrandtorinoBot implements IPlayer {
 					percent);
 		} else // for human advisor
 		if (isHumanAdvisor && gameInfo.isPreFlop()) {
-			action = humanAdvisor.getHumanAction(gameInfo);
+			action = humanAdvisor.getAction(gameInfo);
 			Log.f(DEBUG_PATH, "Human action: " + action.toString());
 		} else {
 			// for preflop. Bot will make decision by preflop chart.

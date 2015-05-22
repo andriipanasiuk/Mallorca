@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.core.game.situation;
+package mallorcatour.hhparser.situationhandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.situation.ISituationHandler;
+import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Pair;
 
 /**

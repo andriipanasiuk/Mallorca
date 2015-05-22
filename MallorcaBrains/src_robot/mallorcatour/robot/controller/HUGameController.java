@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.bot.interfaces.IGameController;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -16,6 +15,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.robot.PlayerInfo;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
+import mallorcatour.robot.interfaces.IGameController;
 import mallorcatour.util.Log;
 import mp3player.Mp3Player;
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;

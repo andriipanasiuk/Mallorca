@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import mallorcatour.bot.interfaces.IGameController;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -26,6 +25,7 @@ import mallorcatour.robot.PlayerInfo;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.robot.hardwaremanager.MouseClickLimiter;
 import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
+import mallorcatour.robot.interfaces.IGameController;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.robot.recognizer.ITableListener;
