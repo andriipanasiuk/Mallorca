@@ -20,7 +20,7 @@ import mallorcatour.util.Log;
  */
 public class ProfitSituationHandler implements ISituationHandler {
 
-    protected IGameInfo gameInfo;  // general game information
+    protected IGameInfo gameInfo;;
     protected String heroName, villainName;
     private Card heroCard1, heroCard2;
     protected LimitType limitType;
@@ -51,6 +51,7 @@ public class ProfitSituationHandler implements ISituationHandler {
         hasFlop = false;
     }
 
+    @Override
     public LocalSituation onHeroSituation() {
         return null;
     }
@@ -58,6 +59,7 @@ public class ProfitSituationHandler implements ISituationHandler {
     /**
      * A new betting round has started.
      */
+    @Override
     public void onStageEvent(PokerStreet street) {
         if (street == PokerStreet.FLOP) {
             hasFlop = true;
@@ -97,10 +99,7 @@ public class ProfitSituationHandler implements ISituationHandler {
         }
     }
 
-    public void beforeHeroAction() {
-        //do nothing
-    }
-
+    @Override
     public void onHeroActed(Action action) {
         if (action.isFold()) {
             if (!gameInfo.isPreFlop()) {
@@ -130,6 +129,7 @@ public class ProfitSituationHandler implements ISituationHandler {
         return villainInfo;
     }
 
+    @Override
     public void onHandEnded() {
         if (profit == -1 && hasFlop) {
             double pot = gameInfo.getPotSize();

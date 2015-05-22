@@ -56,7 +56,7 @@ public class BaseVillainModeller implements IVillainModeller {
     }
 
     public Advice getAdvice(LocalSituation situation, HoleCards cards) {
-        NeuralNetwork nnForUse = null;
+        NeuralNetwork<?> nnForUse = null;
         AdviceCreator adviceCreator = null;
         boolean canRaise = situation.canRaise();
         int street = situation.getStreet();
