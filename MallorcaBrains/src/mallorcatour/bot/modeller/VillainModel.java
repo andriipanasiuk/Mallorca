@@ -4,7 +4,7 @@
  */
 package mallorcatour.bot.modeller;
 
-import mallorcatour.bot.interfaces.IVillainModel;
+import mallorcatour.bot.villainobserver.IVillainListener;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
@@ -19,7 +19,7 @@ import mallorcatour.util.Log;
  * 
  * @author Andrew
  */
-public class BaseVillainModel implements IVillainModel {
+public class VillainModel implements IAdvisor, IVillainListener {
 
 	// TODO create correct neurals with different players or change villain
 	// modelling approach
@@ -37,7 +37,7 @@ public class BaseVillainModel implements IVillainModel {
 	private boolean isVillainKnown;
 	private final String DEBUG_PATH;
 
-	public BaseVillainModel(LimitType limitType, String debug) {
+	public VillainModel(LimitType limitType, String debug) {
 		this.limitType = limitType;
 		preflopVillainModeller = new PreflopSpectrumModeller();
 		currentVillainNeural = limitType == LimitType.NO_LIMIT ? DEFAULT_NL_NEURAL : DEFAULT_FL_NEURAL;

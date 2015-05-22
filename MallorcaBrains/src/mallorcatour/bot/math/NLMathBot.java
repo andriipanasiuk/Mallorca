@@ -6,7 +6,7 @@ import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.modeller.BaseVillainModel;
+import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
@@ -44,7 +44,7 @@ public class NLMathBot implements IPlayer {
     private IActionPreprocessor actionPreprocessor;
     private final String DEBUG_PATH;
 
-	public NLMathBot(BaseVillainModel villainModeller, ISpectrumListener listener,
+	public NLMathBot(VillainModel villainModeller, ISpectrumListener listener,
 			IDecisionListener decisionListener, String debug) {
 		adviceCreator = new AdviceCreatorFromMap();
 		strengthManager = new StrengthManager(false);

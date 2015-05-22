@@ -9,7 +9,6 @@ import java.util.Map;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.interfaces.IVillainModel;
 import mallorcatour.bot.math.IVillainSpectrumHandler;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
@@ -48,14 +47,14 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	private Spectrum randomVillainSpectrum;
 	protected final String DEBUG_PATH;
 
-	public SpectrumSituationHandler(IVillainModel villainModeller, LimitType limitType, boolean modelPreflop,
+	public SpectrumSituationHandler(IAdvisor villainModeller, LimitType limitType, boolean modelPreflop,
 			boolean modelPostflop, ISpectrumListener villainSpectrumListener,
 			IDecisionListener villainDecisionListener, StrengthManager strengthManager, String debug) {
 		this(villainModeller, limitType, modelPreflop, modelPostflop, villainSpectrumListener, villainDecisionListener,
 				strengthManager, false, debug);
 	}
 
-	public SpectrumSituationHandler(IVillainModel villainModeller, LimitType limitType, boolean modelPreflop,
+	public SpectrumSituationHandler(IAdvisor villainModeller, LimitType limitType, boolean modelPreflop,
 			boolean modelPostflop, ISpectrumListener villainSpectrumListener,
 			IDecisionListener villainDecisionListener, StrengthManager strengthManager, boolean needFullFlopPotential,
 			String debug) {

@@ -3,7 +3,6 @@ package mallorcatour.bot.neural;
 import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.IVillainModel;
 import mallorcatour.bot.math.IVillainSpectrumHandler;
 import mallorcatour.bot.preflop.FLPreflopChart;
 import mallorcatour.bot.preflop.IPreflopChart;
@@ -44,7 +43,7 @@ public class GrandtorinoBot implements IPlayer {
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
 
-	public GrandtorinoBot(IAdvisor neuralNetwork, IVillainModel villainModeller, ISituationHandler situationHandler,
+	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
 			IVillainSpectrumHandler villainSpectrumHandler, IActionChecker actionChecker, LimitType limitType,
 			IHumanAdvisor humanAdvisor, boolean isHumanAdvisor, String debug) {
 		this.advisor = neuralNetwork;

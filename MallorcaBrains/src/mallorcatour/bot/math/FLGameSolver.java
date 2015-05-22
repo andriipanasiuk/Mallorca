@@ -7,8 +7,8 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 import java.util.Map;
 
-import mallorcatour.bot.interfaces.IGameSolver;
-import mallorcatour.bot.interfaces.IVillainModel;
+import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.math.IGameSolver;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Action;
@@ -33,11 +33,11 @@ public class FLGameSolver implements IGameSolver {
     private final static double NEARLY_ZERO = 0.0001;
     private final static double TURN_POT_COEFF = 4.91;
     private final static double RIVER_POT_COEFF = 3.14;
-    private IVillainModel villainModeller;
+    private IAdvisor villainModeller;
     private final int MIN_ADDITIONAL_PROFIT = 0;
     private static final double IP_ADDITIONAL_PROFIT_BB = 0.056;
 
-    public FLGameSolver(IVillainModel villainModeller) {
+    public FLGameSolver(IAdvisor villainModeller) {
         this.villainModeller = villainModeller;
     }
 

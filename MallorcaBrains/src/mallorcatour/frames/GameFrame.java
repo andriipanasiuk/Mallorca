@@ -28,7 +28,7 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.bot.modeller.BaseVillainModel;
+import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.robot.PlayerInfo;
 import mallorcatour.robot.controller.HUGameControllerExt;
@@ -65,7 +65,7 @@ public class GameFrame extends javax.swing.JFrame {
     private final ExecutorService executor;
     private final ShowingSpectrumListener spectrumListener;
     private boolean useGoButton;
-    private BaseVillainModel villainModeller;
+    private VillainModel villainModeller;
 //    private Flop predefinedFlop = new Flop(Card.valueOf("Td"), Card.valueOf("2s"), Card.valueOf("3s"));
 //    private Card predefinedTurn = Card.valueOf("Qh");
 //    private Card predefinedRiver = Card.valueOf("5h");
@@ -80,7 +80,7 @@ public class GameFrame extends javax.swing.JFrame {
         spectrumListener = new ShowingSpectrumListener();
         DEBUG_PATH = PokerPreferences.DEBUG_PATTERN
                 + DateUtils.getDate(false) + ".txt";
-        villainModeller = new BaseVillainModel(limitType, DEBUG_PATH);
+        villainModeller = new VillainModel(limitType, DEBUG_PATH);
         IPlayer player = new NLMathBot(villainModeller,
                 spectrumListener, IDecisionListener.EMPTY, DEBUG_PATH);
 //        IPlayer player = new GrandtorinoBot(new BasePokerNN(new SparbotNNPathes(), 20),

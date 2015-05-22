@@ -8,7 +8,7 @@ import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.interfaces.IVillainModel;
+import mallorcatour.brains.IAdvisor;
 
 /**
  * 
@@ -16,7 +16,7 @@ import mallorcatour.bot.interfaces.IVillainModel;
  */
 public class DanielxnPostflopBotFactory implements IBotFactory {
 
-	public IPlayer createBot(IVillainModel modeller, ISpectrumListener spectrumListener,
+	public IPlayer createBot(IAdvisor modeller, ISpectrumListener spectrumListener,
 			IDecisionListener decisionListener, String debug) {
 		throw new UnsupportedOperationException();
 	}

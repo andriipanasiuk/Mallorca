@@ -6,7 +6,6 @@ import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.interfaces.IVillainModel;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
@@ -39,7 +38,7 @@ public class MixBot implements IPlayer {
     private final StrengthManager strengthManager;
     private final IProfitCalculator profitCalculator;
 
-    public MixBot(IAdvisor postflopNN, IVillainModel villainModeller,
+    public MixBot(IAdvisor postflopNN, IAdvisor villainModeller,
             ISpectrumListener listener,
             IDecisionListener decisionListener, String debug) {
         this.postflopNN = postflopNN;

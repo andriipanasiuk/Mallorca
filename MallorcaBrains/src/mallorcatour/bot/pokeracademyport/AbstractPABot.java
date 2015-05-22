@@ -14,7 +14,7 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.bot.modeller.BaseVillainModel;
+import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.Log;
 
@@ -31,11 +31,11 @@ public abstract class AbstractPABot implements Player {
     private int heroSeat;
     private String villainName;
     private String DEBUG_PATH = "default.txt";
-    private BaseVillainModel modeller;
+    private VillainModel modeller;
 
     public AbstractPABot(String name) {
         DEBUG_PATH = name + "_debug_" + DateUtils.getDate(false) + ".txt";
-        modeller = new BaseVillainModel(LimitType.FIXED_LIMIT, DEBUG_PATH);
+        modeller = new VillainModel(LimitType.FIXED_LIMIT, DEBUG_PATH);
         villainObserver = new PAVillainObserver(modeller, DEBUG_PATH);
         Log.f(DEBUG_PATH, "=============================");
         Log.f(DEBUG_PATH, "Grandtorino player inited");
@@ -43,7 +43,7 @@ public abstract class AbstractPABot implements Player {
         Log.f(DEBUG_PATH, "=============================");
     }
 
-    protected BaseVillainModel getVillainModeller() {
+    protected VillainModel getVillainModeller() {
         return modeller;
     }
 

@@ -1,4 +1,4 @@
-package mallorcatour.bot.interfaces;
+package mallorcatour.brains.math;
 
 import java.util.Map;
 
