@@ -14,7 +14,11 @@ import java.util.List;
  */
 public class PokerExamples implements Serializable, Iterable<PokerLearningExample> {
 
-    private List<PokerLearningExample> examples;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2198075062717636324L;
+	private List<PokerLearningExample> examples;
 
     public PokerExamples(List<PokerLearningExample> examples) {
         this.examples = examples;

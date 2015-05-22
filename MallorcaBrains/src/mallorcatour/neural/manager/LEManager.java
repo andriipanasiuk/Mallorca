@@ -2,19 +2,20 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.neural.core;
+package mallorcatour.neural.manager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorInterpreter;
 import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.interfaces.IDistanceCalculator;
 import mallorcatour.interfaces.IInputInterpreter;
+import mallorcatour.neural.core.ILearningExample;
+import mallorcatour.neural.core.LearningExample;
 import mallorcatour.util.Log;
 import mallorcatour.util.MyFileWriter;
 import mallorcatour.util.ReaderUtils;
@@ -60,8 +61,8 @@ public class LEManager {
         writer.addToFile(LearningExample.toString(inputVector, outputVector), true);
     }
 
-    public static void toFile(MyFileWriter fileWriter, List<? extends ILearningExample> examples) {
-        for (ILearningExample example : examples) {
+    public static void toFile(MyFileWriter fileWriter, List<? extends ILearningExample<?, ?>> examples) {
+        for (ILearningExample<?, ?> example : examples) {
             fileWriter.addToFile(example.toString(), true);
         }
     }
@@ -127,7 +128,7 @@ public class LEManager {
         return result;
     }
 
-    public static double[] createInputArray(ILearningExample example) {
+    public static double[] createInputArray(ILearningExample<?, ?> example) {
         return createInputArray(example.getInput());
     }
 
@@ -155,12 +156,12 @@ public class LEManager {
         return output;
     }
 
-    public static List<PokerLearningExample> getSimilarSituations(
-            List<PokerLearningExample> examples, LocalSituation similarTo,
-            double maxDistance, IDistanceCalculator<LocalSituation> distance) {
-        List<PokerLearningExample> result = new ArrayList<PokerLearningExample>();
-        for (PokerLearningExample example : examples) {
-            LocalSituation exampleSituation = example.getSituation();
+    public static <T extends IVector, L extends ILearningExample<T, ?>> List<L> getSimilarSituations(
+            List<L> examples, T similarTo,
+            double maxDistance, IDistanceCalculator<T> distance) {
+        List<L> result = new ArrayList<>();
+        for (L example : examples) {
+            T exampleSituation = example.getInput();
             if (distance.getDistance(similarTo, exampleSituation) < maxDistance) {
                 result.add(example);
             }

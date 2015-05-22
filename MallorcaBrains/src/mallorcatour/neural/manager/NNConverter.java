@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.neural.core;
+package mallorcatour.neural.manager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import mallorcatour.hhparser.AdviceReader;
 import mallorcatour.hhparser.HandParser;
 import mallorcatour.hhparser.TournamentParser;
 import mallorcatour.hhparser.core.Tournament;
+import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.MyFileWriter;
@@ -99,7 +100,7 @@ public class NNConverter {
             //
             examples.get(index).setAdvice(advices.get(index));
             //
-            LocalSituation situation = examples.get(index).getSituation();
+            LocalSituation situation = examples.get(index).getInput();
             switch (situation.getStreet()) {
                 case LocalSituation.PREFLOP:
                     LEManager.toFile(preflopWriter, situation, advices.get(index));
@@ -153,7 +154,7 @@ public class NNConverter {
             //
             examples.get(index).setAdvice(advices.get(index));
             //
-            LocalSituation situation = examples.get(index).getSituation();
+            LocalSituation situation = examples.get(index).getInput();
             switch (situation.getStreet()) {
                 case LocalSituation.PREFLOP:
                     LEManager.toFile(preflopWriter, situation, advices.get(index));

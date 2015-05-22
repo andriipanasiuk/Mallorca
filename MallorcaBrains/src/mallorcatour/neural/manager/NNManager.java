@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.neural.core;
+package mallorcatour.neural.manager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +10,9 @@ import java.util.List;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.interfaces.IOutputInterpreter;
+import mallorcatour.neural.core.ILearningExample;
+import mallorcatour.neural.core.LearningExample;
+import mallorcatour.neural.core.VectorCreator;
 import mallorcatour.util.MyFileWriter;
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
@@ -22,28 +25,28 @@ import org.neuroph.nnet.MultiLayerPerceptron;
  */
 public class NNManager {
 
-    public static <T extends IVector> double errorOnExamples(NeuralNetwork neuralNetwork,
-            List<? extends ILearningExample> examples, IOutputInterpreter<T> creator) {
+    public static <T extends IVector> double errorOnExamples(NeuralNetwork<?> neuralNetwork,
+            List<? extends ILearningExample<?, ?>> examples, IOutputInterpreter<T> creator) {
         double error = 0;
-        for (ILearningExample example : examples) {
+        for (ILearningExample<?, ?> example : examples) {
             error += errorOnExample(neuralNetwork, example, creator);
         }
         error /= examples.size();
         return error;
     }
 
-    public static double errorOnExamples(NeuralNetwork neuralNetwork,
-            List<? extends ILearningExample> examples) {
+    public static double errorOnExamples(NeuralNetwork<?> neuralNetwork,
+            List<? extends ILearningExample<?, ?>> examples) {
         return errorOnExamples(neuralNetwork, examples, new VectorCreator());
     }
 
-    public static double errorOnExample(NeuralNetwork neuralNetwork,
+    public static double errorOnExample(NeuralNetwork<?> neuralNetwork,
             LearningExample example) {
         return errorOnExample(neuralNetwork, example, new VectorCreator());
     }
 
-    public static <T extends IVector> double errorOnExample(NeuralNetwork neuralNetwork,
-            ILearningExample example, IOutputInterpreter<T> creator) {
+    public static <T extends IVector> double errorOnExample(NeuralNetwork<?> neuralNetwork,
+            ILearningExample<?, ?> example, IOutputInterpreter<T> creator) {
         neuralNetwork.setInput(LEManager.createInputArray(example));
         neuralNetwork.calculate();
         double[] realOutput = neuralNetwork.getOutput();
@@ -63,7 +66,7 @@ public class NNManager {
         return createErrorSample(nn, examples, sectionSize, maxError, new VectorCreator());
     }
 
-    public static <T extends IVector> int[] createErrorSample(NeuralNetwork nn,
+    public static <T extends IVector> int[] createErrorSample(NeuralNetwork<?> nn,
             List<LearningExample> examples, double sectionSize, double maxError,
             IOutputInterpreter<T> creator) {
         int sectionCount = (int) Math.round(maxError / sectionSize);

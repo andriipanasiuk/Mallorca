@@ -72,10 +72,10 @@ public class LearningExample implements ILearningExample<BaseVector, BaseVector>
         return getOutput().getValues().size();
     }
 
-    public static Comparator<ILearningExample> inputComparator(final int... columns) {
-        return new Comparator<ILearningExample>() {
+    public static Comparator<ILearningExample<?, ?>> inputComparator(final int... columns) {
+        return new Comparator<ILearningExample<?, ?>>() {
 
-            public int compare(ILearningExample o1, ILearningExample o2) {
+            public int compare(ILearningExample<?, ?> o1, ILearningExample<?, ?> o2) {
                 return VectorUtils.comparator(columns).compare(o1.getInput(), o2.getInput());
             }
         };
