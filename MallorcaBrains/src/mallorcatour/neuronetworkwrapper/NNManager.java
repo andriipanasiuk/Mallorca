@@ -113,10 +113,10 @@ public class NNManager {
             Layer current = perceptron.getLayerAt(i);
             int count = current.getNeuronsCount();
             for (int j = 0; j < count; j++) {
-                int outputConnections = current.getNeuronAt(j).getOutConnections().size();
+                int outputConnections = current.getNeuronAt(j).getOutConnections().length;
                 double[] weights = new double[outputConnections];
                 for (int k = 0; k < outputConnections; k++) {
-                    weights[k] = current.getNeuronAt(j).getOutConnections().get(k).getWeight().getValue();
+                    weights[k] = current.getNeuronAt(j).getOutConnections()[k].getWeight().getValue();
                 }
                 writer.addToFile(Arrays.toString(weights), true);
             }

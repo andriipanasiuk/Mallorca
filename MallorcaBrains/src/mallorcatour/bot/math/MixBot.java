@@ -43,7 +43,7 @@ public class MixBot implements IPlayer {
             IDecisionListener decisionListener, String debug) {
         this.postflopNN = postflopNN;
 		adviceCreator = new AdviceCreatorFromMap();
-		strengthManager = new StrengthManager();
+		strengthManager = new StrengthManager(false);
 		profitCalculator = new NLProfitCalculator(villainModeller);
 		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, false, listener,
 				decisionListener, strengthManager, true, debug);

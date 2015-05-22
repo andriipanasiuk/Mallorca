@@ -19,9 +19,7 @@ import mallorcatour.util.Log;
 import mallorcatour.util.MyFileWriter;
 import mallorcatour.util.ReaderUtils;
 
-import org.neuroph.core.learning.SupervisedTrainingElement;
-import org.neuroph.core.learning.TrainingElement;
-import org.neuroph.core.learning.TrainingSet;
+import org.neuroph.core.data.DataSet;
 
 /**
  *
@@ -86,7 +84,7 @@ public class LEManager {
      * @param adaptForNeuroph defines if needed change all -1 to 0.
      * @return
      */
-    public static TrainingSet<? extends TrainingElement> createTrainingSet(
+    public static DataSet createTrainingSet(
             List<? extends LearningExample> examples) {
         if (examples.isEmpty()) {
             throw new IllegalArgumentException("List of examples must be not empty");
@@ -94,10 +92,9 @@ public class LEManager {
         int input = examples.get(0).getInputDimension();
         int output = examples.get(0).getOutputDimension();
 
-        TrainingSet<SupervisedTrainingElement> result =
-                new TrainingSet<SupervisedTrainingElement>(input, output);
+		DataSet result = new DataSet(input, output);
         for (LearningExample example : examples) {
-            result.addElement(new SupervisedTrainingElementAdapter(example));
+            result.addRow(new SupervisedTrainingElementAdapter(example));
         }
         return result;
     }
@@ -108,14 +105,12 @@ public class LEManager {
      * @param adaptForNeuroph
      * @return
      */
-    public static TrainingSet<SupervisedTrainingElement> createTrainingSet(
-            LearningExample example) {
+	public static DataSet createTrainingSet(LearningExample example) {
         int input = example.getInputDimension();
         int output = example.getOutputDimension();
 
-        TrainingSet<SupervisedTrainingElement> result =
-                new TrainingSet<SupervisedTrainingElement>(input, output);
-        result.addElement(new SupervisedTrainingElementAdapter(example));
+		DataSet result = new DataSet(input, output);
+        result.addRow(new SupervisedTrainingElementAdapter(example));
         return result;
     }
 

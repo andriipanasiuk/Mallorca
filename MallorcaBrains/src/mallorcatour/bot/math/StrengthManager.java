@@ -15,6 +15,10 @@ import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.Log;
 
+/**
+ * @author andriipanasiuk
+ *
+ */
 public class StrengthManager implements IGameObserver {
 
 	public Map<HoleCards, StreetEquity> preflop = new HashMap<>();
@@ -22,13 +26,21 @@ public class StrengthManager implements IGameObserver {
 	public Map<HoleCards, StreetEquity> turn = new HashMap<>();
 	public Map<HoleCards, StreetEquity> river = new HashMap<>();
 
-	private Spectrum randomVillainSpectrum;
+	private Spectrum randomSpectrum;
 	private IGameInfo gameInfo;
+	private final boolean needFlopFullPotential;
 
+	public StrengthManager() {
+		needFlopFullPotential = false;
+	}
+
+	public StrengthManager(boolean needFlopFullPotential) {
+		this.needFlopFullPotential = needFlopFullPotential;
+	}
 	@Override
 	public void onHoleCards(Card c1, Card c2, String heroName, String villainName) {
 		preflop = new HashMap<HoleCards, StreetEquity>();
-		for (HoleCards holeCards : randomVillainSpectrum) {
+		for (HoleCards holeCards : randomSpectrum) {
 			StreetEquity eq = EquilatorPreflop.equityVsRandom(holeCards.first, holeCards.second);
 			preflop.put(holeCards, eq);
 		}
@@ -42,25 +54,30 @@ public class StrengthManager implements IGameObserver {
 	private void calculateStrengthMap(PokerStreet street) {
 		long start = System.currentTimeMillis();
 		if (street == PokerStreet.FLOP) {
-            randomVillainSpectrum.remove(gameInfo.getFlop().first);
-            randomVillainSpectrum.remove(gameInfo.getFlop().second);
-            randomVillainSpectrum.remove(gameInfo.getFlop().third);
+            randomSpectrum.remove(gameInfo.getFlop().first);
+            randomSpectrum.remove(gameInfo.getFlop().second);
+            randomSpectrum.remove(gameInfo.getFlop().third);
         } else if (street == PokerStreet.TURN) {
-            randomVillainSpectrum.remove(gameInfo.getTurn());
+            randomSpectrum.remove(gameInfo.getTurn());
         } else if (street == PokerStreet.RIVER) {
-            randomVillainSpectrum.remove(gameInfo.getRiver());
+            randomSpectrum.remove(gameInfo.getRiver());
         }
 		if (street == PokerStreet.FLOP) {
 			flop = new HashMap<HoleCards, StreetEquity>();
 			Map<Integer, StreetEquity> cache = new HashMap<Integer, StreetEquity>();
-			for (HoleCards holeCards : randomVillainSpectrum) {
+			for (HoleCards holeCards : randomSpectrum) {
 				double strength = PokerEquilatorBrecher.strengthOnFlop(holeCards.first, holeCards.second,
 						gameInfo.getFlop().first, gameInfo.getFlop().second, gameInfo.getFlop().third);
 				int hash = holeCards.hashCodeForValues();
 				StreetEquity equity = cache.get(hash);
 				if (equity == null) {
-					equity = PokerEquilatorBrecher.equityOnFlop(holeCards.first, holeCards.second,
-							gameInfo.getFlop().first, gameInfo.getFlop().second, gameInfo.getFlop().third);
+					if (needFlopFullPotential) {
+						equity = PokerEquilatorBrecher.equityOnFlopFull(holeCards.first, holeCards.second,
+								gameInfo.getFlop(), true);
+					} else {
+						equity = PokerEquilatorBrecher.equityOnFlop(holeCards.first, holeCards.second,
+								gameInfo.getFlop());
+					}
 					cache.put(hash, equity);
 				}
 				equity.strength = strength;
@@ -69,7 +86,7 @@ public class StrengthManager implements IGameObserver {
 		} else if (street == PokerStreet.TURN) {
 			turn = new HashMap<HoleCards, StreetEquity>();
 			Map<Integer, StreetEquity> cache = new HashMap<Integer, StreetEquity>();
-			for (HoleCards holeCards : randomVillainSpectrum) {
+			for (HoleCards holeCards : randomSpectrum) {
 				double strength = PokerEquilatorBrecher.strengthOnTurn(holeCards.first, holeCards.second,
 						gameInfo.getFlop().first, gameInfo.getFlop().second, gameInfo.getFlop().third,
 						gameInfo.getTurn());
@@ -86,7 +103,7 @@ public class StrengthManager implements IGameObserver {
 			}
 		} else if (street == PokerStreet.RIVER) {
 			river = new HashMap<HoleCards, StreetEquity>();
-			for (HoleCards holeCards : randomVillainSpectrum) {
+			for (HoleCards holeCards : randomSpectrum) {
 				double strength = PokerEquilatorBrecher.strengthOnRiver(holeCards.first, holeCards.second,
 						gameInfo.getFlop().first, gameInfo.getFlop().second, gameInfo.getFlop().third,
 						gameInfo.getTurn(), gameInfo.getRiver());
@@ -102,7 +119,7 @@ public class StrengthManager implements IGameObserver {
 	@Override
 	public void onHandStarted(IGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
-		randomVillainSpectrum = Spectrum.random();
+		randomSpectrum = Spectrum.random();
 	}
 
 	@Override

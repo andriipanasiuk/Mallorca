@@ -19,7 +19,7 @@ import mallorcatour.neuronetworkwrapper.PokerLearningExample;
 import mallorcatour.util.Log;
 import mallorcatour.util.Pair;
 import mallorcatour.util.SerializatorUtils;
-import org.neuroph.core.NeuralNetwork;
+
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 
@@ -71,9 +71,8 @@ public class PAVillainObserver implements IVillainObserver, IDecisionListener {
         return currentVillain;
     }
 
-    @SuppressWarnings("deprecation")
 	private void learnPreflopNN(VillainStatistics villainStatistics) {
-        NeuralNetwork nn = new MultiLayerPerceptron(7, 10, 3);
+        MultiLayerPerceptron nn = new MultiLayerPerceptron(7, 10, 3);
         List<PokerLearningExample> examples = villainStatistics.getExamples();
         List<PokerLearningExample> preflopExamples = new ArrayList<PokerLearningExample>();
         for (PokerLearningExample example : examples) {
@@ -81,8 +80,9 @@ public class PAVillainObserver implements IVillainObserver, IDecisionListener {
                 preflopExamples.add(example);
             }
         }
-        nn.learnInSameThread(LEManager.createTrainingSet(preflopExamples),
-                new MomentumBackpropagation(ITERATION_COUNT / preflopExamples.size()));
+        MomentumBackpropagation rule = new MomentumBackpropagation();
+        rule.setMaxIterations(ITERATION_COUNT / preflopExamples.size());
+		nn.learn(LEManager.createTrainingSet(preflopExamples), rule);
         villainStatistics.setPreflopNeuralNetwork(nn);
         villainStatistics.setPreflopLearned(true);
     }

@@ -45,7 +45,6 @@ import mallorcatour.util.UniformRandomizer;
 import mallorcatour.util.frames.FrameUtils;
 
 import org.neuroph.core.NeuralNetwork;
-import org.neuroph.core.learning.ILearningListener;
 import org.neuroph.nnet.Kohonen;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.KohonenLearning;
@@ -1295,21 +1294,13 @@ public class NNFrame extends javax.swing.JFrame {
             kohonenLearningButton.setText("Start learning");
             isKohonenLearningProcessed = false;
         } else {
-            ILearningListener listener = new ILearningListener() {
-
-                public void onLearningStopped() {
-                    isKohonenLearningProcessed = false;
-                    kohonenLearningButton.setText("Start learning");
-                }
-            };
             isKohonenLearningProcessed = true;
             int inputSize = learningExamples.get(0).getInputDimension();
             int outputSize = learningExamples.get(0).getOutputDimension();
-            int kohonenNNSize = kohonenNN.getInputNeurons().size();
+            int kohonenNNSize = kohonenNN.getInputNeurons().length;
             int iterationCount = Integer.parseInt(iterationCountField.getText());
             double learningRate = Double.parseDouble(learningRateField.getText());
-            KohonenLearning learning = new KohonenLearning(iterationCount, learningRate);
-            learning.setListener(listener);
+            KohonenLearning learning = new KohonenLearning();
             if (kohonenNNSize == inputSize) {
                 kohonenNN.learnInNewThread(LEManager.createTrainingSet(learningExamples),
                         learning);
@@ -1935,8 +1926,8 @@ public class NNFrame extends javax.swing.JFrame {
 
     private void kohonenLoaded() {
         infoKohonenLabel.setText("Kohonen NN has loaded. Dimension of input vector: "
-                + kohonenNN.getInputNeurons().size() + ". Count of map neurons: "
-                + kohonenNN.getOutputNeurons().size());
+                + kohonenNN.getInputNeurons().length + ". Count of map neurons: "
+                + kohonenNN.getOutputNeurons().length);
     }
 
     /**

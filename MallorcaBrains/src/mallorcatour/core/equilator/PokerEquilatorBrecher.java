@@ -184,6 +184,10 @@ public class PokerEquilatorBrecher {
 		return equityVsRandom(card1, card2, new Card[] { flop1, flop2, flop3 });
 	}
 
+	public static StreetEquity equityOnFlop(Card card1, Card card2, Flop flop) {
+		return equityVsRandom(card1, card2, flop.toArray());
+	}
+
 	public static StreetEquity equityOnFlopFull(boolean flush, Card... cards) {
 		return equityVsRandomFullPotential(cards[0], cards[1], new Card[] { cards[2], cards[3], cards[4] }, flush);
 	}
@@ -192,6 +196,10 @@ public class PokerEquilatorBrecher {
 			Card flop1, Card flop2, Card flop3, boolean flush) {
 		return equityVsRandomFullPotential(card1, card2, new Card[] {
 				flop1, flop2, flop3 }, flush);
+	}
+
+	public static StreetEquity equityOnFlopFull(Card card1, Card card2, Flop flop, boolean flush) {
+		return equityVsRandomFullPotential(card1, card2, flop.toArray(), flush);
 	}
 
 	public static StreetEquity equityOnTurn(Card myCard1, Card myCard2,

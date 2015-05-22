@@ -40,7 +40,7 @@ public class FLMathBot implements IPlayer {
             ISpectrumListener spectrumListener,
             IDecisionListener decisionListener, String debug) {
 		adviceCreator = new AdviceCreatorFromMap();
-		strengthManager = new StrengthManager();
+		strengthManager = new StrengthManager(false);
 		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.FIXED_LIMIT, true, true,
 				spectrumListener, decisionListener, strengthManager, true, debug);
         //TODO change to real profit calculator

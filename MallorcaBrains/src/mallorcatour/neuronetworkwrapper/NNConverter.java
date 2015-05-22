@@ -61,11 +61,12 @@ public class NNConverter {
                 example.setHand(hand);
                 result.add(example);
             }
-        }
+		}
+		Log.d("Parsed "  +count + " hands");
         return result;
     }
 
-    public static List<PokerLearningExample> localSituationsToFile(Tournament tournament,
+    public static List<PokerLearningExample> localSituationsToFile(File directory, Tournament tournament,
             String pathToAdvices, ISituationHandler handler) {
         boolean addToExamples = true;
         String adviceFilename = getAdviceFile(tournament, pathToAdvices);
@@ -88,10 +89,11 @@ public class NNConverter {
                     + ". Advices count: " + advices.size());
             return null;
         }
-        MyFileWriter preflopWriter = MyFileWriter.prepareForWriting("preflop.txt", addToExamples);
-        MyFileWriter flopWriter = MyFileWriter.prepareForWriting("flop.txt", addToExamples);
-        MyFileWriter turnWriter = MyFileWriter.prepareForWriting("turn.txt", addToExamples);
-        MyFileWriter riverWriter = MyFileWriter.prepareForWriting("river.txt", addToExamples);
+        MyFileWriter preflopWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/preflop.txt",
+				addToExamples);
+		MyFileWriter flopWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/flop.txt", addToExamples);
+		MyFileWriter turnWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/turn.txt", addToExamples);
+		MyFileWriter riverWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/river.txt", addToExamples);
 
         for (int index = 0; index < examples.size(); index++) {
             //

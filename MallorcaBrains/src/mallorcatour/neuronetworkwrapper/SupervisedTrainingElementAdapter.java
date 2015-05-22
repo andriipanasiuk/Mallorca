@@ -4,15 +4,20 @@
  */
 package mallorcatour.neuronetworkwrapper;
 
-import org.neuroph.core.learning.SupervisedTrainingElement;
+import org.neuroph.core.data.DataSetRow;
 
 /**
  *
  * @author Andrew
  */
-public class SupervisedTrainingElementAdapter extends SupervisedTrainingElement {
+public class SupervisedTrainingElementAdapter extends DataSetRow {
 
-    public SupervisedTrainingElementAdapter(LearningExample learningExample) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4694537850146601716L;
+
+	public SupervisedTrainingElementAdapter(LearningExample learningExample) {
         super(LEManager.createInputArray(learningExample.getInput()),
                 LEManager.createInputArray(learningExample.getOutput()));
     }

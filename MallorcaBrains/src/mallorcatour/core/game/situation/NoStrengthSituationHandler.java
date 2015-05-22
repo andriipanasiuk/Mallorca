@@ -139,10 +139,7 @@ public class NoStrengthSituationHandler implements ISituationHandler {
         }
     }
 
-    public void beforeHeroAction() {
-        //do nothing
-    }
-
+    @Override
     public void onHandEnded() {
         //do nothing
     }

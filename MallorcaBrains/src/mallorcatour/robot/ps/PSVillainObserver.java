@@ -4,7 +4,6 @@
  */
 package mallorcatour.robot.ps;
 
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +28,7 @@ import mallorcatour.util.Pair;
 import mallorcatour.util.ReaderUtils;
 import mallorcatour.util.SerializatorUtils;
 import mallorcatour.util.StringUtils;
-import org.neuroph.core.NeuralNetwork;
+
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 
@@ -78,12 +77,13 @@ public class PSVillainObserver implements IVillainObserver {
         this.listener = listener;
         this.tableName = tableName;
         this.heroName = heroName;
-        this.DEBUG_PATH = debug;
-        if (limitType == LimitType.FIXED_LIMIT) {
-            preflopInputSize = 7;
-        } else {
-            preflopInputSize = 8;
-        }
+		this.DEBUG_PATH = debug;
+		// TODO change to constant values from LocalSituation
+		if (limitType == LimitType.FIXED_LIMIT) {
+			preflopInputSize = 7;
+		} else {
+			preflopInputSize = 8;
+		}
     }
 
     public void onHandPlayed(long handNumber) {
@@ -215,16 +215,17 @@ public class PSVillainObserver implements IVillainObserver {
     private void learnPreflopNN(VillainStatistics villainStatistics) {
         long start = System.currentTimeMillis();
         List<PokerLearningExample> examples = villainStatistics.getExamples();
-        NeuralNetwork nn = new MultiLayerPerceptron(preflopInputSize, 10, 3);
+        MultiLayerPerceptron nn = new MultiLayerPerceptron(preflopInputSize, 10, 3);
         List<PokerLearningExample> preflopExamples = new ArrayList<PokerLearningExample>();
         for (PokerLearningExample example : examples) {
             if (example.getSituation().getStreet() == LocalSituation.PREFLOP) {
                 preflopExamples.add(example);
             }
-        }
-        nn.learnInSameThread(LEManager.createTrainingSet(preflopExamples),
-                new MomentumBackpropagation(ITERATION_COUNT / preflopExamples.size()));
-        villainStatistics.setPreflopNeuralNetwork(nn);
+		}
+		MomentumBackpropagation rule = new MomentumBackpropagation();
+		rule.setMaxIterations(ITERATION_COUNT / preflopExamples.size());
+		nn.learn(LEManager.createTrainingSet(preflopExamples), rule);
+		villainStatistics.setPreflopNeuralNetwork(nn);
         villainStatistics.setPreflopLearned(true);
         Log.f(DEBUG_PATH, "Villain's preflop MLP was learned in "
                 + (System.currentTimeMillis() - start) + " ms");

@@ -12,17 +12,16 @@
    private static final Map<String, Integer> monthes = new HashMap<>();
    private static final String DATE_FORMAT = "yyyy_MM_dd_HH_mm_ss";
  
-   public static String getDate(boolean withNano)
-   {
-     DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-     Date date = new Date();
-     String result = dateFormat.format(date);
-     if (withNano) {
-       result = result + "_" + System.currentTimeMillis();
-     }
-     return result;
-   }
- 
+	public static String getDate(boolean withMillis) {
+		DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		Date date = new Date();
+		String result = dateFormat.format(date);
+		if (withMillis) {
+			result = result + "_" + System.currentTimeMillis();
+		}
+		return result;
+	}
+
    public static Date parsePADate(String date) {
      date = preprocessDate(date);
      SimpleDateFormat format = new SimpleDateFormat("M dd, yyyy - HH:mm:ss");

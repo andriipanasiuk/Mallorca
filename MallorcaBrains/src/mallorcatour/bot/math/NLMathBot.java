@@ -46,7 +46,7 @@ public class NLMathBot implements IPlayer {
 	public NLMathBot(BaseVillainModeller villainModeller, ISpectrumListener listener,
 			IDecisionListener decisionListener, String debug) {
 		adviceCreator = new AdviceCreatorFromMap();
-		strengthManager = new StrengthManager();
+		strengthManager = new StrengthManager(false);
 		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, true, listener,
 				decisionListener, strengthManager, true, debug);
 		preflopPokerNN = new BasePokerNN(new DanielxnNeurals(), true);

@@ -59,8 +59,8 @@ public class GrandtorinoBot implements IPlayer {
         this.pokerNN = neuralNetwork;
         this.limitType = limitType;
         this.DEBUG_PATH = debug;
+        strengthManager = new StrengthManager(false);
         profitCalculator = new NLProfitCalculator(villainModeller);
-		strengthManager = new StrengthManager();
 		situationHandler = new SpectrumSituationHandler(villainModeller, limitType, modelPreflop, modelPostflop,
 				spectrumListener, villainDecisionListener, strengthManager, true, DEBUG_PATH);
 		if (limitType == LimitType.NO_LIMIT) {
