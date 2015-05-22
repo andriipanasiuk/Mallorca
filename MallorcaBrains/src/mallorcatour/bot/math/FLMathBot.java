@@ -8,6 +8,7 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
+import mallorcatour.brains.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;

@@ -5,13 +5,15 @@ import java.util.Map;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.modeller.BasePokerNN;
 import mallorcatour.bot.modeller.BaseVillainModeller;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
+import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.StrengthManager;
+import mallorcatour.brains.neural.NeuralAdvisor;
+import mallorcatour.brains.neural.gusxensen.GusXensenNeural;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -21,7 +23,6 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.grandtorino.nn.danielxn.DanielxnNeurals;
 import mallorcatour.util.Log;
 
 /** 
@@ -36,7 +37,7 @@ public class NLMathBot implements IPlayer {
     private SpectrumSituationHandler situationHandler;
     private StrengthManager strengthManager;
 	private String heroName, villainName;
-    private IPokerNN preflopPokerNN;
+    private IAdvisor preflopAdvisor;
     private IProfitCalculator profitCalculator;
     private IPreflopChart preflopBot;
     private Card heroCard1, heroCard2;
@@ -49,7 +50,7 @@ public class NLMathBot implements IPlayer {
 		strengthManager = new StrengthManager(false);
 		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, true, listener,
 				decisionListener, strengthManager, true, debug);
-		preflopPokerNN = new BasePokerNN(new DanielxnNeurals(), true);
+		preflopAdvisor = new NeuralAdvisor(new GusXensenNeural());
         preflopBot = new NLPreflopChart();
         actionPreprocessor = new NLActionPreprocessor();
         this.DEBUG_PATH = debug;
@@ -102,7 +103,7 @@ public class NLMathBot implements IPlayer {
                 }
             }
             if (action == null) {
-                advice = preflopPokerNN.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
+                advice = preflopAdvisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
                 action = advice.getAction();
                 Log.f(DEBUG_PATH, "Advice: " + advice.toString());
                 action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);

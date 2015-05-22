@@ -6,6 +6,7 @@ package mallorcatour.bot.modeller;
 
 import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.villainobserver.VillainStatistics;
+import mallorcatour.brains.neural.AbstractNeurals;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.Advice;
@@ -14,14 +15,6 @@ import mallorcatour.core.game.advice.SmartAdviceCreator;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.LocalSituationInterpreter;
-import mallorcatour.grandtorino.nn.brazil.BrazilNeurals;
-import mallorcatour.grandtorino.nn.chucky.ChuckyNeurals;
-import mallorcatour.grandtorino.nn.core.AbstractNeurals;
-import mallorcatour.grandtorino.nn.danielxn.DanielxnNeurals;
-import mallorcatour.grandtorino.nn.germany.GermanyNeurals;
-import mallorcatour.grandtorino.nn.pokibratFL.PokibratNeurals;
-import mallorcatour.grandtorino.nn.sparbotFL.SparbotNeurals;
-import mallorcatour.grandtorino.nn.waterhouse.WaterhouseNeurals;
 import mallorcatour.util.Log;
 
 import org.neuroph.core.NeuralNetwork;
@@ -32,14 +25,15 @@ import org.neuroph.core.NeuralNetwork;
  */
 public class BaseVillainModeller implements IVillainModeller {
 
-	private static final AbstractNeurals DEFAULT_NL_NEURAL = new DanielxnNeurals();
-    private static final AbstractNeurals DEFAULT_FL_NEURAL = new SparbotNeurals();
-    private static final AbstractNeurals POKIBRAT_FL = new PokibratNeurals();
-    private static final AbstractNeurals SPARBOT_FL = new SparbotNeurals();
-    private static final AbstractNeurals BRAZIL_FL = new BrazilNeurals();
-    private static final AbstractNeurals WATERHOUSE_FL = new WaterhouseNeurals();
-    private static final AbstractNeurals GERMANY_FL = new GermanyNeurals();
-    private static final AbstractNeurals CHUCKY_FL = new ChuckyNeurals();
+	//TODO create correct neurals with different players or change villain modelling approach
+	private static final AbstractNeurals DEFAULT_NL_NEURAL = null;
+    private static final AbstractNeurals DEFAULT_FL_NEURAL = null;
+    private static final AbstractNeurals POKIBRAT_FL = null;
+    private static final AbstractNeurals SPARBOT_FL = null;
+    private static final AbstractNeurals BRAZIL_FL = null;
+    private static final AbstractNeurals WATERHOUSE_FL = null;
+    private static final AbstractNeurals GERMANY_FL = null;
+    private static final AbstractNeurals CHUCKY_FL = null;
     private static final int REQUIRED_HANDS_FOR_MODELLING = 5;
     private VillainStatistics villainStatistics;
     private AbstractNeurals currentVillainNeural;
@@ -66,19 +60,19 @@ public class BaseVillainModeller implements IVillainModeller {
                     return preflopVillainModeller.getAdvice(situation, cards,
                             villainStatistics.getPrefloNeuralNetwork());
                 }
-                nnForUse = currentVillainNeural.getPreflopNN();
+                nnForUse = currentVillainNeural.getPreflop();
                 adviceCreator = new SmartAdviceCreator(canRaise);
                 break;
             case 1:
-                nnForUse = currentVillainNeural.getFlopNN();
+                nnForUse = currentVillainNeural.getFlop();
                 adviceCreator = new SmartPostflopAdviceCreator(canRaise);
                 break;
             case 2:
-                nnForUse = currentVillainNeural.getTurnNN();
+                nnForUse = currentVillainNeural.getTurn();
                 adviceCreator = new SmartPostflopAdviceCreator(canRaise);
                 break;
             case 3:
-                nnForUse = currentVillainNeural.getRiverNN();
+                nnForUse = currentVillainNeural.getRiver();
                 adviceCreator = new SmartPostflopAdviceCreator(canRaise);
                 break;
             default:

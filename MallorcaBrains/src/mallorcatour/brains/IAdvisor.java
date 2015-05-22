@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package mallorcatour.bot.interfaces;
+package mallorcatour.brains;
 
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
@@ -13,7 +13,7 @@ import mallorcatour.core.game.situation.LocalSituation;
  *
  * @author Andrew
  */
-public interface IPokerNN {
+public interface IAdvisor {
 
 	/**
 	 * Return advice for action in any situation with hole cards.

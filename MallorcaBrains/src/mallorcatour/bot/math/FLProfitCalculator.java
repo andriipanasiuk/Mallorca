@@ -3,6 +3,7 @@ package mallorcatour.bot.math;
 import java.util.Map;
 
 import mallorcatour.bot.interfaces.IVillainModeller;
+import mallorcatour.brains.StrengthManager;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;

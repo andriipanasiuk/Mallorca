@@ -7,15 +7,15 @@ import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
 import mallorcatour.bot.math.NLProfitCalculator;
-import mallorcatour.bot.math.StrengthManager;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.FLPreflopChart;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
+import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.StrengthManager;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -45,18 +45,18 @@ public class GrandtorinoBot implements IPlayer {
     private final SpectrumSituationHandler situationHandler;
     private final NLProfitCalculator profitCalculator;
     private final StrengthManager strengthManager;
-    private final IPokerNN pokerNN;
+    private final IAdvisor advisor;
     private final IPreflopChart preflopBot;
     private final IHumanAdvisor humanAdvisor;
     private final IActionPreprocessor actionPreprocessor;
     private final LimitType limitType;
     private final String DEBUG_PATH;
 
-    public GrandtorinoBot(IPokerNN neuralNetwork, IVillainModeller villainModeller,
+    public GrandtorinoBot(IAdvisor neuralNetwork, IVillainModeller villainModeller,
             LimitType limitType, ISpectrumListener spectrumListener,
             IDecisionListener villainDecisionListener, IHumanAdvisor humanAdvisor,
             boolean isHumanAdvisor, boolean modelPreflop, boolean modelPostflop, String debug) {
-        this.pokerNN = neuralNetwork;
+        this.advisor = neuralNetwork;
         this.limitType = limitType;
         this.DEBUG_PATH = debug;
         strengthManager = new StrengthManager(false);
@@ -120,7 +120,7 @@ public class GrandtorinoBot implements IPlayer {
             }
             //if there is no preflop OR action is no in chart
             if (action == null) {
-                Advice advice = pokerNN.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
+                Advice advice = advisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
                 Log.f(DEBUG_PATH, "Advice: " + advice.toString());
                 action = advice.getAction();
                 action = actionPreprocessor.preprocessAction(action, gameInfo, villainName);

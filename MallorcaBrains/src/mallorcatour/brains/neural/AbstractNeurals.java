@@ -1,4 +1,4 @@
-package mallorcatour.grandtorino.nn.core;
+package mallorcatour.brains.neural;
 
 import java.io.InputStream;
 
@@ -6,11 +6,11 @@ import mallorcatour.core.game.interfaces.IPokerStats;
 
 import org.neuroph.core.NeuralNetwork;
 
-public abstract class AbstractNeurals implements IPokerStats {
-	private NeuralNetwork preflopNN;
-	private NeuralNetwork flopNN;
-	private NeuralNetwork turnNN;
-	private NeuralNetwork riverNN;
+public abstract class AbstractNeurals implements ISituationData, IPokerStats, IPokerNeurals {
+	private NeuralNetwork<?> preflopNN;
+	private NeuralNetwork<?> flopNN;
+	private NeuralNetwork<?> turnNN;
+	private NeuralNetwork<?> riverNN;
 
 	protected abstract String getSituationsPath();
 
@@ -35,23 +35,28 @@ public abstract class AbstractNeurals implements IPokerStats {
 		this.riverNN = NeuralNetwork.load(getRiverStream());
 	}
 
-	public NeuralNetwork getPreflopNN() {
+	@Override
+	public NeuralNetwork<?> getPreflop() {
 		return this.preflopNN;
 	}
 
-	public NeuralNetwork getFlopNN() {
+	@Override
+	public NeuralNetwork<?> getFlop() {
 		return this.flopNN;
 	}
 
-	public NeuralNetwork getTurnNN() {
+	@Override
+	public NeuralNetwork<?> getTurn() {
 		return this.turnNN;
 	}
 
-	public NeuralNetwork getRiverNN() {
+	@Override
+	public NeuralNetwork<?> getRiver() {
 		return this.riverNN;
 	}
 
-	public InputStream getSituationsStream() {
+	@Override
+	public InputStream getSituationStream() {
 		return getClass().getResourceAsStream(getSituationsPath());
 	}
 

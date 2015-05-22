@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
-import mallorcatour.bot.interfaces.IPokerNN;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModeller;
-import mallorcatour.bot.math.StrengthManager;
+import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
@@ -35,7 +35,7 @@ import mallorcatour.util.Log;
 public class SpectrumSituationHandler extends SituationHandler {
 
 	protected Spectrum villainSpectrum;
-	private final IPokerNN villainModellingNN;
+	private final IAdvisor villainModellingNN;
 	private final boolean modelPreflop, modelPostflop;
     //TODO use for FL
     @SuppressWarnings("unused")
