@@ -24,7 +24,6 @@ public class SituationHandler implements ISituationHandler {
     protected int heroActionCount, countOfHeroAggressive, villainActionCount,
             countOfOppAggressive;
     protected boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
-    protected String villainName;
     private double strength, positivePotential, negativePotential;
     protected LimitType limitType;
     private final boolean needFullPotentialOnFlop;
@@ -47,7 +46,6 @@ public class SituationHandler implements ISituationHandler {
 		strength = equity.strength;
 		positivePotential = equity.positivePotential;
 		negativePotential = equity.negativePotential;
-        this.villainName = villainName;
     }
 
     private LocalSituation getHeroSituation() {

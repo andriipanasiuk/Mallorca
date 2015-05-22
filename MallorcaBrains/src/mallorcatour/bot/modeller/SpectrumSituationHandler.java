@@ -79,6 +79,7 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	@Override
 	public void onHoleCards(Card c1, Card c2, String villainName) {
 		super.onHoleCards(c1, c2, villainName);
+		raisesOnStreet = 1;
 		strengthManager.onHoleCards(c1, c2, villainName);
 		villainSpectrum = Spectrum.random();
 		randomVillainSpectrum = Spectrum.random();
@@ -145,11 +146,7 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	public void onStageEvent(PokerStreet street) {
 		super.onStageEvent(street);
 		strengthManager.onStageEvent(street);
-		if (street == PokerStreet.PREFLOP) {
-			raisesOnStreet = 1;
-		} else {
-			raisesOnStreet = 0;
-		}
+		raisesOnStreet = 0;
 		if (modelPostflop) {
 			if (street == PokerStreet.FLOP) {
 				villainSpectrum.remove(flop1);

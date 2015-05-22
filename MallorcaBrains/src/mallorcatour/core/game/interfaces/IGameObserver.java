@@ -16,7 +16,7 @@ public interface IGameObserver {
 
 
 	/**
-	 * A new betting round has started.
+	 * A new betting round has started. Not called on preflop.
 	 */
 	public void onStageEvent(PokerStreet street);
 

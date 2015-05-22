@@ -36,14 +36,17 @@ public class BaseGameInfo implements IGameInfo {
         return bigBlind;
     }
 
+    @Override
     public PokerStreet getStage() {
         return street;
     }
 
+    @Override
     public boolean isPreFlop() {
         return street == PokerStreet.PREFLOP;
     }
 
+    @Override
     public boolean isPostFlop() {
         return street != PokerStreet.PREFLOP;
     }
@@ -72,10 +75,12 @@ public class BaseGameInfo implements IGameInfo {
         return heroAmountToCall;
     }
 
+    @Override
     public double getBankRollAtRisk() {
         return bankrollAtRisk;
     }
 
+    @Override
     public boolean canHeroRaise() {
         if (limitType == LimitType.NO_LIMIT) {
             return getBankRollAtRisk() > 0;
@@ -84,19 +89,12 @@ public class BaseGameInfo implements IGameInfo {
         }
     }
 
-    public double getBankRoll(String name) {
-        for (PlayerInfo player : players) {
-            if (player.getName().equals(name)) {
-                return player.getStack();
-            }
-        }
-        throw new IllegalArgumentException("There is no player with name " + name);
-    }
-
+    @Override
     public int getNumRaises() {
         return raisesOnStreet[street.intValue()];
     }
 
+    @Override
     public LimitType getLimitType() {
         return limitType;
     }

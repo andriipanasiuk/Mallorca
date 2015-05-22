@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.BaseGameInfo;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.robot.ExtPlayerInfo;
-import mallorcatour.robot.controller.HUGameInfo;
 
 /**
  * Class that parses strings given by the engine and stores values for later
@@ -32,15 +32,16 @@ public class AiGamesController {
 
 	private Map<String, String> settings = new HashMap<String, String>();
 
-	private String myName = "";
+	private String heroName = "";
+	private String villainName = "";
 
 	@SuppressWarnings("unused")
 	private int timeBank, timePerMove;
 
-	private HUGameInfo gameInfo;
+	private BaseGameInfo gameInfo;
 	private IGameObserver observer;
 
-	public AiGamesController(HUGameInfo gameInfo, IGameObserver observer) {
+	public AiGamesController(BaseGameInfo gameInfo, IGameObserver observer) {
 		this.gameInfo = gameInfo;
 		this.observer = observer;
 	}
@@ -56,15 +57,12 @@ public class AiGamesController {
 	protected void updateSetting(String key, String value) {
 		settings.put(key, value);
 		if (key.equals("your_bot")) {
-			gameInfo.heroInfo = new ExtPlayerInfo(value);
-			String villain;
 			if (value.equals("player1")) {
-				villain = "player2";
+				villainName = "player2";
 			} else {
-				villain = "player1";
+				villainName = "player1";
 			}
-			gameInfo.villainInfo = new ExtPlayerInfo(villain);
-			myName = value;
+			heroName = value;
 		} else if (key.equals("timebank")) { // Maximum amount of time your bot
 												// can take for one response
 			timeBank = Integer.valueOf(value);
@@ -76,8 +74,7 @@ public class AiGamesController {
 		} else if (key.equals("starting_stack")) { // Starting stack for each
 													// bot
 			int stack = Integer.valueOf(value);
-			gameInfo.heroInfo.stack = stack;
-			gameInfo.villainInfo.stack = stack;
+			gameInfo.bankrollAtRisk = stack;
 		} else {
 			System.err.printf("Unknown settings command: %s %s\n", key, value);
 		}
@@ -103,14 +100,24 @@ public class AiGamesController {
 		} else if (key.equals("on_button")) { // Which bot has the button,
 												// onButton is true if it's your
 												// bot
-			gameInfo.heroInfo.isOnButton = value.equals(gameInfo.heroInfo.name);
-			gameInfo.villainInfo.isOnButton = value.equals(gameInfo.villainInfo.name);
+			gameInfo.onButton = value.equals(heroName);
 		} else if (key.equals("max_win_pot")) { // The size of the current pot
 			gameInfo.pot = Integer.valueOf(value);
 		} else if (key.equals("amount_to_call")) { // The amount of the call
-			gameInfo.amountToCall = Integer.valueOf(value);
+			gameInfo.heroAmountToCall = Integer.valueOf(value);
 		} else if (key.equals("table")) { // The cards on the table
 			gameInfo.board = Arrays.asList(parseCards(value));
+			PokerStreet street;
+			if (gameInfo.board.size() == 3) {
+				street = PokerStreet.FLOP;
+			} else if (gameInfo.board.size() == 4) {
+				street = PokerStreet.TURN;
+			} else if (gameInfo.board.size() == 5) {
+				street = PokerStreet.RIVER;
+			} else {
+				throw new IllegalArgumentException("Not correct count of board cards");
+			}
+			observer.onStageEvent(street);
 		} else {
 			System.err.printf("Unknown match command: %s %s\n", key, value);
 		}
@@ -127,35 +134,41 @@ public class AiGamesController {
 	 *            : value to be set for the key
 	 */
 	protected void updateMove(String bot, String key, String amount) {
-		if (bot.equals(myName)) {
+		if (key.equals("stack")) { // The amount in your starting stack
+			int value = Integer.valueOf(amount);
+			if (value < gameInfo.bankrollAtRisk) {
+				gameInfo.bankrollAtRisk = value;
+			}
+		}
+		if (key.equals("raise")) {
+			int am = Integer.valueOf(amount);
+			gameInfo.bankrollAtRisk = Math.max(0, gameInfo.bankrollAtRisk - am);
+		}
+		if (bot.equals(heroName)) {
 			if (key.equals("stack")) { // The amount in your starting stack
-				gameInfo.heroInfo.stack = Integer.valueOf(amount);
 				observer.onHandStarted(gameInfo);
-			} else if (key.equals("post")) {; // The amount you have to pay for
-												// the blind
-				gameInfo.heroInfo.stack -= Integer.valueOf(amount);
+			} else if (key.equals("post")) {
+				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
 			} else if (key.equals("hand")) { // Your cards
 				Card[] cards = parseCards(amount);
-				observer.onHoleCards(cards[0], cards[1], gameInfo.villainInfo.getName());
+				observer.onHoleCards(cards[0], cards[1], villainName);
 			} else if (key.equals("wins")) {
 				observer.onHandEnded();
 			} else {
 				// That should be all
 			}
 		} else { // assume it's the opponent
-			if (key.equals("stack")) { // The amount in your opponent's starting
-										// stack
-				gameInfo.villainInfo.stack = Integer.valueOf(amount);
-			} else if (key.equals("post")) { // The amount your opponent paid
-												// for the blind
-				gameInfo.villainInfo.stack -= Integer.valueOf(amount);
+			if (key.equals("post")) { // The amount your opponent paid
+										// for the blind
+				// do nothing
 			} else if (key.equals("hand")) {
 				// Hand of the opponent on a showdown, not stored
 			} else if (key.equals("wins")) {
 				observer.onHandEnded();
-			} else {
+			} else if (key.equals("fold") || key.equals("check") || key.equals("call") || key.equals("raise")) {
 				// The move your opponent did
-				observer.onVillainActed(fromString(key, amount), -1);
+				Action action = fromString(key, amount);
+				observer.onVillainActed(action, -1);
 			}
 		}
 	}
@@ -209,7 +222,8 @@ public class AiGamesController {
 		gameInfo.bigBlind = 0;
 		gameInfo.pot = 0;
 		gameInfo.board = Collections.emptyList();
-		gameInfo.amountToCall = 0;
+		gameInfo.heroAmountToCall = 0;
+		gameInfo.bankrollAtRisk = Double.MAX_VALUE;
 	}
 
 }

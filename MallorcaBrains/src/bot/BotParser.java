@@ -13,9 +13,16 @@ package bot;
 
 import java.util.Scanner;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.neural.NeuralBotFactory;
+import mallorcatour.brains.IAdvisor;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;
 import mallorcatour.robot.controller.HUGameInfo;
+import mallorcatour.util.Log;
 
 /**
  * Class that reads the engine's input and asks the bot Class to calculate the
@@ -33,7 +40,7 @@ public class BotParser {
 	}
 
 	public void run() {
-		HUGameInfo gameInfo = new HUGameInfo();
+		BaseGameInfo gameInfo = new BaseGameInfo();
 		AiGamesController controller = new AiGamesController(gameInfo, bot);
 		while (scan.hasNextLine()) {
 			String line = scan.nextLine().trim();
@@ -67,5 +74,14 @@ public class BotParser {
 			act = "raise";
 		}
 		return String.format("%s %d", act, action.getAmount());
+	}
+
+	public static void main(String[] args) {
+		Log.WRITE_TO_ERR = true;
+		EquilatorPreflop.loadFrom = LoadFrom.CODE;
+		NeuralBotFactory factory = new NeuralBotFactory();
+		BotParser parser = new BotParser(factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+				IDecisionListener.EMPTY, ""));
+		parser.run();
 	}
 }
