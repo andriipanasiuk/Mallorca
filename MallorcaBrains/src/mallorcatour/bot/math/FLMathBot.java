@@ -6,9 +6,9 @@ import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.interfaces.IVillainModeller;
+import mallorcatour.bot.interfaces.IVillainModel;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
-import mallorcatour.brains.StrengthManager;
+import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -37,7 +37,7 @@ public class FLMathBot implements IPlayer {
     private final StrengthManager strengthManager; 
     private final String DEBUG_PATH;
 
-    public FLMathBot(IVillainModeller villainModeller,
+    public FLMathBot(IVillainModel villainModeller,
             ISpectrumListener spectrumListener,
             IDecisionListener decisionListener, String debug) {
 		adviceCreator = new AdviceCreatorFromMap();

@@ -1,11 +1,10 @@
-package mallorcatour.bot.math;
+package mallorcatour.bot.modeller;
 
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.IVillainModel;
-import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.neural.GrandtorinoBot;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.math.StrengthManager;
@@ -14,19 +13,24 @@ import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.robot.humanadvisor.IHumanAdvisor;
 
-public class NeuralMathBotFactory implements IBotFactory {
+/**
+ * Creates bot that played with neural and model villain by him actions. During
+ * the hand situation handler try to precise villain spectrum.
+ * 
+ * @author andriipanasiuk
+ * 
+ */
+public class NeuralModelVillainBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IVillainModel villainModel, ISpectrumListener spectrumListener,
 			IDecisionListener decisionListener, String debug) {
-		StrengthManager manager = new StrengthManager(false);
-		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel);
-		IActionChecker actionChecker = new NLRiverActionChecker(profitCalculator, manager);
+		StrengthManager strengthManager = new StrengthManager(false);
+		SpectrumSituationHandler handler = new SpectrumSituationHandler(villainModel, LimitType.NO_LIMIT, true, true,
+				spectrumListener, decisionListener, strengthManager, true, debug);
 		GusXensen player = new GusXensen();
-		LimitType limitType = LimitType.NO_LIMIT;
-		SpectrumSituationHandler handler = new SpectrumSituationHandler(villainModel, limitType, true, true,
-				spectrumListener, decisionListener, manager, debug);
 		return new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), villainModel, handler, handler,
-				actionChecker, limitType, IHumanAdvisor.EMPTY, false, debug);
+				IActionChecker.EMPTY, LimitType.NO_LIMIT, IHumanAdvisor.EMPTY, false, debug);
 	}
+
 }

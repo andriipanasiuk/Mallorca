@@ -1,4 +1,4 @@
-package mallorcatour.brains;
+package mallorcatour.brains.math;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -142,9 +142,6 @@ public class SituationHandler implements ISituationHandler, IGameObserver {
         }
     }
 
-    /* (non-Javadoc)
-	 * @see mallorcatour.core.game.situation.IGameObserver#onHandStarted(mallorcatour.core.game.interfaces.IGameInfo)
-	 */
     @Override
 	public void onHandStarted(IGameInfo gameInfo) {
         this.gameInfo = gameInfo;

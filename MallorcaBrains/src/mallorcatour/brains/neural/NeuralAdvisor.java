@@ -11,6 +11,7 @@ import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.SmartAdviceCreator;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
+import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.LocalSituationInterpreter;
 import mallorcatour.util.Log;
@@ -34,11 +35,15 @@ import org.neuroph.core.NeuralNetwork;
  */
 public class NeuralAdvisor implements IAdvisor {
 
-	private IPokerNeurals neurals;
+	private final IPokerNeurals neurals;
+	private final IPokerStats stats;
+	private final String name;
 	private NeuralNetwork<?> preflopNN, flopNN, turnNN, riverNN;
 
-	public NeuralAdvisor(IPokerNeurals nnStreaming) {
+	public NeuralAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, String name) {
 		this.neurals = nnStreaming;
+		this.stats = stats;
+		this.name = name;
 		initNN();
 	}
 
@@ -82,6 +87,31 @@ public class NeuralAdvisor implements IAdvisor {
 		double[] advice = nnForUse.getOutput();
 		result = Advice.create(adviceCreator, advice);
 		return result;
+	}
+
+	@Override
+	public double getAggressionFactor() {
+		return stats.getAggressionFactor();
+	}
+
+	@Override
+	public double getWtsd() {
+		return stats.getWtsd();
+	}
+
+	@Override
+	public double getAggressionFrequency() {
+		return stats.getAggressionFrequency();
+	}
+
+	@Override
+	public double getFoldFrequency() {
+		return stats.getFoldFrequency();
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 }

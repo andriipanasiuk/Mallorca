@@ -31,7 +31,7 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.bot.modeller.BaseVillainModeller;
+import mallorcatour.bot.modeller.BaseVillainModel;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.ExecutorUtils;
 import mallorcatour.util.Log;
@@ -336,7 +336,7 @@ public class PSTableDirector {
         return limitType;
     }
 
-    private IPlayer createPlayer(BaseVillainModeller villainModeller,
+    private IPlayer createPlayer(BaseVillainModel villainModeller,
             LimitType limitType, String debug) {
         IPlayer player;
         if (limitType == LimitType.FIXED_LIMIT) {
@@ -359,7 +359,7 @@ public class PSTableDirector {
         Log.d("Creating player for " + limitType + " table " + fullTableName);
         String debug = DEBUG_BASE_PATH + DateUtils.getDate(false) + "_"
                 + shortTableName + ".txt";
-        BaseVillainModeller villainModeller = new BaseVillainModeller(limitType, debug);
+        BaseVillainModel villainModeller = new BaseVillainModel(limitType, debug);
         IPlayer player = createPlayer(villainModeller, limitType, debug);
         String heroName = StringUtils.between(fullTableName, LOGGED_IN + " as ", "\n");
         IVillainObserver villainObserver = new PSVillainObserver(villainModeller,

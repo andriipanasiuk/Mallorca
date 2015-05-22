@@ -11,6 +11,6 @@ package mallorcatour.bot.interfaces;
  */
 public interface IBotFactory {
 
-    IPlayer createBot(IVillainModeller modeller, ISpectrumListener spectrumListener,
+    IPlayer createBot(IVillainModel modeller, ISpectrumListener spectrumListener,
             IDecisionListener decisionListener, String debug);
 }

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import mallorcatour.brains.IActionChecker;
-import mallorcatour.brains.StrengthManager;
+import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;

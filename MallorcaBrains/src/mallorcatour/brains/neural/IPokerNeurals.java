@@ -2,7 +2,7 @@ package mallorcatour.brains.neural;
 
 import org.neuroph.core.NeuralNetwork;
 
-public interface IPokerNeurals{
+public interface IPokerNeurals {
 
 	public abstract NeuralNetwork<?> getRiver();
 

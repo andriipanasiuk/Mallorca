@@ -6,14 +6,14 @@ import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.modeller.BaseVillainModeller;
+import mallorcatour.bot.modeller.BaseVillainModel;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
 import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IAdvisor;
-import mallorcatour.brains.StrengthManager;
+import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.brains.neural.NeuralAdvisor;
-import mallorcatour.brains.neural.gusxensen.GusXensenNeural;
+import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -44,13 +44,14 @@ public class NLMathBot implements IPlayer {
     private IActionPreprocessor actionPreprocessor;
     private final String DEBUG_PATH;
 
-	public NLMathBot(BaseVillainModeller villainModeller, ISpectrumListener listener,
+	public NLMathBot(BaseVillainModel villainModeller, ISpectrumListener listener,
 			IDecisionListener decisionListener, String debug) {
 		adviceCreator = new AdviceCreatorFromMap();
 		strengthManager = new StrengthManager(false);
 		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, true, listener,
 				decisionListener, strengthManager, true, debug);
-		preflopAdvisor = new NeuralAdvisor(new GusXensenNeural());
+		GusXensen player = new GusXensen();
+		preflopAdvisor = new NeuralAdvisor(player, player, "Gus Xensen");
         preflopBot = new NLPreflopChart();
         actionPreprocessor = new NLActionPreprocessor();
         this.DEBUG_PATH = debug;

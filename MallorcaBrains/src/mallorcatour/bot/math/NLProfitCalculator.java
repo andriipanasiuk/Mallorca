@@ -2,8 +2,8 @@ package mallorcatour.bot.math;
 
 import java.util.Map;
 
-import mallorcatour.bot.interfaces.IVillainModeller;
-import mallorcatour.brains.StrengthManager;
+import mallorcatour.bot.interfaces.IVillainModel;
+import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
@@ -15,7 +15,7 @@ import mallorcatour.util.Log;
 
 public class NLProfitCalculator implements IProfitCalculator {
 
-	public NLProfitCalculator(IVillainModeller villainModeller) {
+	public NLProfitCalculator(IVillainModel villainModeller) {
 		gameSolver = new NLGameSolver(villainModeller);
 	}
 
