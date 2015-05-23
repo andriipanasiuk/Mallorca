@@ -19,7 +19,7 @@ import mallorcatour.core.game.interfaces.IGameInfo;
  */
 public class SituationHandler implements ISituationHandler {
 
-    protected IGameInfo gameInfo;  // general game information
+    protected IGameInfo gameInfo;;
     protected Card holeCard1, holeCard2, flop1, flop2, flop3, turn, river;
     protected int heroActionCount, countOfHeroAggressive, villainActionCount,
             countOfOppAggressive;

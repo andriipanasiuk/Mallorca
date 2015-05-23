@@ -54,9 +54,9 @@ public class BotParser {
 				System.out.flush();
 			} else if (parts.length == 3 && parts[0].equals("Settings")) {
 				controller.updateSetting(parts[1], parts[2]);
-			} else if (parts.length == 3 && parts[0].equals("Match")) { 
+			} else if (parts.length == 3 && parts[0].equals("Match")) {
 				controller.updateMatch(parts[1], parts[2]);
-			} else if (parts.length == 3 && parts[0].startsWith("player")) { 
+			} else if (parts.length == 3 && parts[0].startsWith("player")) {
 				controller.updateMove(parts[0], parts[1], parts[2]);
 			} else {
 				System.err.printf("Unable to parse line ``%s''\n", line);
@@ -69,11 +69,19 @@ public class BotParser {
 		if (action.isFold()) {
 			act = "fold";
 		} else if (action.isPassive()) {
-			act = "call";
+			if (action.isCheck()) {
+				act = "check";
+			} else {
+				act = "call";
+			}
 		} else {
 			act = "raise";
 		}
-		return String.format("%s %d", act, action.getAmount());
+		StringBuilder builder = new StringBuilder();
+		builder.append(act);
+		builder.append(" ");
+		builder.append((int) action.getAmount());
+		return builder.toString();
 	}
 
 	public static void main(String[] args) {

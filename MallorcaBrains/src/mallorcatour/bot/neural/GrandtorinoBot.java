@@ -31,7 +31,7 @@ import mallorcatour.util.Log;
 public class GrandtorinoBot implements IPlayer {
 
 	private Card heroCard1, heroCard2;
-	private boolean isHumanAdvisor;
+	private boolean isExternalAdvisor;
 	private IGameInfo gameInfo;;
 	private final ISituationHandler situationHandler;
 	private final IVillainSpectrumHandler villainSpectrumHandler;
@@ -44,7 +44,7 @@ public class GrandtorinoBot implements IPlayer {
 
 	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
 			IVillainSpectrumHandler villainSpectrumHandler, IActionChecker actionChecker, LimitType limitType,
-			IExternalAdvisor humanAdvisor, boolean isHumanAdvisor, String debug) {
+			IExternalAdvisor externalAdvisor, boolean isHumanAdvisor, String debug) {
 		this.advisor = neuralNetwork;
 		this.DEBUG_PATH = debug;
 		this.actionChecker = actionChecker;
@@ -57,8 +57,8 @@ public class GrandtorinoBot implements IPlayer {
 			actionPreprocessor = new FLActionPreprocessor();
 			preflopBot = new FLPreflopChart();
 		}
-		this.isHumanAdvisor = isHumanAdvisor;
-		this.humanAdvisor = humanAdvisor;
+		this.isExternalAdvisor = isHumanAdvisor;
+		this.humanAdvisor = externalAdvisor;
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class GrandtorinoBot implements IPlayer {
 			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()),
 					percent);
 		} else // for human advisor
-		if (isHumanAdvisor && gameInfo.isPreFlop()) {
+		if (isExternalAdvisor && gameInfo.isPreFlop()) {
 			action = humanAdvisor.getAction(gameInfo);
 			Log.f(DEBUG_PATH, "Human action: " + action.toString());
 		} else {

@@ -38,9 +38,6 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	private Spectrum villainSpectrum;
 	private final IAdvisor villainModel;
 	private final boolean modelPreflop, modelPostflop;
-	// TODO use for FL
-	@SuppressWarnings("unused")
-	private int raisesOnStreet = 0;
 	private final ISpectrumListener villainSpectrumListener;
 	private final IDecisionListener villainDecisionListener;
 	private final StrengthManager strengthManager;
@@ -79,7 +76,6 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	@Override
 	public void onHoleCards(Card c1, Card c2, String villainName) {
 		super.onHoleCards(c1, c2, villainName);
-		raisesOnStreet = 1;
 		strengthManager.onHoleCards(c1, c2, villainName);
 		villainSpectrum = Spectrum.random();
 		randomVillainSpectrum = Spectrum.random();
@@ -146,7 +142,6 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	public void onStageEvent(PokerStreet street) {
 		super.onStageEvent(street);
 		strengthManager.onStageEvent(street);
-		raisesOnStreet = 0;
 		if (modelPostflop) {
 			if (street == PokerStreet.FLOP) {
 				villainSpectrum.remove(flop1);
@@ -210,45 +205,33 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	public void onVillainActed(Action action, double villainToCall) {
 		LocalSituation villainSituation = getVillainSituationWithoutStrength(villainToCall);
 		villainDecisionListener.onDecided(villainSituation, action);
-		if ((modelPreflop && gameInfo.isPreFlop()) || (modelPostflop && gameInfo.isPostFlop())) {
+		// TODO consider villain modelling on prelfop also
+		if ((limitType == LimitType.FIXED_LIMIT && modelPreflop && gameInfo.isPreFlop())
+				|| (modelPostflop && gameInfo.isPostFlop())) {
 			modifyVillainSpectrum(villainSituation, action);
 			String log = logVillainSpectrum();
 			villainSpectrumListener.onSpectrumChanged(villainSpectrum, log);
 		}
-		if (action.isAggressive()) {
-			raisesOnStreet++;
-		}
 		super.onVillainActed(action, villainToCall);
 	}
 
-	@Override
-	public void onHeroActed(Action action) {
-		if (action.isAggressive()) {
-			raisesOnStreet++;
-		}
-		super.onHeroActed(action);
-	}
-
 	private void modifyVillainSpectrum(LocalSituation villainSituation, Action villainAction) {
-		// for fixed limit we'll be calculating preflop also
-		if (limitType == LimitType.FIXED_LIMIT || gameInfo.isPostFlop()) {
-			Map<HoleCards, Advice> opponentAdvices = calculateVillainAdvices(villainSituation, villainAction);
-			for (HoleCards villainCards : opponentAdvices.keySet()) {
-				Advice advice = opponentAdvices.get(villainCards);
-				double percent;
-				if (villainAction.isFold()) {
-					percent = advice.getFold();
-				} else if (villainAction.isAggressive()) {
-					percent = advice.getAggressive();
-				} else {
-					percent = advice.getPassive();
-				}
-				double oldPercent = villainSpectrum.getWeight(villainCards);
-				if (percent == 0) {
-					villainSpectrum.remove(villainCards);
-				} else {
-					villainSpectrum.add(villainCards, percent * oldPercent);
-				}
+		Map<HoleCards, Advice> opponentAdvices = calculateVillainAdvices(villainSituation, villainAction);
+		for (HoleCards villainCards : opponentAdvices.keySet()) {
+			Advice advice = opponentAdvices.get(villainCards);
+			double percent;
+			if (villainAction.isFold()) {
+				percent = advice.getFold();
+			} else if (villainAction.isAggressive()) {
+				percent = advice.getAggressive();
+			} else {
+				percent = advice.getPassive();
+			}
+			double oldPercent = villainSpectrum.getWeight(villainCards);
+			if (percent == 0) {
+				villainSpectrum.remove(villainCards);
+			} else {
+				villainSpectrum.add(villainCards, percent * oldPercent);
 			}
 			Log.f(DEBUG_PATH, "---------------------");
 		}
