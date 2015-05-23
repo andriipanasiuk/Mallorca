@@ -21,6 +21,7 @@ import mallorcatour.core.game.BaseGameInfo;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.util.Log;
 
 /**
  * Class that parses strings given by the engine and stores values for later
@@ -103,10 +104,12 @@ public class AiGamesController {
 			gameInfo.onButton = value.equals(heroName);
 		} else if (key.equals("max_win_pot")) { // The size of the current pot
 			gameInfo.pot = Integer.valueOf(value);
+			Log.d("Pot: " + gameInfo.pot);
 		} else if (key.equals("amount_to_call")) { // The amount of the call
 			gameInfo.heroAmountToCall = Integer.valueOf(value);
 		} else if (key.equals("table")) { // The cards on the table
 			gameInfo.board = Arrays.asList(parseCards(value));
+			Log.d("Table: " + value);
 			PokerStreet street;
 			if (gameInfo.board.size() == 3) {
 				street = PokerStreet.FLOP;
@@ -150,9 +153,11 @@ public class AiGamesController {
 				observer.onHandStarted(gameInfo);
 			} else if (key.equals("post")) {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
+				Log.d("Effective stack: " + gameInfo.bankrollAtRisk);
 			} else if (key.equals("hand")) { // Your cards
 				gameInfo.street = PokerStreet.PREFLOP;
 				Card[] cards = parseCards(amount);
+				Log.d("Hole cards: " + amount);
 				observer.onHoleCards(cards[0], cards[1], villainName);
 			} else if (key.equals("wins")) {
 				observer.onHandEnded();
@@ -168,10 +173,13 @@ public class AiGamesController {
 			} else if (key.equals("wins")) {
 				observer.onHandEnded();
 			} else if (key.equals("fold") || key.equals("check") || key.equals("call") || key.equals("raise")) {
-				// The move your opponent did
+				Log.d("Villain " + key + " " + amount);
 				Action action = fromString(key, amount);
 				observer.onVillainActed(action, -1);
 			}
+		}
+		if (key.equals("raise")) {
+			Log.d("Effective stack after raise: " + gameInfo.bankrollAtRisk);
 		}
 	}
 

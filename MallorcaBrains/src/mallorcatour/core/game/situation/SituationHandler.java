@@ -54,7 +54,8 @@ public class SituationHandler implements ISituationHandler {
         double toCall = gameInfo.getHeroAmountToCall();
         double pot = gameInfo.getPotSize();
         double effectiveStack = gameInfo.getBankRollAtRisk();
-        double potOdds = toCall / (toCall + pot);
+        double potAfterCall = toCall + pot;
+        double potOdds = toCall / potAfterCall;
 
         if (gameInfo.isPreFlop()) {
             result = new LocalSituation(LocalSituation.PREFLOP, limitType);
@@ -78,7 +79,7 @@ public class SituationHandler implements ISituationHandler {
         result.setNegativePotential(negativePotential);
         result.setPotOdds(potOdds);
         result.isOnButton(isOnButton);
-        result.setPotToStackOdds((pot + toCall) / (pot + toCall + effectiveStack));
+        result.setPotToStackOdds(potAfterCall / (potAfterCall + effectiveStack));
         result.setFLPotSize(1 - (2 * gameInfo.getBigBlindSize()) / pot);
         result.canRaise(gameInfo.canHeroRaise());
         return result;

@@ -62,13 +62,7 @@ public class Action implements Serializable {
 	}
 
 	public static Action createBetAction(double pot, double percent, double effectiveStack) {
-		double amountOfBet = percent * pot;
-		if (effectiveStack - amountOfBet < THRESHOLD_FOR_GOING_ALLIN * (pot + 2 * amountOfBet)) {
-			return allInAction();
-		}
-		Action result = new Action(Type.AGGRESSIVE, amountOfBet);
-		result.percentOfPot = percent;
-		return result;
+		return createRaiseAction(0, pot, effectiveStack, percent);
 	}
 
 	public static Action createBetAction(double pot, double effectiveStack) {
@@ -82,7 +76,7 @@ public class Action implements Serializable {
 	public static Action createRaiseAction(double toCall, double pot, double effectiveStack, double percent) {
 		double raiseAmount = percent * (toCall + pot);
 		if (effectiveStack - raiseAmount < THRESHOLD_FOR_GOING_ALLIN * (pot + toCall + 2 * raiseAmount)) {
-			return ALL_IN_ACTION;
+			return allInAction();
 		}
 		Action result = new Action(Type.AGGRESSIVE, raiseAmount);
 		result.percentOfPot = percent;

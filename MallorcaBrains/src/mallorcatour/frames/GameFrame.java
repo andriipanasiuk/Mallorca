@@ -19,8 +19,10 @@ import java.util.concurrent.ExecutorService;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.math.NLMathBot;
+import mallorcatour.bot.modeller.VillainModel;
+import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.villainobserver.VillainStatistics;
+import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -29,9 +31,6 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.bot.modeller.VillainModel;
-import mallorcatour.bot.neural.NeuralBotFactory;
-import mallorcatour.brains.IAdvisor;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.robot.ExtPlayerInfo;
 import mallorcatour.robot.controller.HUGameControllerExt;
@@ -57,7 +56,7 @@ public class GameFrame extends javax.swing.JFrame {
     private final LimitType limitType;
     private List<Card> nonUsedCards;
     private IRandomizer randomizer = new UniformRandomizer();
-    private double pot, myBet, botBet, botStack = 6000, myStack = 6000;
+    private double pot, myBet, botBet, botStack = 100, myStack = 100;
     private PokerStreet currentStreet;
     private final static double BIG_BLIND = 10;
     private List<Card> boardCards;
@@ -81,6 +80,7 @@ public class GameFrame extends javax.swing.JFrame {
     public GameFrame(LimitType limitType) {
         initComponents();
         spectrumListener = new ShowingSpectrumListener();
+        Log.WRITE_TO_ERR = true;
         DEBUG_PATH = PokerPreferences.DEBUG_PATTERN
                 + DateUtils.getDate(false) + ".txt";
         villainModeller = new VillainModel(limitType, DEBUG_PATH);
@@ -434,8 +434,13 @@ public class GameFrame extends javax.swing.JFrame {
         } else if (action.isCall()) {
             Log.f(DEBUG_PATH, PokerPreferences.DEFAULT_HERO_NAME + " calls");
             pot += action.getAmount();
-            botBet += action.getAmount();
-            botStack -= action.getAmount();
+			if (action.getAmount() <= botStack) {
+				botBet += action.getAmount();
+				botStack -= action.getAmount();
+			} else {
+				botBet += botStack;
+				botStack = 0;
+			}
             updateUI();
             if (tradeOpened) {
                 changeStreet();

@@ -17,6 +17,7 @@ public class NLActionPreprocessor implements IActionPreprocessor {
         double pot = gameInfo.getPotSize();
         double effectiveStack = gameInfo.getBankRollAtRisk();
         if (action.isAllin()) {
+        	action.setAmount(effectiveStack);
             return action;
         }
         if (action.isFold()) {

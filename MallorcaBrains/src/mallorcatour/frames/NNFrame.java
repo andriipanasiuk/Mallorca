@@ -67,7 +67,7 @@ public class NNFrame extends javax.swing.JFrame {
     private DefaultListModel learningExamplesModel, controlExamplesModel,
             clusterNumberModel, sameExamplesModel;
     private DefaultTableModel clusterTableModel;
-    private final double PERCENT_OF_CONTROL_EXAMPLES = 0.2;
+    private final douдble PERCENT_OF_CONTROL_EXAMPLES = 0.2;
     //for Kohonen SOM
     private int countOfCells;
 //    private Dimension frameSize = new Dimension(900, 670);
