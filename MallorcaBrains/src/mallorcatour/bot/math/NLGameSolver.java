@@ -17,7 +17,7 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.CollectionUtils;
@@ -398,7 +398,7 @@ public class NLGameSolver implements IGameSolver {
                 villainSituation.setPositivePotential(equity.positivePotential);
                 villainSituation.setNegativePotential(equity.negativePotential);
             }
-            Advice advice = villainModeller.getAdvice(villainSituation, villainCards);
+            IAdvice advice = villainModeller.getAdvice(villainSituation, villainCards);
             double oldWeight = villainSpectrum.getWeight(villainCards);
             foldSpectrum.add(villainCards, oldWeight * advice.getFold());
             passiveSpectrum.add(villainCards, oldWeight * advice.getPassive());

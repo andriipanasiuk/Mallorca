@@ -20,7 +20,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.SituationHandler;
@@ -159,8 +159,8 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 		Log.f(DEBUG_PATH, "Villain situation: " + situation.toString());
 	}
 
-	private Map<HoleCards, Advice> calculateVillainAdvices(LocalSituation villainSituation, Action villainAction) {
-		Map<HoleCards, Advice> villainAdvices = new HashMap<HoleCards, Advice>();
+	private Map<HoleCards, IAdvice> calculateVillainAdvices(LocalSituation villainSituation, Action villainAction) {
+		Map<HoleCards, IAdvice> villainAdvices = new HashMap<HoleCards, IAdvice>();
 		Log.f(DEBUG_PATH, "---------------------");
 		logVillainSituation(villainSituation, villainAction);
 		for (HoleCards villainCards : villainSpectrum) {
@@ -189,7 +189,7 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 			villainSituation.setStrength(strength);
 			villainSituation.setPositivePotential(equity.positivePotential);
 			villainSituation.setNegativePotential(equity.negativePotential);
-			Advice advice = null;
+			IAdvice advice = null;
 			if (villainSituation.getStreet() == LocalSituation.PREFLOP) {
 				advice = villainModel.getAdvice(villainSituation, villainCards);
 			}
@@ -216,9 +216,9 @@ public class SpectrumSituationHandler extends SituationHandler implements IVilla
 	}
 
 	private void modifyVillainSpectrum(LocalSituation villainSituation, Action villainAction) {
-		Map<HoleCards, Advice> opponentAdvices = calculateVillainAdvices(villainSituation, villainAction);
+		Map<HoleCards, IAdvice> opponentAdvices = calculateVillainAdvices(villainSituation, villainAction);
 		for (HoleCards villainCards : opponentAdvices.keySet()) {
-			Advice advice = opponentAdvices.get(villainCards);
+			IAdvice advice = opponentAdvices.get(villainCards);
 			double percent;
 			if (villainAction.isFold()) {
 				percent = advice.getFold();

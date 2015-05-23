@@ -4,16 +4,20 @@
  */
 package mallorcatour.bot.preflop;
 
+import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.ExactAdvice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.util.Log;
 
 /**
  *
  * @author Andrew
  */
-public class NLPreflopChart implements IPreflopChart {
+public class NLPreflopChart implements IAdvisor {
 
     public static Advice PERCENT_FOLD_0 = Advice.create(0, 0, 1);
     public static Advice PERCENT_FOLD_10 = Advice.create(0.1, 0, 0.9);
@@ -50,29 +54,60 @@ public class NLPreflopChart implements IPreflopChart {
         vsRaiseChart = new VsRaiseMinPotChart();
     }
 
-	public Action getAction(LocalSituation situation, HoleCards cards) {
-		if (situation.isHeroOnButton() && situation.getHeroActionCount() == 0 && situation.getVillainActionCount() == 0) {
-            double bbsInES = convertPotToStackOddsToBBInEffectiveStack(situation.getPotToStackOdds());
+	private boolean unopened(LocalSituation situation) {
+		return situation.isHeroOnButton() && situation.getHeroActionCount() == 0
+				&& situation.getVillainActionCount() == 0;
+	}
+    @Override
+	public IAdvice getAdvice(LocalSituation situation, HoleCards cards) {
+		if (unopened(situation)) {
+			double bbsInES = convertPotToStackOddsToBBInEffectiveStack(situation.getPotToStackOdds());
             if (bbsInES > minBBsInESForPushFold) {
-                return uoMinPotChart.getAdvice(cards).getAction();
+                return uoMinPotChart.getAdvice(cards);
             } else {
-                return pushFoldChart.getAction(cards, bbsInES);
+            	Action action = pushFoldChart.getAction(cards, bbsInES);
+            	Log.d("Decision by push/fold chart");
+            	return new ExactAdvice(action);
             }
-        } else if (!situation.isHeroOnButton()
-                && situation.getHeroActionCount() == 0
-                && situation.getVillainActionCount() == 1
-                && situation.getVillainAggresionActionCount() == 1
-                && !situation.wasHeroPreviousAggresive()
-                && situation.wasVillainPreviousAggresive()
-                && situation.getPotToStackOdds() < 0.4
-                && situation.getPotOdds() < 0.4) {
-            return vsRaiseChart.getAdvice(cards).getAction();
-        }
+		} else if (vsRaise(situation) && situation.getPotToStackOdds() < 0.4 && situation.getPotOdds() < 0.4) {
+			return vsRaiseChart.getAdvice(cards);
+		}
         return null;
     }
 
-    private double convertPotToStackOddsToBBInEffectiveStack(double potToStackOdds) {
+	private boolean vsRaise(LocalSituation situation) {
+		return !situation.isHeroOnButton() && situation.getHeroActionCount() == 0
+				&& situation.getVillainActionCount() == 1 && situation.getVillainAggresionActionCount() == 1
+				&& !situation.wasHeroPreviousAggresive() && situation.wasVillainPreviousAggresive();
+	}
+
+	private double convertPotToStackOddsToBBInEffectiveStack(double potToStackOdds) {
         return 2 * (1d / potToStackOdds - 0.5);
 
     }
+
+	@Override
+	public double getAggressionFactor() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public double getWtsd() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public double getAggressionFrequency() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public double getFoldFrequency() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getName() {
+		return "Preflop chart bot";
+	}
 }

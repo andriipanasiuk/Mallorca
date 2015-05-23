@@ -8,6 +8,7 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.advice.SmartAdviceCreator;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
@@ -56,7 +57,7 @@ public class NeuralAdvisor implements IAdvisor {
 	}
 
 	@Override
-	public Advice getAdvice(LocalSituation situation, HoleCards cards) {
+	public IAdvice getAdvice(LocalSituation situation, HoleCards cards) {
 		NeuralNetwork<?> nnForUse = null;
 		AdviceCreator adviceCreator = null;
 		boolean canRaise = situation.canRaise();

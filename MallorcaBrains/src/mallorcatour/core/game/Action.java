@@ -12,9 +12,9 @@ public class Action implements Serializable {
 	private double amount;
 	private Type type;
 	private double percentOfPot;
-	private static final Action ALL_IN_ACTION = new Action(Type.AGGRESSIVE, -1.0D);
+	private static final Action ALL_IN_ACTION = new Action(Type.AGGRESSIVE, Double.MAX_VALUE);
 
-	public Action(Type type, double amount) {
+	private Action(Type type, double amount) {
 		this.type = type;
 		this.amount = amount;
 	}
@@ -64,7 +64,7 @@ public class Action implements Serializable {
 	public static Action createBetAction(double pot, double percent, double effectiveStack) {
 		double amountOfBet = percent * pot;
 		if (effectiveStack - amountOfBet < THRESHOLD_FOR_GOING_ALLIN * (pot + 2 * amountOfBet)) {
-			return ALL_IN_ACTION;
+			return allInAction();
 		}
 		Action result = new Action(Type.AGGRESSIVE, amountOfBet);
 		result.percentOfPot = percent;
@@ -186,7 +186,7 @@ public class Action implements Serializable {
 			throw new IllegalArgumentException();
 	}
 
-	public static class Type implements Serializable {
+	private static class Type implements Serializable {
 		private static final long serialVersionUID = 1L;
 		private String action;
 		public static final Type FOLD = new Type("Fold");

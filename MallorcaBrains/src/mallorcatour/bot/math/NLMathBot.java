@@ -6,9 +6,8 @@ import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.modeller.SpectrumSituationHandler;
-import mallorcatour.bot.preflop.IPreflopChart;
+import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
@@ -19,7 +18,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
@@ -38,7 +37,7 @@ public class NLMathBot implements IPlayer {
     private StrengthManager strengthManager;
     private IAdvisor preflopAdvisor;
     private IProfitCalculator profitCalculator;
-    private IPreflopChart preflopBot;
+    private IAdvisor preflopBot;
     private Card heroCard1, heroCard2;
     private IActionPreprocessor actionPreprocessor;
     private final String DEBUG_PATH;
@@ -72,9 +71,10 @@ public class NLMathBot implements IPlayer {
      * Requests an Action from the player
      * Called when it is the Player's turn to act.
      */
+    @Override
     public Action getAction() {
     	LocalSituation situation = situationHandler.onHeroSituation();
-        Advice advice;
+        IAdvice advice;
         Action action = null;
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
         if (gameInfo.isVillainSitOut()) {
@@ -95,7 +95,7 @@ public class NLMathBot implements IPlayer {
         {
             Log.f(DEBUG_PATH, "Preflop: " + situation.toString());
             if (gameInfo.isPreFlop() && gameInfo.isVillainSitOut()) {
-                action = preflopBot.getAction(situation, new HoleCards(heroCard1, heroCard2));
+                action = preflopBot.getAdvice(situation, new HoleCards(heroCard1, heroCard2)).getAction();
                 if (action != null) {
                     action = actionPreprocessor.preprocessAction(action, gameInfo);
                 }

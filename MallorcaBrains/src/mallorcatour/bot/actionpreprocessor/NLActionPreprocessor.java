@@ -20,6 +20,7 @@ public class NLActionPreprocessor implements IActionPreprocessor {
             return Action.createRaiseAction(toCall, pot, Double.MAX_VALUE);
         }
         if (action.isAllin()) {
+        	action.setAmount(Double.MAX_VALUE);
             return action;
         }
         if (action.isFold()) {
@@ -52,7 +53,7 @@ public class NLActionPreprocessor implements IActionPreprocessor {
                 if (gameInfo.isPreFlop()) {
                     return Action.createBetAction(pot, 1, effectiveStack);
                 } else {
-                    Action resultAction = Action.createBetAction(pot, 0.7, effectiveStack);
+                    Action resultAction = Action.createBetAction(pot, 0.75, effectiveStack);
                     double amount = resultAction.getAmount();
                     amount = Math.round(amount / gameInfo.getBigBlindSize()) * gameInfo.getBigBlindSize();
                     resultAction.setAmount(amount);

@@ -14,7 +14,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
@@ -69,7 +69,7 @@ public class MixBot implements IPlayer {
      */
     @Override
     public Action getAction() {
-        Advice advice;
+        IAdvice advice;
         Action action = null;
         Log.f(DEBUG_PATH, "=========  Decision-making  =========");
         LocalSituation situation = situationHandler.onHeroSituation();

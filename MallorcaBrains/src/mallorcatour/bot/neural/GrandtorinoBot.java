@@ -1,12 +1,9 @@
 package mallorcatour.bot.neural;
 
-import mallorcatour.bot.actionpreprocessor.FLActionPreprocessor;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.IVillainSpectrumHandler;
-import mallorcatour.bot.preflop.FLPreflopChart;
-import mallorcatour.bot.preflop.IPreflopChart;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
@@ -15,7 +12,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
@@ -37,7 +34,7 @@ public class GrandtorinoBot implements IPlayer {
 	private final IVillainSpectrumHandler villainSpectrumHandler;
 	private final IAdvisor advisor;
 	private final IActionChecker actionChecker;
-	private final IPreflopChart preflopBot;
+	private final IAdvisor preflopBot;
 	private final IExternalAdvisor humanAdvisor;
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
@@ -54,8 +51,8 @@ public class GrandtorinoBot implements IPlayer {
 			actionPreprocessor = new NLActionPreprocessor();
 			preflopBot = new NLPreflopChart();
 		} else {
-			actionPreprocessor = new FLActionPreprocessor();
-			preflopBot = new FLPreflopChart();
+			throw new UnsupportedOperationException();
+			// TODO remove fl
 		}
 		this.isExternalAdvisor = isHumanAdvisor;
 		this.humanAdvisor = externalAdvisor;
@@ -78,6 +75,41 @@ public class GrandtorinoBot implements IPlayer {
 		heroCard2 = c2;
 	}
 
+	private Action getActionInternal(LocalSituation situation, HoleCards holeCards) {
+		if (gameInfo.isVillainSitOut()) {
+			Log.f(DEBUG_PATH, "Villain is sitting out");
+			double percent = 0.5;
+			return Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()),
+					percent);
+		}
+		Action action = null;
+		if (isExternalAdvisor && gameInfo.isPreFlop()) {
+			action = humanAdvisor.getAction(gameInfo);
+			Log.f(DEBUG_PATH, "Human action: " + action.toString());
+			return action;
+		}
+		IAdvice advice = null;
+		// for preflop. Bot will make decision by preflop chart.
+		if (gameInfo.isPreFlop()) {
+			advice = preflopBot.getAdvice(situation, holeCards);
+			if (advice != null) {
+				Log.f(DEBUG_PATH, "Advice from preflop bot: " + advice);
+			}
+		}
+		// if there is no preflop OR action is no in chart
+		if (advice == null) {
+			advice = advisor.getAdvice(situation, holeCards);
+			Log.f(DEBUG_PATH, "Advice: " + advice);
+		}
+		action = advice.getAction();
+		action = actionPreprocessor.preprocessAction(action, gameInfo);
+		Log.f(DEBUG_PATH, "Action: " + action);
+		action = actionChecker.checkAction(action, situation, gameInfo, holeCards,
+				villainSpectrumHandler.getVillainSpectrum());
+
+		return action;
+	}
+
 	/**
 	 * Requests an Action from the player Called when it is the hero's turn to
 	 * act.
@@ -88,36 +120,7 @@ public class GrandtorinoBot implements IPlayer {
 
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
 		Log.f(DEBUG_PATH, "Situation: " + VectorUtils.toString(situation));
-
-		Action action = null;
-		if (gameInfo.isVillainSitOut()) {
-			Log.f(DEBUG_PATH, "Villain is sitting out");
-			double percent = 0.5;
-			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()),
-					percent);
-		} else // for human advisor
-		if (isExternalAdvisor && gameInfo.isPreFlop()) {
-			action = humanAdvisor.getAction(gameInfo);
-			Log.f(DEBUG_PATH, "Human action: " + action.toString());
-		} else {
-			// for preflop. Bot will make decision by preflop chart.
-			if (gameInfo.isPreFlop()) {
-				action = preflopBot.getAction(situation, new HoleCards(heroCard1, heroCard2));
-				if (action != null) {
-					action = actionPreprocessor.preprocessAction(action, gameInfo);
-				}
-			}
-			// if there is no preflop OR action is no in chart
-			if (action == null) {
-				Advice advice = advisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
-				Log.f(DEBUG_PATH, "Advice: " + advice.toString());
-				action = advice.getAction();
-				action = actionPreprocessor.preprocessAction(action, gameInfo);
-				Log.f(DEBUG_PATH, "Action: " + action.toString());
-				action = actionChecker.checkAction(action, situation, gameInfo, new HoleCards(heroCard1, heroCard2),
-						villainSpectrumHandler.getVillainSpectrum());
-			}
-		}
+		Action action = getActionInternal(situation, new HoleCards(heroCard1, heroCard2));
 		Log.f(DEBUG_PATH, "===============  End  ==============");
 		situationHandler.onHeroActed(action);
 		return action;

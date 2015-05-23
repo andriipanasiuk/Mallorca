@@ -11,7 +11,7 @@ import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
 
@@ -45,12 +45,12 @@ public class VillainModel implements IAdvisor, IVillainListener {
 	}
 
 	@Override
-	public Advice getAdvice(LocalSituation situation, HoleCards cards) {
+	public IAdvice getAdvice(LocalSituation situation, HoleCards cards) {
 		int street = situation.getStreet();
 		if (street == LocalSituation.PREFLOP && isVillainKnown && villainStatistics.isPreflopLearned()) {
 			return preflopVillainModeller.getAdvice(situation, cards, villainStatistics.getPrefloNeuralNetwork());
 		}
-		Advice result = currentVillainNeural.getAdvice(situation, cards);
+		IAdvice result = currentVillainNeural.getAdvice(situation, cards);
 		return result;
 	}
 

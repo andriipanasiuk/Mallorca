@@ -18,9 +18,9 @@ import mallorcatour.util.UniformRandomizer;
  *
  * @author Andrew
  */
-public final class Advice implements IVector, Serializable {
+public final class Advice implements IAdvice, IVector, Serializable {
 
-    private final static long serialVersionUID = 7789283258312255030L;
+	private final static long serialVersionUID = 7789283258312255030L;
     private static final String FOLD = "Fold: ";
     private static final String PASSIVE = "Passive: ";
     private static final String AGGRESSIVE = "Aggressive: ";
@@ -77,18 +77,22 @@ public final class Advice implements IVector, Serializable {
         this.aggressivePercent = aggressivePercent;
     }
 
+    @Override
     public double getFold() {
         return (double) getFoldPercent() / 100;
     }
 
+    @Override
     public double getPassive() {
         return (double) getPassivePercent() / 100;
     }
 
+    @Override
     public double getAggressive() {
         return (double) getAggressivePercent() / 100;
     }
 
+    @Override
     public Action getAction() {
         int random = (int) (randomizer.getRandom() * 100);
         if (getFoldPercent() > random) {
