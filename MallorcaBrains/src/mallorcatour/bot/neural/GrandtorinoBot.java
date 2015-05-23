@@ -3,7 +3,7 @@ package mallorcatour.bot.neural;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.IVillainSpectrumHandler;
+import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
@@ -31,7 +31,7 @@ public class GrandtorinoBot implements IPlayer {
 	private boolean isExternalAdvisor;
 	private IGameInfo gameInfo;;
 	private final ISituationHandler situationHandler;
-	private final IVillainSpectrumHandler villainSpectrumHandler;
+	private final ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor advisor;
 	private final IActionChecker actionChecker;
 	private final IAdvisor preflopBot;
@@ -40,12 +40,12 @@ public class GrandtorinoBot implements IPlayer {
 	private final String DEBUG_PATH;
 
 	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
-			IVillainSpectrumHandler villainSpectrumHandler, IActionChecker actionChecker, LimitType limitType,
+			ISpectrumHolder villainSpectrumHandler, IActionChecker actionChecker, LimitType limitType,
 			IExternalAdvisor externalAdvisor, boolean isHumanAdvisor, String debug) {
 		this.advisor = neuralNetwork;
 		this.DEBUG_PATH = debug;
 		this.actionChecker = actionChecker;
-		this.villainSpectrumHandler = villainSpectrumHandler;
+		this.villainSpectrumHolder = villainSpectrumHandler;
 		this.situationHandler = situationHandler;
 		if (limitType == LimitType.NO_LIMIT) {
 			actionPreprocessor = new NLActionPreprocessor();
@@ -105,8 +105,7 @@ public class GrandtorinoBot implements IPlayer {
 		action = actionPreprocessor.preprocessAction(action, gameInfo);
 		Log.f(DEBUG_PATH, "Action: " + action);
 		action = actionChecker.checkAction(action, situation, gameInfo, holeCards,
-				villainSpectrumHandler.getVillainSpectrum());
-
+				villainSpectrumHolder.getSpectrum());
 		return action;
 	}
 
@@ -150,7 +149,7 @@ public class GrandtorinoBot implements IPlayer {
 	 */
 	@Override
 	public void onVillainActed(Action action, double toCall) {
-		// TODO remove to call from here
+		// TODO remove toCall parameter from here
 		situationHandler.onVillainActed(action, toCall);
 	}
 

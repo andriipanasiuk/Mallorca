@@ -78,7 +78,7 @@ public class FLMathBot implements IPlayer {
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
 		} else {
 			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1,
-					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
+					heroCard2, situationHandler.getSpectrum(), strengthManager);
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
 			saveSpectrum();
             advice = adviceCreator.create(map);
@@ -109,7 +109,7 @@ public class FLMathBot implements IPlayer {
                 board[i++] = c;
             }
             double strength = PokerEquilatorBrecher.strengthVsSpectrum(
-                    heroCard1, heroCard2, board, situationHandler.getVillainSpectrum());
+                    heroCard1, heroCard2, board, situationHandler.getSpectrum());
             if (Math.abs(strength - gameInfo.getHeroAmountToCall() / gameInfo.getPotSize()) < 0.1) {
                 Log.f(DEBUG_PATH, "Hero must fold but call by pot odds");
                 return Action.callAction(gameInfo.getHeroAmountToCall());

@@ -86,7 +86,7 @@ public class MixBot implements IPlayer {
         } else {
 			// preflop
 			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1,
-					heroCard2, situationHandler.getVillainSpectrum(), strengthManager);
+					heroCard2, situationHandler.getSpectrum(), strengthManager);
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
             advice = adviceCreator.create(map);
             action = advice.getAction();

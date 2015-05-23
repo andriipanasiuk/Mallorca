@@ -16,11 +16,7 @@ public class NLActionPreprocessor implements IActionPreprocessor {
         double toCall = gameInfo.getHeroAmountToCall();
         double pot = gameInfo.getPotSize();
         double effectiveStack = gameInfo.getBankRollAtRisk();
-        if (gameInfo.isVillainSitOut()) {
-            return Action.createRaiseAction(toCall, pot, Double.MAX_VALUE);
-        }
         if (action.isAllin()) {
-        	action.setAmount(Double.MAX_VALUE);
             return action;
         }
         if (action.isFold()) {
