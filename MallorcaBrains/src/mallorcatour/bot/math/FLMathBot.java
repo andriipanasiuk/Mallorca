@@ -78,7 +78,7 @@ public class FLMathBot implements IPlayer {
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
 		} else {
 			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1,
-					heroCard2, situationHandler.getSpectrum(), strengthManager);
+					heroCard2, situationHandler.getSpectrum());
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
 			saveSpectrum();
             advice = adviceCreator.create(map);

@@ -15,15 +15,17 @@ import mallorcatour.util.Log;
 
 public class NLProfitCalculator implements IProfitCalculator {
 
-	public NLProfitCalculator(IAdvisor villainModeller) {
+	public NLProfitCalculator(IAdvisor villainModeller, StrengthManager strengthManager) {
 		gameSolver = new NLGameSolver(villainModeller);
+		this.strengthManager  = strengthManager;;
 	}
 
 	private final NLGameSolver gameSolver;
+	private final StrengthManager strengthManager;
 
 	@Override
 	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, IAggressionInfo situation,
-			Card holeCard1, Card holeCard2, Spectrum villainSpectrum, StrengthManager strengthManager) {
+			Card holeCard1, Card holeCard2, Spectrum villainSpectrum) {
 		int heroActionCount = situation.getHeroActionCount();
 		int countOfHeroAggressive = situation.getHeroAggresionActionCount();
 		int villainActionCount = situation.getVillainActionCount();

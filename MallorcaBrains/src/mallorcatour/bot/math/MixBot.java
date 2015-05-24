@@ -43,7 +43,7 @@ public class MixBot implements IPlayer {
         this.postflopNN = postflopNN;
 		adviceCreator = new AdviceCreatorFromMap();
 		strengthManager = new StrengthManager(false);
-		profitCalculator = new NLProfitCalculator(villainModeller);
+		profitCalculator = new NLProfitCalculator(villainModeller, strengthManager);
 		situationHandler = new SpectrumSituationHandler(villainModeller, LimitType.NO_LIMIT, true, false, listener,
 				decisionListener, strengthManager, true, debug);
         actionPreprocessor = new NLActionPreprocessor();
@@ -86,7 +86,7 @@ public class MixBot implements IPlayer {
         } else {
 			// preflop
 			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1,
-					heroCard2, situationHandler.getSpectrum(), strengthManager);
+					heroCard2, situationHandler.getSpectrum());
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
             advice = adviceCreator.create(map);
             action = advice.getAction();

@@ -14,14 +14,19 @@ import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.LimitType;
 
+/**
+ * Creates neural bot with river's action profit check by decision-tree.
+ * @author andriipanasiuk
+ *
+ */
 public class NeuralMathBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
 			IDecisionListener decisionListener, String debug) {
 		StrengthManager manager = new StrengthManager(false);
-		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel);
-		IActionChecker actionChecker = new NLRiverActionChecker(profitCalculator, manager);
+		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel, manager);
+		IActionChecker actionChecker = new NLRiverActionChecker(profitCalculator);
 		GusXensen player = new GusXensen();
 		LimitType limitType = LimitType.NO_LIMIT;
 		SpectrumSituationHandler handler = new SpectrumSituationHandler(villainModel, limitType, true, true,

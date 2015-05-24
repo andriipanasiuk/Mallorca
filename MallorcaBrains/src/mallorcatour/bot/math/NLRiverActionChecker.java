@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import mallorcatour.brains.IActionChecker;
-import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
@@ -15,14 +14,12 @@ import mallorcatour.core.spectrum.Spectrum;
 public class NLRiverActionChecker implements IActionChecker {
 
 	private final IProfitCalculator profitCalculator;
-	private final StrengthManager strengthManager;
 
 	private final static double MIN_VALUE_FOR_CALL_DECISION = 10;
     private final static double MIN_VALUE_FOR_BET_DECISION = 10;
 
-	public NLRiverActionChecker(IProfitCalculator profitCalculator, StrengthManager strengthManager) {
+	public NLRiverActionChecker(IProfitCalculator profitCalculator) {
 		this.profitCalculator = profitCalculator;
-		this.strengthManager = strengthManager;
 	}
 
 	@Override
@@ -32,7 +29,7 @@ public class NLRiverActionChecker implements IActionChecker {
 			return action;
 		}
 		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, cards.first,
-				cards.second, villainSpectrum, strengthManager);
+				cards.second, villainSpectrum);
 		if (gameInfo.getHeroAmountToCall() > 0) {
 			if (action.isFold()) {
 				for (Entry<Action, Double> entry : map.entrySet()) {

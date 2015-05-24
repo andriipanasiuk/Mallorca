@@ -13,9 +13,16 @@ import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.CollectionUtils;
 import mallorcatour.util.Log;
 
+/**
+ * @deprecated remove fl from bot project.
+ * @author andriipanasiuk
+ *
+ */
+@Deprecated
 public class FLProfitCalculator implements IProfitCalculator {
 
 	private final FLGameSolver gameSolver;
+	private StrengthManager strengthManager;
 
 	public FLProfitCalculator(IAdvisor villainModeller) {
 		gameSolver = new FLGameSolver(villainModeller);
@@ -23,7 +30,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 
 	@Override
 	public Map<Action, Double> getProfitMap(IGameInfo gameInfo, IAggressionInfo situation,
-			Card holeCard1, Card holeCard2, Spectrum villainSpectrum, StrengthManager strengthManager) {
+			Card holeCard1, Card holeCard2, Spectrum villainSpectrum) {
 		Log.d("getFLProfitMap. Pot: " + gameInfo.getPotSize());
 		int heroActionCount  =situation.getHeroActionCount();
 		int heroAggressionCount = situation.getHeroAggresionActionCount();
