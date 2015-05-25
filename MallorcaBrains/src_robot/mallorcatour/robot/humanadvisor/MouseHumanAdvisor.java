@@ -6,10 +6,11 @@ package mallorcatour.robot.humanadvisor;
 
 import java.awt.MouseInfo;
 import java.awt.Point;
+
 import javax.swing.JFrame;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.frames.HumanActionFrame;
 import mallorcatour.util.robot.RobotUtils;
 import mallorcatour.util.spline.SplineMouseMover;
@@ -50,7 +51,8 @@ public class MouseHumanAdvisor extends AbstractHumanAdvisor {
         }
     }
 
-    protected void getPreflopAction(IGameInfo gameInfo, final IActionHolder actionHolder) {
+    @Override
+    protected void getPreflopAction(IPlayerGameInfo gameInfo, final IActionHolder actionHolder) {
         pointerPosition = MouseInfo.getPointerInfo().getLocation();
         holder.setHolder(actionHolder);
         frame.setGameInfo(gameInfo);

@@ -16,7 +16,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
 
@@ -28,7 +28,7 @@ import mallorcatour.util.Log;
 public class FLMathBot implements IPlayer {
 
     private BaseAdviceCreatorFromMap adviceCreator;
-    private IGameInfo gameInfo;
+    private IPlayerGameInfo gameInfo;
     private final SpectrumSituationHandler situationHandler;
     private final IProfitCalculator profitCalculator;
     private Card heroCard1, heroCard2;
@@ -132,7 +132,7 @@ public class FLMathBot implements IPlayer {
      * @param gi the game stat information
      */
     @Override
-    public void onHandStarted(IGameInfo gameInfo) {
+    public void onHandStarted(IPlayerGameInfo gameInfo) {
         this.gameInfo = gameInfo;
         strengthManager.onHandStarted(gameInfo);
         situationHandler.onHandStarted(gameInfo);

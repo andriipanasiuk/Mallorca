@@ -6,13 +6,13 @@ package mallorcatour.core.game;
 
 import java.util.List;
 
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
 /**
  *
  * @author Andrew
  */
-public class BaseGameInfo implements IGameInfo {
+public class BaseGameInfo implements IPlayerGameInfo {
 
 	public LimitType limitType;
 	public int[] raisesOnStreet = new int[4];

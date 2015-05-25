@@ -11,7 +11,8 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.Log;
 
@@ -19,7 +20,7 @@ import mallorcatour.util.Log;
  * @author andriipanasiuk
  *
  */
-public class StrengthManager implements IGameObserver {
+public class StrengthManager implements IPlayerGameObserver {
 
 	public Map<HoleCards, StreetEquity> preflop = new HashMap<>();
 	public Map<HoleCards, StreetEquity> flop = new HashMap<>();
@@ -117,7 +118,7 @@ public class StrengthManager implements IGameObserver {
 	}
 
 	@Override
-	public void onHandStarted(IGameInfo gameInfo) {
+	public void onHandStarted(IPlayerGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		randomSpectrum = Spectrum.random();
 	}

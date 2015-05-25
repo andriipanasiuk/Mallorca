@@ -2,7 +2,7 @@ package mallorcatour.bot.actionpreprocessor;
 
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
 /**
  * This bot currently does not use global parameters.
@@ -12,7 +12,7 @@ import mallorcatour.core.game.interfaces.IGameInfo;
 public class NLActionPreprocessor implements IActionPreprocessor {
 
 	@Override
-	public Action preprocessAction(Action action, IGameInfo gameInfo) {
+	public Action preprocessAction(Action action, IPlayerGameInfo gameInfo) {
 		double toCall = gameInfo.getHeroAmountToCall();
 		double pot = gameInfo.getPotSize();
 		double effectiveStack = gameInfo.getBankRollAtRisk();

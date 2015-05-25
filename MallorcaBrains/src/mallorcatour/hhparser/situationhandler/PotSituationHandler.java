@@ -6,11 +6,13 @@ package mallorcatour.hhparser.situationhandler;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Pair;
@@ -21,7 +23,7 @@ import mallorcatour.util.Pair;
  */
 public class PotSituationHandler implements ISituationHandler {
 
-    protected IGameInfo gameInfo;  // general game information
+    protected IGameInfo gameInfo;
     protected String heroName, villainName;
     protected LimitType limitType;
     double pot;
@@ -70,7 +72,7 @@ public class PotSituationHandler implements ISituationHandler {
      * A new game has been started.
      * @param gi the game stat information
      */
-    public void onHandStarted(IGameInfo gameInfo) {
+    public void onHandStarted(IPlayerGameInfo gameInfo) {
         this.gameInfo = gameInfo;
         pot = -1;
     }

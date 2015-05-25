@@ -13,24 +13,24 @@ import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 
 /**
- *
+ * 
  * @author Andrew
  */
 public interface IGameInfo {
 
-    public double getBigBlindSize();
+	public double getBigBlindSize();
 
-    public PokerStreet getStage();
+	public PokerStreet getStage();
 
-    public boolean isPreFlop();
+	public boolean isPreFlop();
 
-    public boolean isPostFlop();
+	public boolean isPostFlop();
 
-    public boolean isFlop();
+	public boolean isFlop();
 
-    public boolean isTurn();
+	public boolean isTurn();
 
-    public boolean isRiver();
+	public boolean isRiver();
 
 	public List<Card> getBoard();
 
@@ -40,21 +40,14 @@ public interface IGameInfo {
 
 	public Card getRiver();
 
-    public double getPotSize();
+	public double getPotSize();
 
-    public boolean onButton();
+	public double getBankRollAtRisk();
 
-    public double getHeroAmountToCall();
+	public int getNumRaises();
 
-    public double getBankRollAtRisk();
+	public LimitType getLimitType();
 
-    public boolean canHeroRaise();
+	PlayerInfo getPlayer(String name);
 
-    public int getNumRaises();
-
-    public LimitType getLimitType();
-
-    PlayerInfo getPlayer(String name);
-
-	boolean isVillainSitOut();
 }

@@ -29,7 +29,7 @@ import mallorcatour.core.game.advice.SmartAdviceCreator;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.util.Log;
 
 //import com.ibot.HandPotential;
@@ -43,8 +43,7 @@ import mallorcatour.util.Log;
 public class FellOmen2 implements IPlayer {
     // constants used:
 
-    private String heroName;
-    private IGameInfo gameInfo;
+    private IPlayerGameInfo gameInfo;
     private Card holeCard1, holeCard2;
     private Card flop1, flop2, flop3, turn, river;
     private StreetEquity flopEquity, turnEquity;
@@ -257,7 +256,7 @@ public class FellOmen2 implements IPlayer {
     }
 
     @Override
-    public void onHandStarted(IGameInfo gameInfo) {
+    public void onHandStarted(IPlayerGameInfo gameInfo) {
         this.gameInfo = gameInfo;
     }
 

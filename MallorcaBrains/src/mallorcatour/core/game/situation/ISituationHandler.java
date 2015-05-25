@@ -4,14 +4,14 @@
  */
 package mallorcatour.core.game.situation;
 
-import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 import mallorcatour.core.game.interfaces.IHeroObserver;
 
 /**
  *
  * @author Andrew
  */
-public interface ISituationHandler extends IHeroObserver, IGameObserver {
+public interface ISituationHandler extends IHeroObserver, IPlayerGameObserver {
 
     LocalSituation onHeroSituation();
 }

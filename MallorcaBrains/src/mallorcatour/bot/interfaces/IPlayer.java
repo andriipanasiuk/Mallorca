@@ -5,13 +5,13 @@
 package mallorcatour.bot.interfaces;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 
 /**
  *
  * @author Andrew
  */
-public interface IPlayer extends IGameObserver {
+public interface IPlayer extends IPlayerGameObserver {
 
     Action getAction();
 

@@ -14,7 +14,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorUtils;
@@ -29,7 +29,7 @@ public class GrandtorinoBot implements IPlayer {
 
 	private Card heroCard1, heroCard2;
 	private boolean isExternalAdvisor;
-	private IGameInfo gameInfo;;
+	private IPlayerGameInfo gameInfo;;
 	private final ISituationHandler situationHandler;
 	private final ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor advisor;
@@ -139,7 +139,7 @@ public class GrandtorinoBot implements IPlayer {
 	 *            the game start information
 	 */
 	@Override
-	public void onHandStarted(IGameInfo gameInfo) {
+	public void onHandStarted(IPlayerGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		situationHandler.onHandStarted(gameInfo);
 	}

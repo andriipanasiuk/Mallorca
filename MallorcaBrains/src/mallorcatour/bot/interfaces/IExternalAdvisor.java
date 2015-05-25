@@ -5,7 +5,7 @@
 package mallorcatour.bot.interfaces;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
 /**
  *
@@ -15,10 +15,10 @@ public interface IExternalAdvisor {
 
     public final static IExternalAdvisor EMPTY = new IExternalAdvisor() {
 
-        public Action getAction(IGameInfo gameInfo) {
+        public Action getAction(IPlayerGameInfo gameInfo) {
             return Action.foldAction();
         }
     };
 
-    public Action getAction(IGameInfo gameInfo);
+    public Action getAction(IPlayerGameInfo gameInfo);
 }

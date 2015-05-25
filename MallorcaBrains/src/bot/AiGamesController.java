@@ -20,7 +20,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.BaseGameInfo;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 import mallorcatour.util.Log;
 
 /**
@@ -40,9 +40,9 @@ public class AiGamesController {
 	private int timeBank, timePerMove;
 
 	private BaseGameInfo gameInfo;
-	private IGameObserver observer;
+	private IPlayerGameObserver observer;
 
-	public AiGamesController(BaseGameInfo gameInfo, IGameObserver observer) {
+	public AiGamesController(BaseGameInfo gameInfo, IPlayerGameObserver observer) {
 		this.gameInfo = gameInfo;
 		this.observer = observer;
 	}

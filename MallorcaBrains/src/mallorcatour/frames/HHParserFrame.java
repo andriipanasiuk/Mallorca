@@ -333,7 +333,8 @@ public class HHParserFrame extends javax.swing.JFrame {
         for (Hand hand : handHandler.buildHands()) {
             Log.d(i++ + "");
             ProfitSituationHandler handler = new ProfitSituationHandler();
-            new HandParser().parse(hand, heroName, handler);
+            //TODO correct calculating profit of the hand
+//            new HandParser().parse(hand, heroName, handler);
             if (handler.hasFlop()) {
                 if (hand.getButtonPlayer().equals(heroName)) {
                     IPProfit += handler.getProfit();

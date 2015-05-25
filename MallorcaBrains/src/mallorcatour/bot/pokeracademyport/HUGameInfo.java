@@ -4,7 +4,6 @@
  */
 package mallorcatour.bot.pokeracademyport;
 
-import com.biotools.meerkat.GameInfo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,14 +13,16 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.util.Log;
+
+import com.biotools.meerkat.GameInfo;
 
 /**
  *
  * @author Andrew
  */
-public class HUGameInfo implements IGameInfo {
+public class HUGameInfo implements IPlayerGameInfo {
 
     private final GameInfo gameInfo;
     private final LimitType limitType;

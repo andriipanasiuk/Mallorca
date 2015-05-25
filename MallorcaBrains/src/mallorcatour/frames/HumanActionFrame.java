@@ -11,7 +11,7 @@
 package mallorcatour.frames;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.robot.humanadvisor.AbstractHumanAdvisor;
 import mallorcatour.robot.humanadvisor.IActionHolder;
 
@@ -21,7 +21,7 @@ import mallorcatour.robot.humanadvisor.IActionHolder;
  */
 public class HumanActionFrame extends javax.swing.JFrame {
 
-    private IGameInfo gameInfo;
+    private IPlayerGameInfo gameInfo;
     private IActionHolder actionHolder;
 
     /** Creates new form HumanActionFrame */
@@ -34,7 +34,7 @@ public class HumanActionFrame extends javax.swing.JFrame {
         this.actionHolder = actionHolder;
     }
 
-    public void setGameInfo(IGameInfo gameInfo) {
+    public void setGameInfo(IPlayerGameInfo gameInfo) {
         this.gameInfo = gameInfo;
         if (gameInfo.getHeroAmountToCall() == 0) {
             passiveButton.setText("Check");

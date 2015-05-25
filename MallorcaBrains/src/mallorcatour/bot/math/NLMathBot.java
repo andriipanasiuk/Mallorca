@@ -15,7 +15,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
@@ -28,7 +28,7 @@ import mallorcatour.util.Log;
 public class NLMathBot implements IPlayer {
 
 	private BaseAdviceCreatorFromMap adviceCreator;
-	private IGameInfo gameInfo;;
+	private IPlayerGameInfo gameInfo;
 	private final ISituationHandler situationHandler;
 	private final ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor preflopAdvisor;
@@ -65,6 +65,7 @@ public class NLMathBot implements IPlayer {
 	public void onHoleCards(Card c1, Card c2, String villainName) {
 		this.heroCard1 = c1;
 		this.heroCard2 = c2;
+		situationHandler.onHoleCards(c1, c2, villainName);
 	}
 
 	/**
@@ -124,7 +125,7 @@ public class NLMathBot implements IPlayer {
 	 *            the game stat information
 	 */
 	@Override
-	public void onHandStarted(IGameInfo gameInfo) {
+	public void onHandStarted(IPlayerGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		situationHandler.onHandStarted(gameInfo);
 	}

@@ -12,15 +12,16 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.situation.ISituationHandler;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.interfaces.IHeroObserver;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 import mallorcatour.util.Log;
 
 /**
  *
  * @author Andrew
  */
-public class ProfitSituationHandler implements ISituationHandler {
+public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserver {
 
     protected IGameInfo gameInfo;;
     protected String heroName, villainName;
@@ -53,11 +54,6 @@ public class ProfitSituationHandler implements ISituationHandler {
         hasFlop = false;
     }
 
-    @Override
-    public LocalSituation onHeroSituation() {
-        return null;
-    }
-
     /**
      * A new betting round has started.
      */
@@ -82,7 +78,7 @@ public class ProfitSituationHandler implements ISituationHandler {
      * A new game has been started.
      * @param gi the game stat information
      */
-    public void onHandStarted(IGameInfo gameInfo) {
+    public void onHandStarted(IPlayerGameInfo gameInfo) {
         this.gameInfo = gameInfo;
     }
 

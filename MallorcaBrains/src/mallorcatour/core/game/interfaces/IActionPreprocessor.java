@@ -12,5 +12,5 @@ import mallorcatour.core.game.Action;
  */
 public interface IActionPreprocessor {
 
-    Action preprocessAction(Action action, IGameInfo gameInfo);
+    Action preprocessAction(Action action, IPlayerGameInfo gameInfo);
 }

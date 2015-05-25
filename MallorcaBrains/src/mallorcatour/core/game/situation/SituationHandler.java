@@ -11,7 +11,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
 /**
  *
@@ -19,7 +19,7 @@ import mallorcatour.core.game.interfaces.IGameInfo;
  */
 public class SituationHandler implements ISituationHandler {
 
-    protected IGameInfo gameInfo;;
+    protected IPlayerGameInfo gameInfo;;
     protected Card holeCard1, holeCard2, flop1, flop2, flop3, turn, river;
     protected int heroActionCount, countOfHeroAggressive, villainActionCount,
             countOfOppAggressive;
@@ -134,7 +134,7 @@ public class SituationHandler implements ISituationHandler {
     }
 
     @Override
-	public void onHandStarted(IGameInfo gameInfo) {
+	public void onHandStarted(IPlayerGameInfo gameInfo) {
         this.gameInfo = gameInfo;
         heroActionCount = 0;
         countOfHeroAggressive = 0;

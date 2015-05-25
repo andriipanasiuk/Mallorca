@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
-import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
+import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
@@ -21,7 +21,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.core.spectrum.Spectrum;
@@ -267,7 +267,7 @@ public class SpectrumSituationHandler extends SituationHandler implements ISpect
 	}
 
 	@Override
-	public void onHandStarted(IGameInfo gameInfo) {
+	public void onHandStarted(IPlayerGameInfo gameInfo) {
 		super.onHandStarted(gameInfo);
 		strengthManager.onHandStarted(gameInfo);
 	}

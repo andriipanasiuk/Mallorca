@@ -7,7 +7,7 @@ import mallorcatour.brains.IActionChecker;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.spectrum.Spectrum;
 
@@ -23,7 +23,7 @@ public class NLRiverActionChecker implements IActionChecker {
 	}
 
 	@Override
-	public Action checkAction(Action action, LocalSituation situation, IGameInfo gameInfo, HoleCards cards,
+	public Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards,
 			Spectrum villainSpectrum) {
 		if (!gameInfo.isRiver() || gameInfo.getLimitType() != LimitType.NO_LIMIT) {
 			return action;

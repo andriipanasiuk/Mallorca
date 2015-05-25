@@ -6,7 +6,7 @@ package mallorcatour.robot.humanadvisor;
 
 import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.util.ExecutorUtils;
 import mallorcatour.util.OnExceptionListener;
 
@@ -16,7 +16,8 @@ import mallorcatour.util.OnExceptionListener;
  */
 public abstract class AbstractHumanAdvisor implements IExternalAdvisor {
 
-    public Action getAction(final IGameInfo gameInfo) {
+	@Override
+    public Action getAction(final IPlayerGameInfo gameInfo) {
         final Action[] result = new Action[1];
         final Object lock = new Object();
         final IActionHolder holder = new IActionHolder() {
@@ -45,12 +46,12 @@ public abstract class AbstractHumanAdvisor implements IExternalAdvisor {
         return result[0];
     }
 
-    public static Action createHeroRaiseAction(IGameInfo gameInfo, double percent) {
+    public static Action createHeroRaiseAction(IPlayerGameInfo gameInfo, double percent) {
         double effectiveStack = gameInfo.getBankRollAtRisk();
         double toCall = gameInfo.getHeroAmountToCall();
         double pot = gameInfo.getPotSize();
         return Action.createRaiseAction(toCall, pot, effectiveStack, percent);
     }
 
-    protected abstract void getPreflopAction(IGameInfo gameInfo, final IActionHolder actionHolder);
+    protected abstract void getPreflopAction(IPlayerGameInfo gameInfo, final IActionHolder actionHolder);
 }
