@@ -7,6 +7,8 @@ public class PlayerInfo extends BasePlayerInfo implements Serializable {
 	private Card holeCard1;
 	private Card holeCard2;
 	private boolean isSittingOut;
+	public boolean isOnButton;
+	public double bet;
 
 	public PlayerInfo(String name, double stack, Card holeCard1, Card holeCard2) {
 		super(name, stack);
@@ -21,6 +23,10 @@ public class PlayerInfo extends BasePlayerInfo implements Serializable {
 
 	public PlayerInfo(String name, double stack) {
 		this(name, stack, false);
+	}
+
+	public PlayerInfo(String name) {
+		super(name);
 	}
 
 	public void setHoleCards(Card first, Card second) {
@@ -45,5 +51,9 @@ public class PlayerInfo extends BasePlayerInfo implements Serializable {
 			return new HoleCards(this.holeCard1, this.holeCard2);
 		}
 		return null;
+	}
+
+	public boolean isOnButton() {
+		return isOnButton;
 	}
 }

@@ -157,4 +157,9 @@ public class GrandtorinoBot implements IPlayer {
 	public void onHandEnded() {
 		// do nothing
 	}
+
+	@Override
+	public String getName() {
+		return "NeuralBot";
+	}
 }

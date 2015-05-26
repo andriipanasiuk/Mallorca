@@ -1,5 +1,7 @@
 package mallorcatour.core.game.interfaces;
 
+import mallorcatour.core.game.PlayerInfo;
+
 public interface IPlayerGameInfo extends IGameInfo {
 	public double getHeroAmountToCall();
 
@@ -8,5 +10,9 @@ public interface IPlayerGameInfo extends IGameInfo {
 	public boolean canHeroRaise();
 
 	public boolean onButton();
+
+	PlayerInfo getVillain();
+
+	PlayerInfo getHero();
 
 }

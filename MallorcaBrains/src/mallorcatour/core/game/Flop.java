@@ -14,4 +14,8 @@ public class Flop {
 	public Card[] toArray() {
 		return new Card[] { this.first, this.second, this.third };
 	}
+
+	public static Flop empty() {
+		return new Flop(null, null, null);
+	}
 }

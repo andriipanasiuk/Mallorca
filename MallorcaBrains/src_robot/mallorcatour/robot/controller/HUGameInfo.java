@@ -54,7 +54,7 @@ public class HUGameInfo extends BaseGameInfo {
     }
 
 	@Override
-	public mallorcatour.core.game.PlayerInfo getPlayer(String name) {
+	public mallorcatour.core.game.PlayerInfo getVillain() {
 		throw new UnsupportedOperationException();
 	}
 

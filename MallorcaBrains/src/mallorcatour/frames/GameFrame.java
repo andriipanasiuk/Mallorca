@@ -11,9 +11,6 @@
 package mallorcatour.frames;
 
 import java.awt.EventQueue;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
@@ -23,24 +20,20 @@ import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.brains.IAdvisor;
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
-import mallorcatour.core.game.Deck;
-import mallorcatour.core.game.Flop;
-import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.interfaces.IRandomizer;
-import mallorcatour.robot.ExtPlayerInfo;
-import mallorcatour.robot.controller.HUGameControllerExt;
+import mallorcatour.core.game.engine.GameEngine;
+import mallorcatour.core.game.engine.GameEngine.EngineListener;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.ExecutorUtils;
 import mallorcatour.util.Log;
 import mallorcatour.util.OnExceptionListener;
 import mallorcatour.util.SerializatorUtils;
-import mallorcatour.util.UniformRandomizer;
 import mallorcatour.util.frames.FrameUtils;
 
 /**
@@ -48,35 +41,21 @@ import mallorcatour.util.frames.FrameUtils;
  * 
  * @author Andrew
  */
-public class GameFrame extends javax.swing.JFrame {
+public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineListener {
 
-	private HUGameControllerExt controller;
-	private long currentHandNumber = -1;
-	private ExtPlayerInfo heroInfo, villainInfo;
-	// temporary. Robot must recognize limit type from table
-	private final LimitType limitType;
-	private List<Card> nonUsedCards;
-	private IRandomizer randomizer = new UniformRandomizer();
-	private double pot, myBet, botBet, botStack = 100, myStack = 100;
-	private PokerStreet currentStreet;
-	private final static double BIG_BLIND = 10;
-	private List<Card> boardCards;
-	private boolean tradeOpened;
-	private Card botCard1, botCard2, myCard1, myCard2;
-	private boolean endOfHand;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7429672585051881560L;
 	private final Object lock = new Object();
+	private final Object actionLock = new Object();
 	private final ExecutorService executor;
 	private final ShowingSpectrumListener spectrumListener;
 	private boolean useGoButton;
 	private VillainModel villainModeller;
-	// private Flop predefinedFlop = new Flop(Card.valueOf("Td"),
-	// Card.valueOf("2s"), Card.valueOf("3s"));
-	// private Card predefinedTurn = Card.valueOf("Qh");
-	// private Card predefinedRiver = Card.valueOf("5h");
-	private Flop predefinedFlop = null;
-	private Card predefinedTurn = null;
-	private Card predefinedRiver = null;
 	private final String DEBUG_PATH;
+	private GameEngine engine;
+	private Action lastMove;
 
 	/** Creates new form GrandtorinoGameFrame */
 	public GameFrame(LimitType limitType) {
@@ -88,123 +67,15 @@ public class GameFrame extends javax.swing.JFrame {
 		NeuralBotFactory factory = new NeuralBotFactory();
 		IPlayer player = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				"debug.txt");
-		controller = new HUGameControllerExt(player, PokerPreferences.DEFAULT_HERO_NAME, DEBUG_PATH);
 		executor = ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY);
-		this.limitType = limitType;
+		engine = new GameEngine(this, player, DEBUG_PATH);
+		engine.setListener(this);
 		enableActionButtons(false);
-		myDealerButton.setVisible(false);
+		humanDealerButton.setVisible(false);
 		botDealerButton.setVisible(false);
 
 		spectrumListener.setShow(showSpectrum);
 		botCardsVisibleToggleButton.getModel().setPressed(true);
-	}
-
-	GameEngine engine = new GameEngine();
-
-	public class GameEngine {
-		private ExtPlayerInfo player1, player2;
-
-		public void deal() {
-			endOfHand = false;
-			tradeOpened = false;
-			currentHandNumber++;
-			currentStreet = PokerStreet.PREFLOP;
-			nonUsedCards = new ArrayList<Card>(Deck.getCards());
-			boolean heroOnButton = currentHandNumber % 2 == 1;
-			heroInfo = new ExtPlayerInfo(PokerPreferences.DEFAULT_HERO_NAME, heroOnButton);
-			villainInfo = new ExtPlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME, !heroOnButton);
-			botStack -= BIG_BLIND / 2;
-			myStack -= BIG_BLIND / 2;
-
-			if (heroInfo.isOnButton()) {
-				botDealerButton.setVisible(true);
-				myStack -= BIG_BLIND / 2;
-			} else {
-				myDealerButton.setVisible(true);
-				botStack -= BIG_BLIND / 2;
-			}
-			//bets
-			botBet = BIG_BLIND / 2 * (heroInfo.isOnButton() ? 1 : 2);
-			myBet = BIG_BLIND / 2 * (villainInfo.isOnButton() ? 1 : 2);
-			pot = botBet + myBet;
-			heroInfo.bet = botBet;
-			villainInfo.bet = myBet;
-
-			//stacks
-			heroInfo.stack = botStack;
-			villainInfo.stack = myStack;
-
-			HoleCards player1Cards = dealBotCards();
-			HoleCards player2Cards = dealMyCards();
-		}
-	}
-
-	private void dealAction() {
-    	botActionLabel.setText("");
-
-    	//TODO
-//        botCardsField.setText(botCards.toString());
-//        myHoleCardsField.setText(.toString());
-
-        botDealerButton.setVisible(false);
-        myDealerButton.setVisible(false);
-
-        if (heroInfo.isOnButton()) {
-            botDealerButton.setVisible(true);
-        } else {
-            myDealerButton.setVisible(true);
-        }
-
-
-        boardCards = new ArrayList<Card>();
-        updateUI();
-        controller.onNewHand(currentHandNumber,
-                Arrays.asList(new ExtPlayerInfo[]{heroInfo, villainInfo}),
-                botCard1, botCard2, boardCards, pot, limitType);
-        dealButton.setVisible(false);
-        if (heroInfo.isOnButton()) {
-            botAction();
-        } else {
-            humanAction();
-        }
-    }
-
-	private HoleCards dealBotCards() {
-		botCard1 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		botCard2 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		return new HoleCards(botCard1, botCard2);
-	}
-
-	private HoleCards dealBotCards(String one, String two) {
-		if (one.equals(two)) {
-			throw new RuntimeException();
-		}
-		botCard1 = Card.valueOf(one);
-		botCard2 = Card.valueOf(two);
-		nonUsedCards.remove(botCard1);
-		nonUsedCards.remove(botCard2);
-		return new HoleCards(botCard1, botCard2);
-	}
-
-	private HoleCards dealMyCards() {
-		myCard1 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		myCard2 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		return new HoleCards(myCard1, myCard2);
-	}
-
-	private void botAction() {
-		if (useGoButton) {
-			lock();
-		}
-		// recognizing bets
-		heroInfo.bet = botBet;
-		villainInfo.bet = myBet;
-
-		Action action = controller.onMyAction(boardCards, pot);
-		botActed(action);
-		if (!endOfHand) {
-			humanAction();
-		}
 	}
 
 	private void lock() {
@@ -219,274 +90,19 @@ public class GameFrame extends javax.swing.JFrame {
 		goButton.setEnabled(false);
 	}
 
-	private void changeStreet() {
-		if (useGoButton) {
-			lock();
-		}
-		goButton.setEnabled(false);
-		tradeOpened = false;
-		if (currentStreet == PokerStreet.RIVER) {
-			List<Card> allBotCards = new ArrayList<Card>(boardCards);
-			List<Card> allMyCards = new ArrayList<Card>(boardCards);
-			allBotCards.add(botCard1);
-			allBotCards.add(botCard2);
-			allMyCards.add(myCard1);
-			allMyCards.add(myCard2);
-			long botCombination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(allBotCards));
-			long myCombination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(allMyCards));
-			String result = null;
-			if (botCombination > myCombination) {
-				result = "Hero";
-			} else if (botCombination < myCombination) {
-				result = "Villain";
-			}
-			endOfHand(result);
-		} else if (currentStreet == PokerStreet.PREFLOP) {
-			if (predefinedFlop != null) {
-				dealFlop(predefinedFlop);
-			} else {
-				dealFlop();
-			}
-			currentStreet = PokerStreet.FLOP;
-			myBet = 0;
-			botBet = 0;
-			updateUI();
-			if (heroInfo.isOnButton()) {
-				humanAction();
-			} else {
-				botAction();
-			}
-		} else {
-			if (currentStreet == PokerStreet.FLOP) {
-				if (predefinedTurn != null) {
-					dealOneCard(predefinedTurn);
-				} else {
-					dealOneCard();
-				}
-			} else {
-				if (predefinedRiver != null) {
-					dealOneCard(predefinedRiver);
-				} else {
-					dealOneCard();
-				}
-			}
-			myBet = 0;
-			botBet = 0;
-			updateUI();
-
-			if (currentStreet == PokerStreet.FLOP) {
-				currentStreet = PokerStreet.TURN;
-			} else if (currentStreet == PokerStreet.TURN) {
-				currentStreet = PokerStreet.RIVER;
-			}
-			if (heroInfo.isOnButton()) {
-				humanAction();
-			} else {
-				botAction();
-			}
-		}
-	}
-
-	private void dealFlop() {
-		Card flop1 = nonUsedCards.get(randomizer.getRandom(0, nonUsedCards.size()));
-		nonUsedCards.remove(flop1);
-		Card flop2 = nonUsedCards.get(randomizer.getRandom(0, nonUsedCards.size()));
-		nonUsedCards.remove(flop2);
-		Card flop3 = nonUsedCards.get(randomizer.getRandom(0, nonUsedCards.size()));
-		nonUsedCards.remove(flop3);
-		boardCards.add(flop1);
-		boardCards.add(flop2);
-		boardCards.add(flop3);
-	}
-
-	private void dealOneCard() {
-		Card card = nonUsedCards.get(randomizer.getRandom(0, nonUsedCards.size()));
-		nonUsedCards.remove(card);
-		boardCards.add(card);
-
-	}
-
-	private void dealOneCard(String card) {
-		Card c = Card.valueOf(card);
-		nonUsedCards.remove(c);
-		boardCards.add(c);
-	}
-
-	private void dealOneCard(Card c) {
-		nonUsedCards.remove(c);
-		boardCards.add(c);
-	}
-
-	private void dealFlop(String one, String two, String three) {
-		Card flop1 = Card.valueOf(one);
-		Card flop2 = Card.valueOf(two);
-		Card flop3 = Card.valueOf(three);
-		nonUsedCards.remove(flop1);
-		nonUsedCards.remove(flop2);
-		nonUsedCards.remove(flop3);
-		boardCards.add(flop1);
-		boardCards.add(flop2);
-		boardCards.add(flop3);
-
-	}
-
-	private void dealFlop(Flop flop) {
-		Card flop1 = flop.first;
-		Card flop2 = flop.second;
-		Card flop3 = flop.third;
-		nonUsedCards.remove(flop1);
-		nonUsedCards.remove(flop2);
-		nonUsedCards.remove(flop3);
-		boardCards.add(flop1);
-		boardCards.add(flop2);
-		boardCards.add(flop3);
-
-	}
-
-	private void humanAction() {
-		enableActionButtons(true);
-		if (botBet > myBet) {
-			passiveButton.setText("Call");
-			aggressiveButton.setText("Raise");
-		} else {
-			passiveButton.setText("Check");
-			aggressiveButton.setText("Bet");
-		}
-		double bet;
-		if (currentStreet == PokerStreet.PREFLOP || currentStreet == PokerStreet.FLOP) {
-			bet = BIG_BLIND;
-		} else {
-			bet = 2 * BIG_BLIND;
-		}
-		if (botBet == 4 * bet) {
-			aggressiveButton.setEnabled(false);
-		}
-	}
-
-	private void iActed(Action action) {
-		enableActionButtons(false);
-		if (action.isFold()) {
-			double toCall = botBet - myBet;
-			controller.onVillainActed(action, toCall);
-			endOfHand("Hero");
-		} else {
-			double toCall = botBet - myBet;
-			pot += toCall;
-			myStack -= toCall;
-			myBet = botBet;
-			if (action.isAggressive()) {
-				myStack -= action.getAmount();
-				pot += action.getAmount();
-				myBet += action.getAmount();
-				tradeOpened = true;
-			}
-			updateUI();
-			if (action.isPassive()) {
-				if (tradeOpened) {
-					if (currentStreet == PokerStreet.RIVER) {
-						controller.onVillainActed(action, toCall);
-					}
-					changeStreet();
-				} else {
-					tradeOpened = true;
-					botAction();
-				}
-			} else {
-				botAction();
-			}
-		}
-	}
-
 	private void enableActionButtons(boolean enable) {
 		foldButton.setEnabled(enable);
 		passiveButton.setEnabled(enable);
 		aggressiveButton.setEnabled(enable);
 	}
 
-	private void endOfHand(String winner) {
-		dealButton.setVisible(true);
-		botCardsField.setVisible(true);
-		new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(1500);
-				} catch (InterruptedException ex) {
-					throw new RuntimeException(ex);
-				}
-				botCardsField.setVisible(botCardsVisibleToggleButton.getModel().isPressed());
-			}
-		}.start();
-		enableActionButtons(false);
-		Log.d("End of hand " + winner);
-		if (winner == null) {
-		} else if (winner.equals("Hero")) {
-			botStack += pot;
-		} else {
-			myStack += pot;
-		}
-		pot = 0;
-		myBet = 0;
-		botBet = 0;
-		updateUI();
-		endOfHand = true;
-	}
-
 	private void updateUI() {
-		botBetField.setText(botBet + "");
-		myBetField.setText(myBet + "");
-		potField.setText(pot + "");
-		boardField.setText(boardCards.toString());
-		myStackField.setText(myStack + "");
-		botStackField.setText(botStack + "");
-	}
-
-	private void botActed(Action action) {
-		botActionLabel.setText(action.toString());
-		if (action.isFold()) {
-			Log.f(DEBUG_PATH, PokerPreferences.DEFAULT_HERO_NAME + " folds");
-			endOfHand("Villain");
-		} else if (action.isCall()) {
-			Log.f(DEBUG_PATH, PokerPreferences.DEFAULT_HERO_NAME + " calls");
-			pot += action.getAmount();
-			if (action.getAmount() <= botStack) {
-				botBet += action.getAmount();
-				botStack -= action.getAmount();
-			} else {
-				botBet += botStack;
-				botStack = 0;
-			}
-			updateUI();
-			if (tradeOpened) {
-				changeStreet();
-			} else {
-				tradeOpened = true;
-			}
-		} else if (action.isCheck()) {
-			Log.f(DEBUG_PATH, PokerPreferences.DEFAULT_HERO_NAME + " checks");
-			if (tradeOpened) {
-				changeStreet();
-			} else {
-				tradeOpened = true;
-			}
-		} else if (action.isAggressive()) {
-			Log.f(DEBUG_PATH, PokerPreferences.DEFAULT_HERO_NAME + " raises " + action.getAmount());
-			double plusAmount = (myBet - botBet) + action.getAmount();
-			botBet += plusAmount;
-			pot += plusAmount;
-			botStack -= plusAmount;
-			if (!tradeOpened) {
-				tradeOpened = true;
-			}
-		} else {
-			Log.f(DEBUG_PATH, "<--------------------Somethind wrong in doAction(). "
-					+ PokerPreferences.DEFAULT_HERO_NAME + " folds.------------>");
-			throw new RuntimeException();
-		}
-		if (!action.isFold()) {
-			updateUI();
-		}
+		botBetField.setText(String.valueOf(gameInfo.getVillain().bet));
+		humanBetField.setText(String.valueOf(gameInfo.getHero().bet));
+		potField.setText(String.valueOf(gameInfo.getPotSize()));
+		boardField.setText(gameInfo.getBoard().toString());
+		humanStackField.setText(String.valueOf(gameInfo.getHero().stack));
+		botStackField.setText(String.valueOf(gameInfo.getVillain().stack));
 	}
 
 	/**
@@ -494,7 +110,6 @@ public class GameFrame extends javax.swing.JFrame {
 	 * WARNING: Do NOT modify this code. The content of this method is always
 	 * regenerated by the Form Editor.
 	 */
-	@SuppressWarnings("unchecked")
 	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
@@ -507,12 +122,12 @@ public class GameFrame extends javax.swing.JFrame {
 		botCardsField = new javax.swing.JTextField();
 		botBetField = new javax.swing.JTextField();
 		potField = new javax.swing.JTextField();
-		myBetField = new javax.swing.JTextField();
+		humanBetField = new javax.swing.JTextField();
 		boardField = new javax.swing.JTextField();
-		myDealerButton = new javax.swing.JButton();
+		humanDealerButton = new javax.swing.JButton();
 		botDealerButton = new javax.swing.JButton();
 		botStackField = new javax.swing.JTextField();
-		myStackField = new javax.swing.JTextField();
+		humanStackField = new javax.swing.JTextField();
 		botActionLabel = new javax.swing.JLabel();
 		goButton = new javax.swing.JButton();
 		botCardsVisibleToggleButton = new javax.swing.JToggleButton();
@@ -558,7 +173,7 @@ public class GameFrame extends javax.swing.JFrame {
 			}
 		});
 
-		myDealerButton.setText("D");
+		humanDealerButton.setText("D");
 
 		botDealerButton.setText("D");
 
@@ -631,7 +246,7 @@ public class GameFrame extends javax.swing.JFrame {
 																		javax.swing.LayoutStyle.ComponentPlacement.RELATED,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
 																		Short.MAX_VALUE)
-																.addComponent(myStackField,
+																.addComponent(humanStackField,
 																		javax.swing.GroupLayout.PREFERRED_SIZE, 63,
 																		javax.swing.GroupLayout.PREFERRED_SIZE))
 												.addGroup(
@@ -646,7 +261,7 @@ public class GameFrame extends javax.swing.JFrame {
 																										layout.createParallelGroup(
 																												javax.swing.GroupLayout.Alignment.TRAILING)
 																												.addComponent(
-																														myDealerButton,
+																														humanDealerButton,
 																														javax.swing.GroupLayout.PREFERRED_SIZE,
 																														47,
 																														javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -665,7 +280,7 @@ public class GameFrame extends javax.swing.JFrame {
 																														73,
 																														javax.swing.GroupLayout.PREFERRED_SIZE)
 																												.addComponent(
-																														myBetField,
+																														humanBetField,
 																														javax.swing.GroupLayout.PREFERRED_SIZE,
 																														56,
 																														javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -799,11 +414,11 @@ public class GameFrame extends javax.swing.JFrame {
 																		layout.createParallelGroup(
 																				javax.swing.GroupLayout.Alignment.BASELINE)
 																				.addComponent(
-																						myBetField,
+																						humanBetField,
 																						javax.swing.GroupLayout.PREFERRED_SIZE,
 																						javax.swing.GroupLayout.DEFAULT_SIZE,
 																						javax.swing.GroupLayout.PREFERRED_SIZE)
-																				.addComponent(myDealerButton)
+																				.addComponent(humanDealerButton)
 																				.addComponent(
 																						myHoleCardsField,
 																						javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -836,7 +451,7 @@ public class GameFrame extends javax.swing.JFrame {
 												.addGroup(
 														layout.createSequentialGroup()
 																.addGap(18, 18, 18)
-																.addComponent(myStackField,
+																.addComponent(humanStackField,
 																		javax.swing.GroupLayout.PREFERRED_SIZE,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
 																		javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -846,44 +461,45 @@ public class GameFrame extends javax.swing.JFrame {
 	}// </editor-fold>//GEN-END:initComponents
 
 	private void dealButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_dealButtonActionPerformed
+		dealButton.setVisible(false);
 		ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY).submit(new Runnable() {
 
 			public void run() {
-				dealAction();
+				engine.deal();
 			}
 		});
 
 	}// GEN-LAST:event_dealButtonActionPerformed
 
 	private void foldButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_foldButtonActionPerformed
-		iActed(Action.foldAction());
+		enableActionButtons(false);
+		botActionLabel.setText("");
+		lastMove = Action.foldAction();
+		synchronized (actionLock) {
+			actionLock.notifyAll();
+		}
 	}// GEN-LAST:event_foldButtonActionPerformed
 
 	private void passiveButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_passiveButtonActionPerformed
-		executor.submit(new Runnable() {
-
-			public void run() {
-				if (passiveButton.getText().equals("Check")) {
-					iActed(Action.checkAction());
-				} else {
-					iActed(Action.callAction(botBet - myBet));
-				}
-			}
-		});
+		botActionLabel.setText("");
+		enableActionButtons(false);
+		if (gameInfo.getHeroAmountToCall() > 0) {
+			lastMove = Action.callAction(gameInfo.getHeroAmountToCall());
+		} else {
+			lastMove = Action.checkAction();
+		}
+		synchronized (actionLock) {
+			actionLock.notifyAll();
+		}
 	}// GEN-LAST:event_passiveButtonActionPerformed
 
 	private void aggressiveButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_aggressiveButtonActionPerformed
-		executor.submit(new Runnable() {
-
-			public void run() {
-				if (currentStreet == PokerStreet.PREFLOP || currentStreet == PokerStreet.FLOP) {
-					iActed(Action.createRaiseAction(BIG_BLIND, -1));
-				} else {
-					iActed(Action.createRaiseAction(2 * BIG_BLIND, -1));
-				}
-			}
-		});
-
+		botActionLabel.setText("");
+		enableActionButtons(false);
+		lastMove = Action.aggressive();
+		synchronized (actionLock) {
+			actionLock.notifyAll();
+		}
 	}// GEN-LAST:event_aggressiveButtonActionPerformed
 
 	public static void main(String[] args) {
@@ -958,13 +574,103 @@ public class GameFrame extends javax.swing.JFrame {
 	private javax.swing.JMenu jMenu1;
 	private javax.swing.JMenuBar jMenuBar1;
 	private javax.swing.JMenuItem jMenuItem1;
-	private javax.swing.JTextField myBetField;
-	private javax.swing.JButton myDealerButton;
+	private javax.swing.JTextField humanBetField;
+	private javax.swing.JButton humanDealerButton;
 	private javax.swing.JTextField myHoleCardsField;
-	private javax.swing.JTextField myStackField;
+	private javax.swing.JTextField humanStackField;
 	private javax.swing.JButton passiveButton;
 	private javax.swing.JTextField potField;
 	private javax.swing.JToggleButton showSpectrumToggleButton;
 	private javax.swing.JCheckBox useGoButtonCheckBox;
+
 	// End of variables declaration//GEN-END:variables
+
+	@Override
+	public void onStageEvent(PokerStreet street) {
+		updateUI();
+	}
+
+	@Override
+	public void onHandStarted(IPlayerGameInfo gameInfo) {
+		this.gameInfo = gameInfo;
+		botDealerButton.setVisible(false);
+		humanDealerButton.setVisible(false);
+
+		if (gameInfo.onButton()) {
+			humanDealerButton.setVisible(true);
+		} else {
+			botDealerButton.setVisible(true);
+		}
+		updateUI();
+	}
+
+	@Override
+	public void onHandEnded() {
+		dealButton.setVisible(true);
+		botCardsField.setVisible(true);
+		new Thread() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(1500);
+				} catch (InterruptedException ex) {
+					throw new RuntimeException(ex);
+				}
+				botCardsField.setVisible(botCardsVisibleToggleButton.getModel().isPressed());
+			}
+		}.start();
+		enableActionButtons(false);
+
+		updateUI();
+
+	}
+
+	@Override
+	public void onHoleCards(Card c1, Card c2, String villainName) {
+		botActionLabel.setText("");
+
+		botCardsField.setText("");
+		myHoleCardsField.setText(c1 + " " + c2);
+	}
+
+	@Override
+	public void onVillainActed(Action action, double toCall) {
+		botActionLabel.setText(action.toString());
+	}
+
+	private IPlayerGameInfo gameInfo;
+
+	@Override
+	public Action getAction() {
+		enableActionButtons(true);
+		if (gameInfo.getHeroAmountToCall() > 0) {
+			passiveButton.setText("Call");
+			aggressiveButton.setText("Raise");
+		} else {
+			passiveButton.setText("Check");
+			aggressiveButton.setText("Bet");
+		}
+
+		synchronized (actionLock) {
+			try {
+				actionLock.wait();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return lastMove;
+	}
+
+	@Override
+	public String getName() {
+		return "Andrew";
+	}
+
+	@Override
+	public void onPlayerActed(Action action, PlayerInfo player) {
+		updateUI();
+		lock();
+	}
+
 }

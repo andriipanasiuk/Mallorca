@@ -11,7 +11,6 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IHeroObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameObserver;
@@ -23,7 +22,7 @@ import mallorcatour.util.Log;
  */
 public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserver {
 
-    protected IGameInfo gameInfo;;
+    private IPlayerGameInfo gameInfo;;
     protected String heroName, villainName;
     private Card heroCard1, heroCard2;
     protected LimitType limitType;
@@ -85,6 +84,7 @@ public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserve
     /**
      * An villain action has been observed.
      */
+    @Override
     public void onVillainActed(Action action, double toCall) {
         if (action.isFold()) {
             if (!gameInfo.isPreFlop()) {
@@ -118,7 +118,7 @@ public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserve
     }
 
     private PlayerInfo getVillainInfo() {
-        PlayerInfo villainInfo = gameInfo.getPlayer(villainName);
+        PlayerInfo villainInfo = gameInfo.getVillain();
         return villainInfo;
     }
 

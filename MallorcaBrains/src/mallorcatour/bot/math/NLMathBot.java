@@ -142,4 +142,9 @@ public class NLMathBot implements IPlayer {
 	public void onHandEnded() {
 		situationHandler.onHandEnded();
 	}
+
+	@Override
+	public String getName() {
+		return "FLMathBot";
+	}
 }

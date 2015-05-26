@@ -30,6 +30,20 @@ public class PokerStreet implements Serializable {
 		throw new IllegalArgumentException("Illegal int value of street; only 0, 1, 2, 3 are legal");
 	}
 
+	public PokerStreet next() {
+		if (intValue == 0) {
+			return PokerStreet.FLOP;
+		} else if (intValue == 1) {
+			return PokerStreet.TURN;
+		} else if (intValue == 2) {
+			return PokerStreet.RIVER;
+		} else if (intValue == 3) {
+			return null;
+		} else {
+			throw new IllegalStateException("Shouln't be");
+		}
+	}
+
 	public String toString() {
 		return this.name;
 	}

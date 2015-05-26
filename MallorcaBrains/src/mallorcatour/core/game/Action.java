@@ -123,6 +123,19 @@ public class Action implements Serializable {
 		return (this.type == Type.PASSIVE) && (this.amount == 0.0D);
 	}
 
+	public String getActString() {
+		if (isCall()) {
+			return "calls " + getAmount();
+		} else if (isCheck()) {
+			return "checks";
+		} else if (isAggressive()) {
+			return "raises " + getAmount();
+		} else if (isFold()) {
+			return "folds";
+		}
+		return null;
+	}
+
 	public String toString() {
 		if (this.type == Type.AGGRESSIVE) {
 			if (this != ALL_IN_ACTION) {

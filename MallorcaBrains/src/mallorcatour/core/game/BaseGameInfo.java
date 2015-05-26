@@ -16,7 +16,7 @@ public class BaseGameInfo implements IPlayerGameInfo {
 
 	public LimitType limitType;
 	public int[] raisesOnStreet = new int[4];
-    public List<PlayerInfo> players;
+    public PlayerInfo heroInfo, villainInfo;
     public PokerStreet street;
     public boolean canHeroRaise;
     public double pot;
@@ -99,18 +99,14 @@ public class BaseGameInfo implements IPlayerGameInfo {
         return limitType;
     }
 
-    public List<PlayerInfo> getPlayers() {
-        return players;
-    }
+	@Override
+	public PlayerInfo getVillain() {
+		return villainInfo;
+	}
 
 	@Override
-	public PlayerInfo getPlayer(String name) {
-		for (PlayerInfo info : players) {
-			if (info.getName().equals(name)) {
-				return info;
-			}
-		}
-		throw new IllegalArgumentException("There is no player with name: " + name);
+	public PlayerInfo getHero() {
+		return heroInfo;
 	}
 
 	@Override

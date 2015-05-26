@@ -405,4 +405,9 @@ public class FellOmen2 implements IPlayer {
 	public void onHandEnded() {
 		//do nothing
 	}
+
+	@Override
+	public String getName() {
+		return "FellOmen2";
+	}
 }

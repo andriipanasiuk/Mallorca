@@ -151,4 +151,9 @@ public class FLMathBot implements IPlayer {
 		strengthManager.onHandEnded();
 		situationHandler.onHandEnded();
 	}
+
+	@Override
+	public String getName() {
+		return "FLMathBot";
+	}
 }

@@ -135,7 +135,8 @@ public class HandParser {
 
     private void newHand(Hand hand) {
         gameInfo = new BaseGameInfo();
-        gameInfo.players = hand.getPlayers();
+        gameInfo.heroInfo = hand.getPlayerInfo(heroName);
+        gameInfo.villainInfo = hand.getPlayerInfo(villainName);
         initPot(hand);
 		if (heroName.equals(hand.getButtonPlayer())) {
 			gameInfo.onButton = true;

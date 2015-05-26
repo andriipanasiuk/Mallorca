@@ -15,4 +15,6 @@ public interface IPlayer extends IPlayerGameObserver {
 
     Action getAction();
 
+    String getName();
+
 }

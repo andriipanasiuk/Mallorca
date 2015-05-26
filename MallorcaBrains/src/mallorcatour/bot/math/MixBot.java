@@ -134,4 +134,8 @@ public class MixBot implements IPlayer {
 		situationHandler.onHandEnded();
 	}
 
+	@Override
+	public String getName() {
+		return "FLMathBot";
+	}
 }

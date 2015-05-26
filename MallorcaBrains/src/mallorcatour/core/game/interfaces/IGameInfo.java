@@ -9,7 +9,6 @@ import java.util.List;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 
 /**
@@ -47,7 +46,5 @@ public interface IGameInfo {
 	public int getNumRaises();
 
 	public LimitType getLimitType();
-
-	PlayerInfo getPlayer(String name);
 
 }

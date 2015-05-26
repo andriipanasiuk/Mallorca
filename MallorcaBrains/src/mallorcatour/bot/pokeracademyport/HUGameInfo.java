@@ -124,7 +124,7 @@ public class HUGameInfo implements IPlayerGameInfo {
     }
 
     @Override
-	public PlayerInfo getPlayer(String name) {
+	public PlayerInfo getVillain() {
     	throw new UnsupportedOperationException();
 	}
 
@@ -158,6 +158,11 @@ public class HUGameInfo implements IPlayerGameInfo {
 	@Override
 	public boolean isVillainSitOut() {
 		return false;
+	}
+
+	@Override
+	public PlayerInfo getHero() {
+		throw new UnsupportedOperationException();
 	}
 
 }
