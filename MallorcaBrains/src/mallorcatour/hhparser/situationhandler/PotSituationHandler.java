@@ -87,7 +87,7 @@ public class PotSituationHandler implements ISituationHandler {
         //do nothing
     }
 
-    public void onHeroActed(Action action) {
+    public void onHeroActed(LocalSituation situation, Action action) {
     }
 
     public void onHandEnded() {

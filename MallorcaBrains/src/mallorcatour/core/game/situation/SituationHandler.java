@@ -96,7 +96,7 @@ public class SituationHandler implements ISituationHandler {
     }
 
     @Override
-	public void onHeroActed(Action action) {
+	public void onHeroActed(LocalSituation situation, Action action) {
         if (action.isAggressive()) {
             wasHeroPreviousAggressive = true;
             countOfHeroAggressive++;

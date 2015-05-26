@@ -182,7 +182,7 @@ public class HandParser {
         learningExamples.add(new PokerLearningExample(situation, createFromAction(action)));
         processPot(action);
         heroPreviousAction = action;
-        handler.onHeroActed(action);
+        handler.onHeroActed(situation, action);
     }
 
     private void processPot(Action action) {

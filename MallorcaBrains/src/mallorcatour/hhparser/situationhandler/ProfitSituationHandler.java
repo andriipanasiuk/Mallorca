@@ -15,6 +15,7 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IHeroObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameObserver;
+import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
 
 /**
@@ -100,7 +101,7 @@ public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserve
     }
 
     @Override
-    public void onHeroActed(Action action) {
+    public void onHeroActed(LocalSituation situation, Action action) {
         if (action.isFold()) {
             if (!gameInfo.isPreFlop()) {
                 profit = -(gameInfo.getPotSize() - heroToCall) / 2;

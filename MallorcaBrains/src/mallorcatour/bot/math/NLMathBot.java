@@ -106,7 +106,7 @@ public class NLMathBot implements IPlayer {
 			action = actionPreprocessor.preprocessAction(action, gameInfo);
 		}
 		Log.f(DEBUG_PATH, "=========  End  =========");
-		situationHandler.onHeroActed(action);
+		situationHandler.onHeroActed(situation, action);
 		return action;
 	}
 

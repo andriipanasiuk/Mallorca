@@ -6,33 +6,24 @@ package mallorcatour.bot.pokeracademyport;
 
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.math.FLMathBot;
-import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.Log;
+import mallorcatour.bot.neural.NeuralBotFactory;
 
 /**
- *
+ * 
  * @author Andrew
  */
 public class GrandtorinoMathPlayer extends AbstractPABot {
 
-    IPlayer myBot;
+	IPlayer myBot;
 
-    public GrandtorinoMathPlayer() {
-        super("MathBot");
-        myBot = new FLMathBot(getVillainModeller(), new ISpectrumListener() {
+	public GrandtorinoMathPlayer() {
+		super("MathBot");
+		myBot = new NeuralBotFactory().createBot(getVillainModeller(), ISpectrumListener.EMPTY, getDecisionListener(),
+				getDebugPath());
+	}
 
-            public void onSpectrumChanged(Spectrum spectrum, String log) {
-                String str = spectrum.toString();
-                if (!str.isEmpty()) {
-                    Log.f(getDebugPath(), "Villain spectrum: " + str.substring(0, str.indexOf("\n")));
-                }
-            }
-        }, getDecisionListener(), getDebugPath());
-    }
-
-    @Override
-    protected IPlayer getRealBot() {
-        return myBot;
-    }
+	@Override
+	protected IPlayer getRealBot() {
+		return myBot;
+	}
 }

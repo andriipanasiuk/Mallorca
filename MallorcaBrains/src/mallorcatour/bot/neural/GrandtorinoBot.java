@@ -30,7 +30,7 @@ import mallorcatour.util.Log;
  */
 public class GrandtorinoBot implements IPlayer {
 
-	protected IPlayerGameInfo gameInfo;;
+	protected IPlayerGameInfo gameInfo;
 	private Card heroCard1, heroCard2;
 	private final ISituationHandler situationHandler;
 	private final ISpectrumHolder villainSpectrumHolder;
@@ -42,20 +42,14 @@ public class GrandtorinoBot implements IPlayer {
 	private final List<IExternalAdvisor> externalHelpers = new ArrayList<>();
 
 	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
-			ISpectrumHolder villainSpectrumHandler, IActionChecker actionChecker, LimitType limitType,
-			String debug) {
+			ISpectrumHolder villainSpectrumHolder, IActionChecker actionChecker, LimitType limitType, String debug) {
 		this.advisor = neuralNetwork;
 		this.DEBUG_PATH = debug;
 		this.actionChecker = actionChecker;
-		this.villainSpectrumHolder = villainSpectrumHandler;
+		this.villainSpectrumHolder = villainSpectrumHolder;
 		this.situationHandler = situationHandler;
-		if (limitType == LimitType.NO_LIMIT) {
-			actionPreprocessor = new NLActionPreprocessor();
-			preflopBot = new NLPreflopChart();
-		} else {
-			throw new UnsupportedOperationException();
-			// TODO remove fl
-		}
+		actionPreprocessor = new NLActionPreprocessor();
+		preflopBot = new NLPreflopChart();
 	}
 
 	public void addExternalHelper(IExternalAdvisor advisor) {
@@ -80,18 +74,16 @@ public class GrandtorinoBot implements IPlayer {
 	}
 
 	private Action getActionInternal(LocalSituation situation, HoleCards holeCards) {
-		
+
 		Action action = null;
-		
+
 		IAdvice advice = null;
-		// for preflop. Bot will make decision by preflop chart.
 		if (gameInfo.isPreFlop()) {
 			advice = preflopBot.getAdvice(situation, holeCards, null);
 			if (advice != null) {
 				Log.f(DEBUG_PATH, "Advice from preflop bot: " + advice);
 			}
 		}
-		// if there is no preflop OR action is no in chart
 		if (advice == null) {
 			advice = advisor.getAdvice(situation, holeCards, null);
 			Log.f(DEBUG_PATH, "Advice: " + advice);
@@ -99,21 +91,20 @@ public class GrandtorinoBot implements IPlayer {
 		action = advice.getAction();
 		action = actionPreprocessor.preprocessAction(action, gameInfo);
 		Log.f(DEBUG_PATH, "Action: " + action);
-		action = actionChecker.checkAction(action, situation, gameInfo, holeCards,
-				villainSpectrumHolder.getSpectrum());
+		action = actionChecker.checkAction(action, situation, gameInfo, holeCards, villainSpectrumHolder.getSpectrum());
 		return action;
 	}
 
 	/**
-	 * Requests an Action from the player Called when it is the hero's turn to
+	 * Requests an Action from the player. Called when it is the hero's turn to
 	 * act.
 	 */
 	@Override
 	public Action getAction() {
 		Action action = null;
-		for(IExternalAdvisor advisor : externalHelpers){
+		for (IExternalAdvisor advisor : externalHelpers) {
 			action = advisor.getAction(gameInfo);
-			if(action != null) {
+			if (action != null) {
 				return action;
 			}
 		}
@@ -123,7 +114,7 @@ public class GrandtorinoBot implements IPlayer {
 		Log.f(DEBUG_PATH, "Situation: " + VectorUtils.toString(situation));
 		action = getActionInternal(situation, new HoleCards(heroCard1, heroCard2));
 		Log.f(DEBUG_PATH, "===============  End  ==============");
-		situationHandler.onHeroActed(action);
+		situationHandler.onHeroActed(situation, action);
 		return action;
 	}
 
