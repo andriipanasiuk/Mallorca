@@ -1,5 +1,8 @@
 package mallorcatour.bot.neural;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.bot.interfaces.IPlayer;
@@ -27,21 +30,20 @@ import mallorcatour.util.Log;
  */
 public class GrandtorinoBot implements IPlayer {
 
+	protected IPlayerGameInfo gameInfo;;
 	private Card heroCard1, heroCard2;
-	private boolean isExternalAdvisor;
-	private IPlayerGameInfo gameInfo;;
 	private final ISituationHandler situationHandler;
 	private final ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor advisor;
 	private final IActionChecker actionChecker;
 	private final IAdvisor preflopBot;
-	private final IExternalAdvisor humanAdvisor;
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
+	private final List<IExternalAdvisor> externalHelpers = new ArrayList<>();
 
 	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
 			ISpectrumHolder villainSpectrumHandler, IActionChecker actionChecker, LimitType limitType,
-			IExternalAdvisor externalAdvisor, boolean isHumanAdvisor, String debug) {
+			String debug) {
 		this.advisor = neuralNetwork;
 		this.DEBUG_PATH = debug;
 		this.actionChecker = actionChecker;
@@ -54,8 +56,10 @@ public class GrandtorinoBot implements IPlayer {
 			throw new UnsupportedOperationException();
 			// TODO remove fl
 		}
-		this.isExternalAdvisor = isHumanAdvisor;
-		this.humanAdvisor = externalAdvisor;
+	}
+
+	public void addExternalHelper(IExternalAdvisor advisor) {
+		externalHelpers.add(advisor);
 	}
 
 	/**
@@ -76,29 +80,20 @@ public class GrandtorinoBot implements IPlayer {
 	}
 
 	private Action getActionInternal(LocalSituation situation, HoleCards holeCards) {
-		if (gameInfo.isVillainSitOut()) {
-			Log.f(DEBUG_PATH, "Villain is sitting out");
-			double percent = 0.5;
-			return Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()),
-					percent);
-		}
+		
 		Action action = null;
-		if (isExternalAdvisor && gameInfo.isPreFlop()) {
-			action = humanAdvisor.getAction(gameInfo);
-			Log.f(DEBUG_PATH, "Human action: " + action.toString());
-			return action;
-		}
+		
 		IAdvice advice = null;
 		// for preflop. Bot will make decision by preflop chart.
 		if (gameInfo.isPreFlop()) {
-			advice = preflopBot.getAdvice(situation, holeCards);
+			advice = preflopBot.getAdvice(situation, holeCards, null);
 			if (advice != null) {
 				Log.f(DEBUG_PATH, "Advice from preflop bot: " + advice);
 			}
 		}
 		// if there is no preflop OR action is no in chart
 		if (advice == null) {
-			advice = advisor.getAdvice(situation, holeCards);
+			advice = advisor.getAdvice(situation, holeCards, null);
 			Log.f(DEBUG_PATH, "Advice: " + advice);
 		}
 		action = advice.getAction();
@@ -115,11 +110,18 @@ public class GrandtorinoBot implements IPlayer {
 	 */
 	@Override
 	public Action getAction() {
+		Action action = null;
+		for(IExternalAdvisor advisor : externalHelpers){
+			action = advisor.getAction(gameInfo);
+			if(action != null) {
+				return action;
+			}
+		}
 		LocalSituation situation = situationHandler.onHeroSituation();
 
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
 		Log.f(DEBUG_PATH, "Situation: " + VectorUtils.toString(situation));
-		Action action = getActionInternal(situation, new HoleCards(heroCard1, heroCard2));
+		action = getActionInternal(situation, new HoleCards(heroCard1, heroCard2));
 		Log.f(DEBUG_PATH, "===============  End  ==============");
 		situationHandler.onHeroActed(action);
 		return action;

@@ -2,7 +2,6 @@ package mallorcatour.bot.modeller;
 
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
-import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.neural.GrandtorinoBot;
@@ -30,7 +29,7 @@ public class NeuralModelVillainBotFactory implements IBotFactory {
 				spectrumListener, decisionListener, strengthManager, true, debug);
 		GusXensen player = new GusXensen();
 		return new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), handler, handler,
-				IActionChecker.EMPTY, LimitType.NO_LIMIT, IExternalAdvisor.EMPTY, false, debug);
+				IActionChecker.EMPTY, LimitType.NO_LIMIT, debug);
 	}
 
 }

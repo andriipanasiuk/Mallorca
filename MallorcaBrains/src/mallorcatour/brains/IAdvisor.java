@@ -7,6 +7,7 @@ package mallorcatour.brains;
 
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 
@@ -18,8 +19,9 @@ public interface IAdvisor extends IPokerStats {
 
 	/**
 	 * Return advice for action in any situation with hole cards.
+	 * @param gameInfo TODO
 	 */
-	IAdvice getAdvice(LocalSituation situation, HoleCards cards);
+	IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo);
 
 	String getName();
 
@@ -51,7 +53,7 @@ public interface IAdvisor extends IPokerStats {
 		}
 
 		@Override
-		public IAdvice getAdvice(LocalSituation situation, HoleCards cards) {
+		public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 			throw new UnsupportedOperationException();
 		}
 	};

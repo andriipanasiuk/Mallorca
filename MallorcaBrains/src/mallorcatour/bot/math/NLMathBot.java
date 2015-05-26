@@ -94,12 +94,12 @@ public class NLMathBot implements IPlayer {
 			action = actionPreprocessor.preprocessAction(action, gameInfo);
 		} else {
 			Log.f(DEBUG_PATH, "Preflop situation: " + situation.toString());
-			advice = preflopBot.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
+			advice = preflopBot.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
 			if (advice != null) {
 				Log.f(DEBUG_PATH, "Advice from preflop chart");
 			}
 			if (advice == null) {
-				advice = preflopAdvisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
+				advice = preflopAdvisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
 			}
 			Log.f(DEBUG_PATH, "Advice: " + advice.toString());
 			action = advice.getAction();

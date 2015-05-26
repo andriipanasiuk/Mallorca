@@ -79,7 +79,7 @@ public class MixBot implements IPlayer {
             action = Action.createRaiseAction(percent
                     * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
         } else if (gameInfo.isPostFlop()) {
-            advice = postflopNN.getAdvice(situation, new HoleCards(heroCard1, heroCard2));
+            advice = postflopNN.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
             action = advice.getAction();
             Log.f(DEBUG_PATH, "Advice: " + advice.toString());
             action = actionPreprocessor.preprocessAction(action, gameInfo);

@@ -191,7 +191,7 @@ public class SpectrumSituationHandler extends SituationHandler implements ISpect
 			villainSituation.setNegativePotential(equity.negativePotential);
 			IAdvice advice = null;
 			if (villainSituation.getStreet() == LocalSituation.PREFLOP) {
-				advice = villainModel.getAdvice(villainSituation, villainCards);
+				advice = villainModel.getAdvice(villainSituation, villainCards, null);
 			}
 			villainAdvices.put(villainCards, advice);
 		}

@@ -10,6 +10,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.ExactAdvice;
 import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
 
@@ -59,7 +60,7 @@ public class NLPreflopChart implements IAdvisor {
 				&& situation.getVillainActionCount() == 0;
 	}
     @Override
-	public IAdvice getAdvice(LocalSituation situation, HoleCards cards) {
+	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		if (unopened(situation)) {
 			double bbsInES = convertPotToStackOddsToBBInEffectiveStack(situation.getPotToStackOdds());
             if (bbsInES > minBBsInESForPushFold) {

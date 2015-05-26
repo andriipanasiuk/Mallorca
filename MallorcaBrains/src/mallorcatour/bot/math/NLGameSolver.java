@@ -398,7 +398,7 @@ public class NLGameSolver implements IGameSolver {
                 villainSituation.setPositivePotential(equity.positivePotential);
                 villainSituation.setNegativePotential(equity.negativePotential);
             }
-            IAdvice advice = villainModeller.getAdvice(villainSituation, villainCards);
+            IAdvice advice = villainModeller.getAdvice(villainSituation, villainCards, null);
             double oldWeight = villainSpectrum.getWeight(villainCards);
             foldSpectrum.add(villainCards, oldWeight * advice.getFold());
             passiveSpectrum.add(villainCards, oldWeight * advice.getPassive());
