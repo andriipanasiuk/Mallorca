@@ -18,22 +18,20 @@ public class Hand implements Serializable {
     private final static long serialVersionUID = 1L;
     private Date date;
     private LimitType limitType;
-    //players
-    private List<PlayerInfo> players;
-    //board cards
+    private List<OpenPlayerInfo> players;
     private Card flop1, flop2, flop3;
     private Card turn, river;
-    //
+
     private String buttonPlayer;
     private double smallBlind, bigBlind;
-    //actions by the street
+
     private List<PlayerAction> preflopActions;
     private List<PlayerAction> flopActions;
     private List<PlayerAction> turnActions;
     private List<PlayerAction> riverActions;
     private long id;
 
-    public Hand(long id, Date date, List<PlayerInfo> players, String button,
+    public Hand(long id, Date date, List<OpenPlayerInfo> players, String button,
             double smallBlind, double bigBlind, LimitType limitType) {
         this.id = id;
         this.date = date;
@@ -88,7 +86,7 @@ public class Hand implements Serializable {
         }
     }
 
-    public List<PlayerInfo> getPlayers() {
+    public List<OpenPlayerInfo> getPlayers() {
         return players;
     }
 
@@ -106,8 +104,8 @@ public class Hand implements Serializable {
         return result;
     }
 
-    public PlayerInfo getPlayerInfo(String name) {
-        for (PlayerInfo player : players) {
+    public OpenPlayerInfo getPlayerInfo(String name) {
+        for (OpenPlayerInfo player : players) {
             if (player.getName().equals(name)) {
                 return player;
             }
@@ -233,7 +231,7 @@ public class Hand implements Serializable {
     public String toString() {
         StringBuilder result = new StringBuilder();
         String smallBlindString = "", bigBlindString = "";
-        for (PlayerInfo player : players) {
+        for (OpenPlayerInfo player : players) {
             String name = player.getName();
             result.append(name);
             if (name.equals(getButtonPlayer())) {

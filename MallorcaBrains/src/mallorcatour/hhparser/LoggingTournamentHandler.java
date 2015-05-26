@@ -6,11 +6,12 @@ package mallorcatour.hhparser;
 
 import java.util.Date;
 import java.util.List;
+
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.hhparser.core.ITournamentHandler;
 import mallorcatour.util.Log;
 
@@ -27,14 +28,15 @@ public class LoggingTournamentHandler implements ITournamentHandler {
         Log.d("Info: " + description);
     }
 
-    public void onHandStarted(long id, Date date, List<PlayerInfo> players,
+    @Override
+    public void onHandStarted(long id, Date date, List<OpenPlayerInfo> players,
             String playerOnButton, double smallBlind, double bigBlind, LimitType limitType) {
         Log.d("New hand. Date: " + date);
         Log.d("Hand id: " + id);
         Log.d("Limit type: " + limitType.toString());
         Log.d("Count of players = " + players.size());
         for (int i = 0; i < players.size(); i++) {
-            PlayerInfo playerInfo = players.get(i);
+            OpenPlayerInfo playerInfo = players.get(i);
             Log.d(i + " player name: " + playerInfo.getName());
             Log.d(i + " player stack: " + playerInfo.getStack());
             Log.d(i + " player cards: " + playerInfo.getHoleCards());

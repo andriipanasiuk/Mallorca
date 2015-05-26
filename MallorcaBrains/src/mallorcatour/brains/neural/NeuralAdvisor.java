@@ -62,6 +62,11 @@ public class NeuralAdvisor implements IAdvisor {
 		AdviceCreator adviceCreator = null;
 		boolean canRaise = situation.canRaise();
 		int street = situation.getStreet();
+		if (canRaise) {
+			Log.d("Hero can raise");
+		} else {
+			Log.d("Hero cannot raise");
+		}
 		switch (street) {
 		case 0:
 			nnForUse = preflopNN;

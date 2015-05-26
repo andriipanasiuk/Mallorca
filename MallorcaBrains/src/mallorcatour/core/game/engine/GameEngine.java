@@ -11,6 +11,7 @@ import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerGameInfoAdapter;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
@@ -57,14 +58,18 @@ public class GameEngine implements IGameInfo {
 	private List<Card> boardCards;
 	private Card player1Card1, player1Card2, player2Card1, player2Card2;
 	private PlayerInfo lastMovePlayer;
-	private PlayerInfo playerInfo1, playerInfo2;
+	private OpenPlayerInfo playerInfo1, playerInfo2;
 
 	public GameEngine(IPlayer player1, IPlayer player2, String debug) {
 		this.player1 = player1;
 		this.player2 = player2;
 		this.DEBUG_PATH = debug;
-		playerInfo1 = new PlayerInfo(player1.getName(), startingStack);
-		playerInfo2 = new PlayerInfo(player2.getName(), startingStack);
+		playerInfo1 = new OpenPlayerInfo(player1.getName(), startingStack);
+		playerInfo2 = new OpenPlayerInfo(player2.getName(), startingStack);
+	}
+
+	public void predefined(){
+		
 	}
 
 	public void setLimitType(LimitType limitType) {

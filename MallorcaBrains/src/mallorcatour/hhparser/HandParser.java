@@ -5,22 +5,20 @@
 package mallorcatour.hhparser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.BaseGameInfo;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.OpenGameInfo;
 import mallorcatour.core.game.PlayerAction;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.hhparser.core.HandManager;
-
-import java.util.List;
-
 import mallorcatour.neural.core.PokerLearningExample;
 
 /**
@@ -29,7 +27,7 @@ import mallorcatour.neural.core.PokerLearningExample;
  */
 public class HandParser {
 
-    private BaseGameInfo gameInfo;
+    private OpenGameInfo gameInfo;
     private double effectiveStack;
     private double pot;
     private double amountToCall;
@@ -134,7 +132,7 @@ public class HandParser {
     }
 
     private void newHand(Hand hand) {
-        gameInfo = new BaseGameInfo();
+        gameInfo = new OpenGameInfo();
         gameInfo.heroInfo = hand.getPlayerInfo(heroName);
         gameInfo.villainInfo = hand.getPlayerInfo(villainName);
         initPot(hand);

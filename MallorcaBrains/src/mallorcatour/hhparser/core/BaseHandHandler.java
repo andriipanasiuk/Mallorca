@@ -7,12 +7,13 @@ package mallorcatour.hhparser.core;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerAction;
-import mallorcatour.core.game.PlayerInfo;
 
 /**
  *
@@ -27,7 +28,7 @@ public class BaseHandHandler implements IHandHandler {
         hands = new ArrayList<Hand>();
     }
 
-    public void onHandStarted(long id, Date date, List<PlayerInfo> players, String playerOnButton,
+    public void onHandStarted(long id, Date date, List<OpenPlayerInfo> players, String playerOnButton,
             double smallBlind, double bigBlind, LimitType limitType) {
         hand = new Hand(id, date, players, playerOnButton, smallBlind, bigBlind, limitType);
     }

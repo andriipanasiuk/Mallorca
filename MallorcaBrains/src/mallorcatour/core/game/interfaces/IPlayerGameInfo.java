@@ -1,8 +1,9 @@
 package mallorcatour.core.game.interfaces;
 
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerInfo;
 
-public interface IPlayerGameInfo extends IGameInfo {
+public interface IPlayerGameInfo<P extends PlayerInfo> extends IGameInfo {
 	public double getHeroAmountToCall();
 
 	boolean isVillainSitOut();
@@ -11,8 +12,8 @@ public interface IPlayerGameInfo extends IGameInfo {
 
 	public boolean onButton();
 
-	PlayerInfo getVillain();
+	P getVillain();
 
-	PlayerInfo getHero();
+	OpenPlayerInfo getHero();
 
 }

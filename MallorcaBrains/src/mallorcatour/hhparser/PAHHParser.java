@@ -8,12 +8,13 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.hhparser.core.IHandHandler;
 import mallorcatour.hhparser.core.ITournamentHandler;
 import mallorcatour.util.DateUtils;
@@ -30,7 +31,8 @@ public class PAHHParser {
     private static final String GAME_TYPE = "Game Type: ";
     private static final String NUMBER_OF_PLAYERS = "Number of Players: ";
     private static final String TOURNAMENT_SUMMARY = "Tournament Summary";
-    private static final String NEW_HAND = "Poker Academy Pro";
+    @SuppressWarnings("unused")
+	private static final String NEW_HAND = "Poker Academy Pro";
     private static final String NEW_HAND_POKER_GENIUS = "Poker Genius";
     private static final String END_HAND = "****";
     private static final String FLOP = "FLOP:  ";
@@ -162,7 +164,7 @@ public class PAHHParser {
 
     private static void parseNewHand(String buffer, BufferedReader reader, IHandHandler handler) {
         double smallBlind = 0, bigBlind = 0;
-        List<PlayerInfo> players = new ArrayList<PlayerInfo>();
+        List<OpenPlayerInfo> players = new ArrayList<>();
         Date startingDate = null;
         LimitType limitType = null;
         String playerOnButton = null;
@@ -195,7 +197,7 @@ public class PAHHParser {
             }
             int stack = parseNumber(buffer);
             HoleCards cards = parseHoleCards(buffer);
-            players.add(new PlayerInfo(name, stack, cards.first, cards.second));
+            players.add(new OpenPlayerInfo(name, stack, cards.first, cards.second));
             buffer = ReaderUtils.readLine(reader);
         }
         handler.onHandStarted(id, startingDate, players, playerOnButton, smallBlind,

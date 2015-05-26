@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.BaseGameInfo;
+import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IPlayerGameObserver;
@@ -39,10 +39,10 @@ public class AiGamesController {
 	@SuppressWarnings("unused")
 	private int timeBank, timePerMove;
 
-	private BaseGameInfo gameInfo;
+	private GameInfo gameInfo;
 	private IPlayerGameObserver observer;
 
-	public AiGamesController(BaseGameInfo gameInfo, IPlayerGameObserver observer) {
+	public AiGamesController(GameInfo gameInfo, IPlayerGameObserver observer) {
 		this.gameInfo = gameInfo;
 		this.observer = observer;
 	}

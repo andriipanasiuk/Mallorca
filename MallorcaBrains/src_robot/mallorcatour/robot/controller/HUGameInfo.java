@@ -4,7 +4,7 @@
  */
 package mallorcatour.robot.controller;
 
-import mallorcatour.core.game.BaseGameInfo;
+import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.robot.ExtPlayerInfo;
 
@@ -12,7 +12,7 @@ import mallorcatour.robot.ExtPlayerInfo;
  *
  * @author Andrew
  */
-public class HUGameInfo extends BaseGameInfo {
+public class HUGameInfo extends GameInfo {
 
     public int[] raisesOnStreet = new int[4];
     public ExtPlayerInfo heroInfo, villainInfo;

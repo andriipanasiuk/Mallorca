@@ -9,7 +9,8 @@ import mallorcatour.core.equilator.preflop.simple.EquilatorPreflopSimple;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.OpenGameInfo;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IHeroObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
@@ -22,7 +23,7 @@ import mallorcatour.util.Log;
  */
 public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserver {
 
-    private IPlayerGameInfo gameInfo;;
+    private OpenGameInfo gameInfo;;
     protected String heroName, villainName;
     private Card heroCard1, heroCard2;
     protected LimitType limitType;
@@ -61,7 +62,7 @@ public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserve
         if (street == PokerStreet.FLOP) {
             hasFlop = true;
             double pot = gameInfo.getPotSize();
-            PlayerInfo villainInfo = getVillainInfo();
+            OpenPlayerInfo villainInfo = getVillainInfo();
             double heroPreflopStrength = EquilatorPreflopSimple.strengthByFormula(heroCard1, heroCard2);
             double villainPreflopStrength = EquilatorPreflopSimple.strengthByFormula(
                     villainInfo.getHoleCards().first, villainInfo.getHoleCards().second);
@@ -77,8 +78,9 @@ public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserve
      * A new game has been started.
      * @param gi the game stat information
      */
+    @Override
     public void onHandStarted(IPlayerGameInfo gameInfo) {
-        this.gameInfo = gameInfo;
+        this.gameInfo = (OpenGameInfo) gameInfo;
     }
 
     /**
@@ -117,8 +119,8 @@ public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserve
         return expectedProfit;
     }
 
-    private PlayerInfo getVillainInfo() {
-        PlayerInfo villainInfo = gameInfo.getVillain();
+    private OpenPlayerInfo getVillainInfo() {
+    	OpenPlayerInfo villainInfo = gameInfo.getVillain();
         return villainInfo;
     }
 
@@ -131,7 +133,7 @@ public class ProfitSituationHandler implements IHeroObserver, IPlayerGameObserve
             heroCards[0] = heroCard1.intValueForBrecher();
             heroCards[1] = heroCard2.intValueForBrecher();
 
-            PlayerInfo villainInfo = getVillainInfo();
+            OpenPlayerInfo villainInfo = getVillainInfo();
             villainCards[0] = villainInfo.getHoleCards().first.intValueForBrecher();
             villainCards[1] = villainInfo.getHoleCards().second.intValueForBrecher();
             for (int i = 2; i < 7; i++) {

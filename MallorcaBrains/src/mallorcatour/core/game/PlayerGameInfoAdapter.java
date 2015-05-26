@@ -5,12 +5,13 @@ import java.util.List;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
-public class PlayerGameInfoAdapter implements IPlayerGameInfo {
+public class PlayerGameInfoAdapter implements IPlayerGameInfo<PlayerInfo> {
 
 	private final IGameInfo gameInfo;
-	private final PlayerInfo heroInfo, villainInfo;
+	private final PlayerInfo villainInfo;
+	private final OpenPlayerInfo heroInfo;
 
-	public PlayerGameInfoAdapter(IGameInfo gameInfo, PlayerInfo heroInfo, PlayerInfo villainInfo) {
+	public PlayerGameInfoAdapter(IGameInfo gameInfo, OpenPlayerInfo heroInfo, PlayerInfo villainInfo) {
 		this.gameInfo = gameInfo;
 		this.heroInfo = heroInfo;
 		this.villainInfo = villainInfo;
@@ -117,7 +118,7 @@ public class PlayerGameInfoAdapter implements IPlayerGameInfo {
 	}
 
 	@Override
-	public PlayerInfo getHero() {
+	public OpenPlayerInfo getHero() {
 		return heroInfo;
 	}
 

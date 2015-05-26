@@ -7,11 +7,12 @@ package mallorcatour.hhparser.core;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.OpenPlayerInfo;
 
 /**
  *
@@ -32,7 +33,8 @@ public class BaseTournamentHandler implements ITournamentHandler {
         tournament = new Tournament(date, description);
     }
 
-    public void onHandStarted(long id, Date date, List<PlayerInfo> players,
+    @Override
+    public void onHandStarted(long id, Date date, List<OpenPlayerInfo> players,
             String playerOnButton, double smallBlind, double bigBlind, LimitType limitType) {
         handHandler.onHandStarted(id, date, players, playerOnButton, smallBlind, bigBlind, limitType);
     }

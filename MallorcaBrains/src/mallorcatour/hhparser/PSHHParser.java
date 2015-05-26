@@ -15,7 +15,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.hhparser.core.IHandHandler;
 import mallorcatour.util.DateUtils;
 import mallorcatour.util.ReaderUtils;
@@ -181,7 +181,7 @@ public class PSHHParser {
 //    }
     private static double parseNewHand(String buffer, BufferedReader reader, IHandHandler handler) {
         double smallBlind = 0, bigBlind = 0;
-        List<PlayerInfo> players = new ArrayList<PlayerInfo>();
+        List<OpenPlayerInfo> players = new ArrayList<>();
         Date startingDate = null;
         LimitType limitType = null;
         String playerOnButton = null;
@@ -228,7 +228,7 @@ public class PSHHParser {
                 }
                 int stack = Integer.parseInt(matcher.group(3));
                 boolean isSittingOut = buffer.contains(IS_SITTING_OUT);
-                players.add(new PlayerInfo(name, stack, isSittingOut));
+                players.add(new OpenPlayerInfo(name, stack, isSittingOut));
             } else {
                 throw new RuntimeException();
             }
@@ -243,7 +243,7 @@ public class PSHHParser {
             String heroName = m.group(1);
             Card c1 = Card.valueOf(m.group(2));
             Card c2 = Card.valueOf(m.group(3));
-            for (PlayerInfo playerInfo : players) {
+            for (OpenPlayerInfo playerInfo : players) {
                 if (playerInfo.getName().equals(heroName)) {
                     playerInfo.setHoleCards(c1, c2);
                 }

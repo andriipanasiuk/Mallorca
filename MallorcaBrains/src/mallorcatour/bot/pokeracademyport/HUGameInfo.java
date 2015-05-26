@@ -11,6 +11,7 @@ import java.util.List;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
@@ -161,7 +162,7 @@ public class HUGameInfo implements IPlayerGameInfo {
 	}
 
 	@Override
-	public PlayerInfo getHero() {
+	public OpenPlayerInfo getHero() {
 		throw new UnsupportedOperationException();
 	}
 

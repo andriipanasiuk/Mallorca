@@ -21,7 +21,7 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.BaseGameInfo;
+import mallorcatour.core.game.GameInfo;
 import mallorcatour.util.Log;
 
 /**
@@ -40,7 +40,7 @@ public class BotParser {
 	}
 
 	public void run() {
-		BaseGameInfo gameInfo = new BaseGameInfo();
+		GameInfo gameInfo = new GameInfo();
 		AiGamesController controller = new AiGamesController(gameInfo, bot);
 		while (scan.hasNextLine()) {
 			String line = scan.nextLine().trim();
