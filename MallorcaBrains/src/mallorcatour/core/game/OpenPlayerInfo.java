@@ -5,8 +5,8 @@ public class OpenPlayerInfo extends PlayerInfo {
 	 * 
 	 */
 	private static final long serialVersionUID = 7635447535829425630L;
-	private Card holeCard1;
-	private Card holeCard2;
+	public Card holeCard1;
+	public Card holeCard2;
 
 	public OpenPlayerInfo(String name, double stack) {
 		super(name, stack);

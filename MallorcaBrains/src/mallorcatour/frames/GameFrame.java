@@ -24,8 +24,8 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.engine.GameEngine;
 import mallorcatour.core.game.engine.GameEngine.EngineListener;
+import mallorcatour.core.game.engine.PredefinedGameEngine;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.util.DateUtils;
@@ -52,7 +52,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	private boolean useGoButton;
 	private VillainModel villainModeller;
 	private final String DEBUG_PATH;
-	private GameEngine engine;
+	private PredefinedGameEngine engine;
 	private Action lastMove;
 
 	/** Creates new form GrandtorinoGameFrame */
@@ -65,7 +65,8 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 		NeuralBotFactory factory = new NeuralBotFactory();
 		IPlayer player = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				"debug.txt");
-		engine = new GameEngine(this, player, DEBUG_PATH);
+		engine = new PredefinedGameEngine(this, player, DEBUG_PATH);
+		engine.player = player;
 		engine.setListener(this);
 		enableActionButtons(false);
 		humanDealerButton.setVisible(false);

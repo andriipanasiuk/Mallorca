@@ -56,7 +56,6 @@ public class GameEngine implements IGameInfo {
 	private List<Card> nonUsedCards;
 	private PokerStreet currentStreet;
 	private List<Card> boardCards;
-	private Card player1Card1, player1Card2, player2Card1, player2Card2;
 	private PlayerInfo lastMovePlayer;
 	private OpenPlayerInfo playerInfo1, playerInfo2;
 
@@ -65,15 +64,17 @@ public class GameEngine implements IGameInfo {
 		this.player2 = player2;
 		this.DEBUG_PATH = debug;
 		playerInfo1 = new OpenPlayerInfo(player1.getName(), startingStack);
-		playerInfo2 = new OpenPlayerInfo(player2.getName(), startingStack);
-	}
-
-	public void predefined(){
-		
+		playerInfo2 = new OpenPlayerInfo(player2.getName(), startingStack - 300);
 	}
 
 	public void setLimitType(LimitType limitType) {
 		this.limitType = limitType;
+	}
+
+	protected void dealButton(IPlayer player, PlayerInfo playerInfo){
+		boolean flip = currentHandNumber % 2 == 1;
+		playerInfo.isOnButton = flip;
+		otherThan(playerInfo).isOnButton = !flip;
 	}
 
 	public void deal() {
@@ -81,9 +82,9 @@ public class GameEngine implements IGameInfo {
 		currentHandNumber++;
 		currentStreet = PokerStreet.PREFLOP;
 		nonUsedCards = new ArrayList<Card>(Deck.getCards());
-		boolean player1OnButton = currentHandNumber % 2 == 1;
-		playerInfo1.isOnButton = player1OnButton;
-		playerInfo2.isOnButton = !player1OnButton;
+
+		dealButton(player1, playerInfo1);
+
 		playerInfo1.stack -= BIG_BLIND / 2;
 		playerInfo2.stack -= BIG_BLIND / 2;
 
@@ -103,11 +104,15 @@ public class GameEngine implements IGameInfo {
 		player1.onHandStarted(new PlayerGameInfoAdapter(this, playerInfo1, playerInfo2));
 		player2.onHandStarted(new PlayerGameInfoAdapter(this, playerInfo2, playerInfo1));
 
-		HoleCards player1Cards = dealPlayer1Cards();
-		HoleCards player2Cards = dealPlayer2Cards();
-		player1.onHoleCards(player1Cards.first, player1Cards.second, "player2");
-		player2.onHoleCards(player2Cards.first, player2Cards.second, "player1");
+		dealCards(player1, playerInfo1);
+		dealCards(player2, playerInfo2);
 		gameCycle();
+	}
+
+	protected void dealCards(IPlayer player, OpenPlayerInfo playerInfo) {
+		HoleCards player1Cards = dealHoleCards();
+		playerInfo.setHoleCards(player1Cards.first, player1Cards.second);
+		player.onHoleCards(player1Cards.first, player1Cards.second, otherThan(player).getName());
 	}
 
 	void dealFlop(String one, String two, String three) {
@@ -136,27 +141,10 @@ public class GameEngine implements IGameInfo {
 
 	}
 
-	private HoleCards dealPlayer1Cards() {
-		player1Card1 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		player1Card2 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		return new HoleCards(player1Card1, player1Card2);
-	}
-
-	HoleCards dealPlayer1Cards(String one, String two) {
-		if (one.equals(two)) {
-			throw new RuntimeException();
-		}
-		player1Card1 = Card.valueOf(one);
-		player1Card2 = Card.valueOf(two);
-		nonUsedCards.remove(player1Card1);
-		nonUsedCards.remove(player1Card2);
-		return new HoleCards(player1Card1, player1Card2);
-	}
-
-	private HoleCards dealPlayer2Cards() {
-		player2Card1 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		player2Card2 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
-		return new HoleCards(player2Card1, player2Card2);
+	protected HoleCards dealHoleCards() {
+		Card card1 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
+		Card card2 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
+		return new HoleCards(card1, card2);
 	}
 
 	private void dealFlop() {
@@ -175,10 +163,10 @@ public class GameEngine implements IGameInfo {
 		if (playerInfo1.bet == playerInfo2.bet) {
 			List<Card> player1Cards = new ArrayList<Card>(boardCards);
 			List<Card> player2Cards = new ArrayList<Card>(boardCards);
-			player1Cards.add(player1Card1);
-			player1Cards.add(player1Card2);
-			player2Cards.add(player2Card1);
-			player2Cards.add(player2Card2);
+			player1Cards.add(playerInfo1.holeCard1);
+			player1Cards.add(playerInfo1.holeCard2);
+			player2Cards.add(playerInfo2.holeCard1);
+			player2Cards.add(playerInfo2.holeCard2);
 			long player1Combination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(player1Cards));
 			long player2Combination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(player2Cards));
 			if (player1Combination > player2Combination) {
@@ -226,7 +214,7 @@ public class GameEngine implements IGameInfo {
 		return ActionResult.START_STREET;
 	}
 
-	private IPlayer otherThan(IPlayer player) {
+	protected IPlayer otherThan(IPlayer player) {
 		if (player == player1) {
 			return player2;
 		} else {
@@ -234,7 +222,7 @@ public class GameEngine implements IGameInfo {
 		}
 	}
 
-	private PlayerInfo otherThan(PlayerInfo player) {
+	protected PlayerInfo otherThan(PlayerInfo player) {
 		if (player == playerInfo1) {
 			return playerInfo2;
 		} else {
@@ -248,6 +236,9 @@ public class GameEngine implements IGameInfo {
 		Action action = player.getAction();
 		if (action.isAggressive() && action.getAmount() <= 0) {
 			action.setAmount(Math.max(BIG_BLIND, toCall));
+		}
+		if (action.isAggressive() && action.getAmount() > playerInfo.stack - toCall) {
+			action.setAmount(playerInfo.stack - toCall);
 		}
 		int result = playerActed(action, playerInfo);
 		otherThan(player).onVillainActed(action, toCall);
