@@ -12,6 +12,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.util.Log;
 
 /**
  *
@@ -57,6 +58,9 @@ public class SituationHandler implements ISituationHandler {
         double potAfterCall = toCall + pot;
         double potOdds = toCall / potAfterCall;
 
+        Log.d("Ef. stack: " + effectiveStack);
+        Log.d("Pot: " + pot);
+        Log.d("To call: " + toCall);
         if (gameInfo.isPreFlop()) {
             result = new LocalSituation(LocalSituation.PREFLOP, limitType);
         } else if (gameInfo.isFlop()) {

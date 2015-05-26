@@ -296,11 +296,17 @@ public class GameEngine implements IGameInfo {
 				result = playerAction(button.first, button.second);
 			} else if (result == ActionResult.NEXT_STAGE) {
 				result = changeStreet();
-				player1.onStageEvent(currentStreet);
-				player2.onStageEvent(currentStreet);
+				if (result != ActionResult.END_OF_HAND) {
+					player1.onStageEvent(currentStreet);
+					player2.onStageEvent(currentStreet);
+				}
 			} else if (result == ActionResult.START_STREET) {
-				SimplePair<IPlayer, PlayerInfo> button = getPlayer(false);
-				result = playerAction(button.first, button.second);
+				if (getBankRollAtRisk() > 0) {
+					SimplePair<IPlayer, PlayerInfo> button = getPlayer(false);
+					result = playerAction(button.first, button.second);
+				} else {
+					result = ActionResult.NEXT_STAGE;
+				}
 			} else if (result == ActionResult.ANOTHER_PLAYER) {
 				if (lastMovePlayer == playerInfo1) {
 					result = playerAction(player2, playerInfo2);

@@ -11,7 +11,6 @@
 package mallorcatour.frames;
 
 import java.awt.EventQueue;
-import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
@@ -49,7 +48,6 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	private static final long serialVersionUID = -7429672585051881560L;
 	private final Object lock = new Object();
 	private final Object actionLock = new Object();
-	private final ExecutorService executor;
 	private final ShowingSpectrumListener spectrumListener;
 	private boolean useGoButton;
 	private VillainModel villainModeller;
@@ -67,7 +65,6 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 		NeuralBotFactory factory = new NeuralBotFactory();
 		IPlayer player = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				"debug.txt");
-		executor = ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY);
 		engine = new GameEngine(this, player, DEBUG_PATH);
 		engine.setListener(this);
 		enableActionButtons(false);
@@ -518,7 +515,6 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	}
 
 	private void boardFieldActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_boardFieldActionPerformed
-		// TODO add your handling code here:
 	}// GEN-LAST:event_boardFieldActionPerformed
 
 	private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_goButtonActionPerformed
@@ -547,7 +543,8 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 
 	private void useGoButtonCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {// GEN-FIRST:event_useGoButtonCheckBoxStateChanged
 		useGoButton = useGoButtonCheckBox.getModel().isSelected();
-		goButton.setEnabled(useGoButton);
+		//TODO implement use GO checkbox
+//		goButton.setEnabled(useGoButton);
 	}// GEN-LAST:event_useGoButtonCheckBoxStateChanged
 
 	private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -587,6 +584,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 
 	@Override
 	public void onStageEvent(PokerStreet street) {
+		botActionLabel.setText("");
 		updateUI();
 	}
 
