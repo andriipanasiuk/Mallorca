@@ -9,6 +9,7 @@ import java.util.List;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 
 /**
@@ -54,5 +55,11 @@ public interface IGameInfo {
 	public LimitType getLimitType();
 
 	public boolean onButton(String name);
+
+	public PlayerInfo getHero(String hero);
+
+	public PlayerInfo getVillain(String hero);
+
+	public double getAmountToCall(String hero);
 
 }

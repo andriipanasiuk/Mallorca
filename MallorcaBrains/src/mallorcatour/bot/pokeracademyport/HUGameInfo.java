@@ -12,6 +12,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.OpenPlayerInfo;
+import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.util.Log;
@@ -168,6 +169,21 @@ public class HUGameInfo implements IPlayerGameInfo {
 	@Override
 	public boolean onButton(String name) {
 		return gameInfo.getPlayer(name).isButton();
+	}
+
+	@Override
+	public PlayerInfo getHero(String hero) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public PlayerInfo getVillain(String hero) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public double getAmountToCall(String hero) {
+		throw new UnsupportedOperationException();
 	}
 
 }

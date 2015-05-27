@@ -16,6 +16,7 @@ import mallorcatour.core.game.PlayerGameInfoAdapter;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.util.Log;
 import mallorcatour.util.SimplePair;
@@ -23,10 +24,7 @@ import mallorcatour.util.UniformRandomizer;
 
 public class GameEngine implements IGameInfo {
 
-	public static interface EngineListener {
-		void onPlayerActed(Action action, PlayerInfo player);
-
-	}
+	private IGameObserver<IGameInfo> gameObserver;
 
 	public static class ActionResult {
 		public static final int START_ROUND = -1;
@@ -35,8 +33,6 @@ public class GameEngine implements IGameInfo {
 		public static final int ANOTHER_PLAYER = 2;
 		public static final int START_STREET = 3;
 	}
-
-	private EngineListener listener = null;
 
 	private Flop predefinedFlop = null;
 	private Card predefinedTurn = null;
@@ -59,9 +55,10 @@ public class GameEngine implements IGameInfo {
 	private PlayerInfo lastMovePlayer;
 	private OpenPlayerInfo playerInfo1, playerInfo2;
 
-	public GameEngine(IPlayer player1, IPlayer player2, String debug) {
+	public GameEngine(IPlayer player1, IPlayer player2, IGameObserver observer, String debug) {
 		this.player1 = player1;
 		this.player2 = player2;
+		this.gameObserver = observer;
 		this.DEBUG_PATH = debug;
 		playerInfo1 = new OpenPlayerInfo(player1.getName(), startingStack);
 		playerInfo2 = new OpenPlayerInfo(player2.getName(), startingStack);
@@ -103,6 +100,7 @@ public class GameEngine implements IGameInfo {
 
 		player1.onHandStarted(new PlayerGameInfoAdapter(this, playerInfo1, playerInfo2));
 		player2.onHandStarted(new PlayerGameInfoAdapter(this, playerInfo2, playerInfo1));
+		gameObserver.onHandStarted(this);
 
 		dealCards(player1, playerInfo1);
 		dealCards(player2, playerInfo2);
@@ -256,9 +254,7 @@ public class GameEngine implements IGameInfo {
 		int result = playerActed(action, playerInfo);
 		player.onActed(action, toCall, player.getName());
 		otherThan(player).onActed(action, toCall, player.getName());
-		if (listener != null) {
-			listener.onPlayerActed(action, playerInfo);
-		}
+		gameObserver.onActed(action, -1, player.getName());
 		return result;
 	}
 
@@ -291,6 +287,7 @@ public class GameEngine implements IGameInfo {
 		zeroBets();
 		player1.onHandEnded();
 		player2.onHandEnded();
+		gameObserver.onHandEnded();
 		return winner != null ? winner.name : null;
 	}
 
@@ -313,6 +310,7 @@ public class GameEngine implements IGameInfo {
 				if (result != ActionResult.END_OF_HAND) {
 					player1.onStageEvent(currentStreet);
 					player2.onStageEvent(currentStreet);
+					gameObserver.onStageEvent(currentStreet);
 				}
 			} else if (result == ActionResult.START_STREET) {
 				if (getBankRollAtRisk() > 0) {
@@ -449,10 +447,6 @@ public class GameEngine implements IGameInfo {
 		return limitType;
 	}
 
-	public void setListener(EngineListener listener) {
-		this.listener = listener;
-	}
-
 	@Override
 	public boolean onButton(String name) {
 		if (name.equals(playerInfo1.name)) {
@@ -460,6 +454,21 @@ public class GameEngine implements IGameInfo {
 		} else {
 			return playerInfo2.isOnButton;
 		}
+	}
+
+	@Override
+	public PlayerInfo getHero(String hero) {
+		return playerInfo1.name.equals(hero) ? playerInfo1 : playerInfo2;
+	}
+
+	@Override
+	public PlayerInfo getVillain(String hero) {
+		return playerInfo1.name.equals(hero) ? playerInfo2 : playerInfo1;
+	}
+
+	@Override
+	public double getAmountToCall(String hero) {
+		return Math.max(0, getVillain(hero).bet - getHero(hero).bet);
 	}
 
 }

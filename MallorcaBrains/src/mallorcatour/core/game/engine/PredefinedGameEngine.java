@@ -4,13 +4,14 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.interfaces.IGameObserver;
 
 public class PredefinedGameEngine extends GameEngine {
 
 	public IPlayer player;
 
-	public PredefinedGameEngine(IPlayer player1, IPlayer player2, String debug) {
-		super(player1, player2, debug);
+	public PredefinedGameEngine(IPlayer player1, IPlayer player2, IGameObserver observer, String debug) {
+		super(player1, player2, observer, debug);
 	}
 
 	@Override

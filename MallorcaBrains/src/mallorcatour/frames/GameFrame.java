@@ -14,6 +14,7 @@ import java.awt.EventQueue;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.modeller.NeuralModelVillainBotFactory;
 import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.villainobserver.VillainStatistics;
@@ -21,10 +22,10 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.engine.GameEngine.EngineListener;
-import mallorcatour.core.game.engine.PredefinedGameEngine;
+import mallorcatour.core.game.engine.GameEngine;
+import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.util.DateUtils;
@@ -39,7 +40,7 @@ import mallorcatour.util.frames.FrameUtils;
  * 
  * @author Andrew
  */
-public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineListener {
+public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGameInfo> {
 
 	/**
 	 * 
@@ -51,9 +52,10 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	private boolean useGoButton;
 	private VillainModel villainModeller;
 	private final String DEBUG_PATH;
-	private PredefinedGameEngine engine;
+	private GameEngine engine;
 	private Action lastMove;
-	private IPlayer player;
+	private IPlayer player1;
+	private IPlayer player2;
 
 	/** Creates new form GrandtorinoGameFrame */
 	public GameFrame(LimitType limitType) {
@@ -63,11 +65,11 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 		DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		villainModeller = new VillainModel(limitType, DEBUG_PATH);
 		NeuralModelVillainBotFactory factory = new NeuralModelVillainBotFactory();
-		player = factory.createBot(IAdvisor.UNSUPPORTED, new ShowingSpectrumListener(), IDecisionListener.EMPTY,
+		player1 = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				"debug.txt");
-		engine = new PredefinedGameEngine(this, player, DEBUG_PATH);
-		engine.player = player;
-		engine.setListener(this);
+		player2 = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
+				"debug.txt");
+		engine = new GameEngine(player2, player1, this, DEBUG_PATH);
 		enableActionButtons(false);
 		humanDealerButton.setVisible(false);
 		botDealerButton.setVisible(false);
@@ -95,12 +97,12 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	}
 
 	private void updateUI() {
-		botBetField.setText(String.valueOf(gameInfo.getVillain().bet));
-		humanBetField.setText(String.valueOf(gameInfo.getHero().bet));
+		botBetField.setText(String.valueOf(gameInfo.getHero(player1.getName()).bet));
+		humanBetField.setText(String.valueOf(gameInfo.getHero(player2.getName()).bet));
+		botStackField.setText(String.valueOf(gameInfo.getHero(player1.getName()).stack));
+		humanStackField.setText(String.valueOf(gameInfo.getHero(player2.getName()).stack));
 		potField.setText(String.valueOf(gameInfo.getPotSize()));
 		boardField.setText(gameInfo.getBoard().toString());
-		humanStackField.setText(String.valueOf(gameInfo.getHero().stack));
-		botStackField.setText(String.valueOf(gameInfo.getVillain().stack));
 	}
 
 	/**
@@ -481,8 +483,8 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	private void passiveButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_passiveButtonActionPerformed
 		botActionLabel.setText("");
 		enableActionButtons(false);
-		if (gameInfo.getAmountToCall() > 0) {
-			lastMove = Action.callAction(gameInfo.getAmountToCall());
+		if (gameInfo.getAmountToCall(player2.getName()) > 0) {
+			lastMove = Action.callAction(gameInfo.getAmountToCall(player2.getName()));
 		} else {
 			lastMove = Action.checkAction();
 		}
@@ -592,16 +594,8 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	}
 
 	@Override
-	public void onHandStarted(IPlayerGameInfo gameInfo) {
+	public void onHandStarted(IGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
-		botDealerButton.setVisible(false);
-		humanDealerButton.setVisible(false);
-
-		if (gameInfo.onButton()) {
-			humanDealerButton.setVisible(true);
-		} else {
-			botDealerButton.setVisible(true);
-		}
 		updateUI();
 	}
 
@@ -628,54 +622,82 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	}
 
 	@Override
-	public void onHoleCards(Card c1, Card c2) {
-		botActionLabel.setText("");
-
-		botCardsField.setText("");
-		myHoleCardsField.setText(c1 + " " + c2);
-	}
-
-	@Override
 	public void onActed(Action action, double toCall, String name) {
-		if (name.equals(player.getName())) {
+		if (name.equals(player1.getName())) {
 			botActionLabel.setText(action.toString());
 		}
-	}
-
-	private IPlayerGameInfo gameInfo;
-
-	@Override
-	public Action getAction() {
-		enableActionButtons(true);
-		if (gameInfo.getAmountToCall() > 0) {
-			passiveButton.setText("Call");
-			aggressiveButton.setText("Raise");
-		} else {
-			passiveButton.setText("Check");
-			aggressiveButton.setText("Bet");
-		}
-
-		synchronized (actionLock) {
-			try {
-				actionLock.wait();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return lastMove;
-	}
-
-	@Override
-	public String getName() {
-		return "Andrew";
-	}
-
-	@Override
-	public void onPlayerActed(Action action, PlayerInfo player) {
 		updateUI();
 		if (useGoButton) {
 			lock();
 		}
+	}
+
+	private IGameInfo gameInfo;
+
+	private class HumanPlayer implements IPlayer {
+
+		@Override
+		public void onHoleCards(Card c1, Card c2) {
+			botActionLabel.setText("");
+			botCardsField.setText("");
+			myHoleCardsField.setText(c1 + " " + c2);
+		}
+
+		@Override
+		public Action getAction() {
+			enableActionButtons(true);
+			if (gameInfo.getAmountToCall(getName()) > 0) {
+				passiveButton.setText("Call");
+				aggressiveButton.setText("Raise");
+			} else {
+				passiveButton.setText("Check");
+				aggressiveButton.setText("Bet");
+			}
+
+			synchronized (actionLock) {
+				try {
+					actionLock.wait();
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			return lastMove;
+		}
+
+		@Override
+		public String getName() {
+			return "Andrew";
+		}
+
+		@Override
+		public void onStageEvent(PokerStreet street) {
+			GameFrame.this.onStageEvent(street);
+		}
+
+		@Override
+		public void onActed(Action action, double toCall, String name) {
+			GameFrame.this.onActed(action, toCall, name);
+		}
+
+		@Override
+		public void onHandStarted(IPlayerGameInfo gameInfo) {
+			GameFrame.this.onHandStarted(gameInfo);
+			botDealerButton.setVisible(false);
+			humanDealerButton.setVisible(false);
+
+			if (gameInfo.onButton()) {
+				humanDealerButton.setVisible(true);
+			} else {
+				botDealerButton.setVisible(true);
+			}
+		}
+
+		@Override
+		public void onHandEnded() {
+			GameFrame.this.onHandEnded();
+
+		}
+
 	}
 
 }
