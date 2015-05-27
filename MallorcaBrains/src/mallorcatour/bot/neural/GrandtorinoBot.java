@@ -76,7 +76,7 @@ public class GrandtorinoBot implements IPlayer {
 	 *            your seat number at the table
 	 */
 	@Override
-	public void onHoleCards(Card c1, Card c2, String villainName) {
+	public void onHoleCards(Card c1, Card c2) {
 		cardsObserver.onHoleCards(c1, c2);
 		heroCard1 = c1;
 		heroCard2 = c2;

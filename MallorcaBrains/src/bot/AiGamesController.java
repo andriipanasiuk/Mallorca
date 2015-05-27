@@ -158,7 +158,7 @@ public class AiGamesController {
 				gameInfo.street = PokerStreet.PREFLOP;
 				Card[] cards = parseCards(amount);
 				Log.d("Hole cards: " + amount);
-				observer.onHoleCards(cards[0], cards[1], villainName);
+				observer.onHoleCards(cards[0], cards[1]);
 			} else if (key.equals("wins")) {
 				observer.onHandEnded();
 			} else {

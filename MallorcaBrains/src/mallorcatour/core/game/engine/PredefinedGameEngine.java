@@ -28,7 +28,7 @@ public class PredefinedGameEngine extends GameEngine {
 		if (player == this.player) {
 			HoleCards cards = HoleCards.valueOf("9s6c");
 			playerInfo.setHoleCards(cards.first, cards.second);
-			player.onHoleCards(cards.first, cards.second, otherThan(player).getName());
+			player.onHoleCards(cards.first, cards.second);
 		} else {
 			super.dealCards(player, playerInfo);
 		}

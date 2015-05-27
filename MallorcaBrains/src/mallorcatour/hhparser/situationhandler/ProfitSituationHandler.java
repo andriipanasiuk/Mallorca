@@ -47,11 +47,11 @@ public class ProfitSituationHandler implements IPlayer {
 	 *            your seat number at the table
 	 */
 	@Override
-	public void onHoleCards(Card c1, Card c2, String villainName) {
+	public void onHoleCards(Card c1, Card c2) {
 		heroCard1 = c1;
 		heroCard2 = c2;
 		profit = -1;
-		this.villainName = villainName;
+//		this.villainName = villainName;
 		if (gameInfo.onButton()) {
 			heroToCall = gameInfo.getBigBlindSize() / 2;
 		} else {

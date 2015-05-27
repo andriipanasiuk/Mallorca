@@ -260,7 +260,8 @@ public class FellOmen2 implements IPlayer {
         this.gameInfo = gameInfo;
     }
 
-    public void onHoleCards(Card card1, Card card2, String villainName) {
+    @Override
+    public void onHoleCards(Card card1, Card card2) {
         this.holeCard1 = card1;
         this.holeCard2 = card2;
         this.onButton = gameInfo.onButton();

@@ -329,7 +329,7 @@ public class HUGameController implements IGameController {
         Log.f(DEBUG_PATH, smallBlindLog);
         Log.f(DEBUG_PATH, bigBlindLog);
 
-        player.onHoleCards(holeCard1, holeCard2, gameInfo.villainInfo.getName());
+        player.onHoleCards(holeCard1, holeCard2);
         if (currentStreet == PokerStreet.PREFLOP) {
             player.onStageEvent(currentStreet);
         }

@@ -626,7 +626,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	}
 
 	@Override
-	public void onHoleCards(Card c1, Card c2, String villainName) {
+	public void onHoleCards(Card c1, Card c2) {
 		botActionLabel.setText("");
 
 		botCardsField.setText("");

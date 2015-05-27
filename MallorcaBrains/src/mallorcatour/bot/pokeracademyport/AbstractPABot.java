@@ -79,8 +79,7 @@ public abstract class AbstractPABot implements Player {
         Log.f(DEBUG_PATH, "*** HOLE CARDS ****   " + card1 + " " + card2);
         getRealBot().onHandStarted(gi);
         getRealBot().onHoleCards(CardAdapter.createFromPACard(card1),
-                CardAdapter.createFromPACard(card2),
-                villainName);
+                CardAdapter.createFromPACard(card2));
     }
 
     public Action getAction() {

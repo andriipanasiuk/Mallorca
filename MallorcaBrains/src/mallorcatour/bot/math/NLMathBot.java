@@ -72,7 +72,7 @@ public class NLMathBot implements IPlayer {
 	 *            your seat number at the table
 	 */
 	@Override
-	public void onHoleCards(Card c1, Card c2, String villainName) {
+	public void onHoleCards(Card c1, Card c2) {
 		this.heroCard1 = c1;
 		this.heroCard2 = c2;
 		cardsObserver.onHoleCards(c1, c2);

@@ -112,7 +112,7 @@ public class GameEngine implements IGameInfo {
 	protected void dealCards(IPlayer player, OpenPlayerInfo playerInfo) {
 		HoleCards player1Cards = dealHoleCards();
 		playerInfo.setHoleCards(player1Cards.first, player1Cards.second);
-		player.onHoleCards(player1Cards.first, player1Cards.second, otherThan(player).getName());
+		player.onHoleCards(player1Cards.first, player1Cards.second);
 	}
 
 	void dealFlop(String one, String two, String three) {

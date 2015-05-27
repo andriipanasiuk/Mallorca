@@ -65,7 +65,7 @@ public class MixBot implements IPlayer {
 	 *            your seat number at the table
 	 */
 	@Override
-	public void onHoleCards(Card c1, Card c2, String villainName) {
+	public void onHoleCards(Card c1, Card c2) {
 		// situationHandler.onHoleCards(c1, c2, villainName);
 		this.heroCard1 = c1;
 		this.heroCard2 = c2;
