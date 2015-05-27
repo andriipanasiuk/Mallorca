@@ -5,11 +5,12 @@
 
 package mallorcatour.interfaces;
 
+
 /**
  *
  * @author Andrew
  */
 public interface IOutputInterpreter<T> {
 
-    T create(double... output);
+	T create(double... output);
 }

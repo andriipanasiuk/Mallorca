@@ -46,7 +46,7 @@ public class TestNeural {
 		BaseVector vector = BaseVector.valueOf(input);
 		networkFromCode.setInput(new VectorInterpreter(true).createInput(vector));
 		networkFromCode.calculate();
-		Log.d(Advice.create(new SmartPostflopAdviceCreator(true), networkFromCode.getOutput()).toString());
+		Log.d(Advice.create(new SmartPostflopAdviceCreator(), true, networkFromCode.getOutput()).toString());
 	}
 
 	public static void main(String... args) {

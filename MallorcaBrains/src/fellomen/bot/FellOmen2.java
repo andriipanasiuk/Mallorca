@@ -78,8 +78,8 @@ public class FellOmen2 implements IPlayer {
         double foldProb = actionDblArray[0][preFlopIndex];
         Log.f(DEBUG, "Probabilities: " + foldProb + " " + callProb + " " + raiseProb);
 
-        AdviceCreator creator = new SmartAdviceCreator(true);
-        Advice result = Advice.create(creator, foldProb, callProb, raiseProb);
+        AdviceCreator creator = new SmartAdviceCreator();
+        Advice result = Advice.create(creator, true, foldProb, callProb, raiseProb);
         return result;
     }
 
@@ -108,8 +108,8 @@ public class FellOmen2 implements IPlayer {
         Log.f(DEBUG, "Probabilities: " + foldProb + " " + callProb + " " + raiseProb);
 
 
-        AdviceCreator creator = new SmartPostflopAdviceCreator(true);
-        Advice result = Advice.create(creator, foldProb, callProb, raiseProb);
+        AdviceCreator creator = new SmartPostflopAdviceCreator();
+        Advice result = Advice.create(creator, true, foldProb, callProb, raiseProb);
         return result;
     }
 
@@ -137,8 +137,8 @@ public class FellOmen2 implements IPlayer {
         double foldProb = actionDblArray[0][turnIndex];
         Log.f(DEBUG, "Probabilities: " + foldProb + " " + callProb + " " + raiseProb);
 
-        AdviceCreator creator = new SmartPostflopAdviceCreator(true);
-        Advice result = Advice.create(creator, foldProb, callProb, raiseProb);
+        AdviceCreator creator = new SmartPostflopAdviceCreator();
+        Advice result = Advice.create(creator, true, foldProb, callProb, raiseProb);
 
         return result;
     }
@@ -166,8 +166,8 @@ public class FellOmen2 implements IPlayer {
 
         Log.f(DEBUG, "Probabilities: " + foldProb + " " + callProb + " " + raiseProb);
         AdviceCreator creator = new SmartRiverAdviceCreator(
-                gameInfo.getNumRaises() == 0, true);
-        Advice result = Advice.create(creator, foldProb, callProb, raiseProb);
+                gameInfo.getNumRaises() == 0);
+        Advice result = Advice.create(creator, true, foldProb, callProb, raiseProb);
         return result;
     }
 

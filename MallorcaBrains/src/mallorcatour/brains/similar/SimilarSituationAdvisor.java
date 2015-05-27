@@ -30,7 +30,8 @@ public class SimilarSituationAdvisor extends NeuralAdvisor {
 	private int MIN_COUNT_OF_SIMILAR_SITUATIONS = 4;
 	private final static double[] DEGREE_OF_SIMILARITY = new double[4];
 
-	public SimilarSituationAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, ISituationData situationData, String name) {
+	public SimilarSituationAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, ISituationData situationData,
+			String name) {
 		super(nnStreaming, stats, name);
 		this.situationData = situationData;
 		DEGREE_OF_SIMILARITY[0] = 0.05;
@@ -73,24 +74,23 @@ public class SimilarSituationAdvisor extends NeuralAdvisor {
 	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		List<PokerLearningExample> examplesForUse = null;
 		AdviceCreator adviceCreator = null;
-		boolean canRaise = situation.canRaise();
 		int street = situation.getStreet();
 		switch (street) {
 		case 0:
 			examplesForUse = preflopSituations;
-			adviceCreator = new SmartAdviceCreator(canRaise);
+			adviceCreator = new SmartAdviceCreator();
 			break;
 		case 1:
 			examplesForUse = flopSituations;
-			adviceCreator = new SmartPostflopAdviceCreator(canRaise);
+			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
 		case 2:
 			examplesForUse = turnSituations;
-			adviceCreator = new SmartPostflopAdviceCreator(canRaise);
+			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
 		case 3:
 			examplesForUse = riverSituations;
-			adviceCreator = new SmartRiverAdviceCreator(situation.getPotOdds() == 0, canRaise);
+			adviceCreator = new SmartRiverAdviceCreator(situation.getPotOdds() == 0);
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal street: " + street);
@@ -111,7 +111,7 @@ public class SimilarSituationAdvisor extends NeuralAdvisor {
 		List<PokerLearningExample> similarSituations = LEManager.getSimilarSituations(examplesForUse, current,
 				similarityDegree, new LocalSituationDistance());
 		if (similarSituations.size() >= MIN_COUNT_OF_SIMILAR_SITUATIONS) {
-			return Advice.create(creator, LEManager.getAverageOutput(similarSituations));
+			return Advice.create(creator, current.canRaise(), LEManager.getAverageOutput(similarSituations));
 		}
 		return null;
 	}

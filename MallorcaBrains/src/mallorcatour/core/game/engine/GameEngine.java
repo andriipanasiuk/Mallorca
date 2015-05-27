@@ -43,6 +43,8 @@ public class GameEngine implements IGameInfo {
 	private String DEBUG_PATH = "hh.txt";
 	private IRandomizer randomizer = new UniformRandomizer();
 
+	private int firstButtonFlip;
+
 	private boolean tradeOpened;
 	private int currentHandNumber = -1;
 	private LimitType limitType;
@@ -68,7 +70,7 @@ public class GameEngine implements IGameInfo {
 	}
 
 	protected void dealButton(IPlayer player, OpenPlayerInfo playerInfo) {
-		boolean flip = currentHandNumber % 2 == 1;
+		boolean flip = currentHandNumber % 2 == firstButtonFlip;
 		playerInfo.isOnButton = flip;
 		otherThan(playerInfo).isOnButton = !flip;
 	}
@@ -81,7 +83,7 @@ public class GameEngine implements IGameInfo {
 		currentStreet = PokerStreet.PREFLOP;
 		nonUsedCards = new ArrayList<Card>(Deck.getCards());
 
-		dealButton(player1, playerInfo1);
+		dealButton(player2, playerInfo2);
 
 		Log.f(DEBUG_PATH, "*************************");
 		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.stack + (playerInfo1.isOnButton ? " *" : ""));
@@ -123,12 +125,14 @@ public class GameEngine implements IGameInfo {
 
 	public TournamentSummary gameCycle() {
 		currentHandNumber = 0;
+		firstButtonFlip = randomizer.getRandom(0, 2);
 		BIG_BLIND = START_BIG_BLIND;
 		playerInfo1.stack = startingStack;
 		playerInfo2.stack = startingStack;
 		while (playerInfo1.stack > 0 && playerInfo2.stack > 0) {
 			deal();
 		}
+		Log.d(playerInfo1.stack + " " + playerInfo2.stack);
 		TournamentSummary result = new TournamentSummary();
 		if (playerInfo1.stack > playerInfo2.stack) {
 			result.winner = playerInfo1.name;
@@ -149,19 +153,6 @@ public class GameEngine implements IGameInfo {
 		Card flop1 = Card.valueOf(one);
 		Card flop2 = Card.valueOf(two);
 		Card flop3 = Card.valueOf(three);
-		nonUsedCards.remove(flop1);
-		nonUsedCards.remove(flop2);
-		nonUsedCards.remove(flop3);
-		boardCards.add(flop1);
-		boardCards.add(flop2);
-		boardCards.add(flop3);
-
-	}
-
-	private void dealFlop(Flop flop) {
-		Card flop1 = flop.first;
-		Card flop2 = flop.second;
-		Card flop3 = flop.third;
 		nonUsedCards.remove(flop1);
 		nonUsedCards.remove(flop2);
 		nonUsedCards.remove(flop3);
@@ -281,11 +272,6 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(c);
 	}
 
-	private void dealOneCard(Card c) {
-		nonUsedCards.remove(c);
-		boardCards.add(c);
-	}
-
 	private String endOfHand(OpenPlayerInfo winner) {
 		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.holeCard1 + " " + playerInfo1.holeCard2);
 		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.holeCard1 + " " + playerInfo2.holeCard2);
@@ -353,7 +339,7 @@ public class GameEngine implements IGameInfo {
 			return ActionResult.END_OF_HAND;
 		} else if (action.isPassive()) {
 			pot += action.getAmount();
-			if (action.getAmount() <= playerInfo1.stack) {
+			if (action.getAmount() <= playerInfo.stack) {
 				playerInfo.bet += action.getAmount();
 				playerInfo.stack -= action.getAmount();
 			} else {

@@ -20,7 +20,7 @@ public class BotVsBot {
 				"Grantorino Up", DEBUG_PATH);
 		IPlayer playerDown = new NeuralBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, "Grantorino Down", DEBUG_PATH);
-		GameEngine engine = new GameEngine(playerDown, playerUp, IGameObserver.EMPTY, DEBUG_PATH);
+		GameEngine engine = new GameEngine(playerUp, playerDown, IGameObserver.EMPTY, DEBUG_PATH);
 
 		int count1 = 0, count2 = 0;
 		for (int i = 0; i < 100; i++) {
@@ -31,6 +31,7 @@ public class BotVsBot {
 				count2++;
 			}
 			Log.d("Game # " + i + " has been played. Hands " + summary.handsCount);
+			Log.d(count1 + " " + count2);
 		}
 		Log.d(count1 + " " + count2);
 	}

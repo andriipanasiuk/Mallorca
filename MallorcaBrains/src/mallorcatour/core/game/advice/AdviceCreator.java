@@ -4,16 +4,16 @@
  */
 package mallorcatour.core.game.advice;
 
-import mallorcatour.interfaces.IOutputInterpreter;
+import mallorcatour.interfaces.IAdviceInterpreter;
 import mallorcatour.util.Log;
 
 /**
  * Default Advice creator.
  * @author Andrew
  */
-public class AdviceCreator implements IOutputInterpreter<Advice> {
+public class AdviceCreator implements IAdviceInterpreter {
 
-    public Advice create(double... output) {
+    public Advice create(boolean canRaise, double... output) {
         if (output.length != 3) {
             throw new IllegalArgumentException("Output dimension must equals 3");
         }

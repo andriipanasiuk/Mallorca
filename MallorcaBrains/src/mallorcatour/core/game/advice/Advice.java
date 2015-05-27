@@ -10,7 +10,7 @@ import java.util.List;
 
 import mallorcatour.core.game.Action;
 import mallorcatour.core.vector.IVector;
-import mallorcatour.interfaces.IOutputInterpreter;
+import mallorcatour.interfaces.IAdviceInterpreter;
 import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.util.UniformRandomizer;
 
@@ -24,7 +24,7 @@ public final class Advice implements IAdvice, IVector, Serializable {
     private static final String FOLD = "Fold: ";
     private static final String PASSIVE = "Passive: ";
     private static final String AGGRESSIVE = "Aggressive: ";
-    private final static IOutputInterpreter<Advice> DEFAULT_CREATOR = new AdviceCreator();
+    private final static IAdviceInterpreter DEFAULT_CREATOR = new AdviceCreator();
     private final transient IRandomizer randomizer = new UniformRandomizer();
 
     public List<Number> getValues() {
@@ -53,11 +53,11 @@ public final class Advice implements IAdvice, IVector, Serializable {
     }
 
     public static Advice create(double... values) {
-        return DEFAULT_CREATOR.create(values);
+        return DEFAULT_CREATOR.create(true, values);
     }
 
-    public static Advice create(IOutputInterpreter<Advice> creator, double... values) {
-        return creator.create(values);
+    public static Advice create(IAdviceInterpreter creator, boolean canRaise, double... values) {
+        return creator.create(canRaise ,values);
     }
     private int foldPercent;
     private int passivePercent;

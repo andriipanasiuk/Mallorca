@@ -18,13 +18,13 @@ public class SmartPostflopAdviceCreator extends SmartAdviceCreator {
 
     private final static int MIN_FOLD_TO_OTHER_ZERO = 60;
 
-    public SmartPostflopAdviceCreator(boolean canHeroRaise) {
-        super(canHeroRaise);
+    public SmartPostflopAdviceCreator() {
+        super();
     }
 
     @Override
-    public Advice create(double... output) {
-        Advice result = super.create(output);
+    public Advice create(boolean canRaise, double... output) {
+        Advice result = super.create(canRaise, output);
 
         int foldCount = result.getFoldPercent();
         int passiveCount = result.getPassivePercent();

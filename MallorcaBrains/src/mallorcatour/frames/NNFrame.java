@@ -1582,14 +1582,14 @@ public class NNFrame extends javax.swing.JFrame {
 
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
         double error = NNManager.errorOnExamples(multiLayerPerceptron,
-                learningExamples, new SmartAdviceCreator(true));
+                learningExamples, new SmartAdviceCreator());
         JOptionPane.showMessageDialog(this,
                 "Error on learning examples = " + error);
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         double error = NNManager.errorOnExamples(multiLayerPerceptron,
-                controlExamples, new SmartAdviceCreator(true));
+                controlExamples, new SmartAdviceCreator());
         JOptionPane.showMessageDialog(this,
                 "Error on control examples = " + error);
     }//GEN-LAST:event_jMenuItem11ActionPerformed
@@ -1598,7 +1598,7 @@ public class NNFrame extends javax.swing.JFrame {
         double sectionSize = 0.2;
         double maxError = 1.4;
         int[] sample = NNManager.createErrorSample(multiLayerPerceptron,
-                allExamples, sectionSize, maxError, new SmartAdviceCreator(false));
+                allExamples, sectionSize, maxError, new SmartAdviceCreator());
         String info = "";
         for (int i = 0; i < sample.length; i++) {
             info += "Count of examples with error (" + (i * sectionSize) + " - "

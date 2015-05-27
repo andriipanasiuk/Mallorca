@@ -4,6 +4,8 @@
  */
 package mallorcatour.core.game.advice;
 
+import mallorcatour.interfaces.IOutputInterpreter;
+
 /**
  * Advice creator that has three rules before it creates advice:
  * 1) if aggression is bigger than MIN_AGGRESSIVE_TO_ZERO_FOLD then foldCount =0;
@@ -14,25 +16,23 @@ package mallorcatour.core.game.advice;
  *
  * @author Andrew
  */
-public class SmartAdviceCreator extends AdviceCreator {
+public class SmartAdviceCreator extends AdviceCreator implements IOutputInterpreter<Advice> {
 
     private static final int MIN_AGGRESSIVE_TO_ZERO_FOLD = 60;
-    private final boolean canHeroRaise;
 
-    public SmartAdviceCreator(boolean canHeroRaise) {
-        this.canHeroRaise = canHeroRaise;
+    public SmartAdviceCreator() {
     }
 
     @Override
-    public Advice create(double... output) {
-        Advice result = super.create(output);
+    public Advice create(boolean canRaise, double... output) {
+        Advice result = super.create(canRaise, output);
 
         int foldCount = result.getFoldPercent();
         int passiveCount = result.getPassivePercent();
         int aggressiveCount = result.getAggressivePercent();
 
         //rules of this creator
-        if (!canHeroRaise) {
+        if (!canRaise) {
             passiveCount += aggressiveCount;
             aggressiveCount = 0;
         }
@@ -48,4 +48,9 @@ public class SmartAdviceCreator extends AdviceCreator {
         }
         return new Advice(foldCount, passiveCount, aggressiveCount);
     }
+
+	@Override
+	public Advice create(double... output) {
+		return create(true, output);
+	}
 }

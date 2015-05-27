@@ -17,14 +17,14 @@ public class SmartRiverAdviceCreator extends SmartPostflopAdviceCreator {
     private static final int MIN_PERCENT_TO_OTHER_ZERO = 70;
     private final boolean isBetAction;
 
-    public SmartRiverAdviceCreator(boolean isBetAction, boolean canHeroRaise) {
-        super(canHeroRaise);
+    public SmartRiverAdviceCreator(boolean isBetAction) {
+        super();
         this.isBetAction = isBetAction;
     }
 
     @Override
-    public Advice create(double... output) {
-        Advice result = super.create(output);
+    public Advice create(boolean canRaise, double... output) {
+        Advice result = super.create(canRaise, output);
         int foldCount = result.getFoldPercent();
         int passiveCount = result.getPassivePercent();
         int aggressiveCount = result.getAggressivePercent();

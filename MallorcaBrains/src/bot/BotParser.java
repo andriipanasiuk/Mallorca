@@ -89,7 +89,7 @@ public class BotParser {
 		EquilatorPreflop.loadFrom = LoadFrom.CODE;
 		NeuralBotFactory factory = new NeuralBotFactory();
 		BotParser parser = new BotParser(factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
-				IDecisionListener.EMPTY, null, ""));
+				IDecisionListener.EMPTY, "Mallorca", ""));
 		parser.run();
 	}
 }

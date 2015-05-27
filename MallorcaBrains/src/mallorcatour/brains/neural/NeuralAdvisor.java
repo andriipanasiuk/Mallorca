@@ -66,19 +66,19 @@ public class NeuralAdvisor implements IAdvisor {
 		switch (street) {
 		case 0:
 			nnForUse = preflopNN;
-			adviceCreator = new SmartAdviceCreator(canRaise);
+			adviceCreator = new SmartAdviceCreator();
 			break;
 		case 1:
 			nnForUse = flopNN;
-			adviceCreator = new SmartPostflopAdviceCreator(canRaise);
+			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
 		case 2:
 			nnForUse = turnNN;
-			adviceCreator = new SmartPostflopAdviceCreator(canRaise);
+			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
 		case 3:
 			nnForUse = riverNN;
-			adviceCreator = new SmartRiverAdviceCreator(situation.getPotOdds() == 0, canRaise);
+			adviceCreator = new SmartRiverAdviceCreator(situation.getPotOdds() == 0);
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal street: " + street);
@@ -87,7 +87,7 @@ public class NeuralAdvisor implements IAdvisor {
 		nnForUse.setInput(new LocalSituationInterpreter().createInput(situation));
 		nnForUse.calculate();
 		double[] advice = nnForUse.getOutput();
-		result = Advice.create(adviceCreator, advice);
+		result = Advice.create(adviceCreator, canRaise, advice);
 		return result;
 	}
 
