@@ -3,7 +3,6 @@ package mallorcatour.core.game.engine;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.OpenPlayerInfo;
-import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 
 public class PredefinedGameEngine extends GameEngine {
@@ -15,7 +14,7 @@ public class PredefinedGameEngine extends GameEngine {
 	}
 
 	@Override
-	protected void dealButton(IPlayer player, PlayerInfo playerInfo) {
+	protected void dealButton(IPlayer player, OpenPlayerInfo playerInfo) {
 		if (player == this.player) {
 			playerInfo.isOnButton = true;
 			otherThan(playerInfo).isOnButton = false;

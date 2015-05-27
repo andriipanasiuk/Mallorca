@@ -34,18 +34,17 @@ public class GameEngine implements IGameInfo {
 		public static final int START_STREET = 3;
 	}
 
-	private Flop predefinedFlop = null;
-	private Card predefinedTurn = null;
-	private Card predefinedRiver = null;
-
 	private final double startingStack = 2000;
-	private final static double BIG_BLIND = 20;
+	private final double START_BIG_BLIND = 20;
+	private final double[] BLINDS = new double[] { 20, 30, 40, 50, 60, 80, 100, 120, 160, 200, 240, 300, 400, 500, 600,
+			800, 1000, 1200, 1600, 2000, 2400 };
+	private double BIG_BLIND = 20;
 	private final IPlayer player1, player2;
 	private String DEBUG_PATH = "hh.txt";
 	private IRandomizer randomizer = new UniformRandomizer();
 
 	private boolean tradeOpened;
-	private long currentHandNumber = -1;
+	private int currentHandNumber = -1;
 	private LimitType limitType;
 
 	private double pot;
@@ -68,7 +67,7 @@ public class GameEngine implements IGameInfo {
 		this.limitType = limitType;
 	}
 
-	protected void dealButton(IPlayer player, PlayerInfo playerInfo) {
+	protected void dealButton(IPlayer player, OpenPlayerInfo playerInfo) {
 		boolean flip = currentHandNumber % 2 == 1;
 		playerInfo.isOnButton = flip;
 		otherThan(playerInfo).isOnButton = !flip;
@@ -77,10 +76,20 @@ public class GameEngine implements IGameInfo {
 	public void deal() {
 		tradeOpened = false;
 		currentHandNumber++;
+		BIG_BLIND = BLINDS[(currentHandNumber - 1) / 10];
+
 		currentStreet = PokerStreet.PREFLOP;
 		nonUsedCards = new ArrayList<Card>(Deck.getCards());
 
 		dealButton(player1, playerInfo1);
+
+		Log.f(DEBUG_PATH, "*************************");
+		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.stack + (playerInfo1.isOnButton ? " *" : ""));
+		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.stack + (playerInfo2.isOnButton ? " *" : ""));
+		Log.f(DEBUG_PATH, "");
+		Log.f(DEBUG_PATH, playerInfo1.name + " posts " + (playerInfo1.isOnButton ? BIG_BLIND / 2 : BIG_BLIND));
+		Log.f(DEBUG_PATH, playerInfo2.name + " posts " + (playerInfo2.isOnButton ? BIG_BLIND / 2 : BIG_BLIND));
+		Log.f(DEBUG_PATH, "");
 
 		playerInfo1.stack -= BIG_BLIND / 2;
 		playerInfo2.stack -= BIG_BLIND / 2;
@@ -107,15 +116,27 @@ public class GameEngine implements IGameInfo {
 		roundCycle();
 	}
 
-	public String gameCycle() {
+	public static class TournamentSummary {
+		public String winner;
+		public int handsCount;
+	}
+
+	public TournamentSummary gameCycle() {
+		currentHandNumber = 0;
+		BIG_BLIND = START_BIG_BLIND;
+		playerInfo1.stack = startingStack;
+		playerInfo2.stack = startingStack;
 		while (playerInfo1.stack > 0 && playerInfo2.stack > 0) {
 			deal();
 		}
+		TournamentSummary result = new TournamentSummary();
 		if (playerInfo1.stack > playerInfo2.stack) {
-			return playerInfo1.name;
+			result.winner = playerInfo1.name;
 		} else {
-			return playerInfo2.name;
+			result.winner = playerInfo2.name;
 		}
+		result.handsCount = currentHandNumber;
+		return result;
 	}
 
 	protected void dealCards(IPlayer player, OpenPlayerInfo playerInfo) {
@@ -202,24 +223,14 @@ public class GameEngine implements IGameInfo {
 		if (currentStreet == PokerStreet.RIVER) {
 			return ActionResult.END_OF_HAND;
 		} else if (currentStreet == PokerStreet.PREFLOP) {
-			if (predefinedFlop != null) {
-				dealFlop(predefinedFlop);
-			} else {
-				dealFlop();
-			}
+			dealFlop();
 		} else if (currentStreet == PokerStreet.FLOP) {
-			if (predefinedTurn != null) {
-				dealOneCard(predefinedTurn);
-			} else {
-				dealOneCard();
-			}
+			dealOneCard();
 		} else {
-			if (predefinedRiver != null) {
-				dealOneCard(predefinedRiver);
-			} else {
-				dealOneCard();
-			}
+			dealOneCard();
 		}
+		Log.f(DEBUG_PATH, "");
+		Log.f(DEBUG_PATH, "Board: " + boardCards + " Pot: " + pot);
 		currentStreet = currentStreet.next();
 		zeroBets();
 		return ActionResult.START_STREET;
@@ -233,7 +244,7 @@ public class GameEngine implements IGameInfo {
 		}
 	}
 
-	protected PlayerInfo otherThan(PlayerInfo player) {
+	protected OpenPlayerInfo otherThan(OpenPlayerInfo player) {
 		if (player == playerInfo1) {
 			return playerInfo2;
 		} else {
@@ -241,7 +252,7 @@ public class GameEngine implements IGameInfo {
 		}
 	}
 
-	private int playerAction(IPlayer player, PlayerInfo playerInfo) {
+	private int playerAction(IPlayer player, OpenPlayerInfo playerInfo) {
 		PlayerInfo other = otherThan(playerInfo);
 		double toCall = other.bet - playerInfo.bet;
 		Action action = player.getAction();
@@ -275,14 +286,18 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(c);
 	}
 
-	private String endOfHand(PlayerInfo winner) {
+	private String endOfHand(OpenPlayerInfo winner) {
+		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.holeCard1 + " " + playerInfo1.holeCard2);
+		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.holeCard1 + " " + playerInfo2.holeCard2);
 		if (winner != null) {
-			Log.d("End of hand. Winner: " + winner.name);
 			winner.stack += pot;
+			Log.f(DEBUG_PATH, winner.name + " wins " + pot);
 		} else {
 			playerInfo1.stack += pot / 2;
 			playerInfo2.stack += pot / 2;
+			Log.f(DEBUG_PATH, "Draw Pot: " + pot);
 		}
+		Log.f(DEBUG_PATH, "");
 		pot = 0;
 		zeroBets();
 		player1.onHandEnded();
@@ -291,11 +306,11 @@ public class GameEngine implements IGameInfo {
 		return winner != null ? winner.name : null;
 	}
 
-	private SimplePair<IPlayer, PlayerInfo> getPlayer(boolean onButton) {
+	private SimplePair<IPlayer, OpenPlayerInfo> getPlayer(boolean onButton) {
 		if (playerInfo1.isOnButton() ^ !onButton) {
-			return new SimplePair<IPlayer, PlayerInfo>(player1, playerInfo1);
+			return new SimplePair<IPlayer, OpenPlayerInfo>(player1, playerInfo1);
 		} else {
-			return new SimplePair<IPlayer, PlayerInfo>(player2, playerInfo2);
+			return new SimplePair<IPlayer, OpenPlayerInfo>(player2, playerInfo2);
 		}
 	}
 
@@ -303,7 +318,7 @@ public class GameEngine implements IGameInfo {
 		int result = ActionResult.START_ROUND;
 		while (result != ActionResult.END_OF_HAND) {
 			if (result == ActionResult.START_ROUND) {
-				SimplePair<IPlayer, PlayerInfo> button = getPlayer(true);
+				SimplePair<IPlayer, OpenPlayerInfo> button = getPlayer(true);
 				result = playerAction(button.first, button.second);
 			} else if (result == ActionResult.NEXT_STAGE) {
 				result = changeStreet();
@@ -314,7 +329,7 @@ public class GameEngine implements IGameInfo {
 				}
 			} else if (result == ActionResult.START_STREET) {
 				if (getBankRollAtRisk() > 0) {
-					SimplePair<IPlayer, PlayerInfo> button = getPlayer(false);
+					SimplePair<IPlayer, OpenPlayerInfo> button = getPlayer(false);
 					result = playerAction(button.first, button.second);
 				} else {
 					result = ActionResult.NEXT_STAGE;
@@ -330,7 +345,7 @@ public class GameEngine implements IGameInfo {
 		return calculateWinner();
 	}
 
-	private int playerActed(Action action, PlayerInfo playerInfo) {
+	private int playerActed(Action action, OpenPlayerInfo playerInfo) {
 		lastMovePlayer = playerInfo;
 		Log.f(DEBUG_PATH, playerInfo.name + " " + action.getActString());
 		double toCall = otherThan(playerInfo).bet - playerInfo.bet;
@@ -451,8 +466,10 @@ public class GameEngine implements IGameInfo {
 	public boolean onButton(String name) {
 		if (name.equals(playerInfo1.name)) {
 			return playerInfo1.isOnButton;
-		} else {
+		} else if (name.equals(playerInfo2.name)) {
 			return playerInfo2.isOnButton;
+		} else {
+			throw new RuntimeException("Wrong name: " + name);
 		}
 	}
 

@@ -23,8 +23,9 @@ import mallorcatour.util.Log;
 
 /**
  * Helper player that tracks spectrum of hero or villain during the round.
+ * 
  * @author andriipanasiuk
- *
+ * 
  */
 public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectrumHolder, IHoleCardsObserver {
 	private Spectrum spectrum;
@@ -56,15 +57,15 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 				equity = strengthManager.preflop.get(cards);
 			} else if (gameInfo.isFlop()) {
 				equity = strengthManager.flop.get(cards);
-				if (equity == null) {
-					Log.d("Cards: " + cards);
-				}
 			} else if (gameInfo.isTurn()) {
 				equity = strengthManager.turn.get(cards);
 			} else if (gameInfo.isRiver()) {
 				equity = strengthManager.river.get(cards);
 			} else {
 				throw new IllegalStateException("Incorrect street: " + gameInfo.getStage());
+			}
+			if (equity == null) {
+				Log.d("Cards: " + cards);
 			}
 			situation.setStrength(equity.strength);
 			situation.setPositivePotential(equity.positivePotential);
@@ -106,6 +107,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		situationHandler.onStageEvent(street);
 		if (street == PokerStreet.FLOP) {
 			spectrum.remove(gameInfo.getFlop().toArray());
+			randomSpectrum.remove(gameInfo.getFlop().toArray());
 		} else if (street == PokerStreet.TURN) {
 			spectrum.remove(gameInfo.getTurn());
 			randomSpectrum.remove(gameInfo.getTurn());
@@ -119,6 +121,9 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	public void onHandStarted(IGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		situationHandler.onHandStarted(gameInfo);
+		if (gameInfo.onButton(hero) ^ !trackHero) {
+			situation = situationHandler.getSituation();
+		}
 		spectrum = Spectrum.random();
 		randomSpectrum = Spectrum.random();
 	}
@@ -143,8 +148,10 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	public void onActed(Action action, double toCall, String name) {
 		situationHandler.onActed(action, toCall, name);
 		if (name.equals(hero) ^ !trackHero) {
+			String modelPlayer = trackHero ? gameInfo.getHero(hero).getName() : gameInfo.getVillain(hero).getName();
+			Log.d("Situation of " + modelPlayer + " " + situation);
 			modifySpectrum(situation, action);
-		}else{
+		} else {
 			situation = situationHandler.getSituation();
 		}
 	}

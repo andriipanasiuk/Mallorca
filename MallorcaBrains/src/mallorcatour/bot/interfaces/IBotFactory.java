@@ -14,5 +14,5 @@ import mallorcatour.brains.IAdvisor;
 public interface IBotFactory {
 
     IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-            IDecisionListener decisionListener, String debug);
+            IDecisionListener decisionListener, String name, String debug);
 }

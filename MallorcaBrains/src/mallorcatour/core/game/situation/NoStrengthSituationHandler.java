@@ -5,7 +5,6 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.util.Log;
 
 public class NoStrengthSituationHandler implements ISituationHandler, IGameObserver<IGameInfo> {
 	protected int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;
@@ -32,10 +31,12 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		double potAfterCall = playerToCall + pot;
 		double potOdds = playerToCall / potAfterCall;
 
-		Log.d("Ef. stack: " + effectiveStack);
-		Log.d("Pot: " + pot);
-		Log.d("To call: " + playerToCall);
-		Log.d("On button: " + isOnButton);
+//		Log.d("---------");
+//		Log.d("Ef. stack: " + effectiveStack);
+//		Log.d("Pot: " + pot);
+//		Log.d("To call: " + playerToCall);
+//		Log.d("On button: " + isOnButton);
+//		Log.d("---------");
 		if (gameInfo.isPreFlop()) {
 			result = new LocalSituation(LocalSituation.PREFLOP, limitType);
 		} else if (gameInfo.isFlop()) {

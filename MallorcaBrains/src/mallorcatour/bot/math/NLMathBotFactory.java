@@ -16,16 +16,17 @@ public class NLMathBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, String debug) {
+			IDecisionListener decisionListener, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
 		NLMathBot bot = new NLMathBot(profitCalculator, debug);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
 				spectrumListener, bot.getName(), false);
-		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, bot.getName());
-		bot.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager), 
+		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, name);
+		bot.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager),
 				new HoleCardsObservers(villainObserver, situationHandler));
 		bot.set(villainObserver);
+		bot.setName(name);
 		return bot;
 	}
 }

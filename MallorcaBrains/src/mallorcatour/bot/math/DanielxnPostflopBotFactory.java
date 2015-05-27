@@ -17,7 +17,7 @@ import mallorcatour.brains.IAdvisor;
 public class DanielxnPostflopBotFactory implements IBotFactory {
 
 	public IPlayer createBot(IAdvisor modeller, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, String debug) {
+			IDecisionListener decisionListener, String name, String debug) {
 		throw new UnsupportedOperationException();
 	}
 }

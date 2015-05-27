@@ -26,7 +26,7 @@ public class NeuralMathBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, String debug) {
+			IDecisionListener decisionListener, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
 		GusXensen player = new GusXensen();
@@ -36,11 +36,12 @@ public class NeuralMathBotFactory implements IBotFactory {
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
 				spectrumListener, bot.getName(), false);
 		IActionChecker actionChecker = new NLRiverActionChecker(profitCalculator, villainObserver);
-		SituationHandler handler = new SituationHandler(limitType, true, bot.getName());
+		SituationHandler handler = new SituationHandler(limitType, true, name);
 		bot.set(new GameObservers(strengthManager, handler, villainObserver), handler, new HoleCardsObservers(
 				villainObserver, handler));
 		bot.set(villainObserver);
 		bot.set(actionChecker);
+		bot.setName(name);
 		return bot;
 	}
 }

@@ -341,10 +341,10 @@ public class PSTableDirector {
         IPlayer player;
         if (limitType == LimitType.FIXED_LIMIT) {
             player = FLbotFactory.createBot(villainModeller,
-                    ISpectrumListener.EMPTY, IDecisionListener.EMPTY, debug);
+                    ISpectrumListener.EMPTY, IDecisionListener.EMPTY, null, debug);
         } else if (limitType == LimitType.NO_LIMIT) {
             player = NLbotFactory.createBot(villainModeller,
-                    ISpectrumListener.EMPTY, IDecisionListener.EMPTY, debug);
+                    ISpectrumListener.EMPTY, IDecisionListener.EMPTY, null, debug);
         } else {
             throw new RuntimeException();
         }

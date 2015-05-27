@@ -16,7 +16,7 @@ import mallorcatour.brains.IAdvisor;
  */
 public class MathBotFLFactory implements IBotFactory {
 
-    public IPlayer createBot(IAdvisor modeller, ISpectrumListener spectrumListener, IDecisionListener decisionListener, String debug) {
+    public IPlayer createBot(IAdvisor modeller, ISpectrumListener spectrumListener, IDecisionListener decisionListener, String name, String debug) {
     	throw new RuntimeException();
     }
 }

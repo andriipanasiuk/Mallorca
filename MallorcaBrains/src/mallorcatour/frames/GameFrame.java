@@ -15,8 +15,8 @@ import java.awt.EventQueue;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.modeller.NeuralModelVillainBotFactory;
 import mallorcatour.bot.modeller.VillainModel;
+import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
@@ -49,27 +49,27 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 	private final Object lock = new Object();
 	private final Object actionLock = new Object();
 	private final ShowingSpectrumListener spectrumListener;
-	private boolean useGoButton;
+	private boolean useGoButton = false;
 	private VillainModel villainModeller;
 	private final String DEBUG_PATH;
 	private GameEngine engine;
 	private Action lastMove;
-	private IPlayer player1;
-	private IPlayer player2;
+	private IPlayer playerUp;
+	private IPlayer playerDown;
 
 	/** Creates new form GrandtorinoGameFrame */
 	public GameFrame(LimitType limitType) {
 		initComponents();
 		spectrumListener = new ShowingSpectrumListener();
-		Log.WRITE_TO_ERR = true;
+		Log.WRITE_TO_ERR = false;
 		DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		villainModeller = new VillainModel(limitType, DEBUG_PATH);
-		NeuralModelVillainBotFactory factory = new NeuralModelVillainBotFactory();
-		player1 = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
-				"debug.txt");
-		player2 = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
-				"debug.txt");
-		engine = new GameEngine(player2, player1, this, DEBUG_PATH);
+		NeuralBotFactory factory = new NeuralBotFactory();
+		playerUp = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
+				"Grantorino Up", DEBUG_PATH);
+		playerDown = new NeuralBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+				IDecisionListener.EMPTY, "Grantorino Down", DEBUG_PATH);
+		engine = new GameEngine(playerDown, playerUp, this, DEBUG_PATH);
 		enableActionButtons(false);
 		humanDealerButton.setVisible(false);
 		botDealerButton.setVisible(false);
@@ -97,10 +97,10 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 	}
 
 	private void updateUI() {
-		botBetField.setText(String.valueOf(gameInfo.getHero(player1.getName()).bet));
-		humanBetField.setText(String.valueOf(gameInfo.getHero(player2.getName()).bet));
-		botStackField.setText(String.valueOf(gameInfo.getHero(player1.getName()).stack));
-		humanStackField.setText(String.valueOf(gameInfo.getHero(player2.getName()).stack));
+		botBetField.setText(String.valueOf(gameInfo.getHero(playerUp.getName()).bet));
+		humanBetField.setText(String.valueOf(gameInfo.getHero(playerDown.getName()).bet));
+		botStackField.setText(String.valueOf(gameInfo.getHero(playerUp.getName()).stack));
+		humanStackField.setText(String.valueOf(gameInfo.getHero(playerDown.getName()).stack));
 		potField.setText(String.valueOf(gameInfo.getPotSize()));
 		boardField.setText(gameInfo.getBoard().toString());
 	}
@@ -466,6 +466,8 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 
 			public void run() {
 				engine.gameCycle();
+				Log.f(DEBUG_PATH, "==========  New tournament  ==========");
+				dealButton.setVisible(true);
 			}
 		});
 
@@ -483,8 +485,8 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 	private void passiveButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_passiveButtonActionPerformed
 		botActionLabel.setText("");
 		enableActionButtons(false);
-		if (gameInfo.getAmountToCall(player2.getName()) > 0) {
-			lastMove = Action.callAction(gameInfo.getAmountToCall(player2.getName()));
+		if (gameInfo.getAmountToCall(playerDown.getName()) > 0) {
+			lastMove = Action.callAction(gameInfo.getAmountToCall(playerDown.getName()));
 		} else {
 			lastMove = Action.checkAction();
 		}
@@ -601,7 +603,6 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 
 	@Override
 	public void onHandEnded() {
-		dealButton.setVisible(true);
 		botCardsField.setVisible(true);
 		new Thread() {
 
@@ -623,7 +624,7 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 
 	@Override
 	public void onActed(Action action, double toCall, String name) {
-		if (name.equals(player1.getName())) {
+		if (name.equals(playerUp.getName())) {
 			botActionLabel.setText(action.toString());
 		}
 		updateUI();

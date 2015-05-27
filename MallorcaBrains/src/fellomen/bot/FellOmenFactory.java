@@ -16,7 +16,7 @@ import mallorcatour.brains.IAdvisor;
  */
 public class FellOmenFactory implements IBotFactory {
 
-    public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener, IDecisionListener decisionListener, String debug) {
+    public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener, IDecisionListener decisionListener, String name, String debug) {
         return new FellOmen2(debug);
     }
 }

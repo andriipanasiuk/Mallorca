@@ -39,20 +39,20 @@ public class StrengthManager implements IGameObserver<IGameInfo> {
 
 	@Override
 	public void onStageEvent(PokerStreet street) {
+		if (street == PokerStreet.FLOP) {
+			randomSpectrum.remove(gameInfo.getFlop().first);
+			randomSpectrum.remove(gameInfo.getFlop().second);
+			randomSpectrum.remove(gameInfo.getFlop().third);
+		} else if (street == PokerStreet.TURN) {
+			randomSpectrum.remove(gameInfo.getTurn());
+		} else if (street == PokerStreet.RIVER) {
+			randomSpectrum.remove(gameInfo.getRiver());
+		}
 		calculateStrengthMap(street);
 	}
 
 	private void calculateStrengthMap(PokerStreet street) {
 		long start = System.currentTimeMillis();
-		if (street == PokerStreet.FLOP) {
-            randomSpectrum.remove(gameInfo.getFlop().first);
-            randomSpectrum.remove(gameInfo.getFlop().second);
-            randomSpectrum.remove(gameInfo.getFlop().third);
-        } else if (street == PokerStreet.TURN) {
-            randomSpectrum.remove(gameInfo.getTurn());
-        } else if (street == PokerStreet.RIVER) {
-            randomSpectrum.remove(gameInfo.getRiver());
-        }
 		if (street == PokerStreet.FLOP) {
 			flop = new HashMap<HoleCards, StreetEquity>();
 			Map<Integer, StreetEquity> cache = new HashMap<Integer, StreetEquity>();

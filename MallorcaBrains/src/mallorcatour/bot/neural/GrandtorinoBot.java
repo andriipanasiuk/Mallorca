@@ -33,7 +33,6 @@ public class GrandtorinoBot implements IPlayer {
 
 	protected IPlayerGameInfo gameInfo;
 	private Card heroCard1, heroCard2;
-	private ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor advisor;
 	private IActionChecker actionChecker;
 	private final IAdvisor preflopBot;
@@ -51,7 +50,7 @@ public class GrandtorinoBot implements IPlayer {
 	}
 
 	public void set(ISpectrumHolder villainSpectrum) {
-		this.villainSpectrumHolder = villainSpectrum;
+		// TODO
 	}
 
 	public void set(IActionChecker actionChecker) {
@@ -166,7 +165,13 @@ public class GrandtorinoBot implements IPlayer {
 
 	@Override
 	public String getName() {
-		return "NeuralBot";
+		return (name != null) ? name : "NeuralBot";
+	}
+
+	private String name;
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

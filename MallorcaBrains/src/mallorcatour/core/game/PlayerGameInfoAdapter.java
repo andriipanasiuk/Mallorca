@@ -126,10 +126,13 @@ public class PlayerGameInfoAdapter implements IPlayerGameInfo {
 	public boolean onButton(String name) {
 		if (name.equals(heroInfo.name)) {
 			return heroInfo.isOnButton;
-		} else {
+		} else if (name.equals(villainInfo.name)) {
 			return villainInfo.isOnButton;
+		} else {
+			throw new RuntimeException("Incorrect name: " + name);
 		}
 	}
+
 	@Override
 	public PlayerInfo getHero(String hero) {
 		return heroInfo.name.equals(hero) ? heroInfo : villainInfo;

@@ -15,13 +15,14 @@ public class NeuralBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, String debug) {
+			IDecisionListener decisionListener, String name, String debug) {
 		GusXensen player = new GusXensen();
 		NeuralAdvisor advisor = new NeuralAdvisor(player, player, "Gus Xensen");
 		GrandtorinoBot realPlayer = new GrandtorinoBot(advisor, LimitType.NO_LIMIT, debug);
-		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true, realPlayer.getName());
+		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true, name);
 		realPlayer.set(handler, handler, handler);
 		realPlayer.set(IActionChecker.EMPTY);
+		realPlayer.setName(name);
 		return realPlayer;
 	}
 

@@ -67,7 +67,7 @@ public class NLPreflopChart implements IAdvisor {
                 return uoMinPotChart.getAdvice(cards);
             } else {
             	Action action = pushFoldChart.getAction(cards, bbsInES);
-            	Log.f("Decision by push/fold chart");
+            	Log.d("Decision by push/fold chart");
             	return new ExactAdvice(action);
             }
 		} else if (vsRaise(situation) && situation.getPotToStackOdds() < 0.4 && situation.getPotOdds() < 0.4) {

@@ -19,7 +19,7 @@ public class GrandtorinoMathPlayer extends AbstractPABot {
 	public GrandtorinoMathPlayer() {
 		super("MathBot");
 		myBot = new NeuralBotFactory().createBot(getVillainModeller(), ISpectrumListener.EMPTY, getDecisionListener(),
-				getDebugPath());
+				null, getDebugPath());
 	}
 
 	@Override

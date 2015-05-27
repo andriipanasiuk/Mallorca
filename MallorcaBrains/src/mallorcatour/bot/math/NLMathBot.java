@@ -42,7 +42,6 @@ public class NLMathBot implements IPlayer {
 	private IGameObserver<IPlayerGameInfo> gameObserver;
 	private IHoleCardsObserver cardsObserver;
 
-
 	public NLMathBot(IProfitCalculator profitCalculator, String debug) {
 		this.profitCalculator = profitCalculator;
 		adviceCreator = new AdviceCreatorFromMap();
@@ -149,6 +148,12 @@ public class NLMathBot implements IPlayer {
 
 	@Override
 	public String getName() {
-		return "NLMathBot";
+		return name != null ? name : "NLMathBot";
+	}
+
+	private String name;
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }
