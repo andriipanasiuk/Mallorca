@@ -33,9 +33,9 @@ public class GrandtorinoBot implements IPlayer {
 
 	protected IPlayerGameInfo gameInfo;
 	private Card heroCard1, heroCard2;
-	private final ISpectrumHolder villainSpectrumHolder;
+	private ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor advisor;
-	private final IActionChecker actionChecker;
+	private IActionChecker actionChecker;
 	private final IAdvisor preflopBot;
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
@@ -50,13 +50,18 @@ public class GrandtorinoBot implements IPlayer {
 		this.cardsObserver = cardsObserver;
 	}
 
-	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
-			ISpectrumHolder villainSpectrumHolder, IActionChecker actionChecker, LimitType limitType, String debug) {
+	public void set(ISpectrumHolder villainSpectrum) {
+		this.villainSpectrumHolder = villainSpectrum;
+	}
+
+	public void set(IActionChecker actionChecker) {
+		this.actionChecker = actionChecker;
+	}
+
+	public GrandtorinoBot(IAdvisor neuralNetwork, LimitType limitType, String debug) {
 		this.advisor = neuralNetwork;
 		this.DEBUG_PATH = debug;
 		this.actionChecker = actionChecker;
-		this.villainSpectrumHolder = villainSpectrumHolder;
-		this.situationHandler = situationHandler;
 		actionPreprocessor = new NLActionPreprocessor();
 		preflopBot = new NLPreflopChart();
 	}
@@ -100,7 +105,7 @@ public class GrandtorinoBot implements IPlayer {
 		action = advice.getAction();
 		action = actionPreprocessor.preprocessAction(action, gameInfo);
 		Log.f(DEBUG_PATH, "Action: " + action);
-		action = actionChecker.checkAction(action, situation, gameInfo, holeCards, villainSpectrumHolder.getSpectrum());
+		action = actionChecker.checkAction(action, situation, gameInfo, holeCards);
 		return action;
 	}
 
@@ -146,12 +151,12 @@ public class GrandtorinoBot implements IPlayer {
 		gameObserver.onHandStarted(gameInfo);
 	}
 
-	/**
-	 * An villain action has been observed.
-	 */
 	@Override
 	public void onActed(Action action, double toCall, String name) {
-		gameObserver.onActed(action, toCall, name);
+		// callback about his action bot send himself
+		if (!name.equals(getName())) {
+			gameObserver.onActed(action, toCall, name);
+		}
 	}
 
 	@Override

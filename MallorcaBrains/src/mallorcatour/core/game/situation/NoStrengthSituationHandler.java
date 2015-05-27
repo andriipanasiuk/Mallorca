@@ -1,7 +1,6 @@
 package mallorcatour.core.game.situation;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
@@ -9,31 +8,34 @@ import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.util.Log;
 
 public class NoStrengthSituationHandler implements ISituationHandler, IGameObserver<IGameInfo> {
-	protected Card flop1, flop2, flop3, turn, river;
 	protected int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;
 	protected IGameInfo gameInfo;
 	protected boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
 	protected final LimitType limitType;
-	protected final String hero;
-	private double heroToCall;
+	private double playerToCall;
 	private double effectiveStack;
 	private double pot;
+	private final String hero;
+	private final boolean trackHero;
+	private double toCall;
 
-	public NoStrengthSituationHandler(LimitType limitType, String hero) {
+	public NoStrengthSituationHandler(LimitType limitType, String hero, boolean trackHero) {
 		this.limitType = limitType;
 		this.hero = hero;
+		this.trackHero = trackHero;
 	}
 
 	@Override
 	public LocalSituation getSituation() {
 		LocalSituation result = null;
-		boolean isOnButton = gameInfo.onButton(hero);
-		double potAfterCall = heroToCall + pot;
-		double potOdds = heroToCall / potAfterCall;
+		boolean isOnButton = gameInfo.onButton(hero) ^ !trackHero;
+		double potAfterCall = playerToCall + pot;
+		double potOdds = playerToCall / potAfterCall;
 
 		Log.d("Ef. stack: " + effectiveStack);
 		Log.d("Pot: " + pot);
-		Log.d("To call: " + heroToCall);
+		Log.d("To call: " + playerToCall);
+		Log.d("On button: " + isOnButton);
 		if (gameInfo.isPreFlop()) {
 			result = new LocalSituation(LocalSituation.PREFLOP, limitType);
 		} else if (gameInfo.isFlop()) {
@@ -63,10 +65,11 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 	public void onHandStarted(IGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		effectiveStack = gameInfo.getBankRollAtRisk();
-		if (gameInfo.onButton(hero)) {
-			heroToCall = gameInfo.getBigBlindSize() / 2;
+		if (gameInfo.onButton(hero) ^ !trackHero) {
+			playerToCall = gameInfo.getBigBlindSize() / 2;
 		}
 		pot = gameInfo.getBigBlindSize() * 3 / 2;
+		toCall = gameInfo.getBigBlindSize() / 2;
 		heroActionCount = 0;
 		countOfHeroAggressive = 0;
 		villainActionCount = 0;
@@ -87,12 +90,12 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 
 	private void onVillainActed(Action action) {
 		if (action.isAggressive()) {
-			this.heroToCall = action.getAmount();
+			this.playerToCall = action.getAmount();
 			wasVillainPreviousAggressive = true;
 			villainActionCount++;
 			countOfOppAggressive++;
 		} else if (action.isPassive()) {
-			this.heroToCall = 0;
+			this.playerToCall = 0;
 			wasVillainPreviousAggressive = false;
 			villainActionCount++;
 		}
@@ -105,11 +108,11 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 
 	@Override
 	public void onStageEvent(PokerStreet street) {
-		heroToCall = 0;
+		playerToCall = 0;
 	}
 
 	@Override
-	public void onActed(Action action, double toCall, String name) {
+	public void onActed(Action action, double toCallParam, String name) {
 		pot += toCall;
 		if (action.isAggressive()) {
 			if (action.getAmount() < effectiveStack) {
@@ -125,7 +128,7 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		} else {
 			toCall = 0;
 		}
-		if (name.equals(hero)) {
+		if (name.equals(hero) ^ !trackHero) {
 			onHeroActed(action);
 		} else {
 			onVillainActed(action);

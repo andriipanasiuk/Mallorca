@@ -4,6 +4,8 @@ import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.neural.GameObservers;
+import mallorcatour.bot.neural.HoleCardsObservers;
 import mallorcatour.bot.neural.SpectrumPlayerObserver;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
@@ -17,11 +19,13 @@ public class NLMathBotFactory implements IBotFactory {
 			IDecisionListener decisionListener, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
+		NLMathBot bot = new NLMathBot(profitCalculator, debug);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
-				spectrumListener, "Villain");
-		NLMathBot bot = new NLMathBot(profitCalculator, null, villainObserver, debug);
+				spectrumListener, bot.getName(), false);
 		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, bot.getName());
-		bot.set(situationHandler, situationHandler, situationHandler);
+		bot.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager), 
+				new HoleCardsObservers(villainObserver, situationHandler));
+		bot.set(villainObserver);
 		return bot;
 	}
 }

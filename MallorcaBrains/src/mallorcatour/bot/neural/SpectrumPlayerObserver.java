@@ -16,12 +16,16 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.NoStrengthSituationHandler;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.Log;
 
+/**
+ * Helper player that tracks spectrum of hero or villain during the round.
+ * @author andriipanasiuk
+ *
+ */
 public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectrumHolder, IHoleCardsObserver {
 	private Spectrum spectrum;
 	private Spectrum randomSpectrum;
@@ -30,14 +34,16 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	private StrengthManager strengthManager;
 	private ISpectrumListener spectrumListener;
 	private final String hero;
+	private final boolean trackHero;
 	private NoStrengthSituationHandler situationHandler;
 	private LocalSituation situation;
 
 	public SpectrumPlayerObserver(IAdvisor model, StrengthManager strengthManager, ISpectrumListener spectrumListener,
-			String hero) {
+			String hero, boolean trackHero) {
 		this.hero = hero;
+		this.trackHero = trackHero;
 		this.model = model;
-		situationHandler = new NoStrengthSituationHandler(LimitType.NO_LIMIT, hero);
+		situationHandler = new NoStrengthSituationHandler(LimitType.NO_LIMIT, hero, trackHero);
 		this.strengthManager = strengthManager;
 		this.spectrumListener = spectrumListener;
 	}
@@ -136,7 +142,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	@Override
 	public void onActed(Action action, double toCall, String name) {
 		situationHandler.onActed(action, toCall, name);
-		if (name.equals(hero)) {
+		if (name.equals(hero) ^ !trackHero) {
 			modifySpectrum(situation, action);
 		}else{
 			situation = situationHandler.getSituation();

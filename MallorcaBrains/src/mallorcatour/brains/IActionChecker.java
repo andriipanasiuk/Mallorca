@@ -10,12 +10,10 @@ public interface IActionChecker {
 	IActionChecker EMPTY = new IActionChecker() {
 
 		@Override
-		public Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards,
-				Spectrum villainSpectrum) {
+		public Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards) {
 			return action;
 		}
 	};
 
-	Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards,
-			Spectrum villainSpectrum);
+	Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards);
 }

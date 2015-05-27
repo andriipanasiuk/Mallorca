@@ -14,6 +14,7 @@ import java.awt.EventQueue;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.modeller.NeuralModelVillainBotFactory;
 import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.villainobserver.VillainStatistics;
@@ -62,7 +63,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 		Log.WRITE_TO_ERR = true;
 		DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		villainModeller = new VillainModel(limitType, DEBUG_PATH);
-		NeuralBotFactory factory = new NeuralBotFactory();
+		NeuralModelVillainBotFactory factory = new NeuralModelVillainBotFactory();
 		player = factory.createBot(IAdvisor.UNSUPPORTED,new ShowingSpectrumListener(), IDecisionListener.EMPTY,
 				"debug.txt");
 		engine = new PredefinedGameEngine(this, player, DEBUG_PATH);

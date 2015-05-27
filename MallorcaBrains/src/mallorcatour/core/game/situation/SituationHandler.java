@@ -18,17 +18,18 @@ import mallorcatour.core.game.PokerStreet;
  */
 public class SituationHandler extends NoStrengthSituationHandler implements IHoleCardsObserver {
 
-	protected Card holeCard1, holeCard2;
+	private Card flop1, flop2, flop3, turn, river;
+	private Card holeCard1, holeCard2;
 	private final boolean needFullPotentialOnFlop;
 	private double strength, positivePotential, negativePotential;
 
 	public SituationHandler(LimitType limitType, String hero) {
-		super(limitType, hero);
+		super(limitType, hero, true);
 		needFullPotentialOnFlop = false;
 	}
 
 	public SituationHandler(LimitType limitType, boolean needFullPotentialOnFlop, String hero) {
-		super(limitType, hero);
+		super(limitType, hero, true);
 		this.needFullPotentialOnFlop = needFullPotentialOnFlop;
 	}
 

@@ -29,14 +29,16 @@ public class NeuralModelVillainBotFactory implements IBotFactory {
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener villainSpectrumListener,
 			IDecisionListener decisionListener, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
-		// TODO change villain name to real
-		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
-				villainSpectrumListener, "Villain");
 		GusXensen player = new GusXensen();
-		GrandtorinoBot bot = new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), null, villainObserver,
-				IActionChecker.EMPTY, LimitType.NO_LIMIT, debug);
+		GrandtorinoBot bot = new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), LimitType.NO_LIMIT,
+				debug);
+		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(new NeuralAdvisor(player, player,
+				"Gus Xensen Villain Model"), strengthManager, villainSpectrumListener, bot.getName(), false);
 		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true, bot.getName());
-		bot.set(new GameObservers(handler, strengthManager), handler, new HoleCardsObservers(villainObserver, handler));
+		bot.set(new GameObservers(handler, strengthManager, villainObserver), handler, new HoleCardsObservers(
+				villainObserver, handler));
+		bot.set(IActionChecker.EMPTY);
+		bot.set(villainObserver);
 		return bot;
 	}
 }

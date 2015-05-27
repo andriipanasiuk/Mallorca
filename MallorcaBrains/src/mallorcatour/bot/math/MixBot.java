@@ -28,6 +28,7 @@ import mallorcatour.util.Log;
  * 
  * @author Andrew
  */
+//TODO add callbacks and test bot
 public class MixBot implements IPlayer {
 
 	private IPlayerGameInfo gameInfo;
@@ -48,8 +49,7 @@ public class MixBot implements IPlayer {
 		strengthManager = new StrengthManager(false);
 		profitCalculator = new NLProfitCalculator(villainModeller, strengthManager);
 		situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, getName());
-		// TODO change villain name to real
-		villainObserver = new SpectrumPlayerObserver(villainModeller, strengthManager, listener, "Villain");
+		villainObserver = new SpectrumPlayerObserver(villainModeller, strengthManager, listener, getName(), false);
 		actionPreprocessor = new NLActionPreprocessor();
 		this.DEBUG_PATH = debug;
 	}

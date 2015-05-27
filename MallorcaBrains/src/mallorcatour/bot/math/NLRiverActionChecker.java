@@ -3,33 +3,34 @@ package mallorcatour.bot.math;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.core.spectrum.Spectrum;
 
 public class NLRiverActionChecker implements IActionChecker {
 
 	private final IProfitCalculator profitCalculator;
+	private final ISpectrumHolder villainSpectrumHolder;
 
 	private final static double MIN_VALUE_FOR_CALL_DECISION = 10;
     private final static double MIN_VALUE_FOR_BET_DECISION = 10;
 
-	public NLRiverActionChecker(IProfitCalculator profitCalculator) {
+	public NLRiverActionChecker(IProfitCalculator profitCalculator, ISpectrumHolder villain) {
 		this.profitCalculator = profitCalculator;
+		this.villainSpectrumHolder = villain;
 	}
 
 	@Override
-	public Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards,
-			Spectrum villainSpectrum) {
+	public Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards) {
 		if (!gameInfo.isRiver() || gameInfo.getLimitType() != LimitType.NO_LIMIT) {
 			return action;
 		}
 		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, cards.first,
-				cards.second, villainSpectrum);
+				cards.second, villainSpectrumHolder.getSpectrum());
 		if (gameInfo.getAmountToCall() > 0) {
 			if (action.isFold()) {
 				for (Entry<Action, Double> entry : map.entrySet()) {

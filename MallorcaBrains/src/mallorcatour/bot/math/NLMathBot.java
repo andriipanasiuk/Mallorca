@@ -32,7 +32,7 @@ public class NLMathBot implements IPlayer {
 	private BaseAdviceCreatorFromMap adviceCreator;
 	private IPlayerGameInfo gameInfo;
 	private ISituationHandler situationHandler;
-	private final ISpectrumHolder villainSpectrumHolder;
+	private ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor preflopAdvisor;
 	private final IProfitCalculator profitCalculator;
 	private final IAdvisor preflopBot;
@@ -42,23 +42,25 @@ public class NLMathBot implements IPlayer {
 	private IGameObserver<IPlayerGameInfo> gameObserver;
 	private IHoleCardsObserver cardsObserver;
 
-	public void set(ISituationHandler situationHandler, IGameObserver observer, IHoleCardsObserver cardsObserver) {
-		this.situationHandler = situationHandler;
-		this.gameObserver = observer;
-		this.cardsObserver = cardsObserver;
-	}
 
-	public NLMathBot(IProfitCalculator profitCalculator, ISituationHandler situationHandler,
-			ISpectrumHolder villainSpectrumHolder, String debug) {
+	public NLMathBot(IProfitCalculator profitCalculator, String debug) {
 		this.profitCalculator = profitCalculator;
-		this.situationHandler = situationHandler;
-		this.villainSpectrumHolder = villainSpectrumHolder;
 		adviceCreator = new AdviceCreatorFromMap();
 		GusXensen player = new GusXensen();
 		preflopAdvisor = new NeuralAdvisor(player, player, "Gus Xensen");
 		preflopBot = new NLPreflopChart();
 		actionPreprocessor = new NLActionPreprocessor();
 		this.DEBUG_PATH = debug;
+	}
+
+	public void set(ISituationHandler situationHandler, IGameObserver observer, IHoleCardsObserver cardsObserver) {
+		this.situationHandler = situationHandler;
+		this.gameObserver = observer;
+		this.cardsObserver = cardsObserver;
+	}
+
+	public void set(ISpectrumHolder villainSpectrumHolder) {
+		this.villainSpectrumHolder = villainSpectrumHolder;
 	}
 
 	/**
@@ -91,8 +93,7 @@ public class NLMathBot implements IPlayer {
 		if (gameInfo.isVillainSitOut()) {
 			Log.f(DEBUG_PATH, "Villain is sitting out");
 			double percent = 0.5;
-			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getAmountToCall()),
-					percent);
+			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getAmountToCall()), percent);
 		} else if (gameInfo.isPostFlop()) {
 			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1, heroCard2,
 					villainSpectrumHolder.getSpectrum());

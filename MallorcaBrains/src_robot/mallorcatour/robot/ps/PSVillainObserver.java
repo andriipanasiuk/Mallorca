@@ -128,8 +128,8 @@ public class PSVillainObserver implements IVillainObserver {
             if (hand.getPlayerInfo(villainName).isSittingOut()) {
                 continue;
             }
-			NoStrengthSituationHandler situationHandler = new NoStrengthSituationHandler(hand.getLimitType(),
-					villainName);
+			NoStrengthSituationHandler situationHandler = new NoStrengthSituationHandler(hand.getLimitType(), heroName,
+					false);
 			if(true){
 				throw new RuntimeException();
 			}
