@@ -64,7 +64,7 @@ public class GameEngine implements IGameInfo {
 		this.player2 = player2;
 		this.DEBUG_PATH = debug;
 		playerInfo1 = new OpenPlayerInfo(player1.getName(), startingStack);
-		playerInfo2 = new OpenPlayerInfo(player2.getName(), startingStack - 300);
+		playerInfo2 = new OpenPlayerInfo(player2.getName(), startingStack);
 	}
 
 	public void setLimitType(LimitType limitType) {
@@ -106,7 +106,18 @@ public class GameEngine implements IGameInfo {
 
 		dealCards(player1, playerInfo1);
 		dealCards(player2, playerInfo2);
-		gameCycle();
+		roundCycle();
+	}
+
+	public String gameCycle() {
+		while (playerInfo1.stack > 0 && playerInfo2.stack > 0) {
+			deal();
+		}
+		if (playerInfo1.stack > playerInfo2.stack) {
+			return playerInfo1.name;
+		} else {
+			return playerInfo2.name;
+		}
 	}
 
 	protected void dealCards(IPlayer player, OpenPlayerInfo playerInfo) {
@@ -159,7 +170,7 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(flop3);
 	}
 
-	private void calculateWinner() {
+	private String calculateWinner() {
 		if (playerInfo1.bet == playerInfo2.bet) {
 			List<Card> player1Cards = new ArrayList<Card>(boardCards);
 			List<Card> player2Cards = new ArrayList<Card>(boardCards);
@@ -170,14 +181,16 @@ public class GameEngine implements IGameInfo {
 			long player1Combination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(player1Cards));
 			long player2Combination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(player2Cards));
 			if (player1Combination > player2Combination) {
-				endOfHand(playerInfo1);
+				return endOfHand(playerInfo1);
 			} else if (player1Combination < player2Combination) {
-				endOfHand(playerInfo2);
+				return endOfHand(playerInfo2);
+			} else {
+				return endOfHand(null);
 			}
 		} else if (playerInfo1.bet > playerInfo2.bet) {
-			endOfHand(playerInfo1);
+			return endOfHand(playerInfo1);
 		} else {
-			endOfHand(playerInfo2);
+			return endOfHand(playerInfo2);
 		}
 	}
 
@@ -266,15 +279,19 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(c);
 	}
 
-	private void endOfHand(PlayerInfo winner) {
+	private String endOfHand(PlayerInfo winner) {
 		if (winner != null) {
 			Log.d("End of hand. Winner: " + winner.name);
 			winner.stack += pot;
+		} else {
+			playerInfo1.stack += pot / 2;
+			playerInfo2.stack += pot / 2;
 		}
 		pot = 0;
 		zeroBets();
 		player1.onHandEnded();
 		player2.onHandEnded();
+		return winner != null ? winner.name : null;
 	}
 
 	private SimplePair<IPlayer, PlayerInfo> getPlayer(boolean onButton) {
@@ -285,7 +302,7 @@ public class GameEngine implements IGameInfo {
 		}
 	}
 
-	private void gameCycle() {
+	private String roundCycle() {
 		int result = ActionResult.START_ROUND;
 		while (result != ActionResult.END_OF_HAND) {
 			if (result == ActionResult.START_ROUND) {
@@ -312,7 +329,7 @@ public class GameEngine implements IGameInfo {
 				}
 			}
 		}
-		calculateWinner();
+		return calculateWinner();
 	}
 
 	private int playerActed(Action action, PlayerInfo playerInfo) {

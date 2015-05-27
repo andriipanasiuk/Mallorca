@@ -34,11 +34,11 @@ public class NLMathBot implements IPlayer {
 	private ISituationHandler situationHandler;
 	private ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor preflopAdvisor;
-	private final IProfitCalculator profitCalculator;
 	private final IAdvisor preflopBot;
-	private Card heroCard1, heroCard2;
+	private final IProfitCalculator profitCalculator;
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
+	private Card heroCard1, heroCard2;
 	private IGameObserver<IPlayerGameInfo> gameObserver;
 	private IHoleCardsObserver cardsObserver;
 
@@ -90,19 +90,11 @@ public class NLMathBot implements IPlayer {
 		IAdvice advice;
 		Action action = null;
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
-		if (gameInfo.isVillainSitOut()) {
-			Log.f(DEBUG_PATH, "Villain is sitting out");
-			double percent = 0.5;
-			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getAmountToCall()), percent);
-		} else if (gameInfo.isPostFlop()) {
+		if (gameInfo.isPostFlop()) {
 			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1, heroCard2,
 					villainSpectrumHolder.getSpectrum());
 			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
 			advice = adviceCreator.create(map);
-			action = advice.getAction();
-			Log.f(DEBUG_PATH, "Advice: " + advice.toString());
-			Log.f(DEBUG_PATH, "Action: " + action.toString());
-			action = actionPreprocessor.preprocessAction(action, gameInfo);
 		} else {
 			Log.f(DEBUG_PATH, "Preflop situation: " + situation.toString());
 			advice = preflopBot.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
@@ -112,10 +104,11 @@ public class NLMathBot implements IPlayer {
 			if (advice == null) {
 				advice = preflopAdvisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
 			}
-			Log.f(DEBUG_PATH, "Advice: " + advice.toString());
-			action = advice.getAction();
-			action = actionPreprocessor.preprocessAction(action, gameInfo);
 		}
+		Log.f(DEBUG_PATH, "Advice: " + advice.toString());
+		action = advice.getAction();
+		Log.f(DEBUG_PATH, "Action: " + action.toString());
+		action = actionPreprocessor.preprocessAction(action, gameInfo);
 		Log.f(DEBUG_PATH, "=========  End  =========");
 		onActed(action, gameInfo.getAmountToCall(), getName());
 		return action;

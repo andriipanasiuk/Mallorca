@@ -16,7 +16,6 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.modeller.NeuralModelVillainBotFactory;
 import mallorcatour.bot.modeller.VillainModel;
-import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
@@ -64,7 +63,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 		DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		villainModeller = new VillainModel(limitType, DEBUG_PATH);
 		NeuralModelVillainBotFactory factory = new NeuralModelVillainBotFactory();
-		player = factory.createBot(IAdvisor.UNSUPPORTED,new ShowingSpectrumListener(), IDecisionListener.EMPTY,
+		player = factory.createBot(IAdvisor.UNSUPPORTED, new ShowingSpectrumListener(), IDecisionListener.EMPTY,
 				"debug.txt");
 		engine = new PredefinedGameEngine(this, player, DEBUG_PATH);
 		engine.player = player;
@@ -464,7 +463,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 		ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY).submit(new Runnable() {
 
 			public void run() {
-				engine.deal();
+				engine.gameCycle();
 			}
 		});
 
@@ -520,9 +519,11 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	}// GEN-LAST:event_boardFieldActionPerformed
 
 	private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_goButtonActionPerformed
-		synchronized (lock) {
-			lock.notifyAll();
-			goButton.setEnabled(false);
+		if (useGoButton) {
+			synchronized (lock) {
+				lock.notifyAll();
+				goButton.setEnabled(false);
+			}
 		}
 	}// GEN-LAST:event_goButtonActionPerformed
 
@@ -545,8 +546,8 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 
 	private void useGoButtonCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {// GEN-FIRST:event_useGoButtonCheckBoxStateChanged
 		useGoButton = useGoButtonCheckBox.getModel().isSelected();
-		//TODO implement use GO checkbox
-//		goButton.setEnabled(useGoButton);
+		// TODO implement use GO checkbox
+		// goButton.setEnabled(useGoButton);
 	}// GEN-LAST:event_useGoButtonCheckBoxStateChanged
 
 	private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -672,7 +673,9 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	@Override
 	public void onPlayerActed(Action action, PlayerInfo player) {
 		updateUI();
-		lock();
+		if (useGoButton) {
+			lock();
+		}
 	}
 
 }
