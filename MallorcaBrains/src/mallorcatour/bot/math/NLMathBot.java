@@ -5,6 +5,7 @@ import java.util.Map;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
+import mallorcatour.bot.neural.IHoleCardsObserver;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
@@ -15,6 +16,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
+import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
@@ -29,7 +31,7 @@ public class NLMathBot implements IPlayer {
 
 	private BaseAdviceCreatorFromMap adviceCreator;
 	private IPlayerGameInfo gameInfo;
-	private final ISituationHandler situationHandler;
+	private ISituationHandler situationHandler;
 	private final ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor preflopAdvisor;
 	private final IProfitCalculator profitCalculator;
@@ -37,9 +39,17 @@ public class NLMathBot implements IPlayer {
 	private Card heroCard1, heroCard2;
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
+	private IGameObserver<IPlayerGameInfo> gameObserver;
+	private IHoleCardsObserver cardsObserver;
 
-	public NLMathBot(IProfitCalculator profitCalculator, ISituationHandler situationHandler, ISpectrumHolder villainSpectrumHolder,
-			String debug) {
+	public void set(ISituationHandler situationHandler, IGameObserver observer, IHoleCardsObserver cardsObserver) {
+		this.situationHandler = situationHandler;
+		this.gameObserver = observer;
+		this.cardsObserver = cardsObserver;
+	}
+
+	public NLMathBot(IProfitCalculator profitCalculator, ISituationHandler situationHandler,
+			ISpectrumHolder villainSpectrumHolder, String debug) {
 		this.profitCalculator = profitCalculator;
 		this.situationHandler = situationHandler;
 		this.villainSpectrumHolder = villainSpectrumHolder;
@@ -65,7 +75,7 @@ public class NLMathBot implements IPlayer {
 	public void onHoleCards(Card c1, Card c2, String villainName) {
 		this.heroCard1 = c1;
 		this.heroCard2 = c2;
-		situationHandler.onHoleCards(c1, c2, villainName);
+		cardsObserver.onHoleCards(c1, c2);
 	}
 
 	/**
@@ -74,14 +84,14 @@ public class NLMathBot implements IPlayer {
 	 */
 	@Override
 	public Action getAction() {
-		LocalSituation situation = situationHandler.onHeroSituation();
+		LocalSituation situation = situationHandler.getSituation();
 		IAdvice advice;
 		Action action = null;
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
 		if (gameInfo.isVillainSitOut()) {
 			Log.f(DEBUG_PATH, "Villain is sitting out");
 			double percent = 0.5;
-			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()),
+			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getAmountToCall()),
 					percent);
 		} else if (gameInfo.isPostFlop()) {
 			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1, heroCard2,
@@ -106,7 +116,7 @@ public class NLMathBot implements IPlayer {
 			action = actionPreprocessor.preprocessAction(action, gameInfo);
 		}
 		Log.f(DEBUG_PATH, "=========  End  =========");
-		situationHandler.onHeroActed(situation, action);
+		onActed(action, gameInfo.getAmountToCall(), getName());
 		return action;
 	}
 
@@ -115,7 +125,7 @@ public class NLMathBot implements IPlayer {
 	 */
 	@Override
 	public void onStageEvent(PokerStreet street) {
-		situationHandler.onStageEvent(street);
+		gameObserver.onStageEvent(street);
 	}
 
 	/**
@@ -127,24 +137,24 @@ public class NLMathBot implements IPlayer {
 	@Override
 	public void onHandStarted(IPlayerGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
-		situationHandler.onHandStarted(gameInfo);
+		gameObserver.onHandStarted(gameInfo);
 	}
 
 	/**
 	 * An villain action has been observed.
 	 */
 	@Override
-	public void onVillainActed(Action action, double toCall) {
-		situationHandler.onVillainActed(action, toCall);
+	public void onActed(Action action, double toCall, String name) {
+		gameObserver.onActed(action, toCall, name);
 	}
 
 	@Override
 	public void onHandEnded() {
-		situationHandler.onHandEnded();
+		gameObserver.onHandEnded();
 	}
 
 	@Override
 	public String getName() {
-		return "FLMathBot";
+		return "NLMathBot";
 	}
 }

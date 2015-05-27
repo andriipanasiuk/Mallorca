@@ -11,8 +11,8 @@ import java.util.List;
 
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
@@ -32,7 +32,7 @@ public class NNConverter {
     private final static String HERO_NAME = "Andrew";
 
     public static List<PokerLearningExample> parseLocalSituations(
-            List<Hand> hands, String heroName, ISituationHandler handler) {
+            List<Hand> hands, String heroName, SituationHandler handler) {
         List<PokerLearningExample> result = new ArrayList<PokerLearningExample>();
         HandParser parser = new HandParser();
 
@@ -48,7 +48,7 @@ public class NNConverter {
     }
 
     public static List<PokerLearningExample> parseLocalSituationsWithoutAdvices(
-            List<Hand> hands, String heroName, ISituationHandler handler) {
+            List<Hand> hands, String heroName, SituationHandler handler) {
         List<PokerLearningExample> result = new ArrayList<PokerLearningExample>();
         HandParser parser = new HandParser();
 
@@ -66,7 +66,7 @@ public class NNConverter {
     }
 
     public static List<PokerLearningExample> localSituationsToFile(File directory, Tournament tournament,
-            String pathToAdvices, ISituationHandler handler) {
+            String pathToAdvices, SituationHandler handler) {
         boolean addToExamples = true;
         String adviceFilename = getAdviceFile(tournament, pathToAdvices);
 
@@ -122,7 +122,7 @@ public class NNConverter {
     }
 
     public static List<PokerLearningExample> localSituationsToFile(List<Hand> hands,
-            String pathToAdvices, ISituationHandler handler) {
+            String pathToAdvices, SituationHandler handler) {
         boolean addToExamples = true;
         String adviceFilename = getAdviceFile(hands.get(0).getStartingDate(), pathToAdvices);
 

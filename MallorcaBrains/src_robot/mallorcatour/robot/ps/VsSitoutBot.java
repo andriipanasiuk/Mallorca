@@ -11,7 +11,7 @@ public class VsSitoutBot implements IExternalAdvisor {
 		if (gameInfo.isVillainSitOut()) {
 			double percent = 0.5;
 			return Action
-					.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
+					.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getAmountToCall()), percent);
 		}
 		return null;
 	}

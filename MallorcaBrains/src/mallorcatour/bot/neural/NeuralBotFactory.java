@@ -7,7 +7,6 @@ import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
-import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.LimitType;
@@ -19,13 +18,12 @@ public class NeuralBotFactory implements IBotFactory {
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
 			IDecisionListener decisionListener, String debug) {
 		GusXensen player = new GusXensen();
-		StrengthManager strengthManager = new StrengthManager(true);
-		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true);
 		NeuralAdvisor advisor = new NeuralAdvisor(player, player, "Gus Xensen");
-		IPlayer realPlayer = new GrandtorinoBot(advisor, handler, ISpectrumHolder.DEFAULT, IActionChecker.EMPTY,
+		GrandtorinoBot realPlayer = new GrandtorinoBot(advisor, null, ISpectrumHolder.DEFAULT, IActionChecker.EMPTY,
 				LimitType.NO_LIMIT, debug);
-		IPlayer strengthManagerAdapter = new StrengthManagerPlayerAdapter(realPlayer, strengthManager);
-		return strengthManagerAdapter;
+		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true, realPlayer.getName());
+		realPlayer.set(handler, handler, handler);
+		return realPlayer;
 	}
 
 }

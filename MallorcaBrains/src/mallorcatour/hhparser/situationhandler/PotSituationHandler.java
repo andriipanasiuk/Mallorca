@@ -51,7 +51,7 @@ public class PotSituationHandler implements ISituationHandler {
     public void onHoleCards(Card c1, Card c2, String villainName) {
     }
 
-    public LocalSituation onHeroSituation() {
+    public LocalSituation getSituation() {
         return null;
     }
 

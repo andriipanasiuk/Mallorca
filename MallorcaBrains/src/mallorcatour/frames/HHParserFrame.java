@@ -22,7 +22,6 @@ import javax.swing.JOptionPane;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.AdviceReader;
 import mallorcatour.hhparser.HandParser;
@@ -34,7 +33,6 @@ import mallorcatour.hhparser.core.BaseHandHandler;
 import mallorcatour.hhparser.core.BaseTournamentHandler;
 import mallorcatour.hhparser.core.HandManager;
 import mallorcatour.hhparser.core.Tournament;
-import mallorcatour.hhparser.situationhandler.NoStrengthSituationHandler;
 import mallorcatour.hhparser.situationhandler.PotSituationHandler;
 import mallorcatour.hhparser.situationhandler.ProfitSituationHandler;
 import mallorcatour.neural.core.PokerExamples;
@@ -222,7 +220,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseTournamentsWithHandler(new SituationHandler(LimitType.NO_LIMIT, true));
+                parseTournamentsWithHandler(new SituationHandler(LimitType.NO_LIMIT, true, "Andrew"));
             }
         });
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -231,7 +229,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseHandsWithHandler(new SituationHandler(LimitType.FIXED_LIMIT));
+                parseHandsWithHandler(new SituationHandler(LimitType.FIXED_LIMIT, "Andrew"));
             }
         });
     }//GEN-LAST:event_jMenuItem2ActionPerformed
@@ -240,7 +238,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseHandsWithoutAdvices("Waterhouse", new SituationHandler(LimitType.FIXED_LIMIT));
+                parseHandsWithoutAdvices("Waterhouse", new SituationHandler(LimitType.FIXED_LIMIT, "Waterhouse"));
             }
         });
     }//GEN-LAST:event_jMenuItem3ActionPerformed
@@ -298,9 +296,10 @@ public class HHParserFrame extends javax.swing.JFrame {
             return;
         }
         BaseHandHandler handHandler = new BaseHandHandler();
-        PAHHParser.parseHandHistory(path, handHandler);
-        List<PokerLearningExample> examples = NNConverter.parseLocalSituationsWithoutAdvices(handHandler.buildHands(), "Andrew", new NoStrengthSituationHandler(LimitType.FIXED_LIMIT));
-        path = FrameUtils.openFileChooser(this, "./");
+		PAHHParser.parseHandHistory(path, handHandler);
+		List<PokerLearningExample> examples = NNConverter.parseLocalSituationsWithoutAdvices(handHandler.buildHands(),
+				"Andrew", new SituationHandler(LimitType.FIXED_LIMIT, "Andrew"));
+		path = FrameUtils.openFileChooser(this, "./");
         if (path == null) {
             return;
         }
@@ -425,7 +424,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         return true;
     }
 
-    private void parseTournamentsWithHandler(ISituationHandler situationHandler) {
+    private void parseTournamentsWithHandler(SituationHandler situationHandler) {
         String[] pathes = FrameUtils.openFileChooserForMultipleFiles(this, "~/workspace-private/mallorcatour");
         if (pathes == null) {
             return;
@@ -462,7 +461,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         }
     }
 
-    private void parseHandsWithHandler(ISituationHandler situationHandler) {
+    private void parseHandsWithHandler(SituationHandler situationHandler) {
         String[] pathes = FrameUtils.openFileChooserForMultipleFiles(this, "./../..");
         if (pathes == null) {
             return;
@@ -490,7 +489,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         }
     }
 
-    private void parseHandsWithoutAdvices(String heroName, ISituationHandler situationHandler) {
+    private void parseHandsWithoutAdvices(String heroName, SituationHandler situationHandler) {
         String[] pathes = FrameUtils.openFileChooserForMultipleFiles(this, "./../..");
         if (pathes == null) {
             return;
@@ -531,7 +530,8 @@ public class HHParserFrame extends javax.swing.JFrame {
             long start = System.currentTimeMillis();
             List<Hand> hands = handler.buildHands();
             for (Hand hand : hands) {
-                handParser.parse(hand, "Andrew", situationHandler);
+				// TODO change
+				// handParser.parse(hand, "Andrew", situationHandler, situationHandler);
             }
             int sectionCount = 10;
             double min = 0, max = 48;

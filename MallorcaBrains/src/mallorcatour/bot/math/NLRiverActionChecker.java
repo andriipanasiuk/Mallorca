@@ -30,11 +30,11 @@ public class NLRiverActionChecker implements IActionChecker {
 		}
 		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, cards.first,
 				cards.second, villainSpectrum);
-		if (gameInfo.getHeroAmountToCall() > 0) {
+		if (gameInfo.getAmountToCall() > 0) {
 			if (action.isFold()) {
 				for (Entry<Action, Double> entry : map.entrySet()) {
 					if (entry.getKey().isPassive() && entry.getValue() >= MIN_VALUE_FOR_CALL_DECISION) {
-						return Action.callAction(gameInfo.getHeroAmountToCall());
+						return Action.callAction(gameInfo.getAmountToCall());
 					}
 				}
 			} else if (action.isPassive()) {

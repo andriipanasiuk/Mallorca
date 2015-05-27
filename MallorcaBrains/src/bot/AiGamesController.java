@@ -16,11 +16,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 import mallorcatour.util.Log;
 
 /**
@@ -40,9 +40,9 @@ public class AiGamesController {
 	private int timeBank, timePerMove;
 
 	private GameInfo gameInfo;
-	private IPlayerGameObserver observer;
+	private IPlayer observer;
 
-	public AiGamesController(GameInfo gameInfo, IPlayerGameObserver observer) {
+	public AiGamesController(GameInfo gameInfo, IPlayer observer) {
 		this.gameInfo = gameInfo;
 		this.observer = observer;
 	}
@@ -175,7 +175,7 @@ public class AiGamesController {
 			} else if (key.equals("fold") || key.equals("check") || key.equals("call") || key.equals("raise")) {
 				Log.d("Villain " + key + " " + amount);
 				Action action = fromString(key, amount);
-				observer.onVillainActed(action, -1);
+				observer.onActed(action, -1, villainName);
 			}
 		}
 		if (key.equals("raise")) {

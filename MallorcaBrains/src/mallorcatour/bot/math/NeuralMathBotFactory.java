@@ -4,7 +4,9 @@ import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.neural.GameObservers;
 import mallorcatour.bot.neural.GrandtorinoBot;
+import mallorcatour.bot.neural.HoleCardsObservers;
 import mallorcatour.bot.neural.SpectrumPlayerObserver;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
@@ -30,10 +32,14 @@ public class NeuralMathBotFactory implements IBotFactory {
 		IActionChecker actionChecker = new NLRiverActionChecker(profitCalculator);
 		GusXensen player = new GusXensen();
 		LimitType limitType = LimitType.NO_LIMIT;
-		SituationHandler handler = new SituationHandler(limitType, true);
+		// TODO change villain name to real
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
-				spectrumListener);
-		return new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), handler, villainObserver, actionChecker,
-				limitType, debug);
+				spectrumListener, "Villain");
+		GrandtorinoBot bot = new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), null, villainObserver,
+				actionChecker, limitType, debug);
+		SituationHandler handler = new SituationHandler(limitType, true, bot.getName());
+		bot.set(new GameObservers(strengthManager, handler, villainObserver), handler, new HoleCardsObservers(
+				villainObserver, handler));
+		return bot;
 	}
 }

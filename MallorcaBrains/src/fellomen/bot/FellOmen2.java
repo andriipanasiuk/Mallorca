@@ -295,7 +295,7 @@ public class FellOmen2 implements IPlayer {
             Log.f(DEBUG, "Villain is sitting out");
             double percent = 0.5;
             action = Action.createRaiseAction(percent
-                    * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()), percent);
+                    * (gameInfo.getPotSize() + gameInfo.getAmountToCall()), percent);
         } else {
             if (gameInfo.isPreFlop()) {
                 advice = preFlopAction(onButton, holeCard1, holeCard2);
@@ -383,8 +383,11 @@ public class FellOmen2 implements IPlayer {
         }
     }
 
-    public void onVillainActed(Action action, double toCall) {
-        onPlayerActed(action, !onButton);
+    @Override
+	public void onActed(Action action, double toCall, String name) {
+		if (!name.equals(getName())) {
+			onPlayerActed(action, !onButton);
+		}
     }
 
     private void testActionTableParsing() {

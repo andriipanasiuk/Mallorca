@@ -41,7 +41,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 		int raisesOnStreetCount = 0;
 		if (gameInfo.isPreFlop()) {
 			if (gameInfo.onButton()
-					&& gameInfo.getHeroAmountToCall() == gameInfo.getBigBlindSize() / 2) {
+					&& gameInfo.getAmountToCall() == gameInfo.getBigBlindSize() / 2) {
 				Map<Action, Double> map = gameSolver.onFirstActionPreFlop(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(), villainSpectrum,
 						new HoleCards(holeCard1, holeCard2), strengthManager.preflop, /*
@@ -57,7 +57,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionPreflop(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(),
-						gameInfo.getHeroAmountToCall(), villainSpectrum, new HoleCards(holeCard1, holeCard2),
+						gameInfo.getAmountToCall(), villainSpectrum, new HoleCards(holeCard1, holeCard2),
 						strengthManager.preflop, gameInfo.onButton(), raisesOnStreetCount,
 						gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
@@ -66,7 +66,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 				return map;
 			}
 		} else if (gameInfo.isFlop()) {
-			if (gameInfo.getHeroAmountToCall() == 0 && !gameInfo.onButton()) {
+			if (gameInfo.getAmountToCall() == 0 && !gameInfo.onButton()) {
 				Map<Action, Double> map = gameSolver.onFirstActionFlop(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(), villainSpectrum, gameInfo.getFlop(),
 						new HoleCards(holeCard1, holeCard2), strengthManager.flop,
@@ -79,7 +79,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionFlop(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(),
-						gameInfo.getHeroAmountToCall(), villainSpectrum, gameInfo.getFlop(), new HoleCards(
+						gameInfo.getAmountToCall(), villainSpectrum, gameInfo.getFlop(), new HoleCards(
 								holeCard1, holeCard2), strengthManager.flop, gameInfo.onButton(),
 						raisesOnStreetCount, gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
@@ -88,7 +88,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 				return map;
 			}
 		} else if (gameInfo.isTurn()) {
-			if (gameInfo.getHeroAmountToCall() == 0 && !gameInfo.onButton()) {
+			if (gameInfo.getAmountToCall() == 0 && !gameInfo.onButton()) {
 				Map<Action, Double> map = gameSolver.onFirstActionTurn(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(), villainSpectrum,
 						gameInfo.getFlop(), gameInfo.getTurn(), new HoleCards(holeCard1, holeCard2),
@@ -101,7 +101,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionTurn(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(),
-						gameInfo.getHeroAmountToCall(), villainSpectrum, gameInfo.getFlop(),gameInfo.getTurn(),
+						gameInfo.getAmountToCall(), villainSpectrum, gameInfo.getFlop(),gameInfo.getTurn(),
 						new HoleCards(holeCard1, holeCard2), strengthManager.turn,
 						gameInfo.onButton(), raisesOnStreetCount, gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
@@ -110,7 +110,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 				return map;
 			}
 		} else if (gameInfo.isRiver()) {
-			if (gameInfo.getHeroAmountToCall() == 0 && !gameInfo.onButton()) {
+			if (gameInfo.getAmountToCall() == 0 && !gameInfo.onButton()) {
 				Map<Action, Double> map = gameSolver.onFirstActionRiver(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(), villainSpectrum, gameInfo.getFlop(),
 						gameInfo.getTurn(), gameInfo.getRiver(), new HoleCards(holeCard1, holeCard2),
@@ -123,7 +123,7 @@ public class FLProfitCalculator implements IProfitCalculator {
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionRiver(heroActionCount, heroAggressionCount,
 						villainActionCount, villainAggressionCount, gameInfo.getPotSize(),
-						gameInfo.getHeroAmountToCall(), villainSpectrum, gameInfo.getFlop(),
+						gameInfo.getAmountToCall(), villainSpectrum, gameInfo.getFlop(),
 						gameInfo.getTurn(), gameInfo.getRiver(),
 						new HoleCards(holeCard1, holeCard2), strengthManager.river, gameInfo.onButton(),
 						raisesOnStreetCount, gameInfo.getBigBlindSize());

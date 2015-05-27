@@ -16,11 +16,12 @@ import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.NoStrengthSituationHandler;
+import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.HandParser;
 import mallorcatour.hhparser.PSHHParser;
 import mallorcatour.hhparser.core.BaseHandHandler;
 import mallorcatour.hhparser.core.HandManager;
-import mallorcatour.hhparser.situationhandler.NoStrengthSituationHandler;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
 import mallorcatour.util.Log;
@@ -127,10 +128,15 @@ public class PSVillainObserver implements IVillainObserver {
             if (hand.getPlayerInfo(villainName).isSittingOut()) {
                 continue;
             }
-            List<PokerLearningExample> examples = new HandParser().parseWithActions(
-                    hand, villainName,
-                    new NoStrengthSituationHandler(hand.getLimitType()));
-            currentVillain.addHandPlayed();
+			NoStrengthSituationHandler situationHandler = new NoStrengthSituationHandler(hand.getLimitType(),
+					villainName);
+			if(true){
+				throw new RuntimeException();
+			}
+			//TODO change handler to interface
+			List<PokerLearningExample> examples = new HandParser().parseWithActions(hand, villainName,
+					(SituationHandler) situationHandler);
+			currentVillain.addHandPlayed();
             currentVillain.addPokerLearningExamples(examples);
             currentVillain.addAggressionInfo(HandManager.calculatePostflopAF(hand, villainName));
             currentVillain.addAggressionFrequencyInfo(HandManager.calculatePostflopAggressionFrequency(hand, villainName));

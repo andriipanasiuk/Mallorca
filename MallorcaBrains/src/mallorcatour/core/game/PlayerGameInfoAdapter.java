@@ -5,13 +5,13 @@ import java.util.List;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
-public class PlayerGameInfoAdapter implements IPlayerGameInfo<PlayerInfo> {
+public class PlayerGameInfoAdapter implements IPlayerGameInfo {
 
 	private final IGameInfo gameInfo;
-	private final PlayerInfo villainInfo;
+	private final OpenPlayerInfo villainInfo;
 	private final OpenPlayerInfo heroInfo;
 
-	public PlayerGameInfoAdapter(IGameInfo gameInfo, OpenPlayerInfo heroInfo, PlayerInfo villainInfo) {
+	public PlayerGameInfoAdapter(IGameInfo gameInfo, OpenPlayerInfo heroInfo, OpenPlayerInfo villainInfo) {
 		this.gameInfo = gameInfo;
 		this.heroInfo = heroInfo;
 		this.villainInfo = villainInfo;
@@ -93,12 +93,12 @@ public class PlayerGameInfoAdapter implements IPlayerGameInfo<PlayerInfo> {
 	}
 
 	@Override
-	public PlayerInfo getVillain() {
+	public OpenPlayerInfo getVillain() {
 		return villainInfo;
 	}
 
 	@Override
-	public double getHeroAmountToCall() {
+	public double getAmountToCall() {
 		return villainInfo.bet - heroInfo.bet;
 	}
 
@@ -120,6 +120,15 @@ public class PlayerGameInfoAdapter implements IPlayerGameInfo<PlayerInfo> {
 	@Override
 	public OpenPlayerInfo getHero() {
 		return heroInfo;
+	}
+
+	@Override
+	public boolean onButton(String name) {
+		if (name.equals(heroInfo.name)) {
+			return heroInfo.isOnButton;
+		} else {
+			return villainInfo.isOnButton;
+		}
 	}
 
 }

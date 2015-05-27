@@ -36,7 +36,7 @@ public class HumanActionFrame extends javax.swing.JFrame {
 
     public void setGameInfo(IPlayerGameInfo gameInfo) {
         this.gameInfo = gameInfo;
-        if (gameInfo.getHeroAmountToCall() == 0) {
+        if (gameInfo.getAmountToCall() == 0) {
             passiveButton.setText("Check");
             foldButton.setEnabled(false);
         } else {
@@ -147,10 +147,10 @@ public class HumanActionFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void passiveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passiveButtonActionPerformed
-        if (gameInfo.getHeroAmountToCall() == 0) {
+        if (gameInfo.getAmountToCall() == 0) {
             actionHolder.actionGot(Action.checkAction());
         } else {
-            actionHolder.actionGot(Action.callAction(gameInfo.getHeroAmountToCall()));
+            actionHolder.actionGot(Action.callAction(gameInfo.getAmountToCall()));
         }
     }//GEN-LAST:event_passiveButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

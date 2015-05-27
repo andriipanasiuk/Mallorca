@@ -9,35 +9,35 @@ import java.util.List;
 
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerLearningExample;
 
 /**
- *
+ * 
  * @author Andrew
  */
 public class TournamentParser {
 
 	public static List<PokerLearningExample> parseLocalSituations(Tournament tournament, String heroName) {
-		return parseLocalSituations(tournament, heroName, new SituationHandler(LimitType.NO_LIMIT, true));
-    }
+		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, heroName);
+		return parseLocalSituations(tournament, heroName, situationHandler);
+	}
 
-    public static List<PokerLearningExample> parseLocalSituations(
-            Tournament tournament, String heroName, ISituationHandler handler) {
-        List<PokerLearningExample> result = new ArrayList<PokerLearningExample>();
+	public static List<PokerLearningExample> parseLocalSituations(Tournament tournament, String heroName,
+			SituationHandler handler) {
+		List<PokerLearningExample> result = new ArrayList<PokerLearningExample>();
 
-        HandParser parser = new HandParser();
-        for (Hand hand : tournament.getHands()) {
-            List<LocalSituation> situations = parser.parse(hand, heroName, handler);
-            for (LocalSituation situation : situations) {
-                PokerLearningExample example = new PokerLearningExample(situation);
-                example.setHand(hand);
-                result.add(example);
-            }
-        }
-        return result;
-    }
+		HandParser parser = new HandParser();
+		for (Hand hand : tournament.getHands()) {
+			List<LocalSituation> situations = parser.parse(hand, heroName, handler);
+			for (LocalSituation situation : situations) {
+				PokerLearningExample example = new PokerLearningExample(situation);
+				example.setHand(hand);
+				result.add(example);
+			}
+		}
+		return result;
+	}
 }

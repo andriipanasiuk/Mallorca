@@ -208,21 +208,21 @@ public class HUGameController implements IGameController {
             if (heroPreviousAction != null && heroPreviousAction.isAggressive()) {
                 Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                         + " calls " + heroPreviousAction.getAmount());
-                villainPreviousAction = Action.callAction(heroPreviousAction.getAmount());
-                player.onVillainActed(villainPreviousAction, heroPreviousAction.getAmount());
-                gameInfo.pot += heroPreviousAction.getAmount();
+				villainPreviousAction = Action.callAction(heroPreviousAction.getAmount());
+				player.onActed(villainPreviousAction, heroPreviousAction.getAmount(), gameInfo.villainInfo.getName());
+				gameInfo.pot += heroPreviousAction.getAmount();
             } else if (currentStreet == PokerStreet.PREFLOP
                     && isMinPotOnPreflop(pot) && heroOnButton) {
                 Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                         + " checks");
                 villainPreviousAction = Action.checkAction();
-                player.onVillainActed(villainPreviousAction, 0);
+                player.onActed(villainPreviousAction, 0, gameInfo.villainInfo.getName());
             } else if (!heroOnButton && currentStreet != PokerStreet.PREFLOP
                     && heroPreviousAction.isCheck()) {
                 Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                         + " checks");
                 villainPreviousAction = Action.checkAction();
-                player.onVillainActed(villainPreviousAction, 0);
+                player.onActed(villainPreviousAction, 0,gameInfo.villainInfo.getName());
             }
             streetChanged = true;
             currentStreet = newStreet;
@@ -249,7 +249,7 @@ public class HUGameController implements IGameController {
             } else {
                 villainToCall = gameInfo.bigBlind / 2;
             }
-            player.onVillainActed(villainPreviousAction, villainToCall);
+            player.onActed(villainPreviousAction, villainToCall, gameInfo.villainInfo.getName());
             gameInfo.pot += villainToCall;
             gameInfo.raisesOnStreet[newStreet.intValue()]++;
             double villainRealBet = villainBet - heroBet;
@@ -263,14 +263,14 @@ public class HUGameController implements IGameController {
                 Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                         + " calls " + gameInfo.bigBlind / 2);
                 villainPreviousAction = Action.callAction(gameInfo.bigBlind / 2);
-                player.onVillainActed(villainPreviousAction, gameInfo.bigBlind / 2);
+                player.onActed(villainPreviousAction, gameInfo.bigBlind / 2, gameInfo.villainInfo.getName());
                 gameInfo.pot += gameInfo.bigBlind / 2;
             }
             if (heroOnButton && gameInfo.street != PokerStreet.PREFLOP) {
                 Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                         + " checks");
                 villainPreviousAction = Action.checkAction();
-                player.onVillainActed(villainPreviousAction, 0);
+                player.onActed(villainPreviousAction, 0, gameInfo.villainInfo.getName());
             }
         }
     }

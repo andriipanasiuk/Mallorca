@@ -47,8 +47,9 @@ public class MixBot implements IPlayer {
 		adviceCreator = new AdviceCreatorFromMap();
 		strengthManager = new StrengthManager(false);
 		profitCalculator = new NLProfitCalculator(villainModeller, strengthManager);
-		situationHandler = new SituationHandler(LimitType.NO_LIMIT, true);
-		villainObserver = new SpectrumPlayerObserver(villainModeller, strengthManager, listener);
+		situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, getName());
+		// TODO change villain name to real
+		villainObserver = new SpectrumPlayerObserver(villainModeller, strengthManager, listener, "Villain");
 		actionPreprocessor = new NLActionPreprocessor();
 		this.DEBUG_PATH = debug;
 	}
@@ -65,7 +66,7 @@ public class MixBot implements IPlayer {
 	 */
 	@Override
 	public void onHoleCards(Card c1, Card c2, String villainName) {
-		situationHandler.onHoleCards(c1, c2, villainName);
+		// situationHandler.onHoleCards(c1, c2, villainName);
 		this.heroCard1 = c1;
 		this.heroCard2 = c2;
 	}
@@ -79,11 +80,11 @@ public class MixBot implements IPlayer {
 		IAdvice advice;
 		Action action = null;
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
-		LocalSituation situation = situationHandler.onHeroSituation();
+		LocalSituation situation = situationHandler.getSituation();
 		if (gameInfo.isVillainSitOut()) {
 			Log.f(DEBUG_PATH, "Villain is sitting out");
 			double percent = 0.5;
-			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getHeroAmountToCall()),
+			action = Action.createRaiseAction(percent * (gameInfo.getPotSize() + gameInfo.getAmountToCall()),
 					percent);
 		} else if (gameInfo.isPostFlop()) {
 			advice = postflopNN.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
@@ -102,7 +103,7 @@ public class MixBot implements IPlayer {
 		}
 		Log.f(DEBUG_PATH, "Action: " + action.toString());
 		Log.f(DEBUG_PATH, "=========  End  =========");
-		situationHandler.onHeroActed(null, action);
+		// situationHandler.onHeroActed(null, action);
 		return action;
 	}
 
@@ -111,8 +112,6 @@ public class MixBot implements IPlayer {
 	 */
 	@Override
 	public void onStageEvent(PokerStreet street) {
-		strengthManager.onStageEvent(street);
-		situationHandler.onStageEvent(street);
 	}
 
 	/**
@@ -125,22 +124,19 @@ public class MixBot implements IPlayer {
 	public void onHandStarted(IPlayerGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		strengthManager.onHandStarted(gameInfo);
-		situationHandler.onHandStarted(gameInfo);
+//		situationHandler.onHandStarted(gameInfo);
 	}
 
 	/**
 	 * An villain action has been observed.
 	 */
 	@Override
-	public void onVillainActed(Action action, double toCall) {
-		strengthManager.onVillainActed(action, toCall);
-		situationHandler.onVillainActed(action, toCall);
+	public void onActed(Action action, double toCall, String name) {
+		// TODO callback to observer
 	}
 
 	@Override
 	public void onHandEnded() {
-		strengthManager.onHandEnded();
-		situationHandler.onHandEnded();
 	}
 
 	@Override

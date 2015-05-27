@@ -17,6 +17,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
+import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
@@ -32,7 +33,6 @@ public class GrandtorinoBot implements IPlayer {
 
 	protected IPlayerGameInfo gameInfo;
 	private Card heroCard1, heroCard2;
-	private final ISituationHandler situationHandler;
 	private final ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor advisor;
 	private final IActionChecker actionChecker;
@@ -40,6 +40,15 @@ public class GrandtorinoBot implements IPlayer {
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
 	private final List<IExternalAdvisor> externalHelpers = new ArrayList<>();
+	private ISituationHandler situationHandler;
+	private IGameObserver gameObserver;
+	private IHoleCardsObserver cardsObserver;
+
+	public void set(IGameObserver gameObserver, ISituationHandler situationHandler, IHoleCardsObserver cardsObserver) {
+		this.gameObserver = gameObserver;
+		this.situationHandler = situationHandler;
+		this.cardsObserver = cardsObserver;
+	}
 
 	public GrandtorinoBot(IAdvisor neuralNetwork, ISituationHandler situationHandler,
 			ISpectrumHolder villainSpectrumHolder, IActionChecker actionChecker, LimitType limitType, String debug) {
@@ -68,7 +77,7 @@ public class GrandtorinoBot implements IPlayer {
 	 */
 	@Override
 	public void onHoleCards(Card c1, Card c2, String villainName) {
-		situationHandler.onHoleCards(c1, c2, villainName);
+		cardsObserver.onHoleCards(c1, c2);
 		heroCard1 = c1;
 		heroCard2 = c2;
 	}
@@ -108,13 +117,13 @@ public class GrandtorinoBot implements IPlayer {
 				return action;
 			}
 		}
-		LocalSituation situation = situationHandler.onHeroSituation();
+		LocalSituation situation = situationHandler.getSituation();
 
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
 		Log.f(DEBUG_PATH, "Situation: " + VectorUtils.toString(situation));
 		action = getActionInternal(situation, new HoleCards(heroCard1, heroCard2));
 		Log.f(DEBUG_PATH, "===============  End  ==============");
-		situationHandler.onHeroActed(situation, action);
+		gameObserver.onActed(action, gameInfo.getAmountToCall(), getName());
 		return action;
 	}
 
@@ -122,7 +131,7 @@ public class GrandtorinoBot implements IPlayer {
 	 * A new betting round has started.
 	 */
 	public void onStageEvent(PokerStreet street) {
-		situationHandler.onStageEvent(street);
+		gameObserver.onStageEvent(street);
 	}
 
 	/**
@@ -134,25 +143,25 @@ public class GrandtorinoBot implements IPlayer {
 	@Override
 	public void onHandStarted(IPlayerGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
-		situationHandler.onHandStarted(gameInfo);
+		gameObserver.onHandStarted(gameInfo);
 	}
 
 	/**
 	 * An villain action has been observed.
 	 */
 	@Override
-	public void onVillainActed(Action action, double toCall) {
-		// TODO remove toCall parameter from here
-		situationHandler.onVillainActed(action, toCall);
+	public void onActed(Action action, double toCall, String name) {
+		gameObserver.onActed(action, toCall, name);
 	}
 
 	@Override
 	public void onHandEnded() {
-		// do nothing
+		gameObserver.onHandEnded();
 	}
 
 	@Override
 	public String getName() {
 		return "NeuralBot";
 	}
+
 }

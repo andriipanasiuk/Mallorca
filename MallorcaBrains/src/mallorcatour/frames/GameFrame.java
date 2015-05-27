@@ -53,6 +53,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	private final String DEBUG_PATH;
 	private PredefinedGameEngine engine;
 	private Action lastMove;
+	private IPlayer player;
 
 	/** Creates new form GrandtorinoGameFrame */
 	public GameFrame(LimitType limitType) {
@@ -62,7 +63,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 		DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		villainModeller = new VillainModel(limitType, DEBUG_PATH);
 		NeuralBotFactory factory = new NeuralBotFactory();
-		IPlayer player = factory.createBot(IAdvisor.UNSUPPORTED,new ShowingSpectrumListener(), IDecisionListener.EMPTY,
+		player = factory.createBot(IAdvisor.UNSUPPORTED,new ShowingSpectrumListener(), IDecisionListener.EMPTY,
 				"debug.txt");
 		engine = new PredefinedGameEngine(this, player, DEBUG_PATH);
 		engine.player = player;
@@ -480,8 +481,8 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	private void passiveButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_passiveButtonActionPerformed
 		botActionLabel.setText("");
 		enableActionButtons(false);
-		if (gameInfo.getHeroAmountToCall() > 0) {
-			lastMove = Action.callAction(gameInfo.getHeroAmountToCall());
+		if (gameInfo.getAmountToCall() > 0) {
+			lastMove = Action.callAction(gameInfo.getAmountToCall());
 		} else {
 			lastMove = Action.checkAction();
 		}
@@ -633,8 +634,10 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	}
 
 	@Override
-	public void onVillainActed(Action action, double toCall) {
-		botActionLabel.setText(action.toString());
+	public void onActed(Action action, double toCall, String name) {
+		if (name.equals(player.getName())) {
+			botActionLabel.setText(action.toString());
+		}
 	}
 
 	private IPlayerGameInfo gameInfo;
@@ -642,7 +645,7 @@ public class GameFrame extends javax.swing.JFrame implements IPlayer, EngineList
 	@Override
 	public Action getAction() {
 		enableActionButtons(true);
-		if (gameInfo.getHeroAmountToCall() > 0) {
+		if (gameInfo.getAmountToCall() > 0) {
 			passiveButton.setText("Call");
 			aggressiveButton.setText("Raise");
 		} else {

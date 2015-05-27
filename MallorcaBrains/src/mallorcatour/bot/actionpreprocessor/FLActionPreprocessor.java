@@ -12,7 +12,7 @@ import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 public class FLActionPreprocessor implements IActionPreprocessor {
 
     public Action preprocessAction(Action action, IPlayerGameInfo gameInfo) {
-        double toCall = gameInfo.getHeroAmountToCall();
+        double toCall = gameInfo.getAmountToCall();
         if (gameInfo.isVillainSitOut()) {
             return Action.createRaiseAction(gameInfo.getBigBlindSize(), -1);
         }

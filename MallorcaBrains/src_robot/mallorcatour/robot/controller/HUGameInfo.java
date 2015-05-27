@@ -6,6 +6,7 @@ package mallorcatour.robot.controller;
 
 import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.robot.ExtPlayerInfo;
 
 /**
@@ -25,7 +26,7 @@ public class HUGameInfo extends GameInfo {
     }
 
     @Override
-    public double getHeroAmountToCall() {
+    public double getAmountToCall() {
         double betDifference = villainInfo.getBet() - heroInfo.getBet();
         if (betDifference <= 0) {
             return 0;
@@ -54,7 +55,7 @@ public class HUGameInfo extends GameInfo {
     }
 
 	@Override
-	public mallorcatour.core.game.PlayerInfo getVillain() {
+	public OpenPlayerInfo getVillain() {
 		throw new UnsupportedOperationException();
 	}
 

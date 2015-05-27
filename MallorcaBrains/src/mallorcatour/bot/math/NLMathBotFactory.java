@@ -17,9 +17,11 @@ public class NLMathBotFactory implements IBotFactory {
 			IDecisionListener decisionListener, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
-		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
-				spectrumListener);
-		return new NLMathBot(profitCalculator, situationHandler, villainObserver, debug);
+				spectrumListener, "Villain");
+		NLMathBot bot = new NLMathBot(profitCalculator, null, villainObserver, debug);
+		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, bot.getName());
+		bot.set(situationHandler, situationHandler, situationHandler);
+		return bot;
 	}
 }

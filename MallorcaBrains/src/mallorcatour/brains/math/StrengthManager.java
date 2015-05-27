@@ -7,12 +7,10 @@ import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.interfaces.IPlayerGameObserver;
+import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.Log;
 
@@ -20,7 +18,7 @@ import mallorcatour.util.Log;
  * @author andriipanasiuk
  *
  */
-public class StrengthManager implements IPlayerGameObserver {
+public class StrengthManager implements IGameObserver<IGameInfo> {
 
 	public Map<HoleCards, StreetEquity> preflop = new HashMap<>();
 	public Map<HoleCards, StreetEquity> flop = new HashMap<>();
@@ -37,14 +35,6 @@ public class StrengthManager implements IPlayerGameObserver {
 
 	public StrengthManager(boolean needFlopFullPotential) {
 		this.needFlopFullPotential = needFlopFullPotential;
-	}
-	@Override
-	public void onHoleCards(Card c1, Card c2, String villainName) {
-		preflop = new HashMap<HoleCards, StreetEquity>();
-		for (HoleCards holeCards : randomSpectrum) {
-			StreetEquity eq = EquilatorPreflop.equityVsRandom(holeCards.first, holeCards.second);
-			preflop.put(holeCards, eq);
-		}
 	}
 
 	@Override
@@ -118,13 +108,18 @@ public class StrengthManager implements IPlayerGameObserver {
 	}
 
 	@Override
-	public void onHandStarted(IPlayerGameInfo gameInfo) {
+	public void onHandStarted(IGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		randomSpectrum = Spectrum.random();
+		preflop = new HashMap<HoleCards, StreetEquity>();
+		for (HoleCards holeCards : randomSpectrum) {
+			StreetEquity eq = EquilatorPreflop.equityVsRandom(holeCards.first, holeCards.second);
+			preflop.put(holeCards, eq);
+		}
 	}
 
 	@Override
-	public void onVillainActed(Action action, double toCall) {
+	public void onActed(Action action, double toCall, String name) {
 		//do nothing
 	}
 

@@ -71,7 +71,7 @@ public class GameEngine implements IGameInfo {
 		this.limitType = limitType;
 	}
 
-	protected void dealButton(IPlayer player, PlayerInfo playerInfo){
+	protected void dealButton(IPlayer player, PlayerInfo playerInfo) {
 		boolean flip = currentHandNumber % 2 == 1;
 		playerInfo.isOnButton = flip;
 		otherThan(playerInfo).isOnButton = !flip;
@@ -241,7 +241,8 @@ public class GameEngine implements IGameInfo {
 			action.setAmount(playerInfo.stack - toCall);
 		}
 		int result = playerActed(action, playerInfo);
-		otherThan(player).onVillainActed(action, toCall);
+		player.onActed(action, toCall, player.getName());
+		otherThan(player).onActed(action, toCall, player.getName());
 		if (listener != null) {
 			listener.onPlayerActed(action, playerInfo);
 		}
@@ -434,4 +435,14 @@ public class GameEngine implements IGameInfo {
 	public void setListener(EngineListener listener) {
 		this.listener = listener;
 	}
+
+	@Override
+	public boolean onButton(String name) {
+		if (name.equals(playerInfo1.name)) {
+			return playerInfo1.isOnButton;
+		} else {
+			return playerInfo2.isOnButton;
+		}
+	}
+
 }

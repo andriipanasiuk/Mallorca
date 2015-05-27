@@ -11,26 +11,33 @@ import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.core.game.interfaces.IHeroObserver;
+import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.NoStrengthSituationHandler;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.Log;
 
-public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, IHeroObserver, ISpectrumHolder {
+public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectrumHolder, IHoleCardsObserver {
 	private Spectrum spectrum;
 	private Spectrum randomSpectrum;
 	private IAdvisor model;
 	private IGameInfo gameInfo;
 	private StrengthManager strengthManager;
 	private ISpectrumListener spectrumListener;
+	private final String hero;
+	private NoStrengthSituationHandler situationHandler;
+	private LocalSituation situation;
 
-	public SpectrumPlayerObserver(IAdvisor model, StrengthManager strengthManager, ISpectrumListener spectrumListener) {
-		super();
+	public SpectrumPlayerObserver(IAdvisor model, StrengthManager strengthManager, ISpectrumListener spectrumListener,
+			String hero) {
+		this.hero = hero;
 		this.model = model;
+		situationHandler = new NoStrengthSituationHandler(LimitType.NO_LIMIT, hero);
 		this.strengthManager = strengthManager;
 		this.spectrumListener = spectrumListener;
 	}
@@ -90,6 +97,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, IHeroOb
 
 	@Override
 	public void onStageEvent(PokerStreet street) {
+		situationHandler.onStageEvent(street);
 		if (street == PokerStreet.FLOP) {
 			spectrum.remove(gameInfo.getFlop().toArray());
 		} else if (street == PokerStreet.TURN) {
@@ -104,12 +112,14 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, IHeroOb
 	@Override
 	public void onHandStarted(IGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
+		situationHandler.onHandStarted(gameInfo);
 		spectrum = Spectrum.random();
 		randomSpectrum = Spectrum.random();
 	}
 
 	@Override
 	public void onHandEnded() {
+		situationHandler.onHandEnded();
 	}
 
 	@Override
@@ -118,13 +128,19 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, IHeroOb
 	}
 
 	@Override
-	public void onHeroActed(LocalSituation situation, Action action) {
-		modifySpectrum(situation, action);
+	public void onHoleCards(Card c1, Card c2) {
+		spectrum.remove(c1, c2);
+		randomSpectrum.remove(c1, c2);
 	}
 
 	@Override
-	public void onCardsKnown(Card... cards) {
-		spectrum.remove(cards);
-		randomSpectrum.remove(cards);
+	public void onActed(Action action, double toCall, String name) {
+		situationHandler.onActed(action, toCall, name);
+		if (name.equals(hero)) {
+			modifySpectrum(situation, action);
+		}else{
+			situation = situationHandler.getSituation();
+		}
 	}
+
 }

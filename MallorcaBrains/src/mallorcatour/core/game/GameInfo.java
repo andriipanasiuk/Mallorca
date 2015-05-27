@@ -4,29 +4,35 @@
  */
 package mallorcatour.core.game;
 
-
-
 /**
- *
+ * 
  * @author Andrew
  */
-public class GameInfo extends GameInfoAdapter<PlayerInfo> {
+public class GameInfo extends GameInfoAdapter {
 
 	public OpenPlayerInfo heroInfo;
-	public PlayerInfo villainInfo;
+	public OpenPlayerInfo villainInfo;
 
-    public GameInfo() {
-    }
+	public GameInfo() {
+	}
 
-
-    @Override
-	public PlayerInfo getVillain() {
+	@Override
+	public OpenPlayerInfo getVillain() {
 		return villainInfo;
 	}
 
-    @Override
+	@Override
 	public OpenPlayerInfo getHero() {
 		return heroInfo;
+	}
+
+	@Override
+	public boolean onButton(String name) {
+		if (name.equals(heroInfo.name)) {
+			return heroInfo.isOnButton;
+		} else {
+			return villainInfo.isOnButton;
+		}
 	}
 
 }

@@ -48,7 +48,7 @@ public abstract class AbstractHumanAdvisor implements IExternalAdvisor {
 
     public static Action createHeroRaiseAction(IPlayerGameInfo gameInfo, double percent) {
         double effectiveStack = gameInfo.getBankRollAtRisk();
-        double toCall = gameInfo.getHeroAmountToCall();
+        double toCall = gameInfo.getAmountToCall();
         double pot = gameInfo.getPotSize();
         return Action.createRaiseAction(toCall, pot, effectiveStack, percent);
     }

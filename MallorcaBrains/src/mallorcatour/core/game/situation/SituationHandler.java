@@ -4,113 +4,58 @@
  */
 package mallorcatour.core.game.situation;
 
+import mallorcatour.bot.neural.IHoleCardsObserver;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
-import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.util.Log;
 
 /**
- *
+ * 
  * @author Andrew
  */
-public class SituationHandler implements ISituationHandler {
+public class SituationHandler extends NoStrengthSituationHandler implements IHoleCardsObserver {
 
-    protected IPlayerGameInfo gameInfo;;
-    protected Card holeCard1, holeCard2, flop1, flop2, flop3, turn, river;
-    protected int heroActionCount, countOfHeroAggressive, villainActionCount,
-            countOfOppAggressive;
-    protected boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
-    private double strength, positivePotential, negativePotential;
-    protected LimitType limitType;
-    private final boolean needFullPotentialOnFlop;
+	protected Card holeCard1, holeCard2;
+	private final boolean needFullPotentialOnFlop;
+	private double strength, positivePotential, negativePotential;
 
-    public SituationHandler(LimitType limitType) {
-        this.limitType = limitType;
-        needFullPotentialOnFlop = false;
-    }
+	public SituationHandler(LimitType limitType, String hero) {
+		super(limitType, hero);
+		needFullPotentialOnFlop = false;
+	}
 
-	public SituationHandler(LimitType limitType, boolean needFullPotentialOnFlop) {
-		this.limitType = limitType;
+	public SituationHandler(LimitType limitType, boolean needFullPotentialOnFlop, String hero) {
+		super(limitType, hero);
 		this.needFullPotentialOnFlop = needFullPotentialOnFlop;
 	}
 
-    @Override
-	public void onHoleCards(Card c1, Card c2, String villainName) {
-        this.holeCard1 = c1;
+	@Override
+	public void onHoleCards(Card c1, Card c2) {
+		this.holeCard1 = c1;
 		this.holeCard2 = c2;
 		StreetEquity equity = EquilatorPreflop.equityVsRandom(holeCard1, holeCard2);
 		strength = equity.strength;
 		positivePotential = equity.positivePotential;
 		negativePotential = equity.negativePotential;
-    }
+	}
 
-    private LocalSituation getHeroSituation() {
-        LocalSituation result = null;
-        boolean isOnButton  = gameInfo.onButton();
-        double toCall = gameInfo.getHeroAmountToCall();
-        double pot = gameInfo.getPotSize();
-        double effectiveStack = gameInfo.getBankRollAtRisk();
-        double potAfterCall = toCall + pot;
-        double potOdds = toCall / potAfterCall;
+	@Override
+	public LocalSituation getSituation() {
+		LocalSituation result = super.getSituation();
+		result.setStrength(strength);
+		result.setPositivePotential(positivePotential);
+		result.setNegativePotential(negativePotential);
+		return result;
+	}
 
-        Log.d("Ef. stack: " + effectiveStack);
-        Log.d("Pot: " + pot);
-        Log.d("To call: " + toCall);
-        if (gameInfo.isPreFlop()) {
-            result = new LocalSituation(LocalSituation.PREFLOP, limitType);
-        } else if (gameInfo.isFlop()) {
-            result = new LocalSituation(LocalSituation.FLOP, limitType);
-        } else if (gameInfo.isTurn()) {
-            result = new LocalSituation(LocalSituation.TURN, limitType);
-        } else if (gameInfo.isRiver()) {
-            result = new LocalSituation(LocalSituation.RIVER, limitType);
-		} else {
-			throw new IllegalStateException("Incorrect street value");
-        }
-        result.setHeroAggresionActionCount(countOfHeroAggressive);
-        result.setHeroActionCount(heroActionCount);
-        result.setVillainAggresionActionCount(countOfOppAggressive);
-        result.setVillainActionCount(villainActionCount);
-        result.wasHeroPreviousAggresive(wasHeroPreviousAggressive);
-        result.wasOpponentPreviousAggresive(wasVillainPreviousAggressive);
-        result.setStrength(strength);
-        result.setPositivePotential(positivePotential);
-        result.setNegativePotential(negativePotential);
-        result.setPotOdds(potOdds);
-        result.isOnButton(isOnButton);
-        result.setPotToStackOdds(potAfterCall / (potAfterCall + effectiveStack));
-        result.setFLPotSize(1 - (2 * gameInfo.getBigBlindSize()) / pot);
-        result.canRaise(gameInfo.canHeroRaise());
-        return result;
-    }
-
-    @Override
-    public LocalSituation onHeroSituation() {
-        LocalSituation result = getHeroSituation();
-        return result;
-    }
-
-    @Override
-	public void onHeroActed(LocalSituation situation, Action action) {
-        if (action.isAggressive()) {
-            wasHeroPreviousAggressive = true;
-            countOfHeroAggressive++;
-        } else if (action.isPassive()) {
-            wasHeroPreviousAggressive = false;
-        }
-        heroActionCount++;
-    }
-
-    @Override
+	@Override
 	public void onStageEvent(PokerStreet street) {
-        if (street == PokerStreet.FLOP) {
-            flop1 = gameInfo.getBoard().get(0);
-            flop2 = gameInfo.getBoard().get(1);
+		if (street == PokerStreet.FLOP) {
+			flop1 = gameInfo.getBoard().get(0);
+			flop2 = gameInfo.getBoard().get(1);
 			flop3 = gameInfo.getBoard().get(2);
 			StreetEquity flopEquity;
 			if (needFullPotentialOnFlop) {
@@ -118,50 +63,22 @@ public class SituationHandler implements ISituationHandler {
 			} else {
 				flopEquity = PokerEquilatorBrecher.equityOnFlop(holeCard1, holeCard2, flop1, flop2, flop3);
 			}
-            strength = flopEquity.strength;
-            positivePotential = flopEquity.positivePotential;
-            negativePotential = flopEquity.negativePotential;
-        } else if (street == PokerStreet.TURN) {
-            turn = gameInfo.getBoard().get(3);
-            StreetEquity turnEquity = PokerEquilatorBrecher.equityOnTurn(holeCard1,
-                    holeCard2, flop1, flop2, flop3, turn);
-            strength = turnEquity.strength;
-            positivePotential = turnEquity.positivePotential;
-            negativePotential = turnEquity.negativePotential;
-        } else if (street == PokerStreet.RIVER) {
-            river = gameInfo.getBoard().get(4);
-            strength = PokerEquilatorBrecher.strengthOnRiver(holeCard1, holeCard2,
-                    flop1, flop2, flop3, turn, river);
-            positivePotential = 0;
-            negativePotential = 0;
-        }
-    }
+			strength = flopEquity.strength;
+			positivePotential = flopEquity.positivePotential;
+			negativePotential = flopEquity.negativePotential;
+		} else if (street == PokerStreet.TURN) {
+			turn = gameInfo.getBoard().get(3);
+			StreetEquity turnEquity = PokerEquilatorBrecher.equityOnTurn(holeCard1, holeCard2, flop1, flop2, flop3,
+					turn);
+			strength = turnEquity.strength;
+			positivePotential = turnEquity.positivePotential;
+			negativePotential = turnEquity.negativePotential;
+		} else if (street == PokerStreet.RIVER) {
+			river = gameInfo.getBoard().get(4);
+			strength = PokerEquilatorBrecher.strengthOnRiver(holeCard1, holeCard2, flop1, flop2, flop3, turn, river);
+			positivePotential = 0;
+			negativePotential = 0;
+		}
+	}
 
-    @Override
-	public void onHandStarted(IPlayerGameInfo gameInfo) {
-        this.gameInfo = gameInfo;
-        heroActionCount = 0;
-        countOfHeroAggressive = 0;
-        villainActionCount = 0;
-        countOfOppAggressive = 0;
-        wasHeroPreviousAggressive = false;
-        wasVillainPreviousAggressive = false;
-    }
-
-    @Override
-	public void onVillainActed(Action action, double toCall) {
-        if (action.isAggressive()) {
-            wasVillainPreviousAggressive = true;
-            villainActionCount++;
-            countOfOppAggressive++;
-        } else if (action.isPassive()) {
-            wasVillainPreviousAggressive = false;
-            villainActionCount++;
-        }
-    }
-
-    @Override
-	public void onHandEnded() {
-        //do nothing
-    }
 }

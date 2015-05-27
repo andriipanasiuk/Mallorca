@@ -95,7 +95,7 @@ public abstract class AbstractPABot implements Player {
             toCall = action.getAmount();
             Log.f(DEBUG_PATH, villainName + " acted " + action);
             if (action.isBetOrRaise() || action.isCheckOrCall() || action.isFold()) {
-                getRealBot().onVillainActed(ActionAdapter.createFromPAAction(action), action.getToCall());
+                getRealBot().onActed(ActionAdapter.createFromPAAction(action), action.getToCall(), villainName);
             }
         }
     }

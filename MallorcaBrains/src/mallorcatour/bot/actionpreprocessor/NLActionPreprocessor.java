@@ -13,7 +13,7 @@ public class NLActionPreprocessor implements IActionPreprocessor {
 
 	@Override
 	public Action preprocessAction(Action action, IPlayerGameInfo gameInfo) {
-		double toCall = gameInfo.getHeroAmountToCall();
+		double toCall = gameInfo.getAmountToCall();
 		double pot = gameInfo.getPotSize();
 		double effectiveStack = gameInfo.getBankRollAtRisk();
 		if (action.isAllin()) {
