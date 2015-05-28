@@ -132,7 +132,9 @@ public class GameEngine implements IGameInfo {
 		while (playerInfo1.stack > 0 && playerInfo2.stack > 0) {
 			deal();
 		}
-		Log.d(playerInfo1.stack + " " + playerInfo2.stack);
+		if (playerInfo1.stack != 4000 && playerInfo2.stack != 4000) {
+			Log.d(playerInfo1.stack + " " + playerInfo2.stack);
+		}
 		TournamentSummary result = new TournamentSummary();
 		if (playerInfo1.stack > playerInfo2.stack) {
 			result.winner = playerInfo1.name;

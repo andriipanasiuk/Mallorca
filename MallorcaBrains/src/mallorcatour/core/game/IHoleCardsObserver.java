@@ -1,6 +1,5 @@
-package mallorcatour.bot.neural;
+package mallorcatour.core.game;
 
-import mallorcatour.core.game.Card;
 
 public interface IHoleCardsObserver {
 	void onHoleCards(Card c1, Card c2);

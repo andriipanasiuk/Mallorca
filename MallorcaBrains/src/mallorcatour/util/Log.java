@@ -25,4 +25,5 @@ public class Log {
 	public static void f(String log) {
 		f(DEBUG_PATH, log);
 	}
+
 }

@@ -6,13 +6,13 @@ import java.util.List;
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
@@ -31,10 +31,11 @@ import mallorcatour.util.Log;
  */
 public class GrandtorinoBot implements IPlayer {
 
-	protected IPlayerGameInfo gameInfo;
+	private IPlayerGameInfo gameInfo;
 	private Card heroCard1, heroCard2;
-	private final IAdvisor advisor;
 	private IActionChecker actionChecker;
+	private String name;
+	private final IAdvisor advisor;
 	private final IAdvisor preflopBot;
 	private final IActionPreprocessor actionPreprocessor;
 	private final String DEBUG_PATH;
@@ -49,10 +50,6 @@ public class GrandtorinoBot implements IPlayer {
 		this.cardsObserver = cardsObserver;
 	}
 
-	public void set(ISpectrumHolder villainSpectrum) {
-		// TODO
-	}
-
 	public void set(IActionChecker actionChecker) {
 		this.actionChecker = actionChecker;
 	}
@@ -60,7 +57,6 @@ public class GrandtorinoBot implements IPlayer {
 	public GrandtorinoBot(IAdvisor neuralNetwork, LimitType limitType, String debug) {
 		this.advisor = neuralNetwork;
 		this.DEBUG_PATH = debug;
-		this.actionChecker = actionChecker;
 		actionPreprocessor = new NLActionPreprocessor();
 		preflopBot = new NLPreflopChart();
 	}
@@ -124,9 +120,11 @@ public class GrandtorinoBot implements IPlayer {
 		LocalSituation situation = situationHandler.getSituation();
 
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
+		Log.f(DEBUG_PATH, "Cards: [" + heroCard1 + " " + heroCard2 + "] " + gameInfo.getBoard());
 		Log.f(DEBUG_PATH, "Situation: " + VectorUtils.toString(situation));
 		action = getActionInternal(situation, new HoleCards(heroCard1, heroCard2));
 		Log.f(DEBUG_PATH, "===============  End  ==============");
+
 		gameObserver.onActed(action, gameInfo.getAmountToCall(), getName());
 		return action;
 	}
@@ -167,8 +165,6 @@ public class GrandtorinoBot implements IPlayer {
 	public String getName() {
 		return (name != null) ? name : "NeuralBot";
 	}
-
-	private String name;
 
 	public void setName(String name) {
 		this.name = name;

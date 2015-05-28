@@ -1,4 +1,4 @@
-package mallorcatour.bot.neural;
+package mallorcatour.bot.villainobserver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +11,7 @@ import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;

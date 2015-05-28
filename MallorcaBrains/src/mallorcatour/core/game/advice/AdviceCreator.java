@@ -62,6 +62,8 @@ public class AdviceCreator implements IAdviceInterpreter {
                         + " aggressive: " + aggressiveCount);
                 return new Advice(100, 0, 0);
         }
-        return new Advice(foldCount, passiveCount, aggressiveCount);
+		Advice raw = new Advice(foldCount, passiveCount, aggressiveCount);
+		Log.f("Raw advice: " + raw);
+		return raw;
     }
 }

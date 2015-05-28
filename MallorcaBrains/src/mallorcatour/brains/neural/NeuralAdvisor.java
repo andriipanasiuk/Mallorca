@@ -41,12 +41,18 @@ public class NeuralAdvisor implements IAdvisor {
 	private final IPokerStats stats;
 	private final String name;
 	private NeuralNetwork<?> preflopNN, flopNN, turnNN, riverNN;
+	private AdviceCreator adviceCreator;
 
 	public NeuralAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, String name) {
 		this.neurals = nnStreaming;
 		this.stats = stats;
 		this.name = name;
 		initNN();
+	}
+
+	public NeuralAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, String name, AdviceCreator adviceCreator) {
+		this(nnStreaming, stats, name);
+		this.adviceCreator = adviceCreator;
 	}
 
 	private void initNN() {
@@ -82,6 +88,9 @@ public class NeuralAdvisor implements IAdvisor {
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal street: " + street);
+		}
+		if (this.adviceCreator != null) {
+			adviceCreator = this.adviceCreator;
 		}
 		Advice result;
 		nnForUse.setInput(new LocalSituationInterpreter().createInput(situation));

@@ -7,7 +7,7 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.neural.SpectrumPlayerObserver;
+import mallorcatour.bot.villainobserver.SpectrumPlayerObserver;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.game.Action;

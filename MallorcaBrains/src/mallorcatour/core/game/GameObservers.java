@@ -1,7 +1,5 @@
-package mallorcatour.bot.neural;
+package mallorcatour.core.game;
 
-import mallorcatour.core.game.Action;
-import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 

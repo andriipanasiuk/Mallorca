@@ -63,9 +63,7 @@ public final class Advice implements IAdvice, IVector, Serializable {
     private int passivePercent;
     private int aggressivePercent;
 
-    Advice(int foldPercent,
-            int passivePercent,
-            int aggressivePercent) {
+	public Advice(int foldPercent, int passivePercent,            int aggressivePercent) {
         if (foldPercent < 0 || passivePercent < 0 || aggressivePercent < 0) {
             throw new IllegalArgumentException("Percents must be form 0 to 100");
         }

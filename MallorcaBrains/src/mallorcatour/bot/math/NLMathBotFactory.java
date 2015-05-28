@@ -4,11 +4,11 @@ import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.neural.GameObservers;
-import mallorcatour.bot.neural.HoleCardsObservers;
-import mallorcatour.bot.neural.SpectrumPlayerObserver;
+import mallorcatour.bot.villainobserver.SpectrumPlayerObserver;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
+import mallorcatour.core.game.GameObservers;
+import mallorcatour.core.game.HoleCardsObservers;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.SituationHandler;
 

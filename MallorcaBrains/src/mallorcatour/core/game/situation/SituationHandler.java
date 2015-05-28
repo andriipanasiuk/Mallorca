@@ -4,11 +4,11 @@
  */
 package mallorcatour.core.game.situation;
 
-import mallorcatour.bot.neural.IHoleCardsObserver;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 
@@ -54,6 +54,7 @@ public class SituationHandler extends NoStrengthSituationHandler implements IHol
 
 	@Override
 	public void onStageEvent(PokerStreet street) {
+		super.onStageEvent(street);
 		if (street == PokerStreet.FLOP) {
 			flop1 = gameInfo.getBoard().get(0);
 			flop2 = gameInfo.getBoard().get(1);

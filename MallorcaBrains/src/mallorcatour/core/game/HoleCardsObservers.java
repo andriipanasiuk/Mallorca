@@ -1,6 +1,5 @@
-package mallorcatour.bot.neural;
+package mallorcatour.core.game;
 
-import mallorcatour.core.game.Card;
 
 public class HoleCardsObservers implements IHoleCardsObserver {
 
