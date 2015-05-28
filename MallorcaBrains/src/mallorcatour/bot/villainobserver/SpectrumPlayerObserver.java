@@ -106,6 +106,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	@Override
 	public void onStageEvent(PokerStreet street) {
 		situationHandler.onStageEvent(street);
+		situation = situationHandler.getSituation();
 		if (street == PokerStreet.FLOP) {
 			spectrum.remove(gameInfo.getFlop().toArray());
 			randomSpectrum.remove(gameInfo.getFlop().toArray());

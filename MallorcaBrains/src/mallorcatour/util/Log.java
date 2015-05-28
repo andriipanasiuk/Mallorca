@@ -2,7 +2,7 @@ package mallorcatour.util;
 
 public class Log {
 	public static boolean WRITE_TO_ERR = false;
-	public static String DEBUG_PATH = "";
+	public static String DEBUG_PATH = "debug.txt";
 
 	public static void d(String log) {
 		if (WRITE_TO_ERR) {

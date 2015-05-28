@@ -8,6 +8,10 @@ public class OpenPlayerInfo extends PlayerInfo {
 	public Card holeCard1;
 	public Card holeCard2;
 
+	public OpenPlayerInfo(String name) {
+		super(name);
+	}
+
 	public OpenPlayerInfo(String name, double stack) {
 		super(name, stack);
 	}

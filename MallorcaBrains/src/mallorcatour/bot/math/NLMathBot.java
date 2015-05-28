@@ -42,13 +42,17 @@ public class NLMathBot implements IPlayer {
 	private IGameObserver<IPlayerGameInfo> gameObserver;
 	private IHoleCardsObserver cardsObserver;
 
-	public NLMathBot(IProfitCalculator profitCalculator, String debug) {
+	private String name;
+
+	public NLMathBot(IProfitCalculator profitCalculator, String name, String debug, ISpectrumHolder villainSpectrumHolder) {
 		this.profitCalculator = profitCalculator;
+		this.name = name;
 		adviceCreator = new AdviceCreatorFromMap();
 		GusXensen player = new GusXensen();
 		preflopAdvisor = new NeuralAdvisor(player, player, "Gus Xensen");
 		preflopBot = new NLPreflopChart();
 		actionPreprocessor = new NLActionPreprocessor();
+		this.villainSpectrumHolder = villainSpectrumHolder;
 		this.DEBUG_PATH = debug;
 	}
 
@@ -59,7 +63,6 @@ public class NLMathBot implements IPlayer {
 	}
 
 	public void set(ISpectrumHolder villainSpectrumHolder) {
-		this.villainSpectrumHolder = villainSpectrumHolder;
 	}
 
 	/**
@@ -150,8 +153,6 @@ public class NLMathBot implements IPlayer {
 	public String getName() {
 		return name != null ? name : "NLMathBot";
 	}
-
-	private String name;
 
 	public void setName(String name) {
 		this.name = name;

@@ -55,6 +55,7 @@ public abstract class GameInfoAdapter implements IPlayerGameInfo {
 		return pot;
 	}
 
+	@Override
 	public double getAmountToCall() {
 		return heroAmountToCall;
 	}

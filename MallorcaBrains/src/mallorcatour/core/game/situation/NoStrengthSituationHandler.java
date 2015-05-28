@@ -5,18 +5,19 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.util.Log;
 
 public class NoStrengthSituationHandler implements ISituationHandler, IGameObserver<IGameInfo> {
-	protected int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;
+	private int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;
+	private boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
 	protected IGameInfo gameInfo;
-	protected boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
 	protected final LimitType limitType;
-	private double playerToCall;
 	private double effectiveStack;
 	private double pot;
 	private final String hero;
 	private final boolean trackHero;
 	private double toCall;
+	private double playerToCall;
 
 	public NoStrengthSituationHandler(LimitType limitType, String hero, boolean trackHero) {
 		this.limitType = limitType;
@@ -30,7 +31,9 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		boolean isOnButton = gameInfo.onButton(hero) ^ !trackHero;
 		double potAfterCall = playerToCall + pot;
 		double potOdds = playerToCall / potAfterCall;
+		double potToStackCoeff = potAfterCall / (potAfterCall + effectiveStack);
 
+		Log.f("toCall: " + playerToCall + " Pot: " + pot);
 		if (gameInfo.isPreFlop()) {
 			result = new LocalSituation(LocalSituation.PREFLOP, limitType);
 		} else if (gameInfo.isFlop()) {
@@ -50,7 +53,7 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		result.wasOpponentPreviousAggresive(wasVillainPreviousAggressive);
 		result.setPotOdds(potOdds);
 		result.isOnButton(isOnButton);
-		result.setPotToStackOdds(potAfterCall / (potAfterCall + effectiveStack));
+		result.setPotToStackOdds(potToStackCoeff);
 		result.setFLPotSize(1 - (2 * gameInfo.getBigBlindSize()) / pot);
 		result.canRaise(effectiveStack > 0);
 		return result;
@@ -74,26 +77,20 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 	}
 
 	private void onHeroActed(Action action) {
+		wasHeroPreviousAggressive = action.isAggressive();
 		if (action.isAggressive()) {
-			wasHeroPreviousAggressive = true;
 			countOfHeroAggressive++;
-		} else if (action.isPassive()) {
-			wasHeroPreviousAggressive = false;
 		}
 		heroActionCount++;
 	}
 
 	private void onVillainActed(Action action) {
+		wasVillainPreviousAggressive = action.isAggressive();
 		if (action.isAggressive()) {
-			this.playerToCall = action.getAmount();
-			wasVillainPreviousAggressive = true;
-			villainActionCount++;
 			countOfOppAggressive++;
 		} else if (action.isPassive()) {
-			this.playerToCall = 0;
-			wasVillainPreviousAggressive = false;
-			villainActionCount++;
 		}
+		villainActionCount++;
 	}
 
 	@Override
@@ -103,7 +100,12 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 
 	@Override
 	public void onStageEvent(PokerStreet street) {
+		toCall = 0;
 		playerToCall = 0;
+	}
+
+	private boolean isTrackPlayer(String name) {
+		return name.equals(hero) ^ !trackHero;
 	}
 
 	@Override
@@ -111,19 +113,27 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		pot += toCall;
 		if (action.isAggressive()) {
 			if (action.getAmount() < effectiveStack) {
-				effectiveStack -= action.getAmount();
+				if (!isTrackPlayer(name)) {
+					playerToCall = action.getAmount();
+				}
 				toCall = action.getAmount();
 				pot += action.getAmount();
+				effectiveStack -= action.getAmount();
 			} else {
-				// real and not side pot
-				pot += effectiveStack;
+				if (!isTrackPlayer(name)) {
+					playerToCall = effectiveStack;
+				}
 				toCall = effectiveStack;
+				pot += effectiveStack;
 				effectiveStack = 0;
 			}
 		} else {
+			if (!isTrackPlayer(name)) {
+				playerToCall = 0;
+			}
 			toCall = 0;
 		}
-		if (name.equals(hero) ^ !trackHero) {
+		if (isTrackPlayer(name)) {
 			onHeroActed(action);
 		} else {
 			onVillainActed(action);

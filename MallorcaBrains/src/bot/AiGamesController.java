@@ -20,6 +20,7 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.GameInfo;
+import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.util.Log;
 
@@ -33,6 +34,9 @@ public class AiGamesController {
 
 	private Map<String, String> settings = new HashMap<String, String>();
 
+	/**
+	 * Used for internal needs. For external we use bot.getName().
+	 */
 	private String heroName = "";
 	private String villainName = "";
 
@@ -40,11 +44,11 @@ public class AiGamesController {
 	private int timeBank, timePerMove;
 
 	private GameInfo gameInfo;
-	private IPlayer observer;
+	private IPlayer bot;
 
 	public AiGamesController(GameInfo gameInfo, IPlayer observer) {
 		this.gameInfo = gameInfo;
-		this.observer = observer;
+		this.bot = observer;
 	}
 
 	/**
@@ -64,6 +68,8 @@ public class AiGamesController {
 				villainName = "player1";
 			}
 			heroName = value;
+			gameInfo.heroInfo = new OpenPlayerInfo(bot.getName());
+			gameInfo.villainInfo = new OpenPlayerInfo(villainName);
 		} else if (key.equals("timebank")) { // Maximum amount of time your bot
 												// can take for one response
 			timeBank = Integer.valueOf(value);
@@ -102,6 +108,9 @@ public class AiGamesController {
 												// onButton is true if it's your
 												// bot
 			gameInfo.onButton = value.equals(heroName);
+			gameInfo.heroInfo.isOnButton = value.equals(heroName);
+			gameInfo.villainInfo.isOnButton = !value.equals(heroName);
+
 		} else if (key.equals("max_win_pot")) { // The size of the current pot
 			gameInfo.pot = Integer.valueOf(value);
 			Log.d("Pot: " + gameInfo.pot);
@@ -121,7 +130,7 @@ public class AiGamesController {
 				throw new IllegalArgumentException("Not correct count of board cards");
 			}
 			gameInfo.street = street;
-			observer.onStageEvent(street);
+			bot.onStageEvent(street);
 		} else {
 			System.err.printf("Unknown match command: %s %s\n", key, value);
 		}
@@ -150,7 +159,7 @@ public class AiGamesController {
 		}
 		if (bot.equals(heroName)) {
 			if (key.equals("stack")) { // The amount in your starting stack
-				observer.onHandStarted(gameInfo);
+				this.bot.onHandStarted(gameInfo);
 			} else if (key.equals("post")) {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
 				Log.d("Effective stack: " + gameInfo.bankrollAtRisk);
@@ -158,9 +167,9 @@ public class AiGamesController {
 				gameInfo.street = PokerStreet.PREFLOP;
 				Card[] cards = parseCards(amount);
 				Log.d("Hole cards: " + amount);
-				observer.onHoleCards(cards[0], cards[1]);
+				this.bot.onHoleCards(cards[0], cards[1]);
 			} else if (key.equals("wins")) {
-				observer.onHandEnded();
+				this.bot.onHandEnded();
 			} else {
 				// That should be all
 			}
@@ -171,11 +180,11 @@ public class AiGamesController {
 			} else if (key.equals("hand")) {
 				// Hand of the opponent on a showdown, not stored
 			} else if (key.equals("wins")) {
-				observer.onHandEnded();
+				this.bot.onHandEnded();
 			} else if (key.equals("fold") || key.equals("check") || key.equals("call") || key.equals("raise")) {
 				Log.d("Villain " + key + " " + amount);
 				Action action = fromString(key, amount);
-				observer.onActed(action, -1, villainName);
+				this.bot.onActed(action, -1, villainName);
 			}
 		}
 		if (key.equals("raise")) {
