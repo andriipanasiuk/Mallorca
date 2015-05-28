@@ -16,7 +16,7 @@ import java.util.Scanner;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.neural.NeuralBotFactory;
+import mallorcatour.bot.neural.NeuralAggroBotFactory;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
@@ -87,7 +87,7 @@ public class BotParser {
 	public static void main(String[] args) {
 		Log.WRITE_TO_ERR = true;
 		EquilatorPreflop.loadFrom = LoadFrom.CODE;
-		NeuralBotFactory factory = new NeuralBotFactory();
+		NeuralAggroBotFactory factory = new NeuralAggroBotFactory();
 		BotParser parser = new BotParser(factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, "Mallorca", ""));
 		parser.run();
