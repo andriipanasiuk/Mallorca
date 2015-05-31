@@ -44,6 +44,20 @@ public class PokerStreet implements Serializable {
 		}
 	}
 
+	public PokerStreet previous() {
+		if (intValue == 0) {
+			return null;
+		} else if (intValue == 1) {
+			return PokerStreet.PREFLOP;
+		} else if (intValue == 2) {
+			return PokerStreet.FLOP;
+		} else if (intValue == 3) {
+			return TURN;
+		} else {
+			throw new IllegalStateException("Shouln't be");
+		}
+	}
+
 	public String toString() {
 		return this.name;
 	}

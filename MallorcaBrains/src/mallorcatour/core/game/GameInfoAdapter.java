@@ -8,14 +8,28 @@ public abstract class GameInfoAdapter implements IPlayerGameInfo {
 	public LimitType limitType;
 	public int[] raisesOnStreet = new int[4];
 	public boolean canHeroRaise;
-	public PokerStreet street;
+	protected PokerStreet street;
 	public double pot;
 	public double bigBlind;
 	public double heroAmountToCall;
 	public List<Card> board;
 	public double bankrollAtRisk;
 	public boolean onButton;
+	private double[] potOnStreet = new double[4];
 
+	public void changeStreet(PokerStreet newStreet) {
+		if (newStreet != PokerStreet.PREFLOP) {
+			potOnStreet[this.street.intValue()] = pot;
+		}
+		this.street = newStreet;
+	}
+
+	@Override
+	public double getPot(PokerStreet street) {
+		return potOnStreet[street.intValue()];
+	}
+
+	@Override
 	public double getBigBlindSize() {
 		return bigBlind;
 	}
@@ -35,6 +49,7 @@ public abstract class GameInfoAdapter implements IPlayerGameInfo {
 		return street != PokerStreet.PREFLOP;
 	}
 
+	@Override
 	public boolean isFlop() {
 		return street == PokerStreet.FLOP;
 	}
@@ -47,10 +62,12 @@ public abstract class GameInfoAdapter implements IPlayerGameInfo {
 		return street == PokerStreet.RIVER;
 	}
 
+	@Override
 	public List<Card> getBoard() {
 		return board;
 	}
 
+	@Override
 	public double getPotSize() {
 		return pot;
 	}

@@ -129,7 +129,7 @@ public class AiGamesController {
 			} else {
 				throw new IllegalArgumentException("Not correct count of board cards");
 			}
-			gameInfo.street = street;
+			gameInfo.changeStreet(street);
 			bot.onStageEvent(street);
 		} else {
 			System.err.printf("Unknown match command: %s %s\n", key, value);
@@ -164,7 +164,7 @@ public class AiGamesController {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
 				Log.d("Effective stack: " + gameInfo.bankrollAtRisk);
 			} else if (key.equals("hand")) { // Your cards
-				gameInfo.street = PokerStreet.PREFLOP;
+				gameInfo.changeStreet(PokerStreet.PREFLOP);
 				Card[] cards = parseCards(amount);
 				Log.d("Hole cards: " + amount);
 				this.bot.onHoleCards(cards[0], cards[1]);

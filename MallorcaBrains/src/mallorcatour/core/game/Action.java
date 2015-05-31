@@ -74,7 +74,7 @@ public class Action implements Serializable {
 	}
 
 	public static Action createRaiseAction(double toCall, double pot, double effectiveStack, double percent) {
-		double raiseAmount = percent * (toCall + pot);
+		double raiseAmount = Math.round(percent * (toCall + pot));
 		if (effectiveStack - raiseAmount < THRESHOLD_FOR_GOING_ALLIN * (pot + toCall + 2 * raiseAmount)) {
 			raiseAmount = effectiveStack;
 			percent = raiseAmount / (pot + toCall);

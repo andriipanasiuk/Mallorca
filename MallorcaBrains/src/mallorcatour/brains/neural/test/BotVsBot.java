@@ -31,11 +31,11 @@ public class BotVsBot {
 		IPlayer playerDown = new NeuralAggroBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, "Grantorino Down", DEBUG_PATH);
 		IPlayer random = new RandomBot("Random", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(mathBot, random, IGameObserver.EMPTY, DEBUG_PATH);
-//		engine.button(mathBot).cards(playerDown, "Qs6c").cards(mathBot, "KcQs").flop("4s5sKs");
+		PredefinedGameEngine engine = new PredefinedGameEngine(mathBot, playerDown, IGameObserver.EMPTY, DEBUG_PATH);
+		engine.button(playerDown).cards(playerDown, "9sTc").cards(mathBot, "KcKs").flop("QsAsQd");
 		int count1 = 0, count2 = 0;
-//		engine.playRound();
-		for (int i = 0; i < 100; i++) {
+		engine.playRound();
+		for (int i = 0; i < 0; i++) {
 			TournamentSummary summary = engine.playGame();
 			if (summary.winner.equals(mathBot.getName())) {
 				count1++;

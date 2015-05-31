@@ -49,6 +49,7 @@ public class GameEngine implements IGameInfo {
 	private int currentHandNumber = -1;
 	private LimitType limitType;
 
+	private double[] potOnStreet = new double[4];
 	private double pot;
 	protected List<Card> nonUsedCards;
 	protected List<Card> boardCards;
@@ -224,6 +225,7 @@ public class GameEngine implements IGameInfo {
 		}
 		Log.f(DEBUG_PATH, "");
 		Log.f(DEBUG_PATH, "Board: " + boardCards + " Pot: " + pot);
+		potOnStreet[currentStreet.intValue()] = pot;
 		currentStreet = currentStreet.next();
 		zeroBets();
 		return ActionResult.START_STREET;
@@ -476,6 +478,11 @@ public class GameEngine implements IGameInfo {
 	@Override
 	public double getAmountToCall(String hero) {
 		return Math.max(0, getVillain(hero).bet - getHero(hero).bet);
+	}
+
+	@Override
+	public double getPot(PokerStreet street) {
+		return potOnStreet[street.intValue()];
 	}
 
 }

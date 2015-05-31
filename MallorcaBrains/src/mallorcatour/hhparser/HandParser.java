@@ -48,7 +48,7 @@ public class HandParser {
             processAction(action);
         }
         if (hand.getFlop() != null) {
-            gameInfo.street = PokerStreet.FLOP;
+            gameInfo.changeStreet(PokerStreet.FLOP);
             Flop flop = hand.getFlop();
             board.add(flop.first);
             board.add(flop.second);
@@ -62,7 +62,7 @@ public class HandParser {
             }
         }
         if (hand.getTurn() != null) {
-            gameInfo.street = PokerStreet.TURN;
+            gameInfo.changeStreet(PokerStreet.TURN);
             Card turn = hand.getTurn();
             board.add(turn);
             situationHandler.onStageEvent(PokerStreet.TURN);
@@ -74,7 +74,7 @@ public class HandParser {
             }
         }
         if (hand.getRiver() != null) {
-            gameInfo.street = PokerStreet.RIVER;
+            gameInfo.changeStreet(PokerStreet.RIVER);
             Card river = hand.getRiver();
             board.add(river);
             situationHandler.onStageEvent(PokerStreet.RIVER);
@@ -125,7 +125,7 @@ public class HandParser {
             onVillainAction(action.getAction(), toCall);
         }
         if (action.getAction().isAggressive()) {
-            gameInfo.raisesOnStreet[gameInfo.street.intValue()]++;
+            gameInfo.raisesOnStreet[gameInfo.getStage().intValue()]++;
         }
     }
 
@@ -139,8 +139,8 @@ public class HandParser {
 		} else {
 			gameInfo.onButton = false;
 		}
-        gameInfo.street = PokerStreet.PREFLOP;
-        gameInfo.raisesOnStreet[gameInfo.street.intValue()] = 1;
+        gameInfo.changeStreet(PokerStreet.PREFLOP);
+        gameInfo.raisesOnStreet[gameInfo.getStage().intValue()] = 1;
         //recognizing hole cards
         HoleCards holeCards = hand.getPlayerInfo(heroName).getHoleCards();
         if (holeCards != null) {

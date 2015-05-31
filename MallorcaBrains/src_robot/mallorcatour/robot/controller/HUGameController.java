@@ -227,13 +227,11 @@ public class HUGameController implements IGameController {
             streetChanged = true;
             currentStreet = newStreet;
         }
-        //processing changing the street
-        gameInfo.street = newStreet;
+        gameInfo.changeStreet(newStreet);
 
         processBoardCards(boardCards, gameInfo.pot);
         //sending current villain actions
-        if (villainBet > heroBet && (gameInfo.street != PokerStreet.PREFLOP
-                || villainBet != gameInfo.bigBlind)) {
+		if (villainBet > heroBet && (!gameInfo.isPreFlop() || villainBet != gameInfo.bigBlind)) {
             Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                     + (heroBet == 0 ? " bets " : " raises ") + (villainBet - heroBet));
             villainPreviousAction = Action.raiseAction(villainBet - heroBet);
@@ -259,14 +257,14 @@ public class HUGameController implements IGameController {
             gameInfo.pot += villainRealBet;
             gameInfo.bankrollAtRisk -= villainRealBet;
         } else if (villainBet == heroBet) {
-            if (!heroOnButton && gameInfo.street == PokerStreet.PREFLOP) {
+            if (!heroOnButton && gameInfo.isPreFlop()) {
                 Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                         + " calls " + gameInfo.bigBlind / 2);
                 villainPreviousAction = Action.callAction(gameInfo.bigBlind / 2);
                 player.onActed(villainPreviousAction, gameInfo.bigBlind / 2, gameInfo.villainInfo.getName());
                 gameInfo.pot += gameInfo.bigBlind / 2;
             }
-            if (heroOnButton && gameInfo.street != PokerStreet.PREFLOP) {
+            if (heroOnButton && !gameInfo.isPreFlop()) {
                 Log.f(DEBUG_PATH, gameInfo.villainInfo.getName()
                         + " checks");
                 villainPreviousAction = Action.checkAction();
@@ -294,7 +292,7 @@ public class HUGameController implements IGameController {
 
         currentHandNumber = handNumber;
         //game stage
-        gameInfo.street = currentStreet;
+        gameInfo.changeStreet(currentStreet);
         //big blind, pot, limit and effective stack
         gameInfo.bigBlind = getBigBlind(players);
         if (currentStreet == PokerStreet.PREFLOP) {

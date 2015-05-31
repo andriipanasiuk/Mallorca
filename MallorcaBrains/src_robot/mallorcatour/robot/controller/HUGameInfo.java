@@ -40,20 +40,6 @@ public class HUGameInfo extends GameInfo {
     	return villainInfo.getStack() == HUGameInfo.SITTING_OUT;
     }
 
-    @Override
-    public boolean canHeroRaise() {
-        if (limitType == LimitType.NO_LIMIT) {
-            boolean result = getBankRollAtRisk() > 0;
-            return result;
-        } else {
-            return raisesOnStreet[street.intValue()] < 4;
-        }
-    }
-
-    public int getNumRaises(){
-        return raisesOnStreet[street.intValue()];
-    }
-
 	@Override
 	public OpenPlayerInfo getVillain() {
 		throw new UnsupportedOperationException();

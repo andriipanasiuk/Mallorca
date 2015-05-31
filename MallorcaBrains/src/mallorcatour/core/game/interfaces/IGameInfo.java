@@ -18,12 +18,6 @@ import mallorcatour.core.game.PokerStreet;
  */
 public interface IGameInfo {
 
-//	boolean canRaise(String hero);
-
-//	boolean onButton(String name);
-//
-//	double getAmountToCall(String name);
-
 	public double getBigBlindSize();
 
 	public PokerStreet getStage();
@@ -45,6 +39,8 @@ public interface IGameInfo {
 	public Card getTurn();
 
 	public Card getRiver();
+
+	public double getPot(PokerStreet street);
 
 	public double getPotSize();
 

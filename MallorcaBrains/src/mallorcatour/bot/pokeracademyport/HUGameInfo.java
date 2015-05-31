@@ -186,4 +186,9 @@ public class HUGameInfo implements IPlayerGameInfo {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public double getPot(PokerStreet street) {
+		throw new UnsupportedOperationException();
+	}
+
 }

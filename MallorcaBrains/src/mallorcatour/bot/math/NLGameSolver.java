@@ -7,10 +7,12 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.math.AggressionInfoBuilder.AggressionInfo;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.IGameSolver;
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.EquilatorStrength;
 import mallorcatour.core.equilator.StreetEquity;
+import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
@@ -18,6 +20,8 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.interfaces.IAggressionInfo;
+import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.util.CollectionUtils;
@@ -32,96 +36,68 @@ public class NLGameSolver implements IGameSolver {
 	private final static double NEARLY_ZERO = 0.0001;
 	private final static double DEFAULT_POSITIVE_POTENTIAL = 0.1;
 	private final static double DEFAULT_NEGATIVE_POTENTIAL = 0.1;
-	private final static double TURN_POT_COEFF = 10.3;
-	private final static double RIVER_POT_COEFF = 8.65;
-	private final static double IP_ADDITIONAL_PROFIT_BB = 0.056;
 	private final IAdvisor villainModeller;
 
 	public NLGameSolver(IAdvisor villainModeller) {
 		this.villainModeller = villainModeller;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionPreflop(int, int,
-	 * int, int, double, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.HoleCards, java.util.Map, boolean, double)
-	 */
 	@Override
-	public Map<Action, Double> onSecondActionPreflop(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
-			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
-		return onSecondActionRecursive(heroActions, heroAggressiveActions, villainActions, villainAggressiveActions,
-				effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] {}, heroCards, strengthMap, isHeroOnButton,
-				PokerStreet.PREFLOP, bigBlind, 0);
+	public Map<Action, Double> onSecondActionPreflop(IGameInfo gameInfo, IAggressionInfo aggressionInfo,
+			double effectiveStack, double pot, double toCall, Spectrum villainSpectrum, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+		return onSecondActionRecursive(gameInfo, aggressionInfo, effectiveStack, pot, toCall, 0, villainSpectrum,
+				new Card[] {}, heroCards, strengthMap, isHeroOnButton, PokerStreet.PREFLOP, bigBlind, 0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionFlop(int, int, int,
-	 * int, double, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.Flop, mallorcatour.core.game.HoleCards,
-	 * java.util.Map, boolean, double)
-	 */
 	@Override
-	public Map<Action, Double> onSecondActionFlop(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
-			Flop flop, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton,
-			double bigBlind) {
-		return onSecondActionRecursive(heroActions, heroAggressiveActions, villainActions, villainAggressiveActions,
-				effectiveStack, pot, toCall, 0, villainSpectrum, flop.toArray(), heroCards, strengthMap,
-				isHeroOnButton, PokerStreet.FLOP, bigBlind, 0);
+	public Map<Action, Double> onSecondActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, double toCall, Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, flop.toArray(),
+				heroCards, strengthMap, isHeroOnButton, PokerStreet.FLOP, bigBlind, 0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionTurn(int, int, int,
-	 * int, double, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.Flop, mallorcatour.core.game.Card,
-	 * mallorcatour.core.game.HoleCards, java.util.Map, boolean, double)
-	 */
 	@Override
-	public Map<Action, Double> onSecondActionTurn(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
-			Flop flop, Card turn, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
-			boolean isHeroOnButton, double bigBlind) {
-		return onSecondActionRecursive(heroActions, heroAggressiveActions, villainActions, villainAggressiveActions,
-				effectiveStack, pot, toCall, 0, villainSpectrum,
-				new Card[] { flop.first, flop.second, flop.third, turn }, heroCards, strengthMap, isHeroOnButton,
-				PokerStreet.TURN, bigBlind, 0);
+	public Map<Action, Double> onSecondActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, double toCall, Spectrum villainSpectrum, Flop flop, Card turn, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] {
+				flop.first, flop.second, flop.third, turn }, heroCards, strengthMap, isHeroOnButton, PokerStreet.TURN,
+				bigBlind, 0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onSecondActionRiver(int, int, int,
-	 * int, double, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.Flop, mallorcatour.core.game.Card,
-	 * mallorcatour.core.game.Card, mallorcatour.core.game.HoleCards,
-	 * java.util.Map, boolean, double)
-	 */
 	@Override
-	public Map<Action, Double> onSecondActionRiver(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
-			Flop flop, Card turn, Card river, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
-			boolean isHeroOnButton, double bigBlind) {
-		return onSecondActionRecursive(heroActions, heroAggressiveActions, villainActions, villainAggressiveActions,
-				effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] { flop.first, flop.second, flop.third,
-						turn, river }, heroCards, strengthMap, isHeroOnButton, PokerStreet.RIVER, bigBlind, 0);
+	public Map<Action, Double> onSecondActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, double toCall, Spectrum villainSpectrum, Flop flop, Card turn, Card river, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] {
+				flop.first, flop.second, flop.third, turn, river }, heroCards, strengthMap, isHeroOnButton,
+				PokerStreet.RIVER, bigBlind, 0);
 	}
 
 	/**
 	 * pot - after call
 	 */
-	private double calculatePassiveProfit(double pot, double heroInvestment, double toCall,
+	private double calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment, double toCall,
 			double bigBlind, PokerStreet street, boolean onButton, HoleCards heroCards, Card[] board,
 			Spectrum villainSpectrum, int depth) {
-		double strength = PokerEquilatorBrecher.strengthVsSpectrum(heroCards, board, villainSpectrum);
-
-		double win = pot - heroInvestment;
+		double strength;
+		if (board.length > 0) {
+			StreetEquity equity = EquilatorStrength.equityVsSpectrumToRiver(heroCards.first, heroCards.second, board,
+					villainSpectrum);
+			strength = equity.strength;
+		} else {
+			strength = EquilatorPreflop.strengthVsSpectrum(heroCards.first, heroCards.second, villainSpectrum);
+		}
+		double previousStreetPot;
+		if (street != PokerStreet.PREFLOP) {
+			previousStreetPot = gameInfo.getPot(street.previous());
+		} else {
+			previousStreetPot = 0;
+		}
+		double win = pot - heroInvestment - previousStreetPot;
+//		double win = pot - heroInvestment;
 		double lose = heroInvestment;
 		String prefix = "";
 		for (int i = 0; i < depth; i++) {
@@ -130,170 +106,109 @@ public class NLGameSolver implements IGameSolver {
 		Log.f(prefix + "Win " + win + " in " + (int) (100 * strength));
 		Log.f(prefix + "Lose " + lose + " in " + (int) (100 * (1 - strength)));
 		double passiveProfit = strength * win - (1 - strength) * lose;
-		if (street == PokerStreet.PREFLOP && passiveProfit > 0) {
-			int add = onButton ? 1 : -1;
-			passiveProfit += add * IP_ADDITIONAL_PROFIT_BB * bigBlind;
-		} else if (street == PokerStreet.FLOP || street == PokerStreet.TURN) {
-			StreetEquity equity = PokerEquilatorBrecher.equityVsSpectrum(heroCards, board, villainSpectrum);
-			double realEquity = StreetEquity.calculateRealEquity(equity);
-			double nextStreetPot;
-			if (street == PokerStreet.FLOP) {
-				nextStreetPot = TURN_POT_COEFF * bigBlind;
-			} else {
-				nextStreetPot = RIVER_POT_COEFF * bigBlind;
-			}
-			double additionalPassiveProfit = realEquity * nextStreetPot - nextStreetPot / 2;
-			if (toCall != 0) {
-				passiveProfit += additionalPassiveProfit;
-			}
-		}
 		return passiveProfit;
 	}
 
-	private Map<Action, Double> onSecondActionRecursive(int heroActions, int heroAggressiveActions,
-            int villainActions, int villainAggressiveActions,
-            double effectiveStack, double pot, double toCall,
-            double heroInvestment, Spectrum villainSpectrum,
-            Card[] board, HoleCards heroCards, Map<HoleCards, StreetEquity> villainStrengthMap,
-            boolean onButton, PokerStreet street, double bigBlind, int depth) {
-        Map<Action, Double> result = new HashMap<Action, Double>();
-        //if hero folds
+	private Map<Action, Double> onSecondActionRecursive(IGameInfo gameInfo, IAggressionInfo info,
+			double effectiveStack, double pot, double toCall, double heroInvestment, Spectrum villainSpectrum,
+			Card[] board, HoleCards heroCards, Map<HoleCards, StreetEquity> villainStrengthMap, boolean onButton,
+			PokerStreet street, double bigBlind, int depth) {
+		Map<Action, Double> result = new HashMap<Action, Double>();
+		// if hero folds
 		String prefix = "";
 		for (int i = 0; i < depth; i++) {
 			prefix += "	";
 		}
-        double foldProfit = -heroInvestment;
-        Log.f(prefix + "If hero folds he wins " + foldProfit);
+		double foldProfit = -heroInvestment;
+		Log.f(prefix + "If hero folds he wins " + foldProfit);
 		result.put(Action.foldAction(), foldProfit);
 		// if hero calls
-		double passiveProfit = calculatePassiveProfit(pot + toCall, heroInvestment + toCall, toCall,
+		double passiveProfit = calculatePassiveProfit(gameInfo, pot + toCall, heroInvestment + toCall, toCall,
 				bigBlind, street, onButton, heroCards, board, villainSpectrum, depth);
 		Log.f(prefix + "If hero calls he wins " + passiveProfit);
-        result.put(Action.callAction(toCall), passiveProfit);
-        //if hero cannot raise
-        if (effectiveStack == 0) {
-        	Log.f(prefix + "Hero cannot raise");
-            return result;
-        }
-        //if hero raises
-        Action heroReraiseAction = Action.createRaiseAction(toCall, pot, effectiveStack);
-        double amount;
-        if (heroReraiseAction.isAllin()) {
-            amount = effectiveStack;
-        } else {
-            amount = heroReraiseAction.getAmount();
-        }
-        Log.f(prefix + "If hero raise " + amount);
+		result.put(Action.callAction(toCall), passiveProfit);
+		// if hero cannot raise
+		if (effectiveStack == 0) {
+			Log.f(prefix + "Hero cannot raise");
+			return result;
+		}
+		// if hero raises
+		Action heroReraiseAction = Action.createRaiseAction(toCall, pot, effectiveStack);
+		double amount;
+		if (heroReraiseAction.isAllin()) {
+			amount = effectiveStack;
+		} else {
+			amount = heroReraiseAction.getAmount();
+		}
+		Log.f(prefix + "If hero raise " + amount);
 
-        double aggressiveProfit = calculateHeroActionProfit(amount,
-                heroActions, heroAggressiveActions,
-                villainActions, villainAggressiveActions, effectiveStack, pot + toCall + amount,
-                heroInvestment + toCall + amount, villainSpectrum, board, heroCards,
-                toCall != 0, true, onButton, street, villainStrengthMap, bigBlind, depth + 1);
-        Log.f(prefix + "Hero wins " + aggressiveProfit);
+		double aggressiveProfit = calculateHeroActionProfit(gameInfo, info, amount, effectiveStack, pot + toCall
+				+ amount, heroInvestment + toCall + amount, villainSpectrum, board, heroCards, toCall != 0, true,
+				onButton, street, villainStrengthMap, bigBlind, depth + 1);
+		Log.f(prefix + "Hero wins " + aggressiveProfit);
 
-        result.put(heroReraiseAction, aggressiveProfit);
-        return result;
-    }
+		result.put(heroReraiseAction, aggressiveProfit);
+		return result;
+	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionPreFlop(int, int,
-	 * int, int, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.HoleCards, java.util.Map, boolean, boolean,
-	 * double)
-	 */
 	@Override
-	public Map<Action, Double> onFirstActionPreFlop(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum,
-			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive,
-			boolean isHeroOnButton, double bigBlind) {
+	public Map<Action, Double> onFirstActionPreFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, Spectrum villainSpectrum, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
+			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
 		Map<Action, Double> result = new HashMap<Action, Double>();
 
 		// if hero folds
 		double foldProfit = 0;
 		result.put(Action.foldAction(), foldProfit);
 		// if hero call small blind
-		double callProfit = calculateHeroActionProfit(0, heroActions, heroAggressiveActions, villainActions,
-				villainAggressiveActions, effectiveStack, pot + bigBlind / 2, bigBlind / 2, villainSpectrum,
-				new Card[] {}, heroCards, wasVillainPreviousAggressive, false, isHeroOnButton, PokerStreet.PREFLOP,
-				strengthMap, bigBlind, 0);
+		double callProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot + bigBlind / 2,
+				bigBlind / 2, villainSpectrum, new Card[] {}, heroCards, wasVillainPreviousAggressive, false,
+				isHeroOnButton, PokerStreet.PREFLOP, strengthMap, bigBlind, 0);
 		result.put(Action.callAction(bigBlind / 2), callProfit);
 
 		// if hero raises
 		double raiseAmount = bigBlind;
 		Action heroRaiseAction = Action.createRaiseAction(raiseAmount, -1);
 
-		double aggressiveProfit = calculateHeroActionProfit(raiseAmount, heroActions, heroAggressiveActions,
-				villainActions, villainAggressiveActions, effectiveStack, pot + bigBlind / 2 + raiseAmount,
-				bigBlind / 2 + raiseAmount, villainSpectrum, new Card[] {}, heroCards, wasVillainPreviousAggressive, true,
-				isHeroOnButton, PokerStreet.PREFLOP,
-				strengthMap, bigBlind, 0);
+		double aggressiveProfit = calculateHeroActionProfit(gameInfo, info, raiseAmount, effectiveStack, pot + bigBlind
+				/ 2 + raiseAmount, bigBlind / 2 + raiseAmount, villainSpectrum, new Card[] {}, heroCards,
+				wasVillainPreviousAggressive, true, isHeroOnButton, PokerStreet.PREFLOP, strengthMap, bigBlind, 0);
 		result.put(heroRaiseAction, aggressiveProfit);
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionFlop(int, int, int,
-	 * int, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.Flop, mallorcatour.core.game.HoleCards,
-	 * java.util.Map, boolean, boolean, double)
-	 */
 	@Override
-	public Map<Action, Double> onFirstActionFlop(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
-			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive,
-			boolean isHeroOnButton, double bigBlind) {
-		return onFirstAction(heroActions, heroAggressiveActions, villainActions, villainAggressiveActions,
-				effectiveStack, pot, villainSpectrum, flop.toArray(), heroCards, strengthMap,
-				wasVillainPreviousAggressive, isHeroOnButton, PokerStreet.FLOP, bigBlind);
+	public Map<Action, Double> onFirstActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
+			double bigBlind) {
+		return onFirstAction(gameInfo, info, effectiveStack, pot, villainSpectrum, flop.toArray(), heroCards,
+				strengthMap, wasVillainPreviousAggressive, isHeroOnButton, PokerStreet.FLOP, bigBlind);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionTurn(int, int, int,
-	 * int, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.Flop, mallorcatour.core.game.Card,
-	 * mallorcatour.core.game.HoleCards, java.util.Map, boolean, boolean,
-	 * double)
-	 */
 	@Override
-	public Map<Action, Double> onFirstActionTurn(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
-			Card turn, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
-			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
-		return onFirstAction(heroActions, heroAggressiveActions, villainActions, villainAggressiveActions,
-				effectiveStack, pot, villainSpectrum, new Card[] { flop.first, flop.second, flop.third, turn },
-				heroCards, strengthMap, wasVillainPreviousAggressive, isHeroOnButton, PokerStreet.TURN, bigBlind);
+	public Map<Action, Double> onFirstActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, Spectrum villainSpectrum, Flop flop, Card turn, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
+			double bigBlind) {
+		return onFirstAction(gameInfo, info, effectiveStack, pot, villainSpectrum, new Card[] { flop.first,
+				flop.second, flop.third, turn }, heroCards, strengthMap, wasVillainPreviousAggressive, isHeroOnButton,
+				PokerStreet.TURN, bigBlind);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mallorcatour.bot.math.IGameSolver#onFirstActionRiver(int, int, int,
-	 * int, double, double, mallorcatour.core.spectrum.Spectrum,
-	 * mallorcatour.core.game.Flop, mallorcatour.core.game.Card,
-	 * mallorcatour.core.game.Card, mallorcatour.core.game.HoleCards,
-	 * java.util.Map, boolean, boolean, double)
-	 */
 	@Override
-	public Map<Action, Double> onFirstActionRiver(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
-			Card turn, Card river, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
-			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
-		return onFirstAction(heroActions, heroAggressiveActions, villainActions, villainAggressiveActions,
-				effectiveStack, pot, villainSpectrum, new Card[] { flop.first, flop.second, flop.third, turn, river },
-				heroCards, strengthMap, wasVillainPreviousAggressive, isHeroOnButton, PokerStreet.RIVER, bigBlind);
+	public Map<Action, Double> onFirstActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, Spectrum villainSpectrum, Flop flop, Card turn, Card river, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
+			double bigBlind) {
+		return onFirstAction(gameInfo, info, effectiveStack, pot, villainSpectrum, new Card[] { flop.first,
+				flop.second, flop.third, turn, river }, heroCards, strengthMap, wasVillainPreviousAggressive,
+				isHeroOnButton, PokerStreet.RIVER, bigBlind);
 	}
 
-	// effective stack by Andrew
-	private Map<Action, Double> onFirstAction(int heroActions, int heroAggressiveActions, int villainActions,
-			int villainAggressiveActions, double effectiveStack, double pot, Spectrum villainSpectrum, Card[] board,
-			HoleCards heroCards, Map<HoleCards, StreetEquity> villainStrengthMap, boolean wasVillainPreviousAggressive,
+	private Map<Action, Double> onFirstAction(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
+			double pot, Spectrum villainSpectrum, Card[] board, HoleCards heroCards,
+			Map<HoleCards, StreetEquity> villainStrengthMap, boolean wasVillainPreviousAggressive,
 			boolean isHeroOnButton, PokerStreet street, double bigBlind) {
 		Map<Action, Double> result = new HashMap<Action, Double>();
 
@@ -302,10 +217,11 @@ public class NLGameSolver implements IGameSolver {
 		result.put(Action.foldAction(), foldProfit);
 		// if hero checks
 		Log.f("If hero checks");
-		double checkProfit = calculateHeroActionProfit(0, heroActions, heroAggressiveActions, villainActions,
-				villainAggressiveActions, effectiveStack, pot, 0, villainSpectrum, board, heroCards,
-				wasVillainPreviousAggressive, false, isHeroOnButton, street, villainStrengthMap, bigBlind, 0);
+		double checkProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot, 0, villainSpectrum,
+				board, heroCards, wasVillainPreviousAggressive, false, isHeroOnButton, street, villainStrengthMap,
+				bigBlind, 1);
 		result.put(Action.checkAction(), checkProfit);
+		Log.f("Hero wins " + checkProfit);
 
 		// if hero bets
 		Action heroBetAction = Action.createBetAction(pot, effectiveStack);
@@ -317,9 +233,9 @@ public class NLGameSolver implements IGameSolver {
 		}
 		Log.f("If hero raise " + betAmount);
 
-		double aggressiveProfit = calculateHeroActionProfit(betAmount, heroActions, heroAggressiveActions,
-				villainActions, villainAggressiveActions, effectiveStack, pot, 0, villainSpectrum, board, heroCards,
-				wasVillainPreviousAggressive, true, isHeroOnButton, street, villainStrengthMap, bigBlind, 0);
+		double aggressiveProfit = calculateHeroActionProfit(gameInfo, info, betAmount, effectiveStack, pot + betAmount,
+				betAmount, villainSpectrum, board, heroCards, wasVillainPreviousAggressive, true, isHeroOnButton,
+				street, villainStrengthMap, bigBlind, 1);
 
 		Log.f("Hero wins " + aggressiveProfit);
 
@@ -327,11 +243,11 @@ public class NLGameSolver implements IGameSolver {
 		return result;
 	}
 
-	private double calculateHeroActionProfit(double heroActionAmount, int heroActions, int heroAggressiveActions,
-			int villainActions, int villainAggressiveActions, double effectiveStack, double pot,
-			double heroInvestment, Spectrum villainSpectrum, Card[] board, HoleCards heroCards,
-			boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive, boolean isHeroOnButton,
-			PokerStreet street, Map<HoleCards, StreetEquity> villainStrengthMap, double bigBlind, int depth) {
+	private double calculateHeroActionProfit(IGameInfo gameInfo, IAggressionInfo info, double heroActionAmount,
+			double effectiveStack, double pot, double heroInvestment, Spectrum villainSpectrum, Card[] board,
+			HoleCards heroCards, boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive,
+			boolean isHeroOnButton, PokerStreet street, Map<HoleCards, StreetEquity> villainStrengthMap,
+			double bigBlind, int depth) {
 
 		double villainToCall = heroActionAmount;
 		double villainPot = pot;
@@ -340,11 +256,16 @@ public class NLGameSolver implements IGameSolver {
 		for (int i = 0; i < depth; i++) {
 			prefix += "	";
 		}
+		AggressionInfo newInfo = AggressionInfoBuilder.build(info).plusHeroAction();
+		if (wasHeroPreviousAggressive) {
+			newInfo.plusHeroAggressiveAction();
+		}
 		LocalSituation villainSituation = getVillainSituationWithoutStrength(street, !isHeroOnButton, villainToCall,
-				villainPot, villainEffectiveStack, heroActions + 1, heroAggressiveActions
-						+ (wasHeroPreviousAggressive ? 1 : 0), villainActions, villainAggressiveActions,
-				wasVillainPreviousAggressive, wasHeroPreviousAggressive, prefix);
+				villainPot, villainEffectiveStack, newInfo, wasVillainPreviousAggressive, wasHeroPreviousAggressive,
+				prefix);
+		Log.f(prefix + "Pot: " + pot + " toCall: " + villainToCall + " effectiveStack: " + villainEffectiveStack);
 		Log.f(prefix + "Villain situation: " + villainSituation.toString());
+
 		Spectrum foldSpectrum = new Spectrum();
 		Spectrum passiveSpectrum = new Spectrum();
 		Spectrum aggressiveSpectrum = new Spectrum();
@@ -373,13 +294,13 @@ public class NLGameSolver implements IGameSolver {
 		if (passiveSpectrum.isEmpty()) {
 			ifVillainPassiveProfit = 0;
 		} else {
-			ifVillainPassiveProfit = calculatePassiveProfit(pot + villainToCall, heroInvestment, heroActionAmount,
-					bigBlind, street, isHeroOnButton, heroCards, board, passiveSpectrum, depth);
+			ifVillainPassiveProfit = calculatePassiveProfit(gameInfo, pot + villainToCall, heroInvestment,
+					heroActionAmount, bigBlind, street, isHeroOnButton, heroCards, board, passiveSpectrum, depth);
 		}
 		Log.f(prefix + "Hero wins " + ifVillainPassiveProfit);
+
 		// if villain aggressives
-		Action villainAggressiveAction = Action.createRaiseAction(villainToCall, pot,
-				villainEffectiveStack);
+		Action villainAggressiveAction = Action.createRaiseAction(villainToCall, pot, villainEffectiveStack);
 
 		double villainReraiseAmount;
 		if (villainAggressiveAction.isAllin()) {
@@ -394,13 +315,13 @@ public class NLGameSolver implements IGameSolver {
 		} else {
 			Log.f(prefix + "When villain reraise " + villainReraiseAmount + " in "
 					+ (int) (aggressiveEquity / villainSpectrumWeight * 100) + "%");
-			double effectiveStackAfterVillainAggressive = effectiveStack - villainToCall - villainReraiseAmount;
+			double effectiveStackAfterVillainAggressive = villainEffectiveStack - villainReraiseAmount;
 			double potAfterVillainAggressive = pot + villainToCall + villainReraiseAmount;
-			Map<Action, Double> map = onSecondActionRecursive(heroActions + 1, heroAggressiveActions
-					+ (wasHeroPreviousAggressive ? 1 : 0), villainActions + 1, villainAggressiveActions + 1,
-					effectiveStackAfterVillainAggressive, potAfterVillainAggressive, villainReraiseAmount,
-					heroInvestment, aggressiveSpectrum, board, heroCards,
-					villainStrengthMap, isHeroOnButton, street, bigBlind, depth + 1);
+			newInfo.plusVillainAction();
+			newInfo.plusVillainAggressiveAction();
+			Map<Action, Double> map = onSecondActionRecursive(gameInfo, newInfo, effectiveStackAfterVillainAggressive,
+					potAfterVillainAggressive, villainReraiseAmount, heroInvestment, aggressiveSpectrum, board,
+					heroCards, villainStrengthMap, isHeroOnButton, street, bigBlind, depth + 1);
 			ifVillainAggressiveProfit = CollectionUtils.maxValue(map);
 			Log.f(prefix + "Hero wins " + ifVillainAggressiveProfit);
 		}
@@ -415,14 +336,9 @@ public class NLGameSolver implements IGameSolver {
 		for (HoleCards villainCards : villainSpectrum) {
 			StreetEquity equity = strengthMap.get(villainCards);
 			double strength = equity.strength;
-			// TODO add positive and negative potentials to villain situation on
-			// preflop and river
 			villainSituation.setStrength(strength);
-			if (villainSituation.getStreet() == LocalSituation.FLOP
-					|| villainSituation.getStreet() == LocalSituation.TURN) {
-				villainSituation.setPositivePotential(equity.positivePotential);
-				villainSituation.setNegativePotential(equity.negativePotential);
-			}
+			villainSituation.setPositivePotential(equity.positivePotential);
+			villainSituation.setNegativePotential(equity.negativePotential);
 			IAdvice advice = villainModeller.getAdvice(villainSituation, villainCards, null);
 			double oldWeight = villainSpectrum.getWeight(villainCards);
 			foldSpectrum.add(villainCards, oldWeight * advice.getFold());
@@ -432,37 +348,28 @@ public class NLGameSolver implements IGameSolver {
 	}
 
 	private LocalSituation getVillainSituationWithoutStrength(PokerStreet street, boolean villainOnButton,
-			double toCall, double pot, double effectiveStack, int heroActions, int heroAggressiveActions,
-			int villainActions, int villainAggressiveActions, boolean wasVillainPreviousAggressive,
-			boolean wasHeroPreviousAggressive, String prefix) {
+			double toCall, double pot, double effectiveStack, IAggressionInfo info,
+			boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive, String prefix) {
 		LocalSituation result = null;
-		// potOdds
 		double potOdds = toCall / (toCall + pot);
 		if (street == PokerStreet.PREFLOP) {
 			result = new LocalSituation(LocalSituation.PREFLOP, LimitType.NO_LIMIT);
 		} else if (street == PokerStreet.FLOP) {
-			// equities
 			result = new LocalSituation(LocalSituation.FLOP, LimitType.NO_LIMIT);
 			result.setPositivePotential(DEFAULT_POSITIVE_POTENTIAL);
 			result.setNegativePotential(DEFAULT_NEGATIVE_POTENTIAL);
 		} else if (street == PokerStreet.TURN) {
-			// equities
 			result = new LocalSituation(LocalSituation.TURN, LimitType.NO_LIMIT);
 			result.setPositivePotential(DEFAULT_POSITIVE_POTENTIAL);
 			result.setNegativePotential(DEFAULT_NEGATIVE_POTENTIAL);
 		} else if (street == PokerStreet.RIVER) {
-			// equities
 			result = new LocalSituation(LocalSituation.RIVER, LimitType.NO_LIMIT);
 		}
-		result.setVillainActionCount(heroActions);
-		result.setVillainAggresionActionCount(heroAggressiveActions);
-		result.setHeroActionCount(villainActions);
-		result.setHeroAggresionActionCount(villainAggressiveActions);
+		result.setAggressionInfoOnlyCount(info);
 		result.wasOpponentPreviousAggresive(wasHeroPreviousAggressive);
 		result.wasHeroPreviousAggresive(wasVillainPreviousAggressive);
 		result.setPotOdds(potOdds);
 		result.isOnButton(villainOnButton);
-		Log.f(prefix + "Pot: " + pot + " toCall: " + toCall + " effectiveStack: " + effectiveStack);
 		result.setPotToStackOdds((pot + toCall) / (pot + toCall + effectiveStack));
 		result.canRaise(effectiveStack != 0);
 		return result;

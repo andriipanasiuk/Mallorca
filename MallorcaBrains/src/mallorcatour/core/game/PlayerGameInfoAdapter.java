@@ -147,4 +147,9 @@ public class PlayerGameInfoAdapter implements IPlayerGameInfo {
 	public double getAmountToCall(String hero) {
 		return Math.max(0, getVillain(hero).bet - getHero(hero).bet);
 	}
+
+	@Override
+	public double getPot(PokerStreet street) {
+		return gameInfo.getPot(street);
+	}
 }

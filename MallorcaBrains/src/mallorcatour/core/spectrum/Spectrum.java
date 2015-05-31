@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import mallorcatour.core.game.Card;
@@ -27,6 +28,11 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 
 	public boolean isEmpty() {
 		return this.weights.isEmpty();
+	}
+
+	public static Spectrum empty() {
+		Spectrum result = new Spectrum();
+		return result;
 	}
 
 	public static Spectrum random() {
@@ -70,15 +76,16 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 			this.weights.put(cards, Double.valueOf(weight));
 	}
 
-	public void add(HoleCards cards) {
+	public Spectrum add(HoleCards cards) {
 		this.weights.put(cards, Double.valueOf(1.0D));
+		return this;
 	}
 
 	public void remove(HoleCards holeCards) {
 		this.weights.remove(holeCards);
 	}
 
-	public void add(String cards) {
+	public Spectrum add(String cards) {
 		Card.Value firstRange = Card.Value.valueOf(cards.charAt(0));
 		Card.Value secondRange = Card.Value.valueOf(cards.charAt(1));
 		boolean all = cards.length() == 2;
@@ -106,6 +113,7 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 					}
 			}
 		}
+		return this;
 	}
 
 	public double getWeight(HoleCards cards) {
@@ -134,8 +142,19 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 		return maxValue;
 	}
 
+	@Override
 	public Iterator<HoleCards> iterator() {
 		return this.weights.keySet().iterator();
+	}
+
+	public Iterable<Entry<HoleCards, Double>> weightsIterator() {
+		return new Iterable<Map.Entry<HoleCards, Double>>() {
+
+			@Override
+			public Iterator<Entry<HoleCards, Double>> iterator() {
+				return Spectrum.this.weights.entrySet().iterator();
+			}
+		};
 	}
 
 	public int size() {

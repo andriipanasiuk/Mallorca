@@ -212,6 +212,12 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
 		this.villainActionCount = villainActionCount;
 	}
 
+	public void setAggressionInfoOnlyCount(IAggressionInfo info){
+		villainActionCount = info.getVillainActionCount();
+		heroActionCount = info.getHeroActionCount();
+		villainAggresionActionCount = info.getVillainAggresionActionCount();
+		heroAggresionActionCount = info.getHeroAggresionActionCount();
+	}
 	/**
      * @param localAggresion the localAggresion to set
      */

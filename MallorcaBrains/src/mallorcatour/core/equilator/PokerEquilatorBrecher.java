@@ -16,7 +16,6 @@ import com.stevebrecher.HandEval;
 
 /**
  *
- * @author техно
  */
 public class PokerEquilatorBrecher {
 
