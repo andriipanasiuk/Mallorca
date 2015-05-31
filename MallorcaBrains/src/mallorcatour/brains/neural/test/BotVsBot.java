@@ -33,7 +33,7 @@ public class BotVsBot {
 //		engine.button(mathBot).cards(playerDown, "Qs6c").cards(mathBot, "KcQs").flop("4s5sKs");
 		int count1 = 0, count2 = 0;
 //		engine.playRound();
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1; i++) {
 			TournamentSummary summary = engine.playGame();
 			if (summary.winner.equals(mathBot.getName())) {
 				count1++;
