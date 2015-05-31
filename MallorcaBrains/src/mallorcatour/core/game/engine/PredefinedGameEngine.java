@@ -73,7 +73,6 @@ public class PredefinedGameEngine extends GameEngine {
 		boardCards.add(flop1);
 		boardCards.add(flop2);
 		boardCards.add(flop3);
-
 	}
 
 }

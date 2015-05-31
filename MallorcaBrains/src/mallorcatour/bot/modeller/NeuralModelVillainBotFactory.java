@@ -31,15 +31,13 @@ public class NeuralModelVillainBotFactory implements IBotFactory {
 		StrengthManager strengthManager = new StrengthManager(false);
 		GusXensen player = new GusXensen();
 		GrandtorinoBot bot = new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"), LimitType.NO_LIMIT,
-				debug);
-		bot.setName(name);
+				name, debug);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(new NeuralAdvisor(player, player,
-				"Gus Xensen Villain Model"), strengthManager, villainSpectrumListener, bot.getName(), false);
+				"Gus Xensen Villain Model"), strengthManager, villainSpectrumListener, name, false);
 		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true, name);
-		bot.set(new GameObservers(handler, strengthManager, villainObserver), handler, new HoleCardsObservers(
+		bot.set(handler, new GameObservers(handler, strengthManager, villainObserver), new HoleCardsObservers(
 				villainObserver, handler));
 		bot.set(IActionChecker.EMPTY);
-		bot.setName(name);
 		return bot;
 	}
 }

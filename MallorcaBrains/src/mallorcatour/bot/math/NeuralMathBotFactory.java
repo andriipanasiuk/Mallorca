@@ -32,15 +32,14 @@ public class NeuralMathBotFactory implements IBotFactory {
 		GusXensen player = new GusXensen();
 		LimitType limitType = LimitType.NO_LIMIT;
 		GrandtorinoBot bot = new GrandtorinoBot(new NeuralAdvisor(player, player, "Gus Xensen"),
-				limitType, debug);
+				limitType, name, debug);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
-				spectrumListener, bot.getName(), false);
+				spectrumListener, name, false);
 		IActionChecker actionChecker = new NLRiverActionChecker(profitCalculator, villainObserver);
 		SituationHandler handler = new SituationHandler(limitType, true, name);
-		bot.set(new GameObservers(strengthManager, handler, villainObserver), handler, new HoleCardsObservers(
+		bot.set(handler, new GameObservers(strengthManager, handler, villainObserver), new HoleCardsObservers(
 				villainObserver, handler));
 		bot.set(actionChecker);
-		bot.setName(name);
 		return bot;
 	}
 }

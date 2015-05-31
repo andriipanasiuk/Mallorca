@@ -256,7 +256,6 @@ public class GameEngine implements IGameInfo {
 			action.setAmount(playerInfo.stack - toCall);
 		}
 		int result = playerActed(action, playerInfo);
-		player.onActed(action, toCall, player.getName());
 		otherThan(player).onActed(action, toCall, player.getName());
 		gameObserver.onActed(action, -1, player.getName());
 		return result;

@@ -2,23 +2,14 @@ package mallorcatour.bot.math;
 
 import java.util.Map;
 
-import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
-import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
-import mallorcatour.core.game.IHoleCardsObserver;
-import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.util.Log;
 
@@ -27,59 +18,23 @@ import mallorcatour.util.Log;
  * 
  * @author Andrew
  */
-public class NLMathBot implements IPlayer {
+public class NLMathBot extends ObservingPlayer {
 
-	private BaseAdviceCreatorFromMap adviceCreator;
-	private IPlayerGameInfo gameInfo;
-	private ISituationHandler situationHandler;
 	private ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor preflopAdvisor;
 	private final IAdvisor preflopBot;
+	private BaseAdviceCreatorFromMap adviceCreator;
 	private final IProfitCalculator profitCalculator;
-	private final IActionPreprocessor actionPreprocessor;
-	private final String DEBUG_PATH;
-	private Card heroCard1, heroCard2;
-	private IGameObserver<IPlayerGameInfo> gameObserver;
-	private IHoleCardsObserver cardsObserver;
 
-	private String name;
-
-	public NLMathBot(IProfitCalculator profitCalculator, String name, String debug, ISpectrumHolder villainSpectrumHolder) {
+	public NLMathBot(IProfitCalculator profitCalculator, String name, String debug,
+			ISpectrumHolder villainSpectrumHolder) {
+		super(name, debug);
 		this.profitCalculator = profitCalculator;
-		this.name = name;
+		this.villainSpectrumHolder = villainSpectrumHolder;
 		adviceCreator = new AdviceCreatorFromMap();
 		GusXensen player = new GusXensen();
 		preflopAdvisor = new NeuralAdvisor(player, player, "Gus Xensen");
 		preflopBot = new NLPreflopChart();
-		actionPreprocessor = new NLActionPreprocessor();
-		this.villainSpectrumHolder = villainSpectrumHolder;
-		this.DEBUG_PATH = debug;
-	}
-
-	public void set(ISituationHandler situationHandler, IGameObserver observer, IHoleCardsObserver cardsObserver) {
-		this.situationHandler = situationHandler;
-		this.gameObserver = observer;
-		this.cardsObserver = cardsObserver;
-	}
-
-	public void set(ISpectrumHolder villainSpectrumHolder) {
-	}
-
-	/**
-	 * An event called to tell us our hole cards and seat number
-	 * 
-	 * @param c1
-	 *            your first hole card
-	 * @param c2
-	 *            your second hole card
-	 * @param seat
-	 *            your seat number at the table
-	 */
-	@Override
-	public void onHoleCards(Card c1, Card c2) {
-		this.heroCard1 = c1;
-		this.heroCard2 = c2;
-		cardsObserver.onHoleCards(c1, c2);
 	}
 
 	/**
@@ -112,41 +67,8 @@ public class NLMathBot implements IPlayer {
 		Log.f(DEBUG_PATH, "Action: " + action.toString());
 		action = actionPreprocessor.preprocessAction(action, gameInfo);
 		Log.f(DEBUG_PATH, "=========  End  =========");
-		onActed(action, gameInfo.getAmountToCall(), getName());
+		gameObserver.onActed(action, gameInfo.getAmountToCall(), getName());
 		return action;
-	}
-
-	/**
-	 * A new betting round has started.
-	 */
-	@Override
-	public void onStageEvent(PokerStreet street) {
-		gameObserver.onStageEvent(street);
-	}
-
-	/**
-	 * A new game has been started.
-	 * 
-	 * @param gi
-	 *            the game stat information
-	 */
-	@Override
-	public void onHandStarted(IPlayerGameInfo gameInfo) {
-		this.gameInfo = gameInfo;
-		gameObserver.onHandStarted(gameInfo);
-	}
-
-	/**
-	 * An villain action has been observed.
-	 */
-	@Override
-	public void onActed(Action action, double toCall, String name) {
-		gameObserver.onActed(action, toCall, name);
-	}
-
-	@Override
-	public void onHandEnded() {
-		gameObserver.onHandEnded();
 	}
 
 	@Override
@@ -154,7 +76,4 @@ public class NLMathBot implements IPlayer {
 		return name != null ? name : "NLMathBot";
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
 }

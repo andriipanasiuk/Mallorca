@@ -465,7 +465,7 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 		ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY).submit(new Runnable() {
 
 			public void run() {
-				engine.gameCycle();
+				engine.playGame();
 				Log.f(DEBUG_PATH, "==========  New tournament  ==========");
 				dealButton.setVisible(true);
 			}

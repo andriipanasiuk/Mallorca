@@ -33,7 +33,10 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		double potOdds = playerToCall / potAfterCall;
 		double potToStackCoeff = potAfterCall / (potAfterCall + effectiveStack);
 
-		Log.f("toCall: " + playerToCall + " Pot: " + pot);
+		if(!trackHero){
+			int i=0;
+		}
+		Log.f(this + " toCall: " + playerToCall + " Pot: " + pot);
 		if (gameInfo.isPreFlop()) {
 			result = new LocalSituation(LocalSituation.PREFLOP, limitType);
 		} else if (gameInfo.isFlop()) {
@@ -106,6 +109,11 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 
 	private boolean isTrackPlayer(String name) {
 		return name.equals(hero) ^ !trackHero;
+	}
+
+	@Override
+	public String toString() {
+		return "Sit. handler for " + (trackHero ? ("hero " + hero) : ("villain " + gameInfo.getVillain(hero).name));
 	}
 
 	@Override

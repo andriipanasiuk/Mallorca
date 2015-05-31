@@ -148,6 +148,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 
 	@Override
 	public void onActed(Action action, double toCall, String name) {
+		Log.f(this.toString());
 		situationHandler.onActed(action, toCall, name);
 		if (name.equals(hero) ^ !trackHero) {
 			String modelPlayer = trackHero ? gameInfo.getHero(hero).getName() : gameInfo.getVillain(hero).getName();
@@ -156,6 +157,11 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		} else {
 			situation = situationHandler.getSituation();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Observing " + (trackHero ? ("hero " + hero) : ("villain " + gameInfo.getVillain(hero).name));
 	}
 
 }
