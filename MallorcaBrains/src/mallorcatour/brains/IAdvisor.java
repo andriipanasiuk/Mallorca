@@ -54,7 +54,7 @@ public interface IAdvisor extends IPokerStats {
 
 		@Override
 		public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
-			throw new UnsupportedOperationException();
+			return null;
 		}
 	};
 }

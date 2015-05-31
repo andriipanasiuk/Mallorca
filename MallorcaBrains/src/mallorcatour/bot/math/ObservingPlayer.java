@@ -19,7 +19,7 @@ public abstract class ObservingPlayer implements IPlayer {
 	protected Card heroCard1, heroCard2;
 	protected IGameObserver<IPlayerGameInfo> gameObserver;
 	private IHoleCardsObserver cardsObserver;
-	protected String name;
+	protected final String name;
 
 	public ObservingPlayer(String name, String debug) {
 		this.name = name;
@@ -48,10 +48,6 @@ public abstract class ObservingPlayer implements IPlayer {
 		this.heroCard1 = c1;
 		this.heroCard2 = c2;
 		cardsObserver.onHoleCards(c1, c2);
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	/**

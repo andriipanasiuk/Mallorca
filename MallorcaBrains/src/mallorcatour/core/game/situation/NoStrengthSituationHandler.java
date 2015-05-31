@@ -33,9 +33,6 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		double potOdds = playerToCall / potAfterCall;
 		double potToStackCoeff = potAfterCall / (potAfterCall + effectiveStack);
 
-		if(!trackHero){
-			int i=0;
-		}
 		Log.f(this + " toCall: " + playerToCall + " Pot: " + pot);
 		if (gameInfo.isPreFlop()) {
 			result = new LocalSituation(LocalSituation.PREFLOP, limitType);

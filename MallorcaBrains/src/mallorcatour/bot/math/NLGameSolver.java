@@ -160,6 +160,7 @@ public class NLGameSolver implements IGameSolver {
         result.put(Action.callAction(toCall), passiveProfit);
         //if hero cannot raise
         if (effectiveStack == 0) {
+        	Log.f(prefix + "Hero cannot raise");
             return result;
         }
         //if hero raises

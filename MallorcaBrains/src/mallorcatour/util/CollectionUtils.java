@@ -42,7 +42,7 @@ public class CollectionUtils {
 	}
 
 	public static <T> double maxValue(Map<T, Double> map) {
-		double result = Double.MIN_VALUE;
+		double result = -Double.MAX_VALUE;
 		for (Map.Entry<T, Double> entry : map.entrySet()) {
 			if (((Double) entry.getValue()).doubleValue() > result) {
 				result = ((Double) entry.getValue()).doubleValue();

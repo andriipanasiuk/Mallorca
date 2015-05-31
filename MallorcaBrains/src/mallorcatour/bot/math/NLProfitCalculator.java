@@ -32,7 +32,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 		int countOfOppAggressive = situation.getVillainAggresionActionCount();
 		boolean wasVillainPreviousAggressive = situation.wasVillainPreviousAggresive();
 		if (gameInfo.isPreFlop()) {
-			if (gameInfo.onButton() && gameInfo.getAmountToCall() == gameInfo.getBigBlindSize() / 2) {
+			if (gameInfo.onButton() && heroActionCount == 0) {
 				return gameSolver.onFirstActionPreFlop(heroActionCount, countOfHeroAggressive, villainActionCount,
 						countOfOppAggressive, gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(), villainSpectrum,
 						new HoleCards(holeCard1, holeCard2), strengthManager.preflop,/*
