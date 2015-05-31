@@ -25,7 +25,7 @@ public class AdviceCreatorFromMap extends BaseAdviceCreatorFromMap {
             } else if (entry.getKey().isAggressive()) {
                 aggressive = entry.getValue();
             } else {
-                throw new RuntimeException();
+            	//do nothing
             }
         }
         double foldPercent = 0, passivePercent = 0, aggressivePercent = 0;

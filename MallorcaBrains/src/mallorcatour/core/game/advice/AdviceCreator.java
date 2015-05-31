@@ -63,7 +63,6 @@ public class AdviceCreator implements IAdviceInterpreter {
                 return new Advice(100, 0, 0);
         }
 		Advice raw = new Advice(foldCount, passiveCount, aggressiveCount);
-		Log.f("Raw advice: " + raw);
 		return raw;
     }
 }

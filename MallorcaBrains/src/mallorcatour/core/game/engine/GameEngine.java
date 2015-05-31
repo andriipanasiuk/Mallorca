@@ -50,9 +50,9 @@ public class GameEngine implements IGameInfo {
 	private LimitType limitType;
 
 	private double pot;
-	private List<Card> nonUsedCards;
+	protected List<Card> nonUsedCards;
+	protected List<Card> boardCards;
 	private PokerStreet currentStreet;
-	private List<Card> boardCards;
 	private PlayerInfo lastMovePlayer;
 	private OpenPlayerInfo playerInfo1, playerInfo2;
 
@@ -75,7 +75,7 @@ public class GameEngine implements IGameInfo {
 		otherThan(playerInfo).isOnButton = !flip;
 	}
 
-	public void deal() {
+	private HandSummary deal() {
 		tradeOpened = false;
 		currentHandNumber++;
 		BIG_BLIND = BLINDS[(currentHandNumber - 1) / 10];
@@ -115,7 +115,7 @@ public class GameEngine implements IGameInfo {
 
 		dealCards(player1, playerInfo1);
 		dealCards(player2, playerInfo2);
-		roundCycle();
+		return roundCycle();
 	}
 
 	public static class TournamentSummary {
@@ -123,7 +123,20 @@ public class GameEngine implements IGameInfo {
 		public int handsCount;
 	}
 
-	public TournamentSummary gameCycle() {
+	public static class HandSummary {
+		public String winner;
+		public double payout;
+	}
+
+	public TournamentSummary playGame() {
+		return gameCycle();
+	}
+
+	public HandSummary playRound() {
+		return deal();
+	}
+
+	private TournamentSummary gameCycle() {
 		currentHandNumber = 0;
 		firstButtonFlip = randomizer.getRandom(0, 2);
 		BIG_BLIND = START_BIG_BLIND;
@@ -151,26 +164,13 @@ public class GameEngine implements IGameInfo {
 		player.onHoleCards(player1Cards.first, player1Cards.second);
 	}
 
-	void dealFlop(String one, String two, String three) {
-		Card flop1 = Card.valueOf(one);
-		Card flop2 = Card.valueOf(two);
-		Card flop3 = Card.valueOf(three);
-		nonUsedCards.remove(flop1);
-		nonUsedCards.remove(flop2);
-		nonUsedCards.remove(flop3);
-		boardCards.add(flop1);
-		boardCards.add(flop2);
-		boardCards.add(flop3);
-
-	}
-
 	protected HoleCards dealHoleCards() {
 		Card card1 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
 		Card card2 = nonUsedCards.remove(randomizer.getRandom(0, nonUsedCards.size()));
 		return new HoleCards(card1, card2);
 	}
 
-	private void dealFlop() {
+	protected void dealFlop() {
 		Card flop1 = nonUsedCards.get(randomizer.getRandom(0, nonUsedCards.size()));
 		nonUsedCards.remove(flop1);
 		Card flop2 = nonUsedCards.get(randomizer.getRandom(0, nonUsedCards.size()));
@@ -182,7 +182,7 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(flop3);
 	}
 
-	private String calculateWinner() {
+	private HandSummary calculateWinner() {
 		if (playerInfo1.bet == playerInfo2.bet) {
 			List<Card> player1Cards = new ArrayList<Card>(boardCards);
 			List<Card> player2Cards = new ArrayList<Card>(boardCards);
@@ -274,10 +274,13 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(c);
 	}
 
-	private String endOfHand(OpenPlayerInfo winner) {
+	private HandSummary endOfHand(OpenPlayerInfo winner) {
 		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.holeCard1 + " " + playerInfo1.holeCard2);
 		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.holeCard1 + " " + playerInfo2.holeCard2);
+		HandSummary result = new HandSummary();
 		if (winner != null) {
+			result.payout = pot/2;
+			result.winner = winner.name;
 			winner.stack += pot;
 			Log.f(DEBUG_PATH, winner.name + " wins " + pot);
 		} else {
@@ -291,7 +294,7 @@ public class GameEngine implements IGameInfo {
 		player1.onHandEnded();
 		player2.onHandEnded();
 		gameObserver.onHandEnded();
-		return winner != null ? winner.name : null;
+		return result;
 	}
 
 	private SimplePair<IPlayer, OpenPlayerInfo> getPlayer(boolean onButton) {
@@ -302,7 +305,7 @@ public class GameEngine implements IGameInfo {
 		}
 	}
 
-	private String roundCycle() {
+	private HandSummary roundCycle() {
 		int result = ActionResult.START_ROUND;
 		while (result != ActionResult.END_OF_HAND) {
 			if (result == ActionResult.START_ROUND) {

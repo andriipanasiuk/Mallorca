@@ -55,8 +55,8 @@ public class NLProfitCalculator implements IProfitCalculator {
 						strengthManager.flop, wasVillainPreviousAggressive, gameInfo.onButton(),
 						gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
-				Log.d("Hero's first action on flop " + map.toString());
-				Log.d("\nHero profit: " + profit);
+				Log.f("Hero's first action on flop " + map.toString());
+				Log.f("\nHero profit: " + profit);
 				return map;
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionFlop(heroActionCount, countOfHeroAggressive,
@@ -65,8 +65,8 @@ public class NLProfitCalculator implements IProfitCalculator {
 								holeCard1, holeCard2), strengthManager.flop, gameInfo.onButton(),
 						gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
-				Log.d("Flop. Second action. " + map.toString());
-				Log.d("\nHero profit: " + profit);
+				Log.f("Flop. Second action. " + map.toString());
+				Log.f("\nHero profit: " + profit);
 				return map;
 			}
 		} else if (gameInfo.isTurn()) {
@@ -77,8 +77,8 @@ public class NLProfitCalculator implements IProfitCalculator {
 						strengthManager.turn, wasVillainPreviousAggressive, gameInfo.onButton(),
 						gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
-				Log.d("Hero's first action on turn " + map.toString());
-				Log.d("\nHero profit: " + profit);
+				Log.f("Hero's first action on turn " + map.toString());
+				Log.f("\nHero profit: " + profit);
 				return map;
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionTurn(heroActionCount, countOfHeroAggressive,
@@ -87,8 +87,8 @@ public class NLProfitCalculator implements IProfitCalculator {
 						new HoleCards(holeCard1, holeCard2), strengthManager.turn,
 						gameInfo.onButton(), gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
-				Log.d("Turn. Second action. " + map.toString());
-				Log.d("\nHero profit: " + profit);
+				Log.f("Turn. Second action. " + map.toString());
+				Log.f("\nHero profit: " + profit);
 				return map;
 			}
 		} else if (gameInfo.isRiver()) {
@@ -100,8 +100,8 @@ public class NLProfitCalculator implements IProfitCalculator {
 								holeCard1, holeCard2), strengthManager.river, wasVillainPreviousAggressive, gameInfo
 								.onButton(), gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
-				Log.d("Hero's first action on river: " + map.toString());
-				Log.d("\nHero profit: " + profit);
+				Log.f("Hero's first action on river: " + map.toString());
+				Log.f("\nHero profit: " + profit);
 				return map;
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionRiver(heroActionCount, countOfHeroAggressive,
@@ -110,8 +110,8 @@ public class NLProfitCalculator implements IProfitCalculator {
 						gameInfo.getRiver(), new HoleCards(holeCard1, holeCard2), strengthManager.river,
 						gameInfo.onButton(), gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
-				Log.d("River. Second action: " + map.toString());
-				Log.d("\nHero profit: " + profit);
+				Log.f("River. Second action: " + map.toString());
+				Log.f("\nHero profit: " + profit);
 				return map;
 			}
 		} else {
