@@ -1,4 +1,4 @@
-package mallorcatour.bot.math;
+package mallorcatour.bot;
 
 import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
 import mallorcatour.bot.interfaces.IPlayer;
@@ -81,4 +81,11 @@ public abstract class ObservingPlayer implements IPlayer {
 	public void onHandEnded() {
 		gameObserver.onHandEnded();
 	}
+
+	@Override
+	public String getName() {
+		return (name != null) ? name : getDefaultName();
+	}
+
+	public abstract String getDefaultName();
 }

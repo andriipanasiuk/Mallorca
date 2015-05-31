@@ -7,6 +7,7 @@ import mallorcatour.bot.math.NLPostflopMathBotFactory;
 import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.neural.NeuralAggroBotFactory;
 import mallorcatour.bot.neural.NeuralBotFactory;
+import mallorcatour.bot.random.RandomBot;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
@@ -29,11 +30,12 @@ public class BotVsBot {
 				"Grantorino Up", DEBUG_PATH);
 		IPlayer playerDown = new NeuralAggroBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, "Grantorino Down", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(mathBot, playerDown, IGameObserver.EMPTY, DEBUG_PATH);
+		IPlayer random = new RandomBot("Random", DEBUG_PATH);
+		PredefinedGameEngine engine = new PredefinedGameEngine(mathBot, random, IGameObserver.EMPTY, DEBUG_PATH);
 //		engine.button(mathBot).cards(playerDown, "Qs6c").cards(mathBot, "KcQs").flop("4s5sKs");
 		int count1 = 0, count2 = 0;
 //		engine.playRound();
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 100; i++) {
 			TournamentSummary summary = engine.playGame();
 			if (summary.winner.equals(mathBot.getName())) {
 				count1++;

@@ -2,6 +2,7 @@ package mallorcatour.bot.math;
 
 import java.util.Map;
 
+import mallorcatour.bot.ObservingPlayer;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
@@ -68,8 +69,8 @@ public class NLMathBot extends ObservingPlayer {
 	}
 
 	@Override
-	public String getName() {
-		return name != null ? name : "NLMathBot";
+	public String getDefaultName() {
+		return "NLMathBot";
 	}
 
 }

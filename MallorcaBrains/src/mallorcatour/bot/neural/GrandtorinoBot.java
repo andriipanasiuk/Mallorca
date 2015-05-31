@@ -3,8 +3,8 @@ package mallorcatour.bot.neural;
 import java.util.ArrayList;
 import java.util.List;
 
+import mallorcatour.bot.ObservingPlayer;
 import mallorcatour.bot.interfaces.IExternalAdvisor;
-import mallorcatour.bot.math.ObservingPlayer;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
@@ -90,7 +90,8 @@ public class GrandtorinoBot extends ObservingPlayer {
 	}
 
 	@Override
-	public String getName() {
-		return (name != null) ? name : "NeuralBot";
+	public String getDefaultName() {
+		return "NeuralBot";
 	}
+
 }

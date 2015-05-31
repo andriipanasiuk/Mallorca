@@ -336,14 +336,14 @@ public class NLGameSolver implements IGameSolver {
 		double villainToCall = heroActionAmount;
 		double villainPot = pot;
 		double villainEffectiveStack = effectiveStack - villainToCall;
-		LocalSituation villainSituation = getVillainSituationWithoutStrength(street, !isHeroOnButton, villainToCall,
-				villainPot, villainEffectiveStack, heroActions + 1, heroAggressiveActions
-						+ (wasHeroPreviousAggressive ? 1 : 0), villainActions, villainAggressiveActions,
-				wasVillainPreviousAggressive, wasHeroPreviousAggressive);
 		String prefix = "";
 		for (int i = 0; i < depth; i++) {
 			prefix += "	";
 		}
+		LocalSituation villainSituation = getVillainSituationWithoutStrength(street, !isHeroOnButton, villainToCall,
+				villainPot, villainEffectiveStack, heroActions + 1, heroAggressiveActions
+						+ (wasHeroPreviousAggressive ? 1 : 0), villainActions, villainAggressiveActions,
+				wasVillainPreviousAggressive, wasHeroPreviousAggressive, prefix);
 		Log.f(prefix + "Villain situation: " + villainSituation.toString());
 		Spectrum foldSpectrum = new Spectrum();
 		Spectrum passiveSpectrum = new Spectrum();
@@ -410,41 +410,6 @@ public class NLGameSolver implements IGameSolver {
 		return aggressiveProfit;
 	}
 
-	@Deprecated
-	private double calculateVillainPassiveProfit(double pot, double heroInvestment,
-			double toCall, Card[] board, HoleCards heroCards, boolean isHeroOnButton, PokerStreet street,
-			double bigBlind, Spectrum passiveSpectrum, int depth) {
-		double ifVillainPassiveProfit;
-		double strength = PokerEquilatorBrecher.strengthVsSpectrum(heroCards, board, passiveSpectrum);
-		String prefix = "";
-		for (int i = 0; i < depth; i++) {
-			prefix += "	";
-		}
-		double win = (pot - heroInvestment);
-		double lose = (heroInvestment); 
-		Log.f(prefix + "Win " + win + " in " + (int) (strength * 100) + "%");
-		Log.f(prefix + "Lose " + lose + " in " + (int) ((1 - strength) * 100) + "%");
-		ifVillainPassiveProfit = strength * win - (1 - strength) * lose;
-		if (street == PokerStreet.PREFLOP && ifVillainPassiveProfit > 0) {
-			int add = isHeroOnButton ? 1 : -1;
-			ifVillainPassiveProfit += add * IP_ADDITIONAL_PROFIT_BB * bigBlind;
-		} else if (street == PokerStreet.FLOP || street == PokerStreet.TURN) {
-			StreetEquity equity = PokerEquilatorBrecher.equityVsSpectrum(heroCards, board, passiveSpectrum);
-			double realEquity = StreetEquity.calculateRealEquity(equity);
-			double nextStreetPot;
-			if (street == PokerStreet.FLOP) {
-				nextStreetPot = TURN_POT_COEFF * bigBlind;
-			} else {
-				nextStreetPot = RIVER_POT_COEFF * bigBlind;
-			}
-			double additionalVillainPassiveProfit = realEquity * nextStreetPot - nextStreetPot / 2;
-			if (toCall != 0) {
-				ifVillainPassiveProfit += additionalVillainPassiveProfit;
-			}
-		}
-		return ifVillainPassiveProfit;
-	}
-
 	private void processVillainSpectrums(Spectrum villainSpectrum, Spectrum foldSpectrum, Spectrum passiveSpectrum,
 			Spectrum aggressiveSpectrum, LocalSituation villainSituation, Map<HoleCards, StreetEquity> strengthMap) {
 		for (HoleCards villainCards : villainSpectrum) {
@@ -469,7 +434,7 @@ public class NLGameSolver implements IGameSolver {
 	private LocalSituation getVillainSituationWithoutStrength(PokerStreet street, boolean villainOnButton,
 			double toCall, double pot, double effectiveStack, int heroActions, int heroAggressiveActions,
 			int villainActions, int villainAggressiveActions, boolean wasVillainPreviousAggressive,
-			boolean wasHeroPreviousAggressive) {
+			boolean wasHeroPreviousAggressive, String prefix) {
 		LocalSituation result = null;
 		// potOdds
 		double potOdds = toCall / (toCall + pot);
@@ -497,7 +462,7 @@ public class NLGameSolver implements IGameSolver {
 		result.wasHeroPreviousAggresive(wasVillainPreviousAggressive);
 		result.setPotOdds(potOdds);
 		result.isOnButton(villainOnButton);
-		Log.f("Pot: " + pot + " toCall: " + toCall + " effectiveStack: " + effectiveStack);
+		Log.f(prefix + "Pot: " + pot + " toCall: " + toCall + " effectiveStack: " + effectiveStack);
 		result.setPotToStackOdds((pot + toCall) / (pot + toCall + effectiveStack));
 		result.canRaise(effectiveStack != 0);
 		return result;
