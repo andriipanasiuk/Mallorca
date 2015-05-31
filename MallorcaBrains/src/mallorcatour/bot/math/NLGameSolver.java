@@ -97,14 +97,13 @@ public class NLGameSolver implements IGameSolver {
 			previousStreetPot = 0;
 		}
 		double win = pot - heroInvestment - previousStreetPot;
-//		double win = pot - heroInvestment;
 		double lose = heroInvestment;
 		String prefix = "";
 		for (int i = 0; i < depth; i++) {
 			prefix += "	";
 		}
-		Log.f(prefix + "Win " + win + " in " + (int) (100 * strength));
-		Log.f(prefix + "Lose " + lose + " in " + (int) (100 * (1 - strength)));
+		Log.f(prefix + "Win " + win + " in " + (int) (100 * strength) + "%");
+		Log.f(prefix + "Lose " + lose + " in " + (int) (100 * (1 - strength)) + "%");
 		double passiveProfit = strength * win - (1 - strength) * lose;
 		return passiveProfit;
 	}
@@ -365,7 +364,7 @@ public class NLGameSolver implements IGameSolver {
 		} else if (street == PokerStreet.RIVER) {
 			result = new LocalSituation(LocalSituation.RIVER, LimitType.NO_LIMIT);
 		}
-		result.setAggressionInfoOnlyCount(info);
+		result.setAggressionInfoOnlyCount(info, true);
 		result.wasOpponentPreviousAggresive(wasHeroPreviousAggressive);
 		result.wasHeroPreviousAggresive(wasVillainPreviousAggressive);
 		result.setPotOdds(potOdds);

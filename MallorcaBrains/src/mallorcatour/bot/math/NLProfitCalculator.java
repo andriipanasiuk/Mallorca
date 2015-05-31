@@ -37,7 +37,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 												 * was villain aggressive
 												 */false, true, gameInfo.getBigBlindSize());
 			} else {
-				return gameSolver.onSecondActionPreflop(null, situation, gameInfo.getBankRollAtRisk(), gameInfo
+				return gameSolver.onSecondActionPreflop(gameInfo, situation, gameInfo.getBankRollAtRisk(), gameInfo
 						.getPotSize(), gameInfo.getAmountToCall(), villainSpectrum,
 						new HoleCards(holeCard1, holeCard2), strengthManager.preflop, gameInfo.onButton(), gameInfo
 								.getBigBlindSize());

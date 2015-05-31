@@ -135,7 +135,6 @@ public class EquilatorPreflop {
 			wins += strength * frequency;
 			count += frequency;
 		}
-		Log.d("Calculated vs " + log + " villain cards");
 		return ((double) wins) / count;
 	}
 
