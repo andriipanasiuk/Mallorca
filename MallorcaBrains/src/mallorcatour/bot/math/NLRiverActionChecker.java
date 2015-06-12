@@ -41,7 +41,7 @@ public class NLRiverActionChecker implements IActionChecker {
 			} else if (action.isPassive()) {
 				for (Entry<Action, Double> entry : map.entrySet()) {
 					if (entry.getKey().isPassive() && entry.getValue() < MIN_VALUE_FOR_CALL_DECISION) {
-						return Action.foldAction();
+						return Action.fold();
 					}
 				}
 			}

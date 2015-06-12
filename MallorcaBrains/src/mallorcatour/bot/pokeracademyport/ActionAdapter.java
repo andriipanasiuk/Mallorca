@@ -22,7 +22,7 @@ public class ActionAdapter {
         } else if (action.isCall()) {
             result = mallorcatour.core.game.Action.callAction(action.getToCall());
         } else if (action.isFold()) {
-            result = mallorcatour.core.game.Action.foldAction();
+            result = mallorcatour.core.game.Action.fold();
         } else {
             Log.d("Strange action: " + action.toString());
             throw new RuntimeException();

@@ -28,10 +28,11 @@ public class GameEngine implements IGameInfo {
 
 	public static class ActionResult {
 		public static final int START_ROUND = -1;
-		public static final int END_OF_HAND = 0;
+		public static final int SHOWDOWN = 0;
 		public static final int NEXT_STAGE = 1;
 		public static final int ANOTHER_PLAYER = 2;
 		public static final int START_STREET = 3;
+		public static final int UNCONTESTED = 4;
 	}
 
 	private final double startingStack = 2000;
@@ -62,12 +63,16 @@ public class GameEngine implements IGameInfo {
 		this.player2 = player2;
 		this.gameObserver = observer;
 		this.DEBUG_PATH = debug;
-		playerInfo1 = new OpenPlayerInfo(player1.getName(), startingStack);
+		playerInfo1 = new OpenPlayerInfo(player1.getName());
 		playerInfo2 = new OpenPlayerInfo(player2.getName(), startingStack);
 	}
 
 	public void setLimitType(LimitType limitType) {
 		this.limitType = limitType;
+	}
+
+	protected void setStartStack(IPlayer player, PlayerInfo playerInfo) {
+		playerInfo.stack = startingStack;
 	}
 
 	protected void dealButton(IPlayer player, OpenPlayerInfo playerInfo) {
@@ -134,6 +139,8 @@ public class GameEngine implements IGameInfo {
 	}
 
 	public HandSummary playRound() {
+		setStartStack(player1, playerInfo1);
+		setStartStack(player2, playerInfo2);
 		return deal();
 	}
 
@@ -141,8 +148,8 @@ public class GameEngine implements IGameInfo {
 		currentHandNumber = 0;
 		firstButtonFlip = randomizer.getRandom(0, 2);
 		BIG_BLIND = START_BIG_BLIND;
-		playerInfo1.stack = startingStack;
-		playerInfo2.stack = startingStack;
+		setStartStack(player1, playerInfo1);
+		setStartStack(player2, playerInfo2);
 		while (playerInfo1.stack > 0 && playerInfo2.stack > 0) {
 			deal();
 		}
@@ -183,8 +190,8 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(flop3);
 	}
 
-	private HandSummary calculateWinner() {
-		if (playerInfo1.bet == playerInfo2.bet) {
+	private HandSummary calculateWinner(int result) {
+		if (result == ActionResult.SHOWDOWN) {
 			List<Card> player1Cards = new ArrayList<Card>(boardCards);
 			List<Card> player2Cards = new ArrayList<Card>(boardCards);
 			player1Cards.add(playerInfo1.holeCard1);
@@ -200,10 +207,12 @@ public class GameEngine implements IGameInfo {
 			} else {
 				return endOfHand(null);
 			}
-		} else if (playerInfo1.bet > playerInfo2.bet) {
+		} else if (result == ActionResult.UNCONTESTED && lastMovePlayer == playerInfo2) {
 			return endOfHand(playerInfo1);
-		} else {
+		} else if (result == ActionResult.UNCONTESTED) {
 			return endOfHand(playerInfo2);
+		} else {
+			throw new RuntimeException("Shouldn't be");
 		}
 	}
 
@@ -215,7 +224,7 @@ public class GameEngine implements IGameInfo {
 	private int changeStreet() {
 		tradeOpened = false;
 		if (currentStreet == PokerStreet.RIVER) {
-			return ActionResult.END_OF_HAND;
+			return ActionResult.SHOWDOWN;
 		} else if (currentStreet == PokerStreet.PREFLOP) {
 			dealFlop();
 		} else if (currentStreet == PokerStreet.FLOP) {
@@ -249,13 +258,16 @@ public class GameEngine implements IGameInfo {
 
 	private int playerAction(IPlayer player, OpenPlayerInfo playerInfo) {
 		PlayerInfo other = otherThan(playerInfo);
-		double toCall = other.bet - playerInfo.bet;
+		double toCall = Math.min(other.bet - playerInfo.bet, playerInfo.stack);
 		Action action = player.getAction();
 		if (action.isAggressive() && action.getAmount() <= 0) {
-			action.setAmount(Math.max(BIG_BLIND, toCall));
+			action.setAmount(toCall);
 		}
-		if (action.isAggressive() && action.getAmount() > playerInfo.stack - toCall) {
-			action.setAmount(playerInfo.stack - toCall);
+		if (action.isAggressive() && getBankRollAtRisk() <= 0) {
+			action = Action.callAction(toCall);
+		}
+		if (action.isAggressive() && action.getAmount() > getBankRollAtRisk()) {
+			action.setAmount(getBankRollAtRisk());
 		}
 		int result = playerActed(action, playerInfo);
 		otherThan(player).onActed(action, toCall, player.getName());
@@ -280,7 +292,7 @@ public class GameEngine implements IGameInfo {
 		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.holeCard1 + " " + playerInfo2.holeCard2);
 		HandSummary result = new HandSummary();
 		if (winner != null) {
-			result.payout = pot/2;
+			result.payout = pot / 2;
 			result.winner = winner.name;
 			winner.stack += pot;
 			Log.f(DEBUG_PATH, winner.name + " wins " + pot);
@@ -308,13 +320,13 @@ public class GameEngine implements IGameInfo {
 
 	private HandSummary roundCycle() {
 		int result = ActionResult.START_ROUND;
-		while (result != ActionResult.END_OF_HAND) {
+		while (result != ActionResult.SHOWDOWN && result != ActionResult.UNCONTESTED) {
 			if (result == ActionResult.START_ROUND) {
 				SimplePair<IPlayer, OpenPlayerInfo> button = getPlayer(true);
 				result = playerAction(button.first, button.second);
 			} else if (result == ActionResult.NEXT_STAGE) {
 				result = changeStreet();
-				if (result != ActionResult.END_OF_HAND) {
+				if (result != ActionResult.SHOWDOWN) {
 					player1.onStageEvent(currentStreet);
 					player2.onStageEvent(currentStreet);
 					gameObserver.onStageEvent(currentStreet);
@@ -334,7 +346,7 @@ public class GameEngine implements IGameInfo {
 				}
 			}
 		}
-		return calculateWinner();
+		return calculateWinner(result);
 	}
 
 	private int playerActed(Action action, OpenPlayerInfo playerInfo) {
@@ -342,7 +354,7 @@ public class GameEngine implements IGameInfo {
 		Log.f(DEBUG_PATH, playerInfo.name + " " + action.getActString());
 		double toCall = otherThan(playerInfo).bet - playerInfo.bet;
 		if (action.isFold()) {
-			return ActionResult.END_OF_HAND;
+			return ActionResult.UNCONTESTED;
 		} else if (action.isPassive()) {
 			pot += action.getAmount();
 			if (action.getAmount() <= playerInfo.stack) {

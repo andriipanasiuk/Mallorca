@@ -44,15 +44,15 @@ public class NeuralAdvisor implements IAdvisor {
 	private AdviceCreator adviceCreator;
 
 	public NeuralAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, String name) {
-		this.neurals = nnStreaming;
-		this.stats = stats;
-		this.name = name;
-		initNN();
+		this(nnStreaming, stats, name, null);
 	}
 
 	public NeuralAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, String name, AdviceCreator adviceCreator) {
-		this(nnStreaming, stats, name);
+		this.neurals = nnStreaming;
+		this.stats = stats;
+		this.name = name;
 		this.adviceCreator = adviceCreator;
+		initNN();
 	}
 
 	private void initNN() {

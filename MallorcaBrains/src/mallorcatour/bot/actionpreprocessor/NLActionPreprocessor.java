@@ -24,7 +24,7 @@ public class NLActionPreprocessor implements IActionPreprocessor {
 			if (toCall == 0) {
 				return Action.checkAction();
 			} else {
-				return Action.foldAction();
+				return Action.fold();
 			}
 		} else if (action.isPassive()) {
 			if (toCall != 0) {

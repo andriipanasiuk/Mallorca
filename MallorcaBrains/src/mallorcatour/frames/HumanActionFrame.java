@@ -131,11 +131,11 @@ public class HumanActionFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void foldButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foldButtonActionPerformed
-        actionHolder.actionGot(Action.foldAction());
+        actionHolder.actionGot(Action.fold());
     }//GEN-LAST:event_foldButtonActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        actionHolder.actionGot(Action.allInAction());
+        actionHolder.actionGot(Action.allIn());
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed

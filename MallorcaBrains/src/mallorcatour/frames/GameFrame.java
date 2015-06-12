@@ -476,7 +476,7 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 	private void foldButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_foldButtonActionPerformed
 		enableActionButtons(false);
 		botActionLabel.setText("");
-		lastMove = Action.foldAction();
+		lastMove = Action.fold();
 		synchronized (actionLock) {
 			actionLock.notifyAll();
 		}

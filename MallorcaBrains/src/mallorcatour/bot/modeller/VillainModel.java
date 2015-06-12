@@ -29,19 +29,19 @@ public class VillainModel implements IAdvisor, IVillainListener {
 		GusXensen player = new GusXensen();
 		DEFAULT_NL_NEURAL = new NeuralAdvisor(player, player, "Gus Xensen");
 	}
-	private static final IAdvisor DEFAULT_FL_NEURAL = null;
 	private static final int REQUIRED_HANDS_FOR_MODELLING = 5;
 	private VillainStatistics villainStatistics;
 	private IAdvisor currentVillainNeural;
 	private final PreflopSpectrumModeller preflopVillainModeller;
-	private final LimitType limitType;
 	private boolean isVillainKnown;
 	private final String DEBUG_PATH;
 
 	public VillainModel(LimitType limitType, String debug) {
-		this.limitType = limitType;
 		preflopVillainModeller = new PreflopSpectrumModeller();
-		currentVillainNeural = limitType == LimitType.NO_LIMIT ? DEFAULT_NL_NEURAL : DEFAULT_FL_NEURAL;
+		if(limitType == LimitType.FIXED_LIMIT){
+			throw new UnsupportedOperationException("FL is unsupported currently");
+		}
+		currentVillainNeural = DEFAULT_NL_NEURAL;
 		this.DEBUG_PATH = debug;
 	}
 
@@ -74,7 +74,7 @@ public class VillainModel implements IAdvisor, IVillainListener {
 		PokerStatsDistance distance = new PokerStatsDistance();
 		double error = distance.getDistance(villainStatistics, DEFAULT_NL_NEURAL);
 		//TODO add real choosing of neural to model opp
-		currentVillainNeural = DEFAULT_FL_NEURAL;
+		currentVillainNeural = DEFAULT_NL_NEURAL;
 		Log.f(DEBUG_PATH, "Modelling by " + currentVillainNeural.getName());
 		Log.f(DEBUG_PATH, "Distance to modelling bot: " + minError);
 	}
@@ -83,7 +83,7 @@ public class VillainModel implements IAdvisor, IVillainListener {
 	public void onVillainKnown(boolean known) {
 		isVillainKnown = known;
 		if (!known) {
-			currentVillainNeural = limitType == LimitType.NO_LIMIT ? DEFAULT_NL_NEURAL : DEFAULT_FL_NEURAL;
+			currentVillainNeural = DEFAULT_NL_NEURAL;
 		}
 	}
 

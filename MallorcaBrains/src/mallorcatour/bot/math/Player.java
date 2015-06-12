@@ -1,9 +1,7 @@
 package mallorcatour.bot.math;
 
-import java.util.Map;
-
 import mallorcatour.bot.ObservingPlayer;
-import mallorcatour.bot.interfaces.ISpectrumHolder;
+import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
@@ -16,22 +14,23 @@ import mallorcatour.util.Log;
  * 
  * @author Andrew
  */
-public class NLMathBot extends ObservingPlayer {
+public class Player extends ObservingPlayer {
 
-	private ISpectrumHolder villainSpectrumHolder;
 	private final IAdvisor preflopAdvisor;
+	private final IAdvisor postflopAdvisor;
 	private final IAdvisor preflopChart;
-	private BaseAdviceCreatorFromMap adviceCreator;
-	private final IProfitCalculator profitCalculator;
+	private IActionChecker actionChecker;
 
-	public NLMathBot(IAdvisor preflop, IAdvisor preflopChart, IProfitCalculator profitCalculator, String name,
-			String debug, ISpectrumHolder villainSpectrumHolder) {
+	public Player(IAdvisor preflopAdvisor, IAdvisor preflopChart, IAdvisor commonAdvisor, IActionChecker actionChecker,
+			String name, String debug) {
 		super(name, debug);
-		this.profitCalculator = profitCalculator;
-		this.villainSpectrumHolder = villainSpectrumHolder;
-		adviceCreator = new AdviceCreatorFromMap();
-		this.preflopAdvisor = preflop;
+		if (commonAdvisor == null || commonAdvisor == IAdvisor.UNSUPPORTED) {
+			throw new IllegalArgumentException("Common advisor must not be null");
+		}
+		this.preflopAdvisor = preflopAdvisor;
+		this.postflopAdvisor = commonAdvisor;
 		this.preflopChart = preflopChart;
+		this.actionChecker = actionChecker;
 	}
 
 	/**
@@ -42,28 +41,27 @@ public class NLMathBot extends ObservingPlayer {
 	public Action getAction() {
 		LocalSituation situation = situationHandler.getSituation();
 		IAdvice advice = null;
+		HoleCards cards = new HoleCards(heroCard1, heroCard2);
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
-		if(gameInfo.isPreFlop()){
+		if (gameInfo.isPreFlop()) {
 			Log.f(DEBUG_PATH, "Preflop situation: " + situation.toString());
-			advice = preflopChart.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
+			advice = preflopChart.getAdvice(situation, cards, gameInfo);
 			if (advice != null) {
 				Log.f(DEBUG_PATH, "Advice from preflop chart");
 			}
 			if (advice == null) {
-				advice = preflopAdvisor.getAdvice(situation, new HoleCards(heroCard1, heroCard2), null);
+				advice = preflopAdvisor.getAdvice(situation, cards, gameInfo);
 			}
 		}
 		if (advice == null) {
-			Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, heroCard1, heroCard2,
-					villainSpectrumHolder.getSpectrum());
-			Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
-			advice = adviceCreator.create(map);
+			advice = postflopAdvisor.getAdvice(situation, cards, gameInfo);
 		}
 		Log.f(DEBUG_PATH, "Advice: " + advice.toString());
 		Action action = advice.getAction();
 		action = actionPreprocessor.preprocessAction(action, gameInfo);
 		Log.f(DEBUG_PATH, "Action: " + action.toString());
 		Log.f(DEBUG_PATH, "=========  End  =========");
+		action = actionChecker.checkAction(action, situation, gameInfo, cards);
 		gameObserver.onActed(action, gameInfo.getAmountToCall(), getName());
 		return action;
 	}

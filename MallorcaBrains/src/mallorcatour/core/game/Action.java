@@ -12,7 +12,7 @@ public class Action implements Serializable {
 	private double amount;
 	private Type type;
 	private double percentOfPot;
-	private static final Action ALL_IN_ACTION = new Action(Type.AGGRESSIVE, Double.MAX_VALUE);
+	private boolean isAllin = false;
 
 	private Action(Type type, double amount) {
 		this.type = type;
@@ -48,7 +48,7 @@ public class Action implements Serializable {
 	}
 
 	public boolean isAllin() {
-		return this == ALL_IN_ACTION;
+		return isAllin;
 	}
 
 	public static Action passive() {
@@ -90,11 +90,13 @@ public class Action implements Serializable {
 		return result;
 	}
 
-	public static Action allInAction() {
-		return ALL_IN_ACTION;
+	public static Action allIn() {
+		Action result = new Action(Type.AGGRESSIVE, Double.MAX_VALUE);
+		result.isAllin = true;
+		return result;
 	}
 
-	public static Action foldAction() {
+	public static Action fold() {
 		return new Action(Type.FOLD);
 	}
 
@@ -138,7 +140,7 @@ public class Action implements Serializable {
 
 	public String toString() {
 		if (this.type == Type.AGGRESSIVE) {
-			if (this != ALL_IN_ACTION) {
+			if (!isAllin()) {
 				return "Raise " + this.amount;
 			}
 			return "All-in";

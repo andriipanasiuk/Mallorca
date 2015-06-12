@@ -115,7 +115,9 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 
 	@Override
 	public void onActed(Action action, double toCallParam, String name) {
-		pot += toCall;
+		if (!action.isFold()) {
+			pot += toCall;
+		}
 		if (action.isAggressive()) {
 			if (action.getAmount() < effectiveStack) {
 				if (!isTrackPlayer(name)) {

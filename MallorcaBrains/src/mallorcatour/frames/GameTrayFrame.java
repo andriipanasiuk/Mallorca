@@ -8,26 +8,36 @@ package mallorcatour.frames;
  * Hidden tray dialog for playing in PokerStart
  * @author Andrew
  */
-import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
-import br.com.wagnerpaz.javahook.NativeKeyboardListener;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
-import fellomen.bot.FellOmenFactory;
-
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.CheckboxMenuItem;
+import java.awt.Image;
+import java.awt.Menu;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
-import mallorcatour.bot.math.DanielxnPostflopBotFactory;
-import mallorcatour.bot.math.MathBotFLFactory;
-import mallorcatour.bot.neural.SparbotNeuralFactory;
+import javax.imageio.ImageIO;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+
+import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.robot.ManageKeySettings;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.ps.PSTableDirector;
 import mallorcatour.util.Log;
+import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
+import br.com.wagnerpaz.javahook.NativeKeyboardListener;
+import fellomen.bot.FellOmenFactory;
 
 public class GameTrayFrame extends JDialog {
 
@@ -68,7 +78,7 @@ public class GameTrayFrame extends JDialog {
         gameDirector = new PSTableDirector(
                 Toolkit.getDefaultToolkit().getScreenSize());
         gameDirector.setFLBotFactory(new FellOmenFactory());
-        gameDirector.setNLBotFactory(new DanielxnPostflopBotFactory());
+        gameDirector.setNLBotFactory(new NeuralBotFactory());
         KeyboardHookManager.addListener(new NativeKeyboardListener() {
 
             public boolean keyPressed(NativeKeyboardEvent nke) {
@@ -140,7 +150,6 @@ public class GameTrayFrame extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 uncheckAll();
                 sparItem.setEnabled(false);
-                gameDirector.setFLBotFactory(new SparbotNeuralFactory());
             }
         });
         mathBotItem = new CheckboxMenuItem("MB");
@@ -149,7 +158,6 @@ public class GameTrayFrame extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 uncheckAll();
                 mathBotItem.setEnabled(false);
-                gameDirector.setFLBotFactory(new MathBotFLFactory());
             }
         });
         fellOmenItem = new CheckboxMenuItem("FO");

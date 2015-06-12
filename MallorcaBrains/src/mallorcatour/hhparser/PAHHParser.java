@@ -99,7 +99,7 @@ public class PAHHParser {
             handler.onPlayerActed(name, Action.betAction(parseNumber(buffer)));
         } else if (buffer.contains(FOLDS)) {
             String name = StringUtils.between(buffer, 0, FOLDS).trim();
-            handler.onPlayerActed(name, Action.foldAction());
+            handler.onPlayerActed(name, Action.fold());
         } else if (buffer.startsWith(END_HAND)) {
             handler.onHandEnded();
         }

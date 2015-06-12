@@ -1,4 +1,4 @@
-package mallorcatour.bot.actionpreprocessor;
+package fellomen.bot;
 
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
@@ -20,7 +20,7 @@ public class FLActionPreprocessor implements IActionPreprocessor {
             if (toCall == 0) {
                 return Action.checkAction();
             } else {
-                return Action.foldAction();
+                return Action.fold();
             }
         } else if (action.isPassive()) {
             if (toCall != 0) {

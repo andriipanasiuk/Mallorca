@@ -99,7 +99,7 @@ public class PlayerGameInfoAdapter implements IPlayerGameInfo {
 
 	@Override
 	public double getAmountToCall() {
-		return villainInfo.bet - heroInfo.bet;
+		return Math.min(heroInfo.stack, villainInfo.bet - heroInfo.bet);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class PlayerGameInfoAdapter implements IPlayerGameInfo {
 
 	@Override
 	public double getAmountToCall(String hero) {
-		return Math.max(0, getVillain(hero).bet - getHero(hero).bet);
+		return gameInfo.getAmountToCall(hero);
 	}
 
 	@Override

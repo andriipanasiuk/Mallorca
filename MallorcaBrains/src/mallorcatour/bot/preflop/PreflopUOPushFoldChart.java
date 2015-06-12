@@ -253,9 +253,9 @@ public class PreflopUOPushFoldChart {
             bbs = nonsuitedAdvices.get(cards.hashCodeForValues());
         }
         if (countOfBBs <= bbs) {
-            return Action.allInAction();
+            return Action.allIn();
         } else {
-            return Action.foldAction();
+            return Action.fold();
         }
     }
 }

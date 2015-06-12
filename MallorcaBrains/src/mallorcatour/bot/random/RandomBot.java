@@ -21,7 +21,7 @@ public class RandomBot extends ObservingPlayer {
 		double random = this.random.nextDouble();
 		if (gameInfo.getAmountToCall() > 0) {
 			if (random < 0.33) {
-				return Action.foldAction();
+				return Action.fold();
 			} else if (random < 0.66) {
 				return Action.callAction(gameInfo.getAmountToCall());
 			} else {

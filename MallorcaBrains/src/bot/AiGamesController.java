@@ -195,7 +195,7 @@ public class AiGamesController {
 	private static Action fromString(String key, String amount) {
 		Action result;
 		if (key.equals("fold")) {
-			result = Action.foldAction();
+			result = Action.fold();
 		} else if (key.equals("call")) {
 			result = Action.callAction(Integer.valueOf(amount));
 		} else if (key.equals("check")) {

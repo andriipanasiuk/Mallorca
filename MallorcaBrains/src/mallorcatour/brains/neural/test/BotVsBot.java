@@ -9,6 +9,7 @@ import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.neural.NeuralAggroBotFactory;
 import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.random.RandomBot;
+import mallorcatour.bot.sklansky.PushBot;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
@@ -24,22 +25,28 @@ public class BotVsBot {
 		String DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		Log.DEBUG_PATH = DEBUG_PATH;
 		NLFullMathBotFactory nlMathBotFactory = new NLFullMathBotFactory();
-		IPlayer mathBot = nlMathBotFactory.createBot(new VillainModel(LimitType.NO_LIMIT, DEBUG_PATH), ISpectrumListener.EMPTY, 
+		NLPostflopMathBotFactory nlPostflopMathBotFactory = new NLPostflopMathBotFactory();
+		IPlayer postflopMathBot = nlPostflopMathBotFactory.createBot(new VillainModel(LimitType.NO_LIMIT, DEBUG_PATH), ISpectrumListener.EMPTY, 
 				IDecisionListener.EMPTY, "MathBot", DEBUG_PATH);
+		IPlayer fullMathBot = nlMathBotFactory.createBot(new VillainModel(LimitType.NO_LIMIT, DEBUG_PATH), ISpectrumListener.EMPTY, 
+				IDecisionListener.EMPTY, "MathBot2", DEBUG_PATH);
 		NeuralBotFactory factory = new NeuralBotFactory();
-		IPlayer playerUp = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
+		IPlayer neuralStandart = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				"Grantorino Up", DEBUG_PATH);
-		IPlayer playerDown = new NeuralAggroBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+		IPlayer neuralAggro = new NeuralAggroBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, "Grantorino Down", DEBUG_PATH);
-		IPlayer random = new RandomBot("Random", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(mathBot, playerDown, IGameObserver.EMPTY, DEBUG_PATH);
-		engine.button(playerDown).cards(playerDown, "9sTc").cards(mathBot, "KcKs").flop("QsAsQd");
+		IPlayer random = new RandomBot("RandomBot", DEBUG_PATH);
+		IPlayer pushBot = new PushBot("PushBot", DEBUG_PATH);
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, pushBot, IGameObserver.EMPTY,
+				DEBUG_PATH);
+//		engine.button(pushBot).cards(postflopMathBot, "6sQc").cards(pushBot, "Kc7s").stack(postflopMathBot, 2020)
+//				.stack(pushBot, 1980).flop("Ks7d7h");
 		int count1 = 0, count2 = 0;
-		engine.playRound();
-		for (int i = 0; i < 0; i++) {
-//		for (int i = 0; i < 100; i++) {
+//		engine.playRound();
+//		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 300; i++) {
 			TournamentSummary summary = engine.playGame();
-			if (summary.winner.equals(mathBot.getName())) {
+			if (summary.winner.equals(fullMathBot.getName())) {
 				count1++;
 			} else {
 				count2++;

@@ -7,6 +7,7 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.OpenPlayerInfo;
+import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.util.SimplePair;
 
@@ -14,6 +15,7 @@ public class PredefinedGameEngine extends GameEngine {
 
 	private IPlayer buttonPlayer;
 	private List<SimplePair<IPlayer, String>> predefinedCards = new ArrayList<>();
+	private List<SimplePair<IPlayer, Double>> predefinedStacks = new ArrayList<>();
 	private String flop;
 
 	public PredefinedGameEngine(IPlayer player1, IPlayer player2, IGameObserver observer, String debug) {
@@ -23,6 +25,17 @@ public class PredefinedGameEngine extends GameEngine {
 	public PredefinedGameEngine button(IPlayer player) {
 		this.buttonPlayer = player;
 		return this;
+	}
+
+	@Override
+	protected void setStartStack(IPlayer player, PlayerInfo playerInfo) {
+		for (SimplePair<IPlayer, Double> pair : predefinedStacks) {
+			if (player == pair.first) {
+				playerInfo.stack = pair.second;
+				return;
+			}
+		}
+		super.setStartStack(player, playerInfo);
 	}
 
 	@Override
@@ -37,6 +50,11 @@ public class PredefinedGameEngine extends GameEngine {
 
 	public PredefinedGameEngine cards(IPlayer player, String cards) {
 		this.predefinedCards.add(new SimplePair<IPlayer, String>(player, cards));
+		return this;
+	}
+
+	public PredefinedGameEngine stack(IPlayer player, double stack) {
+		this.predefinedStacks.add(new SimplePair<IPlayer, Double>(player, stack));
 		return this;
 	}
 

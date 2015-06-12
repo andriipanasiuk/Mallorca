@@ -15,7 +15,7 @@ public class StubProfitCalculator implements IProfitCalculator{
 	public Map<Action, Double> getProfitMap(IPlayerGameInfo gameInfo, IAggressionInfo situation,
 			Card holeCard1, Card holeCard2, Spectrum villainSpectrum) {
 		Map<Action, Double> result = new HashMap<>();
-		result.put(Action.foldAction(), 1D);
+		result.put(Action.fold(), 1D);
 		result.put(Action.passive(), 1D);
 		result.put(Action.aggressive(), 1D);
 		return result;

@@ -256,8 +256,8 @@ public class TestEquilator {
 	}
 
 	public static void testPreflop() {
-		Card card1 = Card.valueOf("Ks");
-		Card card2 = Card.valueOf("Ad");
+		Card card1 = Card.valueOf("8s");
+		Card card2 = Card.valueOf("7d");
 		double strength = EquilatorPreflop.strengthVsRandom(card1, card2);
 		Log.d("Strength: " + strength);
 	}

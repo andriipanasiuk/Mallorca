@@ -21,6 +21,7 @@ import mallorcatour.util.Log;
  * 
  * @author Andrew
  */
+@Deprecated
 public class GrandtorinoBot extends ObservingPlayer {
 
 	private IActionChecker actionChecker;
@@ -48,13 +49,13 @@ public class GrandtorinoBot extends ObservingPlayer {
 
 		IAdvice advice = null;
 		if (gameInfo.isPreFlop()) {
-			advice = preflopBot.getAdvice(situation, holeCards, null);
+			advice = preflopBot.getAdvice(situation, holeCards, gameInfo);
 			if (advice != null) {
 				Log.f(DEBUG_PATH, "Advice from preflop bot: " + advice);
 			}
 		}
 		if (advice == null) {
-			advice = advisor.getAdvice(situation, holeCards, null);
+			advice = advisor.getAdvice(situation, holeCards, gameInfo);
 			Log.f(DEBUG_PATH, "Advice: " + advice);
 		}
 		action = advice.getAction();

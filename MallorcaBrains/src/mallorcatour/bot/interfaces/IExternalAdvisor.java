@@ -16,7 +16,7 @@ public interface IExternalAdvisor {
     public final static IExternalAdvisor EMPTY = new IExternalAdvisor() {
 
         public Action getAction(IPlayerGameInfo gameInfo) {
-            return Action.foldAction();
+            return Action.fold();
         }
     };
 

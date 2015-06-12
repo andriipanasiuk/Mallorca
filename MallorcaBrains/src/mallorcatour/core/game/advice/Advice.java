@@ -94,7 +94,7 @@ public final class Advice implements IAdvice, IVector, Serializable {
     public Action getAction() {
         int random = (int) (randomizer.getRandom() * 100);
         if (getFoldPercent() > random) {
-            return Action.foldAction();
+            return Action.fold();
         } else if (getPassivePercent() + getFoldPercent() > random) {
             return Action.passive();
         } else {

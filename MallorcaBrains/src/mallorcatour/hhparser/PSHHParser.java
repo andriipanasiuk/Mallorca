@@ -111,7 +111,7 @@ public class PSHHParser {
             handler.onPlayerActed(name, Action.betAction(amount));
         } else if (buffer.contains(FOLDS)) {
             String name = StringUtils.between(buffer, 0, ":").trim();
-            handler.onPlayerActed(name, Action.foldAction());
+            handler.onPlayerActed(name, Action.fold());
         } else if (buffer.contains(SUMMARY)) {
             handler.onHandEnded();
         }
