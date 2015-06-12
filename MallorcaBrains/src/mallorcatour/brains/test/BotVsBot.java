@@ -1,4 +1,4 @@
-package mallorcatour.brains.neural.test;
+package mallorcatour.brains.test;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
