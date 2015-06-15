@@ -38,17 +38,17 @@ public final class Advice implements IAdvice, IVector, Serializable {
     /**
      * @see toString() method of this class
      */
-    public static Advice valueOf(String toString) {
-        int from1 = toString.indexOf(FOLD) + FOLD.length();
-        int to1 = toString.indexOf("%", from1);
-        int from2 = toString.indexOf(PASSIVE) + PASSIVE.length();
-        int to2 = toString.indexOf("%", from2);
-        int from3 = toString.indexOf(AGGRESSIVE) + AGGRESSIVE.length();
-        int to3 = toString.indexOf("%", from3);
+    public static Advice valueOf(String adviceStr) {
+        int from1 = adviceStr.indexOf(FOLD) + FOLD.length();
+        int to1 = adviceStr.indexOf("%", from1);
+        int from2 = adviceStr.indexOf(PASSIVE) + PASSIVE.length();
+        int to2 = adviceStr.indexOf("%", from2);
+        int from3 = adviceStr.indexOf(AGGRESSIVE) + AGGRESSIVE.length();
+        int to3 = adviceStr.indexOf("%", from3);
         int fold, passive, aggressive;
-        fold = Integer.parseInt(toString.substring(from1, to1));
-        passive = Integer.parseInt(toString.substring(from2, to2));
-        aggressive = Integer.parseInt(toString.substring(from3, to3));
+        fold = Integer.parseInt(adviceStr.substring(from1, to1));
+        passive = Integer.parseInt(adviceStr.substring(from2, to2));
+        aggressive = Integer.parseInt(adviceStr.substring(from3, to3));
         return new Advice(fold, passive, aggressive);
     }
 
