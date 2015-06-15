@@ -13,10 +13,11 @@ package bot;
 
 import java.util.Scanner;
 
+import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.neural.NeuralAggroBotFactory;
+import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
@@ -49,15 +50,15 @@ public class BotParser {
 				continue;
 			}
 			String[] parts = line.split("\\s+");
-			if (parts.length == 3 && parts[0].equals("Action")) {
+			if (parts.length == 3 && parts[0].equals(AiGamesController.ACTION)) {
 				Action move = bot.getAction();
 				System.out.println(actionToString(move));
 				System.out.flush();
-			} else if (parts.length == 3 && parts[0].equals("Settings")) {
+			} else if (parts.length == 3 && parts[0].equals(AiGamesController.SETTINGS)) {
 				controller.updateSetting(parts[1], parts[2]);
-			} else if (parts.length == 3 && parts[0].equals("Match")) {
+			} else if (parts.length == 3 && parts[0].equals(AiGamesController.MATCH)) {
 				controller.updateMatch(parts[1], parts[2]);
-			} else if (parts.length == 3 && parts[0].startsWith("player")) {
+			} else if (parts.length == 3 && parts[0].startsWith(AiGamesController.PLAYER)) {
 				controller.updateMove(parts[0], parts[1], parts[2]);
 			} else {
 				System.err.printf("Unable to parse line ``%s''" + FileUtils.LINE_SEPARATOR, line);
@@ -68,15 +69,15 @@ public class BotParser {
 	private static String actionToString(Action action) {
 		String act;
 		if (action.isFold()) {
-			act = "fold";
+			act = AiGamesController.FOLD;
 		} else if (action.isPassive()) {
 			if (action.isCheck()) {
-				act = "check";
+				act = AiGamesController.CHECK;
 			} else {
-				act = "call";
+				act = AiGamesController.CALL;
 			}
 		} else {
-			act = "raise";
+			act = AiGamesController.RAISE;
 		}
 		StringBuilder builder = new StringBuilder();
 		builder.append(act);
@@ -88,7 +89,7 @@ public class BotParser {
 	public static void main(String[] args) {
 		Log.WRITE_TO_ERR = true;
 		EquilatorPreflop.loadFrom = LoadFrom.CODE;
-		NeuralAggroBotFactory factory = new NeuralAggroBotFactory();
+		IBotFactory factory = new NLFullMathBotFactory();
 		BotParser parser = new BotParser(factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, "Mallorca", ""));
 		parser.run();

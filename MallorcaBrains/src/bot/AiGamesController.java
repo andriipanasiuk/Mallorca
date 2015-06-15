@@ -33,6 +33,20 @@ public class AiGamesController {
 
 	private int round;
 
+	public static final String ACTION = "Ac" + "tion";
+	public static final String SETTINGS = "Se" + "ttings";
+	public static final String MATCH = "Ma" + "tch";
+	public static final String PLAYER = "pla" + "yer";
+	private static final String HAND = "ha" + "nd";
+	private static final String POST = "po" + "st";
+	private static final String STACK = "sta" + "ck";
+	private static final String WINS = "wi" + "ns";
+
+	public static final String FOLD = "fo" + "ld";
+	public static final String CALL = "ca" + "ll";
+	public static final String CHECK = "che" + "ck";
+	public static final String RAISE = "rai" + "se";
+
 	private Map<String, String> settings = new HashMap<String, String>();
 
 	/**
@@ -159,30 +173,30 @@ public class AiGamesController {
 			gameInfo.bankrollAtRisk = Math.max(0, gameInfo.bankrollAtRisk - am);
 		}
 		if (bot.equals(heroName)) {
-			if (key.equals("stack")) { // The amount in your starting stack
+			if (key.equals(STACK)) { // The amount in your starting stack
 				this.bot.onHandStarted(gameInfo);
-			} else if (key.equals("post")) {
+			} else if (key.equals(POST)) {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
 				Log.d("Effective stack: " + gameInfo.bankrollAtRisk);
-			} else if (key.equals("hand")) { // Your cards
+			} else if (key.equals(HAND)) { // Your cards
 				gameInfo.changeStreet(PokerStreet.PREFLOP);
 				Card[] cards = parseCards(amount);
 				Log.d("Hole cards: " + amount);
 				this.bot.onHoleCards(cards[0], cards[1]);
-			} else if (key.equals("wins")) {
+			} else if (key.equals(WINS)) {
 				this.bot.onHandEnded();
 			} else {
 				// That should be all
 			}
 		} else { // assume it's the opponent
-			if (key.equals("post")) { // The amount your opponent paid
+			if (key.equals(POST)) { // The amount your opponent paid
 										// for the blind
 				// do nothing
-			} else if (key.equals("hand")) {
+			} else if (key.equals(HAND)) {
 				// Hand of the opponent on a showdown, not stored
-			} else if (key.equals("wins")) {
+			} else if (key.equals(WINS)) {
 				this.bot.onHandEnded();
-			} else if (key.equals("fold") || key.equals("check") || key.equals("call") || key.equals("raise")) {
+			} else if (key.equals(FOLD) || key.equals(CHECK) || key.equals(CALL) || key.equals(RAISE)) {
 				Log.d("Villain " + key + " " + amount);
 				Action action = fromString(key, amount);
 				this.bot.onActed(action, -1, villainName);
@@ -195,13 +209,13 @@ public class AiGamesController {
 
 	private static Action fromString(String key, String amount) {
 		Action result;
-		if (key.equals("fold")) {
+		if (key.equals(FOLD)) {
 			result = Action.fold();
-		} else if (key.equals("call")) {
+		} else if (key.equals(CALL)) {
 			result = Action.callAction(Integer.valueOf(amount));
-		} else if (key.equals("check")) {
+		} else if (key.equals(CHECK)) {
 			result = Action.checkAction();
-		} else if (key.equals("raise")) {
+		} else if (key.equals(RAISE)) {
 			result = Action.raiseAction(Integer.valueOf(amount));
 		} else {
 			throw new IllegalArgumentException("Invalid key from engine: " + key);

@@ -128,10 +128,10 @@ public class EquilatorPreflop {
 	public static double strengthVsSpectrum(Card heroCard1, Card heroCard2, Spectrum villainSpectrum) {
 		double count = 0, wins = 0;
 		int log = 0;
+		HoleCards heroCards = new HoleCards(heroCard1, heroCard2);
 		for (HoleCards villainHoleCards : villainSpectrum) {
 			log++;
-			double strength = preflopStrength(new HoleCards(heroCard1,
-					heroCard2), villainHoleCards);
+			double strength = preflopStrength(heroCards, villainHoleCards);
 			double frequency = villainSpectrum.getWeight(villainHoleCards);
 			wins += strength * frequency;
 			count += frequency;
