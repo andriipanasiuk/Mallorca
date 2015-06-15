@@ -10,7 +10,6 @@ import java.util.List;
 
 import mallorcatour.core.game.Action;
 import mallorcatour.core.vector.IVector;
-import mallorcatour.interfaces.IAdviceInterpreter;
 import mallorcatour.tools.IRandomizer;
 import mallorcatour.tools.UniformRandomizer;
 

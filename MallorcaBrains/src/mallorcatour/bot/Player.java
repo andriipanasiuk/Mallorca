@@ -1,6 +1,5 @@
-package mallorcatour.bot.math;
+package mallorcatour.bot;
 
-import mallorcatour.bot.ObservingPlayer;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;

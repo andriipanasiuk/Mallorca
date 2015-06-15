@@ -14,7 +14,6 @@ import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerAction;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.situation.HandConclusion;
 import mallorcatour.tools.Pair;
 
 /**

@@ -1,6 +1,5 @@
-package mallorcatour.interfaces;
+package mallorcatour.core.game.advice;
 
-import mallorcatour.core.game.advice.Advice;
 
 public interface IAdviceInterpreter{
 	Advice create(boolean canRaise, double... output);

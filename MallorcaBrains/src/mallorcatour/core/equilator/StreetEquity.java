@@ -31,7 +31,9 @@ public class StreetEquity {
 
 	@Override
 	public String toString() {
-		return "Strength: " + strength + FileUtils.LINE_SEPARATOR + "Positive: " + positivePotential + "\nNegative: " + negativePotential;
+		return "Strength: " + strength + FileUtils.LINE_SEPARATOR 
+				+ "Positive: " + positivePotential + FileUtils.LINE_SEPARATOR 
+				+ "Negative: " + negativePotential;
 	}
 
 	public double winWillWin() {

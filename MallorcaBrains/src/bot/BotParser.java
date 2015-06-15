@@ -22,6 +22,7 @@ import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.GameInfo;
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 
 /**
@@ -59,7 +60,7 @@ public class BotParser {
 			} else if (parts.length == 3 && parts[0].startsWith("player")) {
 				controller.updateMove(parts[0], parts[1], parts[2]);
 			} else {
-				System.err.printf("Unable to parse line ``%s''\n", line);
+				System.err.printf("Unable to parse line ``%s''" + FileUtils.LINE_SEPARATOR, line);
 			}
 		}
 	}

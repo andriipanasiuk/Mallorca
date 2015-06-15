@@ -4,7 +4,6 @@
  */
 package mallorcatour.core.game.advice;
 
-import mallorcatour.interfaces.IAdviceInterpreter;
 import mallorcatour.tools.Log;
 
 /**

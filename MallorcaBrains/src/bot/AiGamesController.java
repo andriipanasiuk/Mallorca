@@ -22,6 +22,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PokerStreet;
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 
 /**
@@ -83,7 +84,7 @@ public class AiGamesController {
 			int stack = Integer.valueOf(value);
 			gameInfo.bankrollAtRisk = stack;
 		} else {
-			System.err.printf("Unknown settings command: %s %s\n", key, value);
+			System.err.printf("Unknown settings command: %s %s" + FileUtils.LINE_SEPARATOR, key, value);
 		}
 	}
 
@@ -132,7 +133,7 @@ public class AiGamesController {
 			gameInfo.changeStreet(street);
 			bot.onStageEvent(street);
 		} else {
-			System.err.printf("Unknown match command: %s %s\n", key, value);
+			System.err.printf("Unknown match command: %s %s" + FileUtils.LINE_SEPARATOR, key, value);
 		}
 	}
 

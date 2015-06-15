@@ -1,10 +1,10 @@
 package mallorcatour.bot.neural;
 
+import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.math.Player;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
