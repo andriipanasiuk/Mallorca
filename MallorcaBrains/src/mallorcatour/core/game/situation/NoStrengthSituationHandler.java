@@ -1,5 +1,6 @@
 package mallorcatour.core.game.situation;
 
+import mallorcatour.bot.C;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
@@ -33,7 +34,7 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		double potOdds = playerToCall / potAfterCall;
 		double potToStackCoeff = potAfterCall / (potAfterCall + effectiveStack);
 
-		Log.f(this + " toCall: " + playerToCall + " Pot: " + pot);
+		Log.f(this + " " + C.TO_CALL + ": " + playerToCall + " " + C.POT + ": " + pot);
 		if (gameInfo.isPreFlop()) {
 			result = new LocalSituation(LocalSituation.PREFLOP, limitType);
 		} else if (gameInfo.isFlop()) {
@@ -54,7 +55,6 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		result.setPotOdds(potOdds);
 		result.isOnButton(isOnButton);
 		result.setPotToStackOdds(potToStackCoeff);
-		result.setFLPotSize(1 - (2 * gameInfo.getBigBlindSize()) / pot);
 		result.canRaise(effectiveStack > 0);
 		return result;
 	}
@@ -110,7 +110,8 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 
 	@Override
 	public String toString() {
-		return "Sit. handler for " + (trackHero ? ("hero " + hero) : ("villain " + gameInfo.getVillain(hero).name));
+		return "Sit. " + C.HANDLER + " for "
+				+ (trackHero ? (C.HERO + " " + hero) : (C.VILLAIN + " " + gameInfo.getVillain(hero).name));
 	}
 
 	@Override

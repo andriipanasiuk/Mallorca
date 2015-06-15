@@ -11,6 +11,8 @@ import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.random.RandomBot;
 import mallorcatour.bot.sklansky.PushBot;
 import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.neural.NeuralAdvisor;
+import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
 import mallorcatour.core.game.engine.PredefinedGameEngine;
@@ -28,8 +30,12 @@ public class BotVsBot {
 		NLPostflopMathBotFactory nlPostflopMathBotFactory = new NLPostflopMathBotFactory();
 		IPlayer postflopMathBot = nlPostflopMathBotFactory.createBot(new VillainModel(LimitType.NO_LIMIT, DEBUG_PATH), ISpectrumListener.EMPTY, 
 				IDecisionListener.EMPTY, "MathBot", DEBUG_PATH);
-		IPlayer fullMathBot = nlMathBotFactory.createBot(new VillainModel(LimitType.NO_LIMIT, DEBUG_PATH), ISpectrumListener.EMPTY, 
-				IDecisionListener.EMPTY, "MathBot2", DEBUG_PATH);
+
+		GusXensen gusXensen = new GusXensen();
+		NeuralAdvisor villainModel = new NeuralAdvisor(gusXensen, gusXensen, "GusXensen model");
+		IPlayer fullMathBot = nlMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY,
+				IDecisionListener.EMPTY, "Full MathBot", DEBUG_PATH);
+
 		NeuralBotFactory factory = new NeuralBotFactory();
 		IPlayer neuralStandart = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				"Grantorino Up", DEBUG_PATH);
@@ -37,14 +43,14 @@ public class BotVsBot {
 				IDecisionListener.EMPTY, "Grantorino Down", DEBUG_PATH);
 		IPlayer random = new RandomBot("RandomBot", DEBUG_PATH);
 		IPlayer pushBot = new PushBot("PushBot", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, pushBot, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralStandart, IGameObserver.EMPTY,
 				DEBUG_PATH);
 //		engine.button(pushBot).cards(postflopMathBot, "6sQc").cards(pushBot, "Kc7s").stack(postflopMathBot, 2020)
 //				.stack(pushBot, 1980).flop("Ks7d7h");
 		int count1 = 0, count2 = 0;
 //		engine.playRound();
 //		for (int i = 0; i < 2; i++) {
-		for (int i = 0; i < 300; i++) {
+		for (int i = 0; i < 100; i++) {
 			TournamentSummary summary = engine.playGame();
 			if (summary.winner.equals(fullMathBot.getName())) {
 				count1++;

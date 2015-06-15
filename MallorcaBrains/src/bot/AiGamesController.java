@@ -168,7 +168,7 @@ public class AiGamesController {
 				Log.d("Effective " + C.STACK + ": " + gameInfo.bankrollAtRisk);
 			} else if (key.equals(C.HAND)) { // Your cards
 				Card[] cards = parseCards(amount);
-				Log.d("HoleCards: " + amount);
+				Log.d(C.HOLE_CARDS + ": " + amount);
 				this.bot.onHoleCards(cards[0], cards[1]);
 			} else if (key.equals(C.WINS)) {
 				this.bot.onHandEnded();

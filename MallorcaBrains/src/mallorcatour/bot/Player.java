@@ -42,8 +42,8 @@ public class Player extends ObservingPlayer {
 		IAdvice advice = null;
 		HoleCards cards = new HoleCards(heroCard1, heroCard2);
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
+		Log.f(DEBUG_PATH, C.SITUATION + ": " + situation.toString());
 		if (gameInfo.isPreFlop()) {
-			Log.f(DEBUG_PATH, "Preflop situation: " + situation.toString());
 			advice = preflopChart.getAdvice(situation, cards, gameInfo);
 			if (advice != null) {
 				Log.f(DEBUG_PATH, "Advice from preflop chart");
@@ -55,10 +55,10 @@ public class Player extends ObservingPlayer {
 		if (advice == null) {
 			advice = postflopAdvisor.getAdvice(situation, cards, gameInfo);
 		}
-		Log.f(DEBUG_PATH, "Advice: " + advice.toString());
+		Log.f(DEBUG_PATH, C.ADVICE + ": " + advice.toString());
 		Action action = advice.getAction();
 		action = actionPreprocessor.preprocessAction(action, gameInfo);
-		Log.f(DEBUG_PATH, "Action: " + action.toString());
+		Log.f(DEBUG_PATH, C.ACTION + ": " + action.toString());
 		Log.f(DEBUG_PATH, "=========  End  =========");
 		action = actionChecker.checkAction(action, situation, gameInfo, cards);
 		gameObserver.onActed(action, gameInfo.getAmountToCall(), getName());

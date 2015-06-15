@@ -5,8 +5,12 @@ public class C {
 	public static final String HERO = "He" + "ro";
 	public static final String VILLAIN = "vil" + "lain";
 	public static final String POT = "P" + "ot";
+	public static final String EFFECTIVE_STACK = "Effe" + "ctiveStack";
+	public static final String HOLE_CARDS = "Hol" + "e cards";
+	public static final String TO_CALL = "toCa" + "ll";
 	public static final String SITUATION = "Situ" + "ation";
 	public static final String ACTION = "Ac" + "tion";
+	public static final String ADVICE = "Advi" + "ce";
 	public static final String SETTINGS = "Se" + "ttings";
 	public static final String MATCH = "Ma" + "tch";
 	public static final String PLAYER = "pla" + "yer";
@@ -22,4 +26,5 @@ public class C {
 	public static final String SPECTRUM = "Spec" + "trum";
 	public static final String CARDS = "ca" + "rds";
 	public static final String WEIGHT = "we" + "ight";
+	public static final String HANDLER = "han" + "dler";
 }
