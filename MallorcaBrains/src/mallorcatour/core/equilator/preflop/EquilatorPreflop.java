@@ -16,7 +16,7 @@ public class EquilatorPreflop {
 	}
 	public static LoadFrom loadFrom = LoadFrom.CODE;
 	public static boolean LOGGING = false;
-	private static final String PREFLOP_STRENGTH_TABLE_PATH = "preflop.eql";
+	private static final String PREFLOP_STRENGTH_TABLE_PATH = "prefl" + "op.eql";
 	public static double[][] preflopStrength = new double[170][170];
 
 	static {

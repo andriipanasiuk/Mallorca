@@ -124,6 +124,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		this.gameInfo = gameInfo;
 		situationHandler.onHandStarted(gameInfo);
 		if (gameInfo.onButton(hero) ^ !trackHero) {
+			Log.d("Track player on button. We get him situation");
 			situation = situationHandler.getSituation();
 		}
 		spectrum = Spectrum.random();

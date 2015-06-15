@@ -26,7 +26,7 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 	}
 
 	@Override
-	public LocalSituation getSituation() {
+	public LocalSituation getSituation() throws IllegalStateException {
 		LocalSituation result = null;
 		boolean isOnButton = gameInfo.onButton(hero) ^ !trackHero;
 		double potAfterCall = playerToCall + pot;

@@ -41,6 +41,7 @@ public class AiGamesController {
 	private static final String POST = "po" + "st";
 	private static final String STACK = "sta" + "ck";
 	private static final String WINS = "wi" + "ns";
+	private static final String TABLE = "ta" + "ble";
 
 	public static final String FOLD = "fo" + "ld";
 	public static final String CALL = "ca" + "ll";
@@ -131,7 +132,7 @@ public class AiGamesController {
 			Log.d("Pot: " + gameInfo.pot);
 		} else if (key.equals("amount_to_call")) { // The amount of the call
 			gameInfo.heroAmountToCall = Integer.valueOf(value);
-		} else if (key.equals("table")) { // The cards on the table
+		} else if (key.equals(TABLE)) { // The cards on the table
 			gameInfo.board = Arrays.asList(parseCards(value));
 			Log.d("Table: " + value);
 			PokerStreet street;
@@ -162,24 +163,24 @@ public class AiGamesController {
 	 *            : value to be set for the key
 	 */
 	protected void updateMove(String bot, String key, String amount) {
-		if (key.equals("stack")) { // The amount in your starting stack
+		if (key.equals(STACK)) { // The amount in your starting stack
 			int value = Integer.valueOf(amount);
 			if (value < gameInfo.bankrollAtRisk) {
 				gameInfo.bankrollAtRisk = value;
 			}
 		}
-		if (key.equals("raise")) {
+		if (key.equals(RAISE)) {
 			int am = Integer.valueOf(amount);
 			gameInfo.bankrollAtRisk = Math.max(0, gameInfo.bankrollAtRisk - am);
 		}
 		if (bot.equals(heroName)) {
 			if (key.equals(STACK)) { // The amount in your starting stack
+				gameInfo.changeStreet(PokerStreet.PREFLOP);
 				this.bot.onHandStarted(gameInfo);
 			} else if (key.equals(POST)) {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
 				Log.d("Effective stack: " + gameInfo.bankrollAtRisk);
 			} else if (key.equals(HAND)) { // Your cards
-				gameInfo.changeStreet(PokerStreet.PREFLOP);
 				Card[] cards = parseCards(amount);
 				Log.d("Hole cards: " + amount);
 				this.bot.onHoleCards(cards[0], cards[1]);
@@ -202,7 +203,7 @@ public class AiGamesController {
 				this.bot.onActed(action, -1, villainName);
 			}
 		}
-		if (key.equals("raise")) {
+		if (key.equals(RAISE)) {
 			Log.d("Effective stack after raise: " + gameInfo.bankrollAtRisk);
 		}
 	}

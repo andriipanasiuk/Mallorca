@@ -99,7 +99,7 @@ public class EquilatorStrength {
 		return result;
 	}
 
-	public static void main(String... args) {
+	public static void test() {
 		LOGGING = true;
 		Spectrum spectrum = Spectrum.empty();
 		spectrum.add(HoleCards.valueOf("AdJs"), 0.5);
