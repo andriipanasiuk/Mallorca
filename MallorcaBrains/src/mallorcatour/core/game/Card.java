@@ -207,28 +207,6 @@ public final class Card implements Comparable<Card>, Serializable {
 				return KING;
 			case 'A':
 				return ACE;
-			case ':':
-			case ';':
-			case '<':
-			case '=':
-			case '>':
-			case '?':
-			case '@':
-			case 'B':
-			case 'C':
-			case 'D':
-			case 'E':
-			case 'F':
-			case 'G':
-			case 'H':
-			case 'I':
-			case 'L':
-			case 'M':
-			case 'N':
-			case 'O':
-			case 'P':
-			case 'R':
-			case 'S':
 			}
 			throw new IllegalArgumentException("Error in string representation of value");
 		}

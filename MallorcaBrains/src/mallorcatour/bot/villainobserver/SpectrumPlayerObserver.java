@@ -3,6 +3,7 @@ package mallorcatour.bot.villainobserver;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.C;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IAdvisor;
@@ -71,8 +72,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 			situation.setStrength(equity.strength);
 			situation.setPositivePotential(equity.positivePotential);
 			situation.setNegativePotential(equity.negativePotential);
-			IAdvice advice = null;
-			advice = model.getAdvice(situation, cards, null);
+			IAdvice advice = model.getAdvice(situation, cards, null);
 			advices.put(cards, advice);
 		}
 		return advices;
@@ -100,6 +100,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		if (spectrum.isEmpty()) {
 			spectrum = randomSpectrum;
 		}
+		Log.d(C.SPECTRUM + " " + C.WEIGHT + ": " + spectrum.summaryWeight());
 		spectrumListener.onSpectrumChanged(spectrum, "");
 	}
 
@@ -153,7 +154,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		if (name.equals(hero) ^ !trackHero) {
 			Log.f(this.toString() + " he acted");
 			String modelPlayer = trackHero ? gameInfo.getHero(hero).getName() : gameInfo.getVillain(hero).getName();
-			Log.f("Situation of " + modelPlayer + " " + situation);
+			Log.f(C.SITUATION + " of " + modelPlayer + " " + situation);
 			modifySpectrum(situation, action);
 		} else if (!action.isFold()) {
 			Log.f(this.toString() + " not him acted");
@@ -163,7 +164,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 
 	@Override
 	public String toString() {
-		return "Observing " + (trackHero ? ("hero " + hero) : ("villain " + gameInfo.getVillain(hero).name));
+		return "Observing " + (trackHero ? (C.HERO + " " + hero) : (C.VILLAIN + " " + gameInfo.getVillain(hero).name));
 	}
 
 }

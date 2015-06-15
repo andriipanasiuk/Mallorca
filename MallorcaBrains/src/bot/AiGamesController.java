@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.C;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -32,21 +33,6 @@ import mallorcatour.tools.Log;
 public class AiGamesController {
 
 	private int round;
-
-	public static final String ACTION = "Ac" + "tion";
-	public static final String SETTINGS = "Se" + "ttings";
-	public static final String MATCH = "Ma" + "tch";
-	public static final String PLAYER = "pla" + "yer";
-	private static final String HAND = "ha" + "nd";
-	private static final String POST = "po" + "st";
-	private static final String STACK = "sta" + "ck";
-	private static final String WINS = "wi" + "ns";
-	private static final String TABLE = "ta" + "ble";
-
-	public static final String FOLD = "fo" + "ld";
-	public static final String CALL = "ca" + "ll";
-	public static final String CHECK = "che" + "ck";
-	public static final String RAISE = "rai" + "se";
 
 	private Map<String, String> settings = new HashMap<String, String>();
 
@@ -129,10 +115,10 @@ public class AiGamesController {
 
 		} else if (key.equals("max_win_pot")) { // The size of the current pot
 			gameInfo.pot = Integer.valueOf(value);
-			Log.d("Pot: " + gameInfo.pot);
+			Log.d(C.POT + ": " + gameInfo.pot);
 		} else if (key.equals("amount_to_call")) { // The amount of the call
 			gameInfo.heroAmountToCall = Integer.valueOf(value);
-		} else if (key.equals(TABLE)) { // The cards on the table
+		} else if (key.equals(C.TABLE)) { // The cards on the table
 			gameInfo.board = Arrays.asList(parseCards(value));
 			Log.d("Table: " + value);
 			PokerStreet street;
@@ -163,60 +149,60 @@ public class AiGamesController {
 	 *            : value to be set for the key
 	 */
 	protected void updateMove(String bot, String key, String amount) {
-		if (key.equals(STACK)) { // The amount in your starting stack
+		if (key.equals(C.STACK)) { // The amount in your starting stack
 			int value = Integer.valueOf(amount);
 			if (value < gameInfo.bankrollAtRisk) {
 				gameInfo.bankrollAtRisk = value;
 			}
 		}
-		if (key.equals(RAISE)) {
+		if (key.equals(C.RAISE)) {
 			int am = Integer.valueOf(amount);
 			gameInfo.bankrollAtRisk = Math.max(0, gameInfo.bankrollAtRisk - am);
 		}
 		if (bot.equals(heroName)) {
-			if (key.equals(STACK)) { // The amount in your starting stack
+			if (key.equals(C.STACK)) { // The amount in your starting stack
 				gameInfo.changeStreet(PokerStreet.PREFLOP);
 				this.bot.onHandStarted(gameInfo);
-			} else if (key.equals(POST)) {
+			} else if (key.equals(C.POST)) {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
-				Log.d("Effective stack: " + gameInfo.bankrollAtRisk);
-			} else if (key.equals(HAND)) { // Your cards
+				Log.d("Effective " + C.STACK + ": " + gameInfo.bankrollAtRisk);
+			} else if (key.equals(C.HAND)) { // Your cards
 				Card[] cards = parseCards(amount);
-				Log.d("Hole cards: " + amount);
+				Log.d("HoleCards: " + amount);
 				this.bot.onHoleCards(cards[0], cards[1]);
-			} else if (key.equals(WINS)) {
+			} else if (key.equals(C.WINS)) {
 				this.bot.onHandEnded();
 			} else {
 				// That should be all
 			}
 		} else { // assume it's the opponent
-			if (key.equals(POST)) { // The amount your opponent paid
+			if (key.equals(C.POST)) { // The amount your opponent paid
 										// for the blind
 				// do nothing
-			} else if (key.equals(HAND)) {
+			} else if (key.equals(C.HAND)) {
 				// Hand of the opponent on a showdown, not stored
-			} else if (key.equals(WINS)) {
+			} else if (key.equals(C.WINS)) {
 				this.bot.onHandEnded();
-			} else if (key.equals(FOLD) || key.equals(CHECK) || key.equals(CALL) || key.equals(RAISE)) {
-				Log.d("Villain " + key + " " + amount);
+			} else if (key.equals(C.FOLD) || key.equals(C.CHECK) || key.equals(C.CALL) || key.equals(C.RAISE)) {
+				Log.d(C.VILLAIN + " " + key + " " + amount);
 				Action action = fromString(key, amount);
 				this.bot.onActed(action, -1, villainName);
 			}
 		}
-		if (key.equals(RAISE)) {
-			Log.d("Effective stack after raise: " + gameInfo.bankrollAtRisk);
+		if (key.equals(C.RAISE)) {
+			Log.d("Effective " + C.STACK  + " after " + C.RAISE + ": " + gameInfo.bankrollAtRisk);
 		}
 	}
 
 	private static Action fromString(String key, String amount) {
 		Action result;
-		if (key.equals(FOLD)) {
+		if (key.equals(C.FOLD)) {
 			result = Action.fold();
-		} else if (key.equals(CALL)) {
+		} else if (key.equals(C.CALL)) {
 			result = Action.callAction(Integer.valueOf(amount));
-		} else if (key.equals(CHECK)) {
+		} else if (key.equals(C.CHECK)) {
 			result = Action.checkAction();
-		} else if (key.equals(RAISE)) {
+		} else if (key.equals(C.RAISE)) {
 			result = Action.raiseAction(Integer.valueOf(amount));
 		} else {
 			throw new IllegalArgumentException("Invalid key from engine: " + key);

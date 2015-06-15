@@ -92,11 +92,10 @@ public class NeuralAdvisor implements IAdvisor {
 		if (this.adviceCreator != null) {
 			adviceCreator = this.adviceCreator;
 		}
-		Advice result;
 		nnForUse.setInput(new LocalSituationInterpreter().createInput(situation));
 		nnForUse.calculate();
 		double[] advice = nnForUse.getOutput();
-		result = Advice.create(adviceCreator, canRaise, advice);
+		Advice result = Advice.create(adviceCreator, canRaise, advice);
 		return result;
 	}
 

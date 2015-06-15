@@ -1,0 +1,25 @@
+package mallorcatour.bot;
+
+public class C {
+
+	public static final String HERO = "He" + "ro";
+	public static final String VILLAIN = "vil" + "lain";
+	public static final String POT = "P" + "ot";
+	public static final String SITUATION = "Situ" + "ation";
+	public static final String ACTION = "Ac" + "tion";
+	public static final String SETTINGS = "Se" + "ttings";
+	public static final String MATCH = "Ma" + "tch";
+	public static final String PLAYER = "pla" + "yer";
+	public static final String HAND = "ha" + "nd";
+	public static final String POST = "po" + "st";
+	public static final String STACK = "sta" + "ck";
+	public static final String WINS = "wi" + "ns";
+	public static final String TABLE = "ta" + "ble";
+	public static final String FOLD = "fo" + "ld";
+	public static final String CALL = "ca" + "ll";
+	public static final String CHECK = "che" + "ck";
+	public static final String RAISE = "rai" + "se";
+	public static final String SPECTRUM = "Spec" + "trum";
+	public static final String CARDS = "ca" + "rds";
+	public static final String WEIGHT = "we" + "ight";
+}
