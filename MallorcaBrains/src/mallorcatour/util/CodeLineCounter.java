@@ -48,7 +48,10 @@ public class CodeLineCounter {
     }
 
     public static void calculateCodeLines() {
-        Log.d("Lines of code: " + calculateCodeLines("C:\\Users\\Andrew\\Documents\\NetBeansProjects\\Utils"));
+        Log.d("Lines of code: " + calculateCodeLines("/home/andriipanasiuk/workspace-private/mallorcatour/src"));
     }
 
+    public static void main(String... args){
+    	calculateCodeLines();
+    }
 }

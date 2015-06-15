@@ -11,7 +11,7 @@ import java.util.List;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.interfaces.IAdviceInterpreter;
-import mallorcatour.interfaces.IRandomizer;
+import mallorcatour.util.IRandomizer;
 import mallorcatour.util.UniformRandomizer;
 
 /**

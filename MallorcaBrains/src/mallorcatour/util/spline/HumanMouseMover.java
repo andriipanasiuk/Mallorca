@@ -8,7 +8,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
 
-import mallorcatour.interfaces.IRandomizer;
+import mallorcatour.util.IRandomizer;
 import mallorcatour.util.ThreadUtils;
 import mallorcatour.util.UniformRandomizer;
 

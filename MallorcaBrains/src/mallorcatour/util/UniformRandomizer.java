@@ -5,7 +5,6 @@
 package mallorcatour.util;
 
 import java.util.Random;
-import mallorcatour.interfaces.IRandomizer;
 
 /**
  *

@@ -17,7 +17,7 @@ import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.interfaces.IRandomizer;
+import mallorcatour.util.IRandomizer;
 import mallorcatour.util.Log;
 import mallorcatour.util.SimplePair;
 import mallorcatour.util.UniformRandomizer;

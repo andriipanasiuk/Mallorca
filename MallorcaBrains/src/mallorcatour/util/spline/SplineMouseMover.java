@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import mallorcatour.interfaces.IRandomizer;
+import mallorcatour.util.IRandomizer;
 import mallorcatour.util.Log;
 import mallorcatour.util.UniformRandomizer;
 import mallorcatour.util.robot.RobotUtils;

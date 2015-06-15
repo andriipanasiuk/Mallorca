@@ -5,6 +5,7 @@ import java.io.IOException;
 
 public class MyFileWriter {
 	private FileWriter fileWriter;
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	private MyFileWriter(String path, boolean append) {
 		try {
@@ -14,8 +15,8 @@ public class MyFileWriter {
 		}
 	}
 
-	public static MyFileWriter prepareForWriting(String path, boolean append) {
-		return new MyFileWriter(path, append);
+	public static MyFileWriter prepareForWriting(String path, boolean appendBool) {
+		return new MyFileWriter(path, appendBool);
 	}
 
 	public void append(String append) {
@@ -33,7 +34,7 @@ public class MyFileWriter {
 			throw new IllegalArgumentException("You need prepare file to writing first!");
 		try {
 			if (toNewLine)
-				this.fileWriter.append("\n" + addString);
+				this.fileWriter.append(LINE_SEPARATOR + addString);
 			else
 				this.fileWriter.append(addString);
 		} catch (IOException ex) {

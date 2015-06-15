@@ -8,10 +8,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import mallorcatour.core.game.Action;
-import mallorcatour.interfaces.IRandomizer;
 import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
+import mallorcatour.util.IRandomizer;
 import mallorcatour.util.Log;
 import mallorcatour.util.ThreadUtils;
 import mallorcatour.util.UniformRandomizer;
