@@ -38,6 +38,7 @@ import mallorcatour.neural.generator.NNWriter;
 import mallorcatour.neural.manager.LEManager;
 import mallorcatour.neural.manager.NNManager;
 import mallorcatour.tools.DoubleUtils;
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.IRandomizer;
 import mallorcatour.tools.Log;
 import mallorcatour.tools.MyFileWriter;
@@ -1602,7 +1603,7 @@ public class NNFrame extends javax.swing.JFrame {
         String info = "";
         for (int i = 0; i < sample.length; i++) {
             info += "Count of examples with error (" + (i * sectionSize) + " - "
-                    + (i + 1) * sectionSize + ") " + sample[i] + "\n";
+                    + (i + 1) * sectionSize + ") " + sample[i] + FileUtils.LINE_SEPARATOR;
         }
         JOptionPane.showMessageDialog(this, info);
     }//GEN-LAST:event_jMenuItem22ActionPerformed

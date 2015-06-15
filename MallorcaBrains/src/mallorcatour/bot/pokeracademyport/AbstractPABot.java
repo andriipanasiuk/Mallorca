@@ -4,19 +4,20 @@
  */
 package mallorcatour.bot.pokeracademyport;
 
+import mallorcatour.bot.interfaces.IDecisionListener;
+import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.bot.modeller.VillainModel;
+import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.PokerStreet;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.FileUtils;
+import mallorcatour.tools.Log;
+
 import com.biotools.meerkat.Action;
 import com.biotools.meerkat.Card;
 import com.biotools.meerkat.GameInfo;
 import com.biotools.meerkat.Player;
 import com.biotools.meerkat.util.Preferences;
-
-import mallorcatour.bot.interfaces.IDecisionListener;
-import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.PokerStreet;
-import mallorcatour.bot.modeller.VillainModel;
-import mallorcatour.tools.DateUtils;
-import mallorcatour.tools.Log;
 
 /**
  *
@@ -102,7 +103,7 @@ public abstract class AbstractPABot implements Player {
     public void stageEvent(int i) {
         toCall = 0;
         Log.f(DEBUG_PATH, "\nSTAGE EVENT: " + PokerStreet.valueOf(i));
-        Log.f(DEBUG_PATH, "BOARD: " + gi.getBoard() + " POT: " + paGameInfo.getMainPotSize() + "\n");
+        Log.f(DEBUG_PATH, "BOARD: " + gi.getBoard() + " POT: " + paGameInfo.getMainPotSize() + FileUtils.LINE_SEPARATOR);
         getRealBot().onStageEvent(PokerStreet.valueOf(i));
     }
 

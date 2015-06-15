@@ -4,17 +4,6 @@
  */
 package mallorcatour.robot.ps;
 
-import mallorcatour.robot.ActionSynchronizer;
-import mallorcatour.robot.ResultListener;
-import mallorcatour.robot.controller.HUGameController;
-
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinDef.RECT;
-import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
-
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -31,17 +20,28 @@ import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.modeller.VillainModel;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.bot.modeller.VillainModel;
+import mallorcatour.robot.ActionSynchronizer;
+import mallorcatour.robot.ResultListener;
+import mallorcatour.robot.controller.HUGameController;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 import mallorcatour.tools.OnExceptionListener;
 import mallorcatour.tools.StringUtils;
 import mallorcatour.tools.ThreadUtils;
 import mallorcatour.util.mp3player.Alarm;
 import mallorcatour.util.robot.ImageUtils;
+
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinDef.RECT;
+import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 
 /**
  *
@@ -363,7 +363,7 @@ public class PSTableDirector {
                 + shortTableName + ".txt";
         VillainModel villainModeller = new VillainModel(limitType, debug);
         IPlayer player = createPlayer(villainModeller, limitType, debug);
-        String heroName = StringUtils.between(fullTableName, LOGGED_IN + " as ", "\n");
+        String heroName = StringUtils.between(fullTableName, LOGGED_IN + " as ", FileUtils.LINE_SEPARATOR);
         IVillainObserver villainObserver = new PSVillainObserver(villainModeller,
                 limitType, fullTableName, heroName, debug);
         HUGameController controller = new HUGameController(player, heroName, debug);

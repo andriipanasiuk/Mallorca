@@ -1,5 +1,6 @@
 package mallorcatour.neural.generator;
 
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.MyFileWriter;
 
 import org.neuroph.core.Layer;
@@ -29,7 +30,7 @@ public class NNWriter {
 				writer.append(", ");
 			}
 			if (i % 10 == 0) {
-				writer.append("\n");
+				writer.append(FileUtils.LINE_SEPARATOR);
 			}
 		}
 		writer.append("};\n");

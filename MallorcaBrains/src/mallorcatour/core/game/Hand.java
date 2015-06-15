@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import mallorcatour.tools.FileUtils;
+
 /**
  * Class that represents poker hand.
  * @author Andrew
@@ -215,7 +217,7 @@ public class Hand implements Serializable {
                 result.append("raises ");
                 result.append(action.getAmount());
             }
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
         }
     }
 
@@ -236,9 +238,9 @@ public class Hand implements Serializable {
             result.append(name);
             if (name.equals(getButtonPlayer())) {
                 result.append(" *");
-                smallBlindString = name + " posts small blind " + getBigBlind() / 2 + "\n";
+                smallBlindString = name + " posts small blind " + getBigBlind() / 2 + FileUtils.LINE_SEPARATOR;
             } else {
-                bigBlindString = name + " posts big blind " + getBigBlind() + "\n";
+                bigBlindString = name + " posts big blind " + getBigBlind() + FileUtils.LINE_SEPARATOR;
             }
             result.append(" ");
             result.append(player.getStack());
@@ -250,29 +252,29 @@ public class Hand implements Serializable {
             if (player.isSittingOut()) {
                 result.append(" is sitting out");
             }
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
         }
-        result.append("\n");
+        result.append(FileUtils.LINE_SEPARATOR);
         //
         result.append(smallBlindString);
         result.append(bigBlindString);
 
         processActions(getPreflopActions(), result);
         if (flop1 != null) {
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
             result.append("FLOP: ");
             result.append(flop1);
             result.append(" ");
             result.append(flop2);
             result.append(" ");
             result.append(flop3);
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
         } else {
             return result.toString();
         }
         processActions(getFlopActions(), result);
         if (turn != null) {
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
             result.append("TURN: ");
             result.append(flop1);
             result.append(" ");
@@ -281,13 +283,13 @@ public class Hand implements Serializable {
             result.append(flop3);
             result.append(" ");
             result.append(turn);
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
         } else {
             return result.toString();
         }
         processActions(getTurnActions(), result);
         if (river != null) {
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
             result.append("RIVER: ");
             result.append(flop1);
             result.append(" ");
@@ -298,7 +300,7 @@ public class Hand implements Serializable {
             result.append(turn);
             result.append(" ");
             result.append(river);
-            result.append("\n");
+            result.append(FileUtils.LINE_SEPARATOR);
         } else {
             return result.toString();
         }

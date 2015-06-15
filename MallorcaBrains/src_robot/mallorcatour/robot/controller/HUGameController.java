@@ -16,6 +16,7 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.robot.ExtPlayerInfo;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.interfaces.IGameController;
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 import mp3player.Mp3Player;
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
@@ -81,13 +82,13 @@ public class HUGameController implements IGameController {
             }
             gameInfo.board = alreadyTakenCards;
             if (boardCards.size() == 3) {
-                Log.f(DEBUG_PATH, "\nFLOP: " + boardCards + " Pot: " + pot + "\n");
+                Log.f(DEBUG_PATH, "\nFLOP: " + boardCards + " Pot: " + pot + FileUtils.LINE_SEPARATOR);
                 player.onStageEvent(PokerStreet.FLOP);
             } else if (boardCards.size() == 4) {
-                Log.f(DEBUG_PATH, "\nTURN: " + boardCards + " Pot: " + pot + "\n");
+                Log.f(DEBUG_PATH, "\nTURN: " + boardCards + " Pot: " + pot + FileUtils.LINE_SEPARATOR);
                 player.onStageEvent(PokerStreet.TURN);
             } else if (boardCards.size() == 5) {
-                Log.f(DEBUG_PATH, "\nRIVER: " + boardCards + " Pot: " + pot + "\n");
+                Log.f(DEBUG_PATH, "\nRIVER: " + boardCards + " Pot: " + pot + FileUtils.LINE_SEPARATOR);
                 player.onStageEvent(PokerStreet.RIVER);
             }
         }
@@ -308,7 +309,7 @@ public class HUGameController implements IGameController {
         gameInfo.raisesOnStreet[PokerStreet.PREFLOP.intValue()] = 1;
         //logging
         Log.f(DEBUG_PATH, "\n<--------------------->");
-        Log.f(DEBUG_PATH, "Hand number: " + handNumber + "\n");
+        Log.f(DEBUG_PATH, "Hand number: " + handNumber + FileUtils.LINE_SEPARATOR);
         String smallBlindLog = "", bigBlindLog = "";
         for (ExtPlayerInfo playerInfo : players) {
             String log;

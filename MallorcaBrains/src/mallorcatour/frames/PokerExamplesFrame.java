@@ -28,6 +28,7 @@ import mallorcatour.neural.core.PokerExamples;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
 import mallorcatour.tools.DoubleUtils;
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.IRandomizer;
 import mallorcatour.tools.MyFileWriter;
 import mallorcatour.tools.SerializatorUtils;
@@ -738,8 +739,8 @@ public class PokerExamplesFrame extends javax.swing.JFrame {
         error = DoubleUtils.digitsAfterComma(error, 3);
         double percentOfSimilarity = DoubleUtils.digitsAfterComma(
                 (double) allCount / testCount, 2);
-        JOptionPane.showMessageDialog(this, "Average error: " + error + "\n"
-                + "Percent of similarity: " + percentOfSimilarity + "\n");
+        JOptionPane.showMessageDialog(this, "Average error: " + error + FileUtils.LINE_SEPARATOR
+                + "Percent of similarity: " + percentOfSimilarity + FileUtils.LINE_SEPARATOR);
     }
     private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
     }//GEN-LAST:event_jMenu2ActionPerformed

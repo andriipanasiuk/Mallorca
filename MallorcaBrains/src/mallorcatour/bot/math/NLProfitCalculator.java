@@ -11,6 +11,7 @@ import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.tools.CollectionUtils;
+import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 
 public class NLProfitCalculator implements IProfitCalculator {
@@ -50,7 +51,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 						gameInfo.onButton(), gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
 				Log.f("Hero's first action on flop " + map.toString());
-				Log.f("\nHero profit: " + profit);
+				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
 				return map;
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionFlop(gameInfo, situation,
@@ -59,7 +60,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 						gameInfo.onButton(), gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
 				Log.f("Flop. Second action. " + map.toString());
-				Log.f("\nHero profit: " + profit);
+				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
 				return map;
 			}
 		} else if (gameInfo.isTurn()) {
@@ -70,7 +71,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 						wasVillainPreviousAggressive, gameInfo.onButton(), gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
 				Log.f("Hero's first action on turn " + map.toString());
-				Log.f("\nHero profit: " + profit);
+				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
 				return map;
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionTurn(gameInfo, situation,
@@ -79,7 +80,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 						strengthManager.turn, gameInfo.onButton(), gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
 				Log.f("Turn. Second action. " + map.toString());
-				Log.f("\nHero profit: " + profit);
+				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
 				return map;
 			}
 		} else if (gameInfo.isRiver()) {
@@ -91,7 +92,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 						gameInfo.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
 				Log.f("Hero's first action on river: " + map.toString());
-				Log.f("\nHero profit: " + profit);
+				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
 				return map;
 			} else {
 				Map<Action, Double> map = gameSolver.onSecondActionRiver(gameInfo, situation, gameInfo
@@ -101,7 +102,7 @@ public class NLProfitCalculator implements IProfitCalculator {
 								.getBigBlindSize());
 				double profit = CollectionUtils.maxValue(map);
 				Log.f("River. Second action: " + map.toString());
-				Log.f("\nHero profit: " + profit);
+				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
 				return map;
 			}
 		} else {

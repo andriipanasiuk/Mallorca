@@ -14,6 +14,7 @@ import java.util.Set;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.tools.FileUtils;
 
 public class Spectrum implements Iterable<HoleCards>, Serializable {
 	/**
@@ -176,7 +177,7 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 			result.append(item.getKey());
 			result.append(": ");
 			result.append(item.getValue());
-			result.append("\n");
+			result.append(FileUtils.LINE_SEPARATOR);
 		}
 		return result.toString();
 	}

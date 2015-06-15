@@ -5,6 +5,7 @@
 package mallorcatour.core.equilator;
 
 import mallorcatour.tools.DoubleUtils;
+import mallorcatour.tools.FileUtils;
 
 /**
  * 
@@ -30,7 +31,7 @@ public class StreetEquity {
 
 	@Override
 	public String toString() {
-		return "Strength: " + strength + "\n" + "Positive: " + positivePotential + "\nNegative: " + negativePotential;
+		return "Strength: " + strength + FileUtils.LINE_SEPARATOR + "Positive: " + positivePotential + "\nNegative: " + negativePotential;
 	}
 
 	public double winWillWin() {
