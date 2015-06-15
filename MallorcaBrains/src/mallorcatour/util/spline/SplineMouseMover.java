@@ -12,9 +12,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import mallorcatour.util.IRandomizer;
-import mallorcatour.util.Log;
-import mallorcatour.util.UniformRandomizer;
+import mallorcatour.tools.IRandomizer;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.UniformRandomizer;
 import mallorcatour.util.robot.RobotUtils;
 import model.SmoothSpline;
 import utils.MathUtils;

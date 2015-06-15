@@ -22,7 +22,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * Class that parses strings given by the engine and stores values for later

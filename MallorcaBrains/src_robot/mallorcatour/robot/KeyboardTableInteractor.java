@@ -11,10 +11,10 @@ import mallorcatour.core.game.Action;
 import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
-import mallorcatour.util.IRandomizer;
-import mallorcatour.util.Log;
-import mallorcatour.util.ThreadUtils;
-import mallorcatour.util.UniformRandomizer;
+import mallorcatour.tools.IRandomizer;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.ThreadUtils;
+import mallorcatour.tools.UniformRandomizer;
 import mallorcatour.util.robot.RobotUtils;
 import mallorcatour.util.spline.SplineMouseMover;
 

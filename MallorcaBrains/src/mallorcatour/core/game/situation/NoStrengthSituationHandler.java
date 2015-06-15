@@ -5,7 +5,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 public class NoStrengthSituationHandler implements ISituationHandler, IGameObserver<IGameInfo> {
 	private int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;

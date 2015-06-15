@@ -16,8 +16,8 @@ import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
 import mallorcatour.core.game.engine.PredefinedGameEngine;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.robot.controller.PokerPreferences;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.Log;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.Log;
 
 public class BotVsBot {
 

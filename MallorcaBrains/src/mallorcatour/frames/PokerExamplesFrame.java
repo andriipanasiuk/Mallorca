@@ -27,12 +27,12 @@ import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.neural.core.PokerExamples;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
-import mallorcatour.util.DoubleUtils;
-import mallorcatour.util.IRandomizer;
-import mallorcatour.util.MyFileWriter;
-import mallorcatour.util.SerializatorUtils;
-import mallorcatour.util.StringUtils;
-import mallorcatour.util.UniformRandomizer;
+import mallorcatour.tools.DoubleUtils;
+import mallorcatour.tools.IRandomizer;
+import mallorcatour.tools.MyFileWriter;
+import mallorcatour.tools.SerializatorUtils;
+import mallorcatour.tools.StringUtils;
+import mallorcatour.tools.UniformRandomizer;
 import mallorcatour.util.frames.FrameUtils;
 
 /**

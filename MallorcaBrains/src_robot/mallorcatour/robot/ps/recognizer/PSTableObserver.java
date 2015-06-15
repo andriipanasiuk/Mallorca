@@ -10,13 +10,14 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinDef.RECT;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
+
 import java.awt.Dimension;
 import java.awt.Point;
 
 import mallorcatour.robot.recognizer.ITableListener;
-import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.Log;
-import mallorcatour.util.OnExceptionListener;
+import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.OnExceptionListener;
 
 /**
  *

@@ -5,7 +5,7 @@
 package mallorcatour.core.game.advice;
 
 import mallorcatour.interfaces.IAdviceInterpreter;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * Default Advice creator.

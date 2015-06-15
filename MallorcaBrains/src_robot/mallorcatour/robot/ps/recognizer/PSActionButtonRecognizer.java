@@ -6,9 +6,10 @@ package mallorcatour.robot.ps.recognizer;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+
 import mallorcatour.interfaces.IDistanceCalculator;
 import mallorcatour.robot.recognizer.ColorDistanceCalculator;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  *

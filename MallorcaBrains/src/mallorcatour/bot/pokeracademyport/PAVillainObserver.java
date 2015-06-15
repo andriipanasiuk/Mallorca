@@ -16,9 +16,9 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
-import mallorcatour.util.Log;
-import mallorcatour.util.Pair;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.Pair;
+import mallorcatour.tools.SerializatorUtils;
 
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;

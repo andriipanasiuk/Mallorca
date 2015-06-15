@@ -4,7 +4,7 @@
  */
 package mallorcatour.core.game.situation;
 
-import mallorcatour.util.Pair;
+import mallorcatour.tools.Pair;
 
 /**
  *

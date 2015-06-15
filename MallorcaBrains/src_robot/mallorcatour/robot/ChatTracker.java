@@ -6,14 +6,15 @@ package mallorcatour.robot;
 
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;
+
 import java.util.concurrent.ExecutorService;
 
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
-import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.OnExceptionListener;
-import mallorcatour.util.ThreadUtils;
+import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.OnExceptionListener;
+import mallorcatour.tools.ThreadUtils;
 import mallorcatour.util.mp3player.Alarm;
 import mp3player.Mp3Player;
 

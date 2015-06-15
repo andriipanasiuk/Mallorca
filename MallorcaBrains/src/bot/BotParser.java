@@ -22,7 +22,7 @@ import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.GameInfo;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * Class that reads the engine's input and asks the bot Class to calculate the

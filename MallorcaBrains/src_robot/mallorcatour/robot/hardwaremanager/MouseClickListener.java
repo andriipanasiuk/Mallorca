@@ -7,8 +7,10 @@ package mallorcatour.robot.hardwaremanager;
 import br.com.wagnerpaz.javahook.NativeMouseEvent;
 import br.com.wagnerpaz.javahook.NativeMouseListener;
 import br.com.wagnerpaz.javahook.NativeMouseWheelEvent;
+
 import java.awt.Point;
-import mallorcatour.util.Log;
+
+import mallorcatour.tools.Log;
 
 /**
  *

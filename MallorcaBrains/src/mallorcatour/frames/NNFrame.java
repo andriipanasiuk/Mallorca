@@ -37,13 +37,13 @@ import mallorcatour.neural.core.LearningExample;
 import mallorcatour.neural.generator.NNWriter;
 import mallorcatour.neural.manager.LEManager;
 import mallorcatour.neural.manager.NNManager;
-import mallorcatour.util.DoubleUtils;
-import mallorcatour.util.IRandomizer;
-import mallorcatour.util.Log;
-import mallorcatour.util.MyFileWriter;
-import mallorcatour.util.ReaderUtils;
-import mallorcatour.util.StringUtils;
-import mallorcatour.util.UniformRandomizer;
+import mallorcatour.tools.DoubleUtils;
+import mallorcatour.tools.IRandomizer;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.MyFileWriter;
+import mallorcatour.tools.ReaderUtils;
+import mallorcatour.tools.StringUtils;
+import mallorcatour.tools.UniformRandomizer;
 import mallorcatour.util.frames.FrameUtils;
 
 import org.neuroph.core.NeuralNetwork;
@@ -1650,7 +1650,7 @@ public class NNFrame extends javax.swing.JFrame {
         learningExamples = new ArrayList<>();
         int input = Integer.parseInt(JOptionPane.showInputDialog("Input size"));
         BufferedReader reader = ReaderUtils.initReader(path);
-        String buffer = ReaderUtils.readLine(reader);
+        String buffer = ReaderUtils.readLineFrom(reader);
 
         String[] stringValues = buffer.split(",");
         double[] values = new double[stringValues.length];

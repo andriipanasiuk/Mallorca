@@ -24,11 +24,11 @@ import mallorcatour.hhparser.core.BaseHandHandler;
 import mallorcatour.hhparser.core.HandManager;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
-import mallorcatour.util.Log;
-import mallorcatour.util.Pair;
-import mallorcatour.util.ReaderUtils;
-import mallorcatour.util.SerializatorUtils;
-import mallorcatour.util.StringUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.Pair;
+import mallorcatour.tools.ReaderUtils;
+import mallorcatour.tools.SerializatorUtils;
+import mallorcatour.tools.StringUtils;
 
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;

@@ -8,8 +8,9 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import mallorcatour.util.Log;
-import mallorcatour.util.MyFileWriter;
+
+import mallorcatour.tools.Log;
+import mallorcatour.tools.MyFileWriter;
 
 /**
  *

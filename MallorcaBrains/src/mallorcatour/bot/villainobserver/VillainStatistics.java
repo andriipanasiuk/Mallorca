@@ -10,7 +10,8 @@ import java.util.List;
 
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.util.Pair;
+import mallorcatour.tools.Pair;
+
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.nnet.MultiLayerPerceptron;
 

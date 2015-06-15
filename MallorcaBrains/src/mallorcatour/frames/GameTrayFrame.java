@@ -34,7 +34,7 @@ import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.robot.ManageKeySettings;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.ps.PSTableDirector;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;
 import fellomen.bot.FellOmenFactory;

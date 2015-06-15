@@ -12,6 +12,7 @@ package mallorcatour.windowfinder;
 
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -23,7 +24,7 @@ import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.ps.recognizer.PSTableObserver;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.robot.recognizer.ITableListener;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 import mallorcatour.util.mp3player.Alarm;
 
 /**

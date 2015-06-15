@@ -7,8 +7,8 @@ package mallorcatour.robot.hardwaremanager;
 import br.com.wagnerpaz.javahook.NativeMouseEvent;
 import br.com.wagnerpaz.javahook.NativeMouseListener;
 import br.com.wagnerpaz.javahook.NativeMouseWheelEvent;
-import mallorcatour.util.Log;
-import mallorcatour.util.ThreadUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.ThreadUtils;
 
 /**
  *

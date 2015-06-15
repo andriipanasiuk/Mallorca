@@ -18,8 +18,8 @@ import mallorcatour.core.game.Card;
 import mallorcatour.robot.ps.recognizer.PSCardRecognizer;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.robot.recognizer.assets.MinSizeCardAssets;
-import mallorcatour.util.Log;
-import mallorcatour.util.ReaderUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.ReaderUtils;
 import mallorcatour.util.frames.FrameUtils;
 import mallorcatour.util.robot.ImageUtils;
 
@@ -174,7 +174,7 @@ public class PSTestFrame extends javax.swing.JFrame {
             BufferedReader reader = ReaderUtils.initReader(path);
             String buf;
             int line = 0;
-            while ((buf = ReaderUtils.readLine(reader)) != null) {
+            while ((buf = ReaderUtils.readLineFrom(reader)) != null) {
                 line++;
                 if (buf.contains("quart")) {
                     Log.d("Needed file: " + path);

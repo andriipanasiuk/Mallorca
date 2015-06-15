@@ -8,9 +8,11 @@ import br.com.wagnerpaz.javahook.HookManager;
 import br.com.wagnerpaz.javahook.NativeMouseEvent;
 import br.com.wagnerpaz.javahook.NativeMouseListener;
 import br.com.wagnerpaz.javahook.NativeMouseWheelEvent;
+
 import java.util.ArrayList;
 import java.util.List;
-import mallorcatour.util.Log;
+
+import mallorcatour.tools.Log;
 
 /**
  *

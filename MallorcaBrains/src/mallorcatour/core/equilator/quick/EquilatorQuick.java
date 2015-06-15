@@ -3,7 +3,7 @@ package mallorcatour.core.equilator.quick;
 import static mallorcatour.core.equilator.PokerEquilatorBrecher.LOGGING;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 public class EquilatorQuick {
 

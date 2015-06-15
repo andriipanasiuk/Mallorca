@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mallorcatour.robot.recognizer.OnMyActionListener;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.ThreadUtils;
 import mallorcatour.util.robot.ImageUtils;
 import mallorcatour.util.robot.RecognizerUtils;
 import mallorcatour.util.robot.ImageUtils.SearchedImage;
-import mallorcatour.util.Log;
-import mallorcatour.util.ThreadUtils;
 
 /**
  *

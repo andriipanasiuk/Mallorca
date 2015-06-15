@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 public class DoubleUtils {
 	private static final double TEN = 10.0D;

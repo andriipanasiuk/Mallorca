@@ -7,8 +7,8 @@ package mallorcatour.robot.humanadvisor;
 import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.OnExceptionListener;
+import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.OnExceptionListener;
 
 /**
  *

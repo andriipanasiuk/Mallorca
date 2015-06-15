@@ -5,7 +5,8 @@
 package mallorcatour.bot.pokeracademyport;
 
 import com.biotools.meerkat.Action;
-import mallorcatour.util.Log;
+
+import mallorcatour.tools.Log;
 
 /**
  *

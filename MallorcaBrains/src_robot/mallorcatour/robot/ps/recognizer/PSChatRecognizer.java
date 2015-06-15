@@ -6,7 +6,8 @@ package mallorcatour.robot.ps.recognizer;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import mallorcatour.util.Log;
+
+import mallorcatour.tools.Log;
 
 /**
  *

@@ -2,7 +2,7 @@ package mallorcatour.core.equilator.quick;
 
 import static mallorcatour.core.equilator.PokerEquilatorBrecher.combination;
 import static mallorcatour.core.equilator.PokerEquilatorBrecher.encode;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 public class FlopCombinations {
 

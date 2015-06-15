@@ -29,7 +29,7 @@ import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 //import com.ibot.HandPotential;
 /** 

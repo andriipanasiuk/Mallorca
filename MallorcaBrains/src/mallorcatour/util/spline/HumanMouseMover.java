@@ -8,9 +8,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
 
-import mallorcatour.util.IRandomizer;
-import mallorcatour.util.ThreadUtils;
-import mallorcatour.util.UniformRandomizer;
+import mallorcatour.tools.IRandomizer;
+import mallorcatour.tools.ThreadUtils;
+import mallorcatour.tools.UniformRandomizer;
 
 /**
  *

@@ -17,9 +17,9 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.hhparser.core.IHandHandler;
 import mallorcatour.hhparser.core.ITournamentHandler;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.ReaderUtils;
-import mallorcatour.util.StringUtils;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.ReaderUtils;
+import mallorcatour.tools.StringUtils;
 
 /**
  *
@@ -51,7 +51,7 @@ public class PAHHParser {
         String winnerName = null;
         BufferedReader reader = ReaderUtils.initReader(filename);
 
-        String buffer = ReaderUtils.readLine(reader);
+        String buffer = ReaderUtils.readLineFrom(reader);
         while (buffer != null) {
             // tournament start
             if (buffer.contains(TOURNAMENT_SUMMARY)) {
@@ -66,7 +66,7 @@ public class PAHHParser {
                 processHandParsing(buffer, handler, reader);
             }
             // new line reading
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
         handler.onTournamentEnd(winnerName);
     }
@@ -108,12 +108,12 @@ public class PAHHParser {
     public static void parseHandHistory(String filename, IHandHandler handler) {
         BufferedReader reader = ReaderUtils.initReader(filename);
 
-        String buffer = ReaderUtils.readLine(reader);
+        String buffer = ReaderUtils.readLineFrom(reader);
         while (buffer != null) {
             // new hand
             processHandParsing(buffer, handler, reader);
             // new line reading
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
     }
 
@@ -148,7 +148,7 @@ public class PAHHParser {
         int playerCount = 0;
         String description = null;
         Date startingDate = null;
-        String buffer = ReaderUtils.readLine(reader);
+        String buffer = ReaderUtils.readLineFrom(reader);
         while (!buffer.startsWith(END_HAND)) {
             if (buffer.startsWith(START)) {
                 startingDate = DateUtils.parsePADate(buffer.substring(START.length(), buffer.indexOf("EE") - 2));
@@ -157,7 +157,7 @@ public class PAHHParser {
             } else if (buffer.startsWith(NUMBER_OF_PLAYERS)) {
                 playerCount = Integer.parseInt(buffer.substring(NUMBER_OF_PLAYERS.length()));
             }
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
         handler.onTournamentStart(startingDate, playerCount, description);
     }
@@ -171,7 +171,7 @@ public class PAHHParser {
 
         long id = Long.parseLong(StringUtils.between(buffer, "#", " ").replaceAll(",", ""));
         // blinds and limitType parsing
-        buffer = ReaderUtils.readLine(reader);
+        buffer = ReaderUtils.readLineFrom(reader);
         if (buffer.contains(NO_LIMIT)) {
             limitType = LimitType.NO_LIMIT;
             smallBlind = Double.parseDouble(StringUtils.between(buffer, "($", "/"));
@@ -184,12 +184,12 @@ public class PAHHParser {
 
         // startingDate parsing
         ReaderUtils.skipLines(reader, 1);
-        buffer = ReaderUtils.readLine(reader);
+        buffer = ReaderUtils.readLineFrom(reader);
         startingDate = DateUtils.parsePADate(StringUtils.between(buffer, 0, " (EE"));
 
         //player infos parsing
         ReaderUtils.skipLines(reader, 1);
-        buffer = ReaderUtils.readLine(reader);
+        buffer = ReaderUtils.readLineFrom(reader);
         while (!buffer.equals("")) {
             String name = parseName(buffer);
             if (buffer.contains("*")) {
@@ -198,7 +198,7 @@ public class PAHHParser {
             int stack = parseNumber(buffer);
             HoleCards cards = parseHoleCards(buffer);
             players.add(new OpenPlayerInfo(name, stack, cards.first, cards.second));
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
         handler.onHandStarted(id, startingDate, players, playerOnButton, smallBlind,
                 bigBlind, limitType);

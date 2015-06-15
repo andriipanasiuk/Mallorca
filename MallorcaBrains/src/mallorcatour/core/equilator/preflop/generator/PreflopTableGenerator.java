@@ -6,9 +6,9 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Card.Suit;
 import mallorcatour.core.game.Card.Value;
 import mallorcatour.core.game.HoleCards;
-import mallorcatour.util.DoubleUtils;
-import mallorcatour.util.Log;
-import mallorcatour.util.MyFileWriter;
+import mallorcatour.tools.DoubleUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.MyFileWriter;
 
 public class PreflopTableGenerator {
 

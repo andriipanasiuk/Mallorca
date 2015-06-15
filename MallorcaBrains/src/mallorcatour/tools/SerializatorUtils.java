@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -8,7 +8,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import mallorcatour.util.ReaderUtils;
+
+import mallorcatour.tools.ReaderUtils;
 import mallorcatour.util.robot.ImageUtils;
 
 /**
@@ -21,7 +22,7 @@ public class MouseLogProcessor {
         BufferedImage image = new BufferedImage(1200, 800, BufferedImage.TYPE_INT_RGB);
         ImageUtils.fillByColor(image, Color.WHITE.getRGB());
         BufferedReader reader = ReaderUtils.initReader(pathToLog);
-        String buffer = ReaderUtils.readLine(reader);
+        String buffer = ReaderUtils.readLineFrom(reader);
         Point point = null;
         while (buffer != null) {
             if (buffer.equals("")) {
@@ -35,7 +36,7 @@ public class MouseLogProcessor {
                     int i = 0 + 2;
                 }
             }
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
         ImageUtils.toFile(image, pathToImage, false);
     }

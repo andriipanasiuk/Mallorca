@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.util;
+package mallorcatour.tools;
 
 import java.util.Random;
 

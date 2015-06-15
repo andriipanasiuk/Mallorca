@@ -2,10 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.util;
+package mallorcatour.util.code;
 
 import java.io.BufferedReader;
 import java.io.File;
+
+import mallorcatour.tools.Log;
+import mallorcatour.tools.ReaderUtils;
 
 /**
  *
@@ -32,7 +35,7 @@ public class CodeLineCounter {
     private static int calculateCodeLinesInFile(String path) {
         int result = 0;
         BufferedReader reader = ReaderUtils.initReader(path);
-        while (ReaderUtils.readLine(reader) != null) {
+        while (ReaderUtils.readLineFrom(reader) != null) {
             result++;
         }
         return result;

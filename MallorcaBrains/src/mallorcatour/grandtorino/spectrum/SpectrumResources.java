@@ -6,9 +6,9 @@
 /*    */ import java.util.Map.Entry;
 
 import mallorcatour.core.spectrum.Spectrum;
-/*    */ import mallorcatour.util.Log;
-/*    */ import mallorcatour.util.SerializatorUtils;
-/*    */ import mallorcatour.util.StringUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.SerializatorUtils;
+import mallorcatour.tools.StringUtils;
 /*    */ 
 /*    */ public class SpectrumResources
 /*    */ {

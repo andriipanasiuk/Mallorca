@@ -15,9 +15,9 @@ import mallorcatour.core.equilator.quick.FlopCombinations;
 import mallorcatour.core.equilator.spears.PokerEquilatorSpears;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
-import mallorcatour.util.ArrayUtils;
-import mallorcatour.util.CollectionUtils;
-import mallorcatour.util.Log;
+import mallorcatour.tools.ArrayUtils;
+import mallorcatour.tools.CollectionUtils;
+import mallorcatour.tools.Log;
 
 /**
  * 

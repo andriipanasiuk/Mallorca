@@ -20,7 +20,7 @@ import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.NoStrengthSituationHandler;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * Helper player that tracks spectrum of hero or villain during the round.

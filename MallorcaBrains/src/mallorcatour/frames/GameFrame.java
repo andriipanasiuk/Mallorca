@@ -28,11 +28,11 @@ import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.robot.controller.PokerPreferences;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.Log;
-import mallorcatour.util.OnExceptionListener;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.OnExceptionListener;
+import mallorcatour.tools.SerializatorUtils;
 import mallorcatour.util.frames.FrameUtils;
 
 /**

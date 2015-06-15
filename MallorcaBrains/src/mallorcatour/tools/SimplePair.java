@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 public class SimplePair<F, S>{
 	public F first;

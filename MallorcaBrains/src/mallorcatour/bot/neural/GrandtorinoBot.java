@@ -14,7 +14,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorUtils;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * This bot currently does not use global parameters.

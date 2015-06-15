@@ -11,6 +11,7 @@
 package mallorcatour.frames;
 
 import java.io.File;
+
 import javax.swing.DefaultListModel;
 
 import mallorcatour.bot.villainobserver.VillainStatistics;
@@ -18,9 +19,9 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorInterpreter;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.util.DoubleUtils;
-import mallorcatour.util.Log;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.DoubleUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.SerializatorUtils;
 import mallorcatour.util.frames.FrameUtils;
 
 /**

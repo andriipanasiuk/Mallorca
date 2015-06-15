@@ -20,8 +20,8 @@ import mallorcatour.core.game.situation.LocalSituationDistance;
 import mallorcatour.neural.core.PokerExamples;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
-import mallorcatour.util.Log;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.SerializatorUtils;
 
 public class SimilarSituationAdvisor extends NeuralAdvisor {
 	private final ISituationData situationData;

@@ -37,13 +37,13 @@ import mallorcatour.hhparser.situationhandler.PotSituationHandler;
 import mallorcatour.hhparser.situationhandler.ProfitSituationHandler;
 import mallorcatour.neural.core.PokerExamples;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.Log;
-import mallorcatour.util.OnExceptionListener;
-import mallorcatour.util.Pair;
-import mallorcatour.util.ReaderUtils;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.OnExceptionListener;
+import mallorcatour.tools.Pair;
+import mallorcatour.tools.ReaderUtils;
+import mallorcatour.tools.SerializatorUtils;
 import mallorcatour.util.frames.FrameUtils;
 
 /**
@@ -364,7 +364,7 @@ public class HHParserFrame extends javax.swing.JFrame {
             double profit = 0;
             int count = 0;
             int line = 0;
-            while ((buffer = ReaderUtils.readLine(reader)) != null) {
+            while ((buffer = ReaderUtils.readLineFrom(reader)) != null) {
                 line++;
                 if (buffer.contains("Map<Action, Profit>")) {
                     profit += findProfit(path, buffer, line);

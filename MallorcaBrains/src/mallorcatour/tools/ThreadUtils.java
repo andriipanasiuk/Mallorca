@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 public class ThreadUtils {
 	public static void sleep(long millis) {

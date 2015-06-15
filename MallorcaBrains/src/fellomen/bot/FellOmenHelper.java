@@ -14,7 +14,7 @@ import java.util.jar.JarFile;
 
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Card;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  *

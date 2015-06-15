@@ -4,7 +4,7 @@
  */
 package mallorcatour.core.equilator;
 
-import mallorcatour.util.DoubleUtils;
+import mallorcatour.tools.DoubleUtils;
 
 /**
  * 

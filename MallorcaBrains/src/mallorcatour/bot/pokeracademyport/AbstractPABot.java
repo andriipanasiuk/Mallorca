@@ -15,8 +15,8 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.bot.modeller.VillainModel;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.Log;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.Log;
 
 /**
  *

@@ -7,7 +7,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * This bot currently does not use global parameters.

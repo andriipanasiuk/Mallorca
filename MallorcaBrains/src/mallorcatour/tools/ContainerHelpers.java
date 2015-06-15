@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 /*
  * Copyright (C) 2013 The Android Open Source Project

@@ -12,7 +12,7 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * @author andriipanasiuk

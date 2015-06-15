@@ -16,9 +16,9 @@ import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.Log;
-import mallorcatour.util.MyFileWriter;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.MyFileWriter;
 
 /**
  *

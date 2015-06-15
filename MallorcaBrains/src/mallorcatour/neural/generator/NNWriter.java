@@ -1,6 +1,6 @@
 package mallorcatour.neural.generator;
 
-import mallorcatour.util.MyFileWriter;
+import mallorcatour.tools.MyFileWriter;
 
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;

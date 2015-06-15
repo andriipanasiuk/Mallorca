@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -21,12 +21,12 @@ public class DateUtils {
 		return result;
 	}
 
-	public static Date parsePADate(String date) {
-		date = preprocessDate(date);
-		SimpleDateFormat format = new SimpleDateFormat("M dd, yyyy - HH:mm:ss");
+	public static Date parsePADate(String dateStr) {
+		dateStr = preprocessDate(dateStr);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("M dd, yyyy - HH:mm:ss");
 		Date result = null;
 		try {
-			result = format.parse(date);
+			result = dateFormat.parse(dateStr);
 		} catch (ParseException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -55,11 +55,11 @@ public class DateUtils {
 		return result;
 	}
 
-	public static Date parseDate(String date, String dateFormat) {
+	public static Date parseDate(String dateStr, String dateFormat) {
 		SimpleDateFormat format = new SimpleDateFormat(dateFormat);
 		Date result = null;
 		try {
-			result = format.parse(date);
+			result = format.parse(dateStr);
 		} catch (ParseException ex) {
 			throw new RuntimeException(ex);
 		}

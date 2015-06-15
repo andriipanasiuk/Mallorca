@@ -14,7 +14,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.Card.Suit;
 import mallorcatour.core.game.Card.Value;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 import mallorcatour.util.robot.ImageUtils;
 import mallorcatour.util.robot.RecognizerUtils;
 

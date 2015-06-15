@@ -7,12 +7,14 @@ package mallorcatour.robot.hardwaremanager;
 import br.com.wagnerpaz.javahook.HookManager;
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mallorcatour.util.Log;
+
+import mallorcatour.tools.Log;
 
 /**
  *

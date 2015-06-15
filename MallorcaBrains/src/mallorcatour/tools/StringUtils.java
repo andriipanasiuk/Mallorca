@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 public class StringUtils {
 	public static String between(String find, String string1, String string2) {

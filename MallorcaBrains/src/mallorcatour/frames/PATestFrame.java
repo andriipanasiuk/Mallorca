@@ -11,7 +11,7 @@
 package mallorcatour.frames;
 
 import mallorcatour.robot.pa.recognizer.PATableRecognizer;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  *

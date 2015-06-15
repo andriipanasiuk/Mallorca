@@ -9,8 +9,8 @@ import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.ArrayUtils;
-import mallorcatour.util.Log;
+import mallorcatour.tools.ArrayUtils;
+import mallorcatour.tools.Log;
 
 import com.stevebrecher.HandEval;
 

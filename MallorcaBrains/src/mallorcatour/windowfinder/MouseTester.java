@@ -6,19 +6,21 @@ package mallorcatour.windowfinder;
 
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;
+
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
+
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 
 import mallorcatour.robot.ActionSynchronizer;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
-import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.Log;
-import mallorcatour.util.OnExceptionListener;
-import mallorcatour.util.ReaderUtils;
-import mallorcatour.util.ThreadUtils;
+import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.OnExceptionListener;
+import mallorcatour.tools.ReaderUtils;
+import mallorcatour.tools.ThreadUtils;
 import mallorcatour.util.robot.RobotUtils;
 import mallorcatour.util.spline.SplineMouseMover;
 
@@ -81,7 +83,7 @@ public class MouseTester implements WNDENUMPROC {
                         BufferedReader reader = ReaderUtils.initReader(filename);
                         Log.d("Middle of logic " + index);
                         String buffer;
-                        while ((buffer = ReaderUtils.readLine(reader)) != null) {
+                        while ((buffer = ReaderUtils.readLineFrom(reader)) != null) {
                         }
                         Log.d("End of logic " + index);
                         ActionSynchronizer.endOfLogic();

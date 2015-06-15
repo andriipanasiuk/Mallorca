@@ -7,10 +7,11 @@ package mallorcatour.windowfinder;
 
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;
+
 import java.awt.event.KeyEvent;
 
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  *

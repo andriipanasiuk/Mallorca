@@ -13,7 +13,7 @@ import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.hhparser.core.ITournamentHandler;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  *

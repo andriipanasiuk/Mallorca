@@ -17,9 +17,9 @@ import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.hhparser.core.IHandHandler;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.ReaderUtils;
-import mallorcatour.util.StringUtils;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.ReaderUtils;
+import mallorcatour.tools.StringUtils;
 
 /**
  *
@@ -120,12 +120,12 @@ public class PSHHParser {
     public static void parseHandHistory(String filename, IHandHandler handler) {
         BufferedReader reader = ReaderUtils.initReader(filename);
 
-        String buffer = ReaderUtils.readLine(reader);
+        String buffer = ReaderUtils.readLineFrom(reader);
         while (buffer != null) {
             // new hand
             processHandParsing(buffer, handler, reader);
             // new line reading
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
     }
 
@@ -213,11 +213,11 @@ public class PSHHParser {
         }
 
         //button seat parsing
-        buffer = ReaderUtils.readLine(reader);
+        buffer = ReaderUtils.readLineFrom(reader);
         int buttonSeatNumber = Integer.parseInt(StringUtils.between(buffer, "Seat #", " "));
 
         //player infos parsing
-        buffer = ReaderUtils.readLine(reader);
+        buffer = ReaderUtils.readLineFrom(reader);
         while (buffer.startsWith("Seat ")) {
             Matcher matcher = PLAYER_INFO_PATTERN.matcher(buffer);
             if (matcher.find()) {
@@ -232,12 +232,12 @@ public class PSHHParser {
             } else {
                 throw new RuntimeException();
             }
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
         while (!buffer.contains(HOLE_CARDS)) {
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
-        buffer = ReaderUtils.readLine(reader);
+        buffer = ReaderUtils.readLineFrom(reader);
         m = HOLE_CARDS_PATTERN.matcher(buffer);
         if (m.find()) {
             String heroName = m.group(1);

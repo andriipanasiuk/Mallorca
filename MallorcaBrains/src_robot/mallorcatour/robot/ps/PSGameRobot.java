@@ -29,11 +29,11 @@ import mallorcatour.robot.interfaces.IGameController;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
 import mallorcatour.robot.recognizer.ITableListener;
-import mallorcatour.util.ExecutorUtils;
-import mallorcatour.util.IRectangleHolder;
-import mallorcatour.util.Log;
-import mallorcatour.util.OnExceptionListener;
-import mallorcatour.util.ThreadUtils;
+import mallorcatour.tools.ExecutorUtils;
+import mallorcatour.tools.IRectangleHolder;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.OnExceptionListener;
+import mallorcatour.tools.ThreadUtils;
 import mallorcatour.util.robot.RecognizerUtils;
 
 /**

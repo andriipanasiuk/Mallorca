@@ -14,7 +14,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * 

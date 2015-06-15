@@ -4,7 +4,7 @@
  */
 package mallorcatour.util.mp3player;
 
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 import mp3player.Mp3Player;
 
 /**

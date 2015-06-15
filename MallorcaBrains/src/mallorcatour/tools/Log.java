@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 public class Log {
 	public static boolean WRITE_TO_ERR = false;

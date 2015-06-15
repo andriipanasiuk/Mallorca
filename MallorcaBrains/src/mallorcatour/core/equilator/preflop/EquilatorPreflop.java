@@ -1,12 +1,13 @@
 package mallorcatour.core.equilator.preflop;
 
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.Log;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.SerializatorUtils;
 
 public class EquilatorPreflop {
 
@@ -134,6 +135,9 @@ public class EquilatorPreflop {
 			double frequency = villainSpectrum.getWeight(villainHoleCards);
 			wins += strength * frequency;
 			count += frequency;
+		}
+		if (PokerEquilatorBrecher.LOGGING) {
+			Log.d("Calculated vs " + log + " villain cards");
 		}
 		return ((double) wins) / count;
 	}

@@ -14,7 +14,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  * 

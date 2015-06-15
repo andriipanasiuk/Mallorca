@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 public class ArrayUtils {
 	public static int[] removeAll(int[] array, int elementToRemove) {

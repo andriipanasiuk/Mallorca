@@ -24,8 +24,8 @@ import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.CollectionUtils;
-import mallorcatour.util.Log;
+import mallorcatour.tools.CollectionUtils;
+import mallorcatour.tools.Log;
 
 /**
  * 

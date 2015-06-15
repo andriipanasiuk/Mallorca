@@ -5,8 +5,8 @@
 package mallorcatour.robot.pa;
 
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.FileUtils;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.FileUtils;
 
 /**
  *

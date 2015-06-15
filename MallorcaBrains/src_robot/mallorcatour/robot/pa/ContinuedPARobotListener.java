@@ -4,7 +4,7 @@
  */
 package mallorcatour.robot.pa;
 
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 /**
  *

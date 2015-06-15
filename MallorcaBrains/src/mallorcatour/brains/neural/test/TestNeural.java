@@ -10,7 +10,7 @@ import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.VectorInterpreter;
 import mallorcatour.neural.core.NeuralCreator;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 import org.neuroph.core.NeuralNetwork;
 

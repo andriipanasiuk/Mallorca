@@ -6,8 +6,9 @@ package mallorcatour.core.vector;
 
 import java.util.Comparator;
 import java.util.List;
+
 import mallorcatour.interfaces.IDistanceCalculator;
-import mallorcatour.util.DoubleUtils;
+import mallorcatour.tools.DoubleUtils;
 
 /**
  *

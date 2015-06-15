@@ -15,7 +15,7 @@ import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.ISituationHandler;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.util.Pair;
+import mallorcatour.tools.Pair;
 
 /**
  *

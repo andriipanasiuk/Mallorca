@@ -6,8 +6,8 @@ package mallorcatour.core.game.situation;
 
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.util.DateUtils;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.DateUtils;
+import mallorcatour.tools.SerializatorUtils;
 
 /**
  *

@@ -9,7 +9,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.util.SimplePair;
+import mallorcatour.tools.SimplePair;
 
 public class PredefinedGameEngine extends GameEngine {
 

@@ -16,7 +16,7 @@ import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.LocalSituationInterpreter;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 
 import org.neuroph.core.NeuralNetwork;
 

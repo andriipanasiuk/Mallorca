@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 public abstract interface OnExceptionListener {
 	public static final OnExceptionListener EMPTY = new OnExceptionListener() {

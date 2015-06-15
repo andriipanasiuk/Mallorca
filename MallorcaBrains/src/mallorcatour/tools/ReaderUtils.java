@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -13,17 +13,17 @@ public class ReaderUtils {
 	public static List<String> readLines(BufferedReader reader, int lineCount) {
 		List<String> result = new ArrayList<>();
 		for (int i = 0; i < lineCount; i++) {
-			result.add(readLine(reader));
+			result.add(readLineFrom(reader));
 		}
 		return result;
 	}
 
 	public static void skipLines(BufferedReader reader, int lineCount) {
 		for (int i = 0; i < lineCount; i++)
-			readLine(reader);
+			readLineFrom(reader);
 	}
 
-	public static String readLine(BufferedReader reader) {
+	public static String readLineFrom(BufferedReader reader) {
 		String result = null;
 		try {
 			result = reader.readLine();

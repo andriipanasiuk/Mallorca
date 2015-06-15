@@ -12,7 +12,7 @@ package mallorcatour.frames;
 
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.grandtorino.spectrum.CardSpectrumsParsing;
-import mallorcatour.util.SerializatorUtils;
+import mallorcatour.tools.SerializatorUtils;
 import mallorcatour.util.frames.FrameUtils;
 
 /**

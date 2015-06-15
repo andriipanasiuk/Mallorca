@@ -9,10 +9,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.lang.management.ManagementFactory;
+
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import mallorcatour.util.Log;
-import mallorcatour.util.ThreadUtils;
+
+import mallorcatour.tools.Log;
+import mallorcatour.tools.ThreadUtils;
 
 /**
  *

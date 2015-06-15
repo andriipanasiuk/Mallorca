@@ -16,7 +16,7 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.robot.ExtPlayerInfo;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.interfaces.IGameController;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 import mp3player.Mp3Player;
 import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
 import br.com.wagnerpaz.javahook.NativeKeyboardListener;

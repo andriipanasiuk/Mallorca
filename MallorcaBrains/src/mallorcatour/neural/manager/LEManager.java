@@ -16,9 +16,9 @@ import mallorcatour.interfaces.IDistanceCalculator;
 import mallorcatour.interfaces.IInputInterpreter;
 import mallorcatour.neural.core.ILearningExample;
 import mallorcatour.neural.core.LearningExample;
-import mallorcatour.util.Log;
-import mallorcatour.util.MyFileWriter;
-import mallorcatour.util.ReaderUtils;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.MyFileWriter;
+import mallorcatour.tools.ReaderUtils;
 
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -78,7 +78,7 @@ public class LEManager {
     public static List<LearningExample> readLearningExamples(String filename) {
         List<LearningExample> result = new ArrayList<LearningExample>();
         BufferedReader reader = ReaderUtils.initReader(filename);
-        String buffer = ReaderUtils.readLine(reader);
+        String buffer = ReaderUtils.readLineFrom(reader);
         while (buffer != null) {
 			if (!buffer.isEmpty()) {
 				try {
@@ -87,7 +87,7 @@ public class LEManager {
 					Log.d("Invalid row in file with examples");
 				}
 			}
-            buffer = ReaderUtils.readLine(reader);
+            buffer = ReaderUtils.readLineFrom(reader);
         }
         return result;
     }

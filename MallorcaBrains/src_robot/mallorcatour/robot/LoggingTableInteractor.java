@@ -7,7 +7,7 @@ package mallorcatour.robot;
 import mallorcatour.core.game.Action;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
-import mallorcatour.util.Log;
+import mallorcatour.tools.Log;
 import mallorcatour.util.robot.RobotUtils;
 
 /**

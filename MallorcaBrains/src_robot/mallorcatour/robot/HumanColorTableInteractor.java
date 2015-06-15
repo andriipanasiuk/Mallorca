@@ -5,6 +5,7 @@
 package mallorcatour.robot;
 
 import br.com.wagnerpaz.javahook.NativeMouseEvent;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -17,9 +18,9 @@ import mallorcatour.robot.hardwaremanager.MouseClickListener;
 import mallorcatour.robot.hardwaremanager.MouseHookManager;
 import mallorcatour.robot.interfaces.IGameRobot;
 import mallorcatour.robot.ps.recognizer.PSTableRecognizer;
-import mallorcatour.util.IRectangleHolder;
-import mallorcatour.util.Log;
-import mallorcatour.util.ThreadUtils;
+import mallorcatour.tools.IRectangleHolder;
+import mallorcatour.tools.Log;
+import mallorcatour.tools.ThreadUtils;
 import mallorcatour.util.robot.RecognizerUtils;
 
 /**

@@ -1,4 +1,4 @@
-package mallorcatour.util;
+package mallorcatour.tools;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class FileUtils {
 			throw new IllegalArgumentException("You need prepare file to writing first!");
 		try {
 			if (toNewLine)
-				fileWriter.append("\n" + addString);
+				fileWriter.append(FileUtils.LINE_SEPARATOR + addString);
 			else
 				fileWriter.append(addString);
 		} catch (IOException ex) {
@@ -34,4 +34,6 @@ public class FileUtils {
 			throw new RuntimeException(ex);
 		}
 	}
+
+	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 }

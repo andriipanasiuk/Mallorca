@@ -13,7 +13,8 @@ import mallorcatour.interfaces.IOutputInterpreter;
 import mallorcatour.neural.core.ILearningExample;
 import mallorcatour.neural.core.LearningExample;
 import mallorcatour.neural.core.VectorCreator;
-import mallorcatour.util.MyFileWriter;
+import mallorcatour.tools.MyFileWriter;
+
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.nnet.Kohonen;
