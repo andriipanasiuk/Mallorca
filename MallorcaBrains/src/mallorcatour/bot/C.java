@@ -18,7 +18,8 @@ public class C {
 	public static final String POST = "po" + "st";
 	public static final String STACK = "sta" + "ck";
 	public static final String WINS = "wi" + "ns";
-	public static final String TABLE = "ta" + "ble";
+	public static final String TABLE = "Ta" + "ble";
+	public static final String TABLE_AIGAMES = "ta" + "ble";
 	public static final String FOLD = "fo" + "ld";
 	public static final String CALL = "ca" + "ll";
 	public static final String CHECK = "che" + "ck";

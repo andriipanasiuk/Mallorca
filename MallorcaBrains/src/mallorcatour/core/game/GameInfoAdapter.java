@@ -17,6 +17,10 @@ public abstract class GameInfoAdapter implements IPlayerGameInfo {
 	public boolean onButton;
 	private double[] potOnStreet = new double[4];
 
+	public GameInfoAdapter() {
+		resetStreetPots();
+	}
+
 	public void resetStreetPots() {
 		for (int i = 0; i < potOnStreet.length; i++) {
 			potOnStreet[i] = -1;
@@ -24,10 +28,11 @@ public abstract class GameInfoAdapter implements IPlayerGameInfo {
 	}
 
 	public void changeStreet(PokerStreet newStreet) {
-		if (newStreet != PokerStreet.PREFLOP) {
-			potOnStreet[this.street.intValue()] = pot;
-		}
 		this.street = newStreet;
+	}
+
+	public void setPot(PokerStreet street, double pot) {
+		potOnStreet[street.intValue()] = pot;
 	}
 
 	@Override

@@ -19,13 +19,13 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.NLFullMathBotFactory;
-import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.GameInfo;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 
@@ -54,6 +54,12 @@ public class BotParser {
 			}
 			String[] parts = line.split("\\s+");
 			if (parts.length == 3 && parts[0].equals(C.ACTION)) {
+				PokerStreet previous = gameInfo.getStage().previous(); 
+				if (previous != null && gameInfo.getPot(previous) == -1) {
+					double previousPot = gameInfo.pot - gameInfo.heroAmountToCall;
+					gameInfo.setPot(previous, previousPot);
+					Log.d("Previous " + C.POT + " for " + previous + ": " + previousPot);
+				}
 				Action move = bot.getAction();
 				System.out.println(actionToString(move));
 				System.out.flush();
@@ -70,20 +76,20 @@ public class BotParser {
 	}
 
 	private static String actionToString(Action action) {
-		String act;
+		String actionStr;
 		if (action.isFold()) {
-			act = C.FOLD;
+			actionStr = C.FOLD;
 		} else if (action.isPassive()) {
 			if (action.isCheck()) {
-				act = C.CHECK;
+				actionStr = C.CHECK;
 			} else {
-				act = C.CALL;
+				actionStr = C.CALL;
 			}
 		} else {
-			act = C.RAISE;
+			actionStr = C.RAISE;
 		}
 		StringBuilder builder = new StringBuilder();
-		builder.append(act);
+		builder.append(actionStr);
 		builder.append(" ");
 		builder.append((int) action.getAmount());
 		return builder.toString();

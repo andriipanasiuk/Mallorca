@@ -73,29 +73,27 @@ public class AiGamesController {
 	}
 
 	void updateMatch(String key, String value) {
-		if (key.equals("round")) { // Round number
+		if (key.equals("round")) {
 			round = Integer.valueOf(value);
-			System.err.println("Round " + round); // printing the round to the
-													// output for debugging
+			System.err.println("Round " + round);
 			resetRoundVariables();
-		} else if (key.equals("small_blind")) { // Value of the small blind
-		} else if (key.equals("big_blind")) { // Value of the big blind
+		} else if (key.equals("small_blind")) {
+		} else if (key.equals("big_blind")) {
 			gameInfo.bigBlind = Integer.valueOf(value);
-		} else if (key.equals("on_button")) { // Which bot has the button,
-												// onButton is true if it's your
-												// bot
+		} else if (key.equals("on_button")) { 
 			gameInfo.onButton = value.equals(heroName);
 			gameInfo.heroInfo.isOnButton = value.equals(heroName);
 			gameInfo.villainInfo.isOnButton = !value.equals(heroName);
 
-		} else if (key.equals("max_win_pot")) { // The size of the current pot
+		} else if (key.equals("max_win_pot")) {
 			gameInfo.pot = Integer.valueOf(value);
 			Log.d(C.POT + ": " + gameInfo.pot);
-		} else if (key.equals("amount_to_call")) { // The amount of the call
+		} else if (key.equals("amount_to_call")) {
 			gameInfo.heroAmountToCall = Integer.valueOf(value);
-		} else if (key.equals(C.TABLE)) { // The cards on the table
+			Log.d(C.TO_CALL + ": " + gameInfo.heroAmountToCall);
+		} else if (key.equals(C.TABLE_AIGAMES)) {
 			gameInfo.board = Arrays.asList(parseCards(value));
-			Log.d("Table: " + value);
+			Log.d(C.TABLE + ": " + value);
 			PokerStreet street;
 			if (gameInfo.board.size() == 3) {
 				street = PokerStreet.FLOP;
