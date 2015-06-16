@@ -88,7 +88,6 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		wasVillainPreviousAggressive = action.isAggressive();
 		if (action.isAggressive()) {
 			countOfOppAggressive++;
-		} else if (action.isPassive()) {
 		}
 		villainActionCount++;
 	}
@@ -119,28 +118,21 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 		if (!action.isFold()) {
 			pot += toCall;
 		}
+		double amount;
 		if (action.isAggressive()) {
-			if (action.getAmount() < effectiveStack) {
-				if (!isTrackPlayer(name)) {
-					playerToCall = action.getAmount();
-				}
-				toCall = action.getAmount();
-				pot += action.getAmount();
-				effectiveStack -= action.getAmount();
-			} else {
-				if (!isTrackPlayer(name)) {
-					playerToCall = effectiveStack;
-				}
-				toCall = effectiveStack;
-				pot += effectiveStack;
-				effectiveStack = 0;
+			amount = action.getAmount();
+			if (amount >= effectiveStack) {
+				amount = effectiveStack;
 			}
 		} else {
-			if (!isTrackPlayer(name)) {
-				playerToCall = 0;
-			}
-			toCall = 0;
+			amount = 0;
 		}
+		if (!isTrackPlayer(name)) {
+			playerToCall = amount;
+		}
+		toCall = amount;
+		pot += amount;
+		effectiveStack -= amount;
 		if (isTrackPlayer(name)) {
 			onHeroActed(action);
 		} else {

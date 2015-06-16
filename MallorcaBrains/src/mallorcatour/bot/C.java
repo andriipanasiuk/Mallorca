@@ -6,7 +6,7 @@ public class C {
 	public static final String VILLAIN = "vil" + "lain";
 	public static final String POT = "P" + "ot";
 	public static final String EFFECTIVE_STACK = "Effe" + "ctiveStack";
-	public static final String HOLE_CARDS = "Hol" + "e cards";
+	public static final String HOLE_CARDS = "Hol" + "e ca" + "rds";
 	public static final String TO_CALL = "toCa" + "ll";
 	public static final String SITUATION = "Situ" + "ation";
 	public static final String ACTION = "Ac" + "tion";
