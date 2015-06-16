@@ -2,6 +2,7 @@ package mallorcatour.bot.math;
 
 import java.util.Map;
 
+import mallorcatour.bot.C;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.game.Action;
@@ -30,84 +31,70 @@ public class NLProfitCalculator implements IProfitCalculator {
 			Card holeCard2, Spectrum villainSpectrum) {
 		int heroActionCount = situation.getHeroActionCount();
 		boolean wasVillainPreviousAggressive = situation.wasVillainPreviousAggresive();
+		Map<Action, Double> map;
 		if (gameInfo.isPreFlop()) {
 			if (gameInfo.onButton() && heroActionCount == 0) {
-				return gameSolver.onFirstActionPreFlop(gameInfo, situation, gameInfo.getBankRollAtRisk(),
+				map = gameSolver.onFirstActionPreFlop(gameInfo, situation, gameInfo.getBankRollAtRisk(),
 						gameInfo.getPotSize(), villainSpectrum, new HoleCards(holeCard1, holeCard2),
-						strengthManager.preflop,/*
-												 * was villain aggressive
-												 */false, true, gameInfo.getBigBlindSize());
+						strengthManager.preflop, false, true, gameInfo.getBigBlindSize());
+				Log.f(C.HERO + " first " + C.ACTION + " on " + C.PREFLOP + " " + map.toString());
 			} else {
-				return gameSolver.onSecondActionPreflop(gameInfo, situation, gameInfo.getBankRollAtRisk(), gameInfo
+				map = gameSolver.onSecondActionPreflop(gameInfo, situation, gameInfo.getBankRollAtRisk(), gameInfo
 						.getPotSize(), gameInfo.getAmountToCall(), villainSpectrum,
 						new HoleCards(holeCard1, holeCard2), strengthManager.preflop, gameInfo.onButton(), gameInfo
 								.getBigBlindSize());
+				Log.f(C.HERO + " second " + C.ACTION + " on " + C.PREFLOP + " " + map.toString());
 			}
 		} else if (gameInfo.isFlop()) {
 			if (gameInfo.getAmountToCall() == 0 && !gameInfo.onButton()) {
-				Map<Action, Double> map = gameSolver.onFirstActionFlop(gameInfo, situation,
+				map = gameSolver.onFirstActionFlop(gameInfo, situation,
 						gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(), villainSpectrum, gameInfo.getFlop(),
 						new HoleCards(holeCard1, holeCard2), strengthManager.flop, wasVillainPreviousAggressive,
 						gameInfo.onButton(), gameInfo.getBigBlindSize());
-				double profit = CollectionUtils.maxValue(map);
-				Log.f("Hero's first action on flop " + map.toString());
-				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
-				return map;
+				Log.f(C.HERO + " first " + C.ACTION + " on " + C.FLOP + " " + map.toString());
 			} else {
-				Map<Action, Double> map = gameSolver.onSecondActionFlop(gameInfo, situation,
+				map = gameSolver.onSecondActionFlop(gameInfo, situation,
 						gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(), gameInfo.getAmountToCall(),
 						villainSpectrum, gameInfo.getFlop(), new HoleCards(holeCard1, holeCard2), strengthManager.flop,
 						gameInfo.onButton(), gameInfo.getBigBlindSize());
-				double profit = CollectionUtils.maxValue(map);
-				Log.f("Flop. Second action. " + map.toString());
-				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
-				return map;
+				Log.f(C.HERO  + " second " + C.ACTION + " on " + C.FLOP + ": " + map.toString());
 			}
 		} else if (gameInfo.isTurn()) {
 			if (gameInfo.getAmountToCall() == 0 && !gameInfo.onButton()) {
-				Map<Action, Double> map = gameSolver.onFirstActionTurn(gameInfo, situation,
+				map = gameSolver.onFirstActionTurn(gameInfo, situation,
 						gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(), villainSpectrum, gameInfo.getFlop(),
 						gameInfo.getTurn(), new HoleCards(holeCard1, holeCard2), strengthManager.turn,
 						wasVillainPreviousAggressive, gameInfo.onButton(), gameInfo.getBigBlindSize());
-				double profit = CollectionUtils.maxValue(map);
-				Log.f("Hero's first action on turn " + map.toString());
-				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
-				return map;
+				Log.f(C.HERO  + " first " + C.ACTION + " on " + C.TURN + ": " + map.toString());
 			} else {
-				Map<Action, Double> map = gameSolver.onSecondActionTurn(gameInfo, situation,
+				map = gameSolver.onSecondActionTurn(gameInfo, situation,
 						gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(), gameInfo.getAmountToCall(),
 						villainSpectrum, gameInfo.getFlop(), gameInfo.getTurn(), new HoleCards(holeCard1, holeCard2),
 						strengthManager.turn, gameInfo.onButton(), gameInfo.getBigBlindSize());
-				double profit = CollectionUtils.maxValue(map);
-				Log.f("Turn. Second action. " + map.toString());
-				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
-				return map;
+				Log.f(C.HERO  + " second " + C.ACTION + " on " + C.TURN + ": " + map.toString());
 			}
 		} else if (gameInfo.isRiver()) {
 			if (gameInfo.getAmountToCall() == 0 && !gameInfo.onButton()) {
-				Map<Action, Double> map = gameSolver.onFirstActionRiver(gameInfo, situation,
-						gameInfo.getBankRollAtRisk(), gameInfo.getPotSize(), villainSpectrum, gameInfo.getFlop(),
-						gameInfo.getTurn(), gameInfo.getRiver(), new HoleCards(holeCard1, holeCard2),
+				map = gameSolver.onFirstActionRiver(gameInfo, situation, gameInfo.getBankRollAtRisk(),
+						gameInfo.getPotSize(), villainSpectrum, gameInfo.getFlop(), gameInfo.getTurn(),
+						gameInfo.getRiver(), new HoleCards(holeCard1, holeCard2),
 						strengthManager.river, wasVillainPreviousAggressive, gameInfo.onButton(),
 						gameInfo.getBigBlindSize());
-				double profit = CollectionUtils.maxValue(map);
-				Log.f("Hero's first action on river: " + map.toString());
-				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
-				return map;
+				Log.f(C.HERO  + " first " + C.ACTION + " on " + C.RIVER + ": " + map.toString());
 			} else {
-				Map<Action, Double> map = gameSolver.onSecondActionRiver(gameInfo, situation, gameInfo
+				map = gameSolver.onSecondActionRiver(gameInfo, situation, gameInfo
 						.getBankRollAtRisk(), gameInfo.getPotSize(), gameInfo.getAmountToCall(), villainSpectrum,
 						gameInfo.getFlop(), gameInfo.getTurn(), gameInfo.getRiver(),
 						new HoleCards(holeCard1, holeCard2), strengthManager.river, gameInfo.onButton(), gameInfo
 								.getBigBlindSize());
-				double profit = CollectionUtils.maxValue(map);
-				Log.f("River. Second action: " + map.toString());
-				Log.f(FileUtils.LINE_SEPARATOR + "Hero profit: " + profit);
-				return map;
+				Log.f(C.HERO  + " second " + C.ACTION + " on " + C.RIVER + ": " + map.toString());
 			}
 		} else {
 			throw new RuntimeException();
 		}
+		double profit = CollectionUtils.maxValue(map);
+		Log.f(FileUtils.LINE_SEPARATOR + C.HERO + " " + C.PROFIT + ": " + profit);
+		return map;
 	}
 
 }

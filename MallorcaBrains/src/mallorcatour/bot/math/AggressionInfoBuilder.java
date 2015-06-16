@@ -35,13 +35,11 @@ public class AggressionInfoBuilder {
 			return this;
 		}
 
-		public AggressionInfoBuilder.AggressionInfo plusVillainAction() {
+		public AggressionInfoBuilder.AggressionInfo plusVillainAction(boolean aggressive) {
+			if(aggressive) {
+				villainAggresionActionCount++;
+			}
 			villainActionCount++;
-			return this;
-		}
-		
-		public AggressionInfoBuilder.AggressionInfo plusVillainAggressiveAction() {
-			villainAggresionActionCount++;
 			return this;
 		}
 

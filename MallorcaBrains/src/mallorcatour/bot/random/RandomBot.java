@@ -32,8 +32,8 @@ public class RandomBot extends ObservingPlayer {
 			if (random < 0.5) {
 				return Action.checkAction();
 			} else {
-				return Action.createBetAction(gameInfo.getAmountToCall(), gameInfo.getPotSize(),
-						gameInfo.getBankRollAtRisk());
+				return Action.createRaiseAction(gameInfo.getAmountToCall(), gameInfo.getBankRollAtRisk(),
+						gameInfo.getPotSize());
 			}
 		}
 	}

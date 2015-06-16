@@ -61,12 +61,12 @@ public class Action implements Serializable {
 		return result;
 	}
 
-	public static Action createBetAction(double pot, double percent, double effectiveStack) {
+	public static Action createBetAction(double pot, double effectiveStack, double percent) {
 		return createRaiseAction(0, pot, effectiveStack, percent);
 	}
 
 	public static Action createBetAction(double pot, double effectiveStack) {
-		return createBetAction(pot, PERCENT_OF_POT_FOR_BET, effectiveStack);
+		return createBetAction(pot, effectiveStack, PERCENT_OF_POT_FOR_BET);
 	}
 
 	public static Action createRaiseAction(double toCall, double pot, double effectiveStack) {

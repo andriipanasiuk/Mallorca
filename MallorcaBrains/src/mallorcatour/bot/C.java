@@ -27,4 +27,9 @@ public class C {
 	public static final String CARDS = "ca" + "rds";
 	public static final String WEIGHT = "we" + "ight";
 	public static final String HANDLER = "han" + "dler";
+	public static final String PREFLOP = "Prefl" + "op";
+	public static final String FLOP = "Fl" + "op";
+	public static final String TURN = "Tu" + "rn";
+	public static final String RIVER = "Ri" + "ver";
+	public static final String PROFIT = "Pr" + "ofit";
 }

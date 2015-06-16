@@ -81,9 +81,8 @@ public class NLGameSolver implements IGameSolver {
 	/**
 	 * pot - after call
 	 */
-	private double calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment, double toCall,
-			double bigBlind, PokerStreet street, boolean onButton, HoleCards heroCards, Card[] board,
-			Spectrum villainSpectrum, int depth) {
+	private double calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment, PokerStreet street,
+			HoleCards heroCards, Card[] board, Spectrum villainSpectrum, int depth) {
 		double strength;
 		if (board.length > 0) {
 			StreetEquity equity = EquilatorStrength.equityVsSpectrumToRiver(heroCards.first, heroCards.second, board,
@@ -91,6 +90,10 @@ public class NLGameSolver implements IGameSolver {
 			strength = equity.strength;
 		} else {
 			strength = EquilatorPreflop.strengthVsSpectrum(heroCards.first, heroCards.second, villainSpectrum);
+		}
+		String prefix = "";
+		for (int i = 0; i < depth; i++) {
+			prefix += "	";
 		}
 		double win = pot - heroInvestment;
 		if (!CONSIDER_PREV_POT) {
@@ -100,13 +103,10 @@ public class NLGameSolver implements IGameSolver {
 			} else {
 				previousStreetPot = 0;
 			}
+			Log.f(prefix + C.POT + " on prev. str.: " + previousStreetPot);
 			win -= previousStreetPot;
 		}
 		double lose = heroInvestment;
-		String prefix = "";
-		for (int i = 0; i < depth; i++) {
-			prefix += "	";
-		}
 		Log.f(prefix + "Win " + win + " in " + (int) (100 * strength) + "%");
 		Log.f(prefix + "Lose " + lose + " in " + (int) (100 * (1 - strength)) + "%");
 		double passiveProfit = strength * win - (1 - strength) * lose;
@@ -128,8 +128,8 @@ public class NLGameSolver implements IGameSolver {
 		result.put(Action.fold(), foldProfit);
 		// if hero calls
 		Log.f(prefix + "If " + C.HERO + " " + C.CALL + " " + toCall);
-		double passiveProfit = calculatePassiveProfit(gameInfo, pot + toCall, heroInvestment + toCall, toCall,
-				bigBlind, street, onButton, heroCards, board, villainSpectrum, depth);
+		double passiveProfit = calculatePassiveProfit(gameInfo, pot + toCall, heroInvestment + toCall, street,
+				heroCards, board, villainSpectrum, depth);
 		Log.f(prefix + C.HERO + " " + C.WINS + " " + passiveProfit);
 		result.put(Action.callAction(toCall), passiveProfit);
 		// if hero cannot raise
@@ -138,13 +138,8 @@ public class NLGameSolver implements IGameSolver {
 			return result;
 		}
 		// if hero raises
-		Action heroReraiseAction = Action.createRaiseAction(toCall, pot, effectiveStack);
-		double amount;
-		if (heroReraiseAction.isAllin()) {
-			amount = effectiveStack;
-		} else {
-			amount = heroReraiseAction.getAmount();
-		}
+		Action heroReraiseAction = Action.createRaiseAction(toCall, pot, effectiveStack, 1);
+		double amount = heroReraiseAction.getAmount();
 		Log.f(prefix + "If " + C.HERO + " raise " + amount);
 
 		double potAfterAction = pot + toCall + amount;
@@ -165,11 +160,11 @@ public class NLGameSolver implements IGameSolver {
 			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
 		Map<Action, Double> result = new HashMap<Action, Double>();
 
-		// if hero folds
 		double foldProfit = 0;
 		result.put(Action.fold(), foldProfit);
-		// if hero call small blind
-		Log.f("If " + C.HERO + " " + C.CALL);
+
+		double toCall = bigBlind / 2;
+		Log.f("If " + C.HERO + " " + C.CALL + " " + toCall);
 		double callProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot + bigBlind / 2,
 				bigBlind / 2, villainSpectrum, new Card[] {}, heroCards, wasVillainPreviousAggressive, false,
 				isHeroOnButton, PokerStreet.PREFLOP, strengthMap, bigBlind, 1);
@@ -177,15 +172,11 @@ public class NLGameSolver implements IGameSolver {
 
 		Log.f(C.HERO + " " + C.WINS + " " + callProfit);
 
-		// if hero raises
-		double raiseAmount = 2 * bigBlind;
-		if (raiseAmount > effectiveStack) {
-			raiseAmount = effectiveStack;
-		}
-		Action heroRaiseAction = Action.createRaiseAction(raiseAmount, 1);
+		Action heroRaiseAction = Action.createRaiseAction(toCall, pot, effectiveStack, 1);
+		double raiseAmount = heroRaiseAction.getAmount();
+
 		Log.f("If " + C.HERO + " " + C.RAISE + " " + raiseAmount);
 
-		double toCall = bigBlind / 2;
 		double aggressiveProfit = calculateHeroActionProfit(gameInfo, info, raiseAmount, effectiveStack - raiseAmount,
 				pot + toCall + raiseAmount, toCall + raiseAmount, villainSpectrum, new Card[] {}, heroCards,
 				wasVillainPreviousAggressive, true, isHeroOnButton, PokerStreet.PREFLOP, strengthMap, bigBlind, 1);
@@ -241,7 +232,7 @@ public class NLGameSolver implements IGameSolver {
 		Log.f(C.HERO + " " + C.WINS + " " + checkProfit);
 
 		// if hero bets
-		Action heroBetAction = Action.createBetAction(pot, effectiveStack);
+		Action heroBetAction = Action.createBetAction(pot, effectiveStack, 0.75);
 		double betAmount;
 		if (heroBetAction.isAllin()) {
 			betAmount = effectiveStack;
@@ -254,7 +245,7 @@ public class NLGameSolver implements IGameSolver {
 				+ betAmount, betAmount, villainSpectrum, board, heroCards, wasVillainPreviousAggressive, true, isHeroOnButton,
 				street, villainStrengthMap, bigBlind, 1);
 
-		Log.f(C.HERO + " " +C.WINS + " " + aggressiveProfit);
+		Log.f(C.HERO + " " + C.WINS + " " + aggressiveProfit);
 
 		result.put(heroBetAction, aggressiveProfit);
 		return result;
@@ -292,63 +283,56 @@ public class NLGameSolver implements IGameSolver {
 				villainStrengthMap);
 
 		double villainSpectrumWeight = villainSpectrum.summaryWeight();
-		double foldEquity = foldSpectrum.summaryWeight();
-		double passiveEquity = passiveSpectrum.summaryWeight();
-		double aggressiveEquity = aggressiveSpectrum.summaryWeight();
+		double foldWeight = foldSpectrum.summaryWeight();
+		double passiveWeight = passiveSpectrum.summaryWeight();
+		double aggressiveWeight = aggressiveSpectrum.summaryWeight();
 
-		if (Math.abs(foldEquity + passiveEquity + aggressiveEquity - villainSpectrumWeight) > NEARLY_ZERO) {
-			throw new RuntimeException("Equities must be equals in summary. " + "Fold equity: " + foldEquity
-					+ " call equity: " + passiveEquity + " raise equity: " + aggressiveEquity + ". Summary: "
+		if (Math.abs(foldWeight + passiveWeight + aggressiveWeight - villainSpectrumWeight) > NEARLY_ZERO) {
+			throw new RuntimeException("Equities must be equals in summary. " + "Fold equity: " + foldWeight
+					+ " call equity: " + passiveWeight + " raise equity: " + aggressiveWeight + ". Summary: "
 					+ villainSpectrumWeight);
 		}
 		double ifVillainFoldProfit = (pot - heroInvestment);
 
-		Log.f(prefix + "When " + C.VILLAIN + " " + C.FOLD + " in " + (int) (foldEquity / villainSpectrumWeight * 100)
+		Log.f(prefix + "When " + C.VILLAIN + " " + C.FOLD + " in " + (int) (foldWeight / villainSpectrumWeight * 100)
 				+ "%");
 		Log.f(prefix + C.HERO + " " + C.WINS + " " + ifVillainFoldProfit);
 
-		// if villain calls
 		double ifVillainPassiveProfit;
-		Log.f(prefix + "When " + C.VILLAIN + " " + C.CALL + " in "
-				+ (int) (passiveEquity / villainSpectrumWeight * 100) + "%");
 		if (passiveSpectrum.isEmpty()) {
 			ifVillainPassiveProfit = 0;
+			Log.f(prefix + C.VILLAIN + " will not " + C.CALL);
 		} else {
+			Log.f(prefix + "When " + C.VILLAIN + " " + C.CALL + " in "
+					+ (int) (passiveWeight / villainSpectrumWeight * 100) + "%");
 			ifVillainPassiveProfit = calculatePassiveProfit(gameInfo, pot + villainToCall, heroInvestment,
-					heroActionAmount, bigBlind, street, isHeroOnButton, heroCards, board, passiveSpectrum, depth);
+					street, heroCards, board, passiveSpectrum, depth + 1);
+			Log.f(prefix + C.HERO + " " + C.WINS + " " + ifVillainPassiveProfit);
 		}
-		Log.f(prefix + C.HERO + " " + C.WINS + " " + ifVillainPassiveProfit);
 
-		// if villain aggressives
-		Action villainAggressiveAction = Action.createRaiseAction(villainToCall, pot, villainEffectiveStack);
+		Action villainAggressiveAction = Action.createRaiseAction(villainToCall, pot, villainEffectiveStack, 1);
+		double villainReraiseAmount = villainAggressiveAction.getAmount();
 
-		double villainReraiseAmount;
-		if (villainAggressiveAction.isAllin()) {
-			villainReraiseAmount = effectiveStack;
-		} else {
-			villainReraiseAmount = villainAggressiveAction.getAmount();
-		}
 		double ifVillainAggressiveProfit;
 		if (aggressiveSpectrum.isEmpty()) {
 			ifVillainAggressiveProfit = 0;
 			Log.f(prefix + C.VILLAIN + " cannot reraise");
 		} else {
 			Log.f(prefix + "When " + C.VILLAIN + " reraise " + villainReraiseAmount + " in "
-					+ (int) (aggressiveEquity / villainSpectrumWeight * 100) + "%");
+					+ (int) (aggressiveWeight / villainSpectrumWeight * 100) + "%");
 			double effectiveStackAfterVillainAggressive = villainEffectiveStack - villainReraiseAmount;
 			double potAfterVillainAggressive = pot + villainToCall + villainReraiseAmount;
-			newInfo.plusVillainAction();
-			newInfo.plusVillainAggressiveAction();
+			newInfo.plusVillainAction(true);
 			Map<Action, Double> map = onSecondActionRecursive(gameInfo, newInfo, effectiveStackAfterVillainAggressive,
 					potAfterVillainAggressive, villainReraiseAmount, heroInvestment, aggressiveSpectrum, board,
 					heroCards, villainStrengthMap, isHeroOnButton, street, bigBlind, depth + 1);
 			ifVillainAggressiveProfit = CollectionUtils.maxValue(map);
 			Log.f(prefix + C.HERO + " " + C.WINS + " " + ifVillainAggressiveProfit);
 		}
-		double aggressiveProfit = (foldEquity / villainSpectrumWeight) * ifVillainFoldProfit
-				+ (passiveEquity / villainSpectrumWeight) * ifVillainPassiveProfit
-				+ (aggressiveEquity / villainSpectrumWeight) * ifVillainAggressiveProfit;
-		return aggressiveProfit;
+		double profit = (foldWeight / villainSpectrumWeight) * ifVillainFoldProfit
+				+ (passiveWeight / villainSpectrumWeight) * ifVillainPassiveProfit
+				+ (aggressiveWeight / villainSpectrumWeight) * ifVillainAggressiveProfit;
+		return profit;
 	}
 
 	private void processVillainSpectrums(Spectrum villainSpectrum, Spectrum foldSpectrum, Spectrum passiveSpectrum,

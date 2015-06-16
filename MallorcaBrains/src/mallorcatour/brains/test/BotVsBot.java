@@ -45,12 +45,12 @@ public class BotVsBot {
 		IPlayer pushBot = new PushBot("PushBot", DEBUG_PATH);
 		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralStandart, IGameObserver.EMPTY,
 				DEBUG_PATH);
-//		engine.button(pushBot).cards(postflopMathBot, "6sQc").cards(pushBot, "Kc7s").stack(postflopMathBot, 2020)
-//				.stack(pushBot, 1980).flop("Ks7d7h");
+		engine.button(fullMathBot).cards(fullMathBot, "TsTc").cards(neuralStandart, "KcAs").stack(fullMathBot, 1800)
+				.stack(neuralStandart, 1980).flop("KsKdJc");
 		int count1 = 0, count2 = 0;
-//		engine.playRound();
-//		for (int i = 0; i < 2; i++) {
-		for (int i = 0; i < 100; i++) {
+		engine.playRound();
+		for (int i = 0; i < 0; i++) {
+//		for (int i = 0; i < 100; i++) {
 			TournamentSummary summary = engine.playGame();
 			if (summary.winner.equals(fullMathBot.getName())) {
 				count1++;

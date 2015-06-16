@@ -70,4 +70,8 @@ public class Player extends ObservingPlayer {
 		return "NLMathBot";
 	}
 
+	@Override
+	public String toString(){
+		return getName();
+	}
 }
