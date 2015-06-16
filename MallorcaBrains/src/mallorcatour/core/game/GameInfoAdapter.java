@@ -17,6 +17,12 @@ public abstract class GameInfoAdapter implements IPlayerGameInfo {
 	public boolean onButton;
 	private double[] potOnStreet = new double[4];
 
+	public void resetStreetPots() {
+		for (int i = 0; i < potOnStreet.length; i++) {
+			potOnStreet[i] = -1;
+		}
+	}
+
 	public void changeStreet(PokerStreet newStreet) {
 		if (newStreet != PokerStreet.PREFLOP) {
 			potOnStreet[this.street.intValue()] = pot;

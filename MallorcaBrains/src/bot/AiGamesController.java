@@ -39,11 +39,8 @@ public class AiGamesController {
 	/**
 	 * Used for internal needs. For external we use bot.getName().
 	 */
-	private String heroName = "";
-	private String villainName = "";
-
-	@SuppressWarnings("unused")
-	private int timeBank, timePerMove;
+	private String heroName = null;
+	private String villainName = null;
 
 	private GameInfo gameInfo;
 	private IPlayer bot;
@@ -53,15 +50,7 @@ public class AiGamesController {
 		this.bot = observer;
 	}
 
-	/**
-	 * Parses the settings for this game
-	 * 
-	 * @param key
-	 *            : key of the information given
-	 * @param value
-	 *            : value to be set for the key
-	 */
-	protected void updateSetting(String key, String value) {
+	void updateSetting(String key, String value) {
 		settings.put(key, value);
 		if (key.equals("your_bot")) {
 			if (value.equals("player1")) {
@@ -72,16 +61,10 @@ public class AiGamesController {
 			heroName = value;
 			gameInfo.heroInfo = new OpenPlayerInfo(bot.getName());
 			gameInfo.villainInfo = new OpenPlayerInfo(villainName);
-		} else if (key.equals("timebank")) { // Maximum amount of time your bot
-												// can take for one response
-			timeBank = Integer.valueOf(value);
-		} else if (key.equals("time_per_move")) { // The extra amount of time
-													// you get per response
-			timePerMove = Integer.valueOf(value);
-		} else if (key.equals("hands_per_level")) { // Number of rounds before
-													// the blinds are increased
-		} else if (key.equals("starting_stack")) { // Starting stack for each
-													// bot
+		} else if (key.equals("timebank")) {
+		} else if (key.equals("time_per_move")) {
+		} else if (key.equals("hands_per_level")) {
+		} else if (key.equals("starting_stack")) {
 			int stack = Integer.valueOf(value);
 			gameInfo.bankrollAtRisk = stack;
 		} else {
@@ -89,15 +72,7 @@ public class AiGamesController {
 		}
 	}
 
-	/**
-	 * Parses the match information
-	 * 
-	 * @param key
-	 *            : key of the information given
-	 * @param value
-	 *            : value to be set for the key
-	 */
-	protected void updateMatch(String key, String value) {
+	void updateMatch(String key, String value) {
 		if (key.equals("round")) { // Round number
 			round = Integer.valueOf(value);
 			System.err.println("Round " + round); // printing the round to the
@@ -138,56 +113,44 @@ public class AiGamesController {
 		}
 	}
 
-	/**
-	 * Parses the information given about stacks, blinds and moves
-	 * 
-	 * @param bot
-	 *            : bot that this move belongs to (either you or the opponent)
-	 * @param key
-	 *            : key of the information given
-	 * @param amount
-	 *            : value to be set for the key
-	 */
-	protected void updateMove(String bot, String key, String amount) {
-		if (key.equals(C.STACK)) { // The amount in your starting stack
-			int value = Integer.valueOf(amount);
+	void updateMove(String bot, String key, String amountStr) {
+		if (key.equals(C.STACK)) {
+			int value = Integer.valueOf(amountStr);
 			if (value < gameInfo.bankrollAtRisk) {
 				gameInfo.bankrollAtRisk = value;
 			}
 		}
 		if (key.equals(C.RAISE)) {
-			int am = Integer.valueOf(amount);
-			gameInfo.bankrollAtRisk = Math.max(0, gameInfo.bankrollAtRisk - am);
+			int amount = Integer.valueOf(amountStr);
+			gameInfo.bankrollAtRisk = Math.max(0, gameInfo.bankrollAtRisk - amount);
 		}
 		if (bot.equals(heroName)) {
-			if (key.equals(C.STACK)) { // The amount in your starting stack
+			if (key.equals(C.STACK)) {
 				gameInfo.changeStreet(PokerStreet.PREFLOP);
 				this.bot.onHandStarted(gameInfo);
 			} else if (key.equals(C.POST)) {
 				gameInfo.bankrollAtRisk -= gameInfo.bigBlind;
 				Log.d("Effective " + C.STACK + ": " + gameInfo.bankrollAtRisk);
 			} else if (key.equals(C.HAND)) { // Your cards
-				Card[] cards = parseCards(amount);
-				Log.d(C.HOLE_CARDS + ": " + amount);
+				Card[] cards = parseCards(amountStr);
+				Log.d(C.HOLE_CARDS + ": " + amountStr);
 				this.bot.onHoleCards(cards[0], cards[1]);
-			} else if (key.equals(C.WINS)) {
-				this.bot.onHandEnded();
 			} else {
 				// That should be all
 			}
-		} else { // assume it's the opponent
-			if (key.equals(C.POST)) { // The amount your opponent paid
-										// for the blind
+		} else {
+			if (key.equals(C.POST)) {
 				// do nothing
 			} else if (key.equals(C.HAND)) {
 				// Hand of the opponent on a showdown, not stored
-			} else if (key.equals(C.WINS)) {
-				this.bot.onHandEnded();
 			} else if (key.equals(C.FOLD) || key.equals(C.CHECK) || key.equals(C.CALL) || key.equals(C.RAISE)) {
-				Log.d(C.VILLAIN + " " + key + " " + amount);
-				Action action = fromString(key, amount);
+				Log.d(C.VILLAIN + " " + key + " " + amountStr);
+				Action action = fromString(key, amountStr);
 				this.bot.onActed(action, -1, villainName);
 			}
+		}
+		if (key.equals(C.WINS)) {
+			this.bot.onHandEnded();
 		}
 		if (key.equals(C.RAISE)) {
 			Log.d("Effective " + C.STACK  + " after " + C.RAISE + ": " + gameInfo.bankrollAtRisk);
@@ -242,6 +205,7 @@ public class AiGamesController {
 	private void resetRoundVariables() {
 		gameInfo.bigBlind = 0;
 		gameInfo.pot = 0;
+		gameInfo.resetStreetPots();
 		gameInfo.board = Collections.emptyList();
 		gameInfo.heroAmountToCall = 0;
 		gameInfo.bankrollAtRisk = Double.MAX_VALUE;
