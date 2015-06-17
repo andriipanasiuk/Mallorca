@@ -12,6 +12,7 @@ import mallorcatour.bot.villainobserver.IVillainListener;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.neural.core.PokerLearningExample;
@@ -76,7 +77,7 @@ public class PAVillainObserver implements IVillainObserver, IDecisionListener {
         List<PokerLearningExample> examples = villainStatistics.getExamples();
         List<PokerLearningExample> preflopExamples = new ArrayList<PokerLearningExample>();
         for (PokerLearningExample example : examples) {
-            if (example.getInput().getStreet() == LocalSituation.PREFLOP) {
+            if (example.getInput().getStreet() == PokerStreet.PREFLOP_VALUE) {
                 preflopExamples.add(example);
             }
         }
@@ -107,7 +108,7 @@ public class PAVillainObserver implements IVillainObserver, IDecisionListener {
     }
 
     private void processStats(LocalSituation situation, Action action) {
-        if (situation.getStreet() != LocalSituation.PREFLOP) {
+        if (situation.getStreet() != PokerStreet.PREFLOP_VALUE) {
             if (action.isAggressive()) {
                 currentVillain.addAggressionFrequencyInfo(new Pair<Integer, Integer>(1, 1));
             } else {

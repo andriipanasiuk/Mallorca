@@ -39,7 +39,6 @@ public class PokerLearningExample implements ILearningExample<LocalSituation, Ad
     /**
      * @return the situation
      */
-    @Deprecated
     public LocalSituation getSituation() {
         return getInput();
     }
@@ -54,7 +53,6 @@ public class PokerLearningExample implements ILearningExample<LocalSituation, Ad
     /**
      * @return the advice
      */
-    @Deprecated
     public Advice getAdvice() {
         return getOutput();
     }

@@ -5,7 +5,6 @@
 package mallorcatour.hhparser.core;
 
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.situation.LocalSituation;
 
 /**
  *
@@ -49,34 +48,34 @@ public class BaseHandEquities implements HandEquities {
     }
 
     public double getPreflopEquity() {
-        return returnWithCheck(preflopEquity, LocalSituation.PREFLOP);
+        return returnWithCheck(preflopEquity, PokerStreet.PREFLOP_VALUE);
     }
 
     public double getFlopEquity() {
-        return returnWithCheck(flopEquity, LocalSituation.FLOP);
+        return returnWithCheck(flopEquity, PokerStreet.FLOP_VALUE);
     }
 
     public double getTurnEquity() {
-        return returnWithCheck(turnEquity, LocalSituation.TURN);
+        return returnWithCheck(turnEquity, PokerStreet.TURN_VALUE);
     }
 
     public double getRiverEquity() {
-        return returnWithCheck(riverEquity, LocalSituation.RIVER);
+        return returnWithCheck(riverEquity, PokerStreet.RIVER_VALUE);
     }
 
     public double getFlopPositivePotential() {
-        return returnWithCheck(flopPositive, LocalSituation.FLOP);
+        return returnWithCheck(flopPositive, PokerStreet.FLOP_VALUE);
     }
 
     public double getFlopNegativePotential() {
-        return returnWithCheck(flopNegative, LocalSituation.FLOP);
+        return returnWithCheck(flopNegative, PokerStreet.FLOP_VALUE);
     }
 
     public double getTurnPositivePotential() {
-        return returnWithCheck(turnPositive, LocalSituation.TURN);
+        return returnWithCheck(turnPositive, PokerStreet.TURN_VALUE);
     }
 
     public double getTurnNegativePotential() {
-        return returnWithCheck(turnNegative, LocalSituation.TURN);
+        return returnWithCheck(turnNegative, PokerStreet.TURN_VALUE);
     }
 }

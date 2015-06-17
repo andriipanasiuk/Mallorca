@@ -6,10 +6,14 @@ public class PokerStreet implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String name;
 	private int intValue;
-	public static final PokerStreet PREFLOP = new PokerStreet("preflop", 0);
-	public static final PokerStreet FLOP = new PokerStreet("flop", 1);
-	public static final PokerStreet TURN = new PokerStreet("turn", 2);
-	public static final PokerStreet RIVER = new PokerStreet("river", 3);
+	public static final int PREFLOP_VALUE = 0;
+	public static final int FLOP_VALUE = 1;
+	public static final int TURN_VALUE = 2;
+	public static final int RIVER_VALUE = 3;
+	public static final PokerStreet PREFLOP = new PokerStreet("preflop", PREFLOP_VALUE);
+	public static final PokerStreet FLOP = new PokerStreet("flop", FLOP_VALUE);
+	public static final PokerStreet TURN = new PokerStreet("turn", TURN_VALUE);
+	public static final PokerStreet RIVER = new PokerStreet("river", RIVER_VALUE);
 
 	private PokerStreet(String name, int intValue) {
 		this.name = name;

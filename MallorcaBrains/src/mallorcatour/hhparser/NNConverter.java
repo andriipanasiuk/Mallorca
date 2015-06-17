@@ -15,10 +15,8 @@ import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.neural.manager.LEManager;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.Log;
-import mallorcatour.tools.MyFileWriter;
 
 /**
  *
@@ -91,46 +89,11 @@ public class NNConverter {
 		for (int index = 0; index < examples.size(); index++) {
 			examples.get(index).setAdvice(advices.get(index));
 		}
-        writeToFiles(directory, addToExamples, examples);
+        SituationIO.writeToFiles(directory, addToExamples, examples);
         return examples;
     }
 
-	/**
-	 * Write list of poker examples (LocalSituation -> Advice) to 4 files for
-	 * preflop, flop, turn and river in predefined directory
-	 */
-	public static void writeToFiles(File directory, boolean addToExamples, List<PokerLearningExample> examples) {
-		MyFileWriter preflopWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/preflop.txt",
-				addToExamples);
-		MyFileWriter flopWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/flop.txt", addToExamples);
-		MyFileWriter turnWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/turn.txt", addToExamples);
-		MyFileWriter riverWriter = MyFileWriter.prepareForWriting(directory.getAbsolutePath() + "/river.txt", addToExamples);
-
-        for (int index = 0; index < examples.size(); index++) {
-            LocalSituation situation = examples.get(index).getInput();
-            Advice advice = examples.get(index).getOutput();
-            switch (situation.getStreet()) {
-                case LocalSituation.PREFLOP:
-                    LEManager.toFile(preflopWriter, situation, advice);
-                    break;
-                case LocalSituation.FLOP:
-                    LEManager.toFile(flopWriter, situation, advice);
-                    break;
-                case LocalSituation.TURN:
-                    LEManager.toFile(turnWriter, situation, advice);
-                    break;
-                case LocalSituation.RIVER:
-                    LEManager.toFile(riverWriter, situation, advice);
-                    break;
-            }
-        }
-        preflopWriter.endWriting();
-        flopWriter.endWriting();
-        turnWriter.endWriting();
-        riverWriter.endWriting();
-	}
-
-    public static List<PokerLearningExample> localSituationsToFile(File dir, List<Hand> hands,
+	public static List<PokerLearningExample> localSituationsToFile(File dir, List<Hand> hands,
             String pathToAdvices, SituationHandler handler) {
         boolean addToExamples = true;
         String adviceFilename = getAdviceFile(hands.get(0).getStartingDate(), pathToAdvices);
@@ -155,7 +118,7 @@ public class NNConverter {
         for (int index = 0; index < examples.size(); index++) {
         	examples.get(index).setAdvice(advices.get(index));
         }
-        writeToFiles(dir, addToExamples, examples);
+        SituationIO.writeToFiles(dir, addToExamples, examples);
         return examples;
     }
 

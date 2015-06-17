@@ -582,13 +582,13 @@ public class PokerExamplesFrame extends javax.swing.JFrame {
         }
         examples.addAll(newExamples);
         for (PokerLearningExample example : newExamples) {
-            if (example.getSituation().getStreet() == LocalSituation.PREFLOP) {
+            if (example.getSituation().getStreet() == PokerStreet.PREFLOP_VALUE) {
                 preflopExamples.add(example);
-            } else if (example.getSituation().getStreet() == LocalSituation.FLOP) {
+            } else if (example.getSituation().getStreet() == PokerStreet.FLOP_VALUE) {
                 flopExamples.add(example);
-            } else if (example.getSituation().getStreet() == LocalSituation.TURN) {
+            } else if (example.getSituation().getStreet() == PokerStreet.TURN_VALUE) {
                 turnExamples.add(example);
-            } else if (example.getSituation().getStreet() == LocalSituation.RIVER) {
+            } else if (example.getSituation().getStreet() == PokerStreet.RIVER_VALUE) {
                 riverExamples.add(example);
             }
         }

@@ -5,11 +5,13 @@
 package mallorcatour.bot.modeller;
 
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.core.vector.VectorInterpreter;
 import mallorcatour.grandtorino.spectrum.SpectrumResources;
+
 import org.neuroph.core.NeuralNetwork;
 
 /**
@@ -19,7 +21,7 @@ import org.neuroph.core.NeuralNetwork;
 public class PreflopSpectrumModeller {
 
 	public Advice getAdvice(LocalSituation situation, HoleCards cards, NeuralNetwork<?> preflopNN) {
-        if (situation.getStreet() != LocalSituation.PREFLOP) {
+        if (situation.getStreet() != PokerStreet.PREFLOP_VALUE) {
             throw new IllegalArgumentException();
         }
         //preparing input

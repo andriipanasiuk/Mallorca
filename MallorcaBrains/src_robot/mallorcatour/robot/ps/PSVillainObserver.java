@@ -15,7 +15,7 @@ import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.situation.NoStrengthSituationHandler;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.HandParser;
@@ -224,7 +224,7 @@ public class PSVillainObserver implements IVillainObserver {
         MultiLayerPerceptron nn = new MultiLayerPerceptron(preflopInputSize, 10, 3);
         List<PokerLearningExample> preflopExamples = new ArrayList<PokerLearningExample>();
         for (PokerLearningExample example : examples) {
-            if (example.getSituation().getStreet() == LocalSituation.PREFLOP) {
+            if (example.getSituation().getStreet() == PokerStreet.PREFLOP_VALUE) {
                 preflopExamples.add(example);
             }
 		}

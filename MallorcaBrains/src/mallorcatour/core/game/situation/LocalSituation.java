@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
@@ -22,10 +21,6 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
     public static final double DEFAULT_POTENTIAL = 0.1;
     private final static long serialVersionUID = -762999739785198026L;
     private final int street;
-    public static final int PREFLOP = 0;
-    public static final int FLOP = 1;
-    public static final int TURN = 2;
-    public static final int RIVER = 3;
     private double strength = -1;
     private boolean isOnButton;
     private boolean canRaise;
@@ -49,7 +44,6 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
     private double potOdds = -1;
     private double positivePotential = DEFAULT_POTENTIAL;
     private double negativePotential = DEFAULT_POTENTIAL;
-    private LimitType limitType;
 
     @Override
 	public int getHeroAggresionActionCount() {
@@ -73,9 +67,8 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
         return street;
     }
 
-    public LocalSituation(int street, LimitType gameType) {
+    public LocalSituation(int street) {
         this.street = street;
-        this.limitType = gameType;
     }
 
     /**
@@ -95,16 +88,13 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
         villainActionCount = values.get(i++).intValue();
         wasHeroPreviousAggresive = values.get(i++).doubleValue() == 1;
         wasOpponentPreviousAggresive = values.get(i++).doubleValue() == 1;
-        if (limitType == LimitType.NO_LIMIT) {
-            potToStackOdds = values.get(i++).doubleValue();
-        }
+        potToStackOdds = values.get(i++).doubleValue();
 		potOdds = values.get(i++).doubleValue();
 		positivePotential = values.get(i++).doubleValue();
 		negativePotential = values.get(i++).doubleValue();
     }
 
     public LocalSituation(LocalSituation other) {
-        this.limitType = other.limitType;
         this.street = other.street;
         this.strength = other.strength;
         this.isOnButton = other.isOnButton;
@@ -136,12 +126,7 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
         result.add(getVillainActionCount());
         result.add(wasHeroPreviousAggresive() ? 1 : 0);
         result.add(wasVillainPreviousAggresive() ? 1 : 0);
-        if (limitType == LimitType.FIXED_LIMIT && street != PREFLOP) {
-            result.add(getFLPotSize());
-        }
-        if (limitType == LimitType.NO_LIMIT) {
-            result.add(getPotToStackOdds());
-        }
+        result.add(getPotToStackOdds());
 		result.add(getPotOdds());
 		result.add(getPositivePotential());
 		result.add(getNegativePotential());
@@ -362,7 +347,4 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
         this.stackProportion = stackProportion;
     }
 
-    public LimitType getGameType() {
-        return limitType;
-    }
 }

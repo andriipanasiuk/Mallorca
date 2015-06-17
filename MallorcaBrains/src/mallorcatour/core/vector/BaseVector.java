@@ -28,6 +28,14 @@ public class BaseVector implements IVector {
         }
     }
 
+	public double[] asArray() {
+		double[] result = new double[values.size()];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = values.get(i).doubleValue();
+		}
+		return result;
+	}
+
     public List<Number> getValues() {
         return values;
     }

@@ -4,6 +4,7 @@
  */
 package mallorcatour.core.game.situation;
 
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.vector.EuclidDistance;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.interfaces.IDistanceCalculator;
@@ -24,7 +25,7 @@ public class SituationDistanceCalculator implements IDistanceCalculator<LocalSit
                     + "different stages.");
         }
         int street = one.getStreet();
-        if (street == LocalSituation.FLOP || street == LocalSituation.TURN) {
+        if (street == PokerStreet.FLOP_VALUE || street == PokerStreet.TURN_VALUE) {
             LocalSituation local1 = new LocalSituation(one);
             LocalSituation local2 = new LocalSituation(other);
             double pPo11 = local1.getPositivePotential();

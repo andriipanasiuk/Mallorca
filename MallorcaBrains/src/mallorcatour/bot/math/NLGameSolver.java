@@ -18,7 +18,6 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
@@ -354,21 +353,10 @@ public class NLGameSolver implements IGameSolver {
 	private LocalSituation getVillainSituationWithoutStrength(PokerStreet street, boolean villainOnButton,
 			double toCall, double pot, double effectiveStack, IAggressionInfo info,
 			boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive, String prefix) {
-		LocalSituation result = null;
 		double potOdds = toCall / (toCall + pot);
-		if (street == PokerStreet.PREFLOP) {
-			result = new LocalSituation(LocalSituation.PREFLOP, LimitType.NO_LIMIT);
-		} else if (street == PokerStreet.FLOP) {
-			result = new LocalSituation(LocalSituation.FLOP, LimitType.NO_LIMIT);
-			result.setPositivePotential(DEFAULT_POSITIVE_POTENTIAL);
-			result.setNegativePotential(DEFAULT_NEGATIVE_POTENTIAL);
-		} else if (street == PokerStreet.TURN) {
-			result = new LocalSituation(LocalSituation.TURN, LimitType.NO_LIMIT);
-			result.setPositivePotential(DEFAULT_POSITIVE_POTENTIAL);
-			result.setNegativePotential(DEFAULT_NEGATIVE_POTENTIAL);
-		} else if (street == PokerStreet.RIVER) {
-			result = new LocalSituation(LocalSituation.RIVER, LimitType.NO_LIMIT);
-		}
+		LocalSituation result = new LocalSituation(street.intValue());
+		result.setPositivePotential(DEFAULT_POSITIVE_POTENTIAL);
+		result.setNegativePotential(DEFAULT_NEGATIVE_POTENTIAL);
 		result.setAggressionInfoOnlyCount(info, true);
 		result.wasOpponentPreviousAggresive(wasHeroPreviousAggressive);
 		result.wasHeroPreviousAggresive(wasVillainPreviousAggressive);

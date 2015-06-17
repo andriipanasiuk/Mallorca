@@ -28,24 +28,17 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 
 	@Override
 	public LocalSituation getSituation() throws IllegalStateException {
-		LocalSituation result = null;
 		boolean isOnButton = gameInfo.onButton(hero) ^ !trackHero;
 		double potAfterCall = playerToCall + pot;
 		double potOdds = playerToCall / potAfterCall;
 		double potToStackCoeff = potAfterCall / (potAfterCall + effectiveStack);
 
 		Log.f(this + " " + C.TO_CALL + ": " + playerToCall + " " + C.POT + ": " + pot);
-		if (gameInfo.isPreFlop()) {
-			result = new LocalSituation(LocalSituation.PREFLOP, limitType);
-		} else if (gameInfo.isFlop()) {
-			result = new LocalSituation(LocalSituation.FLOP, limitType);
-		} else if (gameInfo.isTurn()) {
-			result = new LocalSituation(LocalSituation.TURN, limitType);
-		} else if (gameInfo.isRiver()) {
-			result = new LocalSituation(LocalSituation.RIVER, limitType);
-		} else {
+		PokerStreet street = gameInfo.getStage();
+		if (street == null) {
 			throw new IllegalStateException("Incorrect street value");
 		}
+		LocalSituation result = new LocalSituation(street.intValue());
 		result.setHeroAggresionActionCount(countOfHeroAggressive);
 		result.setHeroActionCount(heroActionCount);
 		result.setVillainAggresionActionCount(countOfOppAggressive);

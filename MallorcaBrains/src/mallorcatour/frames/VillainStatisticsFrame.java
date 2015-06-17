@@ -15,8 +15,8 @@ import java.io.File;
 import javax.swing.DefaultListModel;
 
 import mallorcatour.bot.villainobserver.VillainStatistics;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.vector.VectorInterpreter;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.tools.DoubleUtils;
@@ -198,7 +198,7 @@ public class VillainStatisticsFrame extends javax.swing.JFrame {
         villainStatistics = SerializatorUtils.load(path, VillainStatistics.class);
         preflopExamplesModel.clear();
         for (PokerLearningExample example : villainStatistics.getExamples()) {
-            if (example.getSituation().getStreet() == LocalSituation.PREFLOP) {
+            if (example.getSituation().getStreet() == PokerStreet.PREFLOP_VALUE) {
                 preflopExamplesModel.addElement(example);
             }
         }

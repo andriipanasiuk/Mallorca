@@ -7,6 +7,7 @@ import mallorcatour.brains.neural.IPokerNeurals;
 import mallorcatour.brains.neural.ISituationData;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.IAdvice;
@@ -57,13 +58,13 @@ public class SimilarSituationAdvisor extends NeuralAdvisor {
 
 		for (PokerLearningExample situation : allSituations) {
 			int street = situation.getInput().getStreet();
-			if (street == LocalSituation.PREFLOP) {
+			if (street == PokerStreet.PREFLOP_VALUE) {
 				preflopSituations.add(situation);
-			} else if (street == LocalSituation.FLOP) {
+			} else if (street == PokerStreet.FLOP_VALUE) {
 				flopSituations.add(situation);
-			} else if (street == LocalSituation.TURN) {
+			} else if (street == PokerStreet.TURN_VALUE) {
 				turnSituations.add(situation);
-			} else if (street == LocalSituation.RIVER) {
+			} else if (street == PokerStreet.RIVER_VALUE) {
 				riverSituations.add(situation);
 			}
 		}
