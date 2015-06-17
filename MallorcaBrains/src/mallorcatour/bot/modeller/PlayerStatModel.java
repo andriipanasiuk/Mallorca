@@ -77,7 +77,7 @@ public class PlayerStatModel implements IAdvisor, IActionObserver, IPokerStats {
 
 	@Override
 	public void acted(LocalSituation situation, Action advice) {
-		// TODO change stats
+		// TODO
 	}
 
 	public void addHandPlayed() {
