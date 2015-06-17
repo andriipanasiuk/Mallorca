@@ -13,7 +13,7 @@ import mallorcatour.tools.Log;
 public class StatCalculator {
 
 	public static class PreflopStats {
-		double vpip, pfr;
+		double vpip, pfr, pfr2;
 	}
 
 	public static class PostflopStats {
@@ -44,7 +44,7 @@ public class StatCalculator {
 	}
 
 	public static PreflopStats getPreflop(List<PokerLearningExample> list) {
-		double vpip = 0, pfr = 0, count = 0;
+		double vpip = 0, pfr = 0, vpipCount = 0, pfrCount = 0;
 		for (PokerLearningExample item : list) {
 			LocalSituation situation = item.getSituation();
 			Advice advice = item.getAdvice();
@@ -52,25 +52,43 @@ public class StatCalculator {
 			if (situation.getStreet() != PokerStreet.PREFLOP_VALUE) {
 				continue;
 			}
-			if (situation.getHeroActionCount() != 0) {
-				continue;
-			}
-			count += 1;
-			vpip += (1 - advice.getFold());
+			pfrCount += 1;
 			pfr += advice.getAggressive();
+			if (situation.getHeroActionCount() == 0) {
+				vpipCount += 1;
+				if (situation.getVillainActionCount() == 0) {
+					vpip += (1 - advice.getFold());
+				} else if (situation.getVillainActionCount() == 1) {
+					if (situation.getVillainAggresionActionCount() == 1) {
+						vpip += (1 - advice.getFold());
+					} else if (situation.getVillainAggresionActionCount() == 0) {
+						vpip += advice.getAggressive();
+					}
+				}
+			}
 		}
 		PreflopStats result = new PreflopStats();
-		result.vpip = vpip / count;
-		result.pfr = pfr / count;
+		result.vpip = vpip / vpipCount;
+		result.pfr = pfr / pfrCount;
 		return result;
 	}
 
 	public static void main(String... args) {
-//		String path = "learning_examples/GusXensen";
-		String path = "Cuba";
-		PreflopStats preflopStats = getPreflop(SituationIO.readFromDir(new File(path)));
-		PostflopStats postflopStats = getPostflop(SituationIO.readFromDir(new File(path)));
-		Log.d("Vpip: " + preflopStats.vpip + " Pfr: " + preflopStats.pfr);
-		Log.d("Aggr.: " + postflopStats.aggrFreq + " Fold: " + postflopStats.foldFreq);
+		{
+			String path = "Cuba";
+			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
+			PreflopStats preflopStats = getPreflop(list);
+			PostflopStats postflopStats = getPostflop(list);
+			Log.d("Vpip: " + preflopStats.vpip + " Pfr: " + preflopStats.pfr);
+			Log.d("Aggr.: " + postflopStats.aggrFreq + " Fold: " + postflopStats.foldFreq);
+		}
+		{
+			String path = "learning_examples/GusXensen";
+			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
+			PreflopStats preflopStats = getPreflop(list);
+			PostflopStats postflopStats = getPostflop(list);
+			Log.d("Vpip: " + preflopStats.vpip + " Pfr: " + preflopStats.pfr);
+			Log.d("Aggr.: " + postflopStats.aggrFreq + " Fold: " + postflopStats.foldFreq);
+		}
 	}
 }
