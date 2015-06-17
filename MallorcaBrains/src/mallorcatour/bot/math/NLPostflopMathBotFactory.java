@@ -6,6 +6,7 @@ import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.bot.villainobserver.SpectrumPlayerObserver;
 import mallorcatour.brains.IActionChecker;
@@ -28,7 +29,8 @@ public class NLPostflopMathBotFactory implements IBotFactory {
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
 			IDecisionListener decisionListener, IStudent student, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
-		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
+		PlayerStatModel model = new PlayerStatModel(debug);
+		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(model, model, strengthManager,
 				spectrumListener, name, false);
 
 		EVAdvisor evAdvisor = new EVAdvisor(villainModel, strengthManager, villainObserver, debug);

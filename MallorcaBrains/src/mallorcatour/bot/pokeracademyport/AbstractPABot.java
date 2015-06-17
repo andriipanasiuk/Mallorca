@@ -6,8 +6,7 @@ package mallorcatour.bot.pokeracademyport;
 
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.modeller.VillainModel;
-import mallorcatour.core.game.LimitType;
+import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.FileUtils;
@@ -32,19 +31,20 @@ public abstract class AbstractPABot implements Player {
     private int heroSeat;
     private String villainName;
     private String DEBUG_PATH = "default.txt";
-    private VillainModel modeller;
+    private PlayerStatModel modeller;
 
     public AbstractPABot(String name) {
         DEBUG_PATH = name + "_debug_" + DateUtils.getDate(false) + ".txt";
-        modeller = new VillainModel(LimitType.FIXED_LIMIT, DEBUG_PATH);
-        villainObserver = new PAVillainObserver(modeller, DEBUG_PATH);
+        modeller = new PlayerStatModel(DEBUG_PATH);
+		// TODO deal with this not so good code
+		villainObserver = new PAVillainObserver(null, DEBUG_PATH);
         Log.f(DEBUG_PATH, "=============================");
         Log.f(DEBUG_PATH, "Grandtorino player inited");
         Log.f(DEBUG_PATH, "Time: " + DateUtils.getDate(false));
         Log.f(DEBUG_PATH, "=============================");
     }
 
-    protected VillainModel getVillainModeller() {
+    protected PlayerStatModel getVillainModeller() {
         return modeller;
     }
 

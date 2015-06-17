@@ -4,6 +4,7 @@
  */
 package mallorcatour.brains.neural;
 
+import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
@@ -43,13 +44,13 @@ public class NeuralAdvisor implements IAdvisor {
 	private NeuralNetwork<?> preflopNN, flopNN, turnNN, riverNN;
 	private AdviceCreator adviceCreator;
 
-	public NeuralAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, String name) {
+	public NeuralAdvisor(IPokerNeurals nnStreaming, HavingStats stats, String name) {
 		this(nnStreaming, stats, name, null);
 	}
 
-	public NeuralAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, String name, AdviceCreator adviceCreator) {
+	public NeuralAdvisor(IPokerNeurals nnStreaming, HavingStats stats, String name, AdviceCreator adviceCreator) {
 		this.neurals = nnStreaming;
-		this.stats = stats;
+		this.stats = stats.getStats();
 		this.name = name;
 		this.adviceCreator = adviceCreator;
 		initNN();
@@ -100,28 +101,13 @@ public class NeuralAdvisor implements IAdvisor {
 	}
 
 	@Override
-	public double getAggressionFactor() {
-		return stats.getAggressionFactor();
-	}
-
-	@Override
-	public double getWtsd() {
-		return stats.getWtsd();
-	}
-
-	@Override
-	public double getAggressionFrequency() {
-		return stats.getAggressionFrequency();
-	}
-
-	@Override
-	public double getFoldFrequency() {
-		return stats.getFoldFrequency();
-	}
-
-	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public IPokerStats getStats() {
+		return stats;
 	}
 
 }

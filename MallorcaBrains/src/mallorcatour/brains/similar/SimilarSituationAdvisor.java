@@ -3,6 +3,7 @@ package mallorcatour.brains.similar;
 import java.util.ArrayList;
 import java.util.List;
 
+import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.neural.IPokerNeurals;
 import mallorcatour.brains.neural.ISituationData;
 import mallorcatour.brains.neural.NeuralAdvisor;
@@ -15,7 +16,6 @@ import mallorcatour.core.game.advice.SmartAdviceCreator;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.LocalSituationDistance;
 import mallorcatour.neural.core.PokerExamples;
@@ -31,7 +31,7 @@ public class SimilarSituationAdvisor extends NeuralAdvisor {
 	private int MIN_COUNT_OF_SIMILAR_SITUATIONS = 4;
 	private final static double[] DEGREE_OF_SIMILARITY = new double[4];
 
-	public SimilarSituationAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, ISituationData situationData,
+	public SimilarSituationAdvisor(IPokerNeurals nnStreaming, HavingStats stats, ISituationData situationData,
 			String name) {
 		super(nnStreaming, stats, name);
 		this.situationData = situationData;
@@ -42,7 +42,7 @@ public class SimilarSituationAdvisor extends NeuralAdvisor {
 		initSituations();
 	}
 
-	public SimilarSituationAdvisor(IPokerNeurals nnStreaming, IPokerStats stats, ISituationData situationData,
+	public SimilarSituationAdvisor(IPokerNeurals nnStreaming, HavingStats stats, ISituationData situationData,
 			int minCountOfSimilar, String name) {
 		super(nnStreaming, stats, name);
 		this.situationData = situationData;

@@ -16,7 +16,7 @@ import mallorcatour.bot.IStudent;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.modeller.VillainModel;
+import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.brains.IAdvisor;
@@ -51,7 +51,7 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 	private final Object actionLock = new Object();
 	private final ShowingSpectrumListener spectrumListener;
 	private boolean useGoButton = false;
-	private VillainModel villainModeller;
+	private PlayerStatModel villainModeller;
 	private final String DEBUG_PATH;
 	private GameEngine engine;
 	private Action lastMove;
@@ -64,7 +64,7 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 		spectrumListener = new ShowingSpectrumListener();
 		Log.WRITE_TO_ERR = false;
 		DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
-		villainModeller = new VillainModel(limitType, DEBUG_PATH);
+		villainModeller = new PlayerStatModel(DEBUG_PATH);
 		NeuralBotFactory factory = new NeuralBotFactory();
 		playerUp = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				IStudent.NONE, "Grantorino Up", DEBUG_PATH);
@@ -560,8 +560,8 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 		if (path == null) {
 			return;
 		}
-		villainModeller.onVillainKnown(true);
-		villainModeller.onVillainChange(SerializatorUtils.load(path, VillainStatistics.class));
+		// TODO set villain correctly
+		// villainModeller.onVillainChange(SerializatorUtils.load(path, VillainStatistics.class));
 	}// GEN-LAST:event_jMenuItem1ActionPerformed
 		// Variables declaration - do not modify//GEN-BEGIN:variables
 

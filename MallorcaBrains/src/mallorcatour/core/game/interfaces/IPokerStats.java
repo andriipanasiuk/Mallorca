@@ -1,9 +1,10 @@
 package mallorcatour.core.game.interfaces;
 
 public interface IPokerStats {
-	public double getAggressionFactor();
 
-	public double getWtsd();
+	public double getVpip();
+
+	public double getPfr();
 
 	public double getAggressionFrequency();
 

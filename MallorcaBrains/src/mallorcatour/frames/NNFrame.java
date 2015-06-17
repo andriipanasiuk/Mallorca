@@ -35,7 +35,7 @@ import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
 import mallorcatour.neural.core.ILearningExample;
 import mallorcatour.neural.core.LearningExample;
-import mallorcatour.neural.generator.NNWriter;
+import mallorcatour.neural.generator.NeuralIO;
 import mallorcatour.neural.manager.LEManager;
 import mallorcatour.neural.manager.NNManager;
 import mallorcatour.tools.DoubleUtils;
@@ -1785,7 +1785,7 @@ public class NNFrame extends javax.swing.JFrame {
 			return;
 		}
 		MyFileWriter writer = MyFileWriter.prepareForWriting(path, false);
-		NNWriter.weightsToJavaClass(writer, multiLayerPerceptron, "Flop");
+		NeuralIO.weightsToJavaClass(writer, multiLayerPerceptron, "Flop");
 		writer.endWriting();
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 

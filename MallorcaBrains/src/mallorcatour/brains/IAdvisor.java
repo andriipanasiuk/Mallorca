@@ -15,11 +15,13 @@ import mallorcatour.core.game.situation.LocalSituation;
  * 
  * @author Andrew
  */
-public interface IAdvisor extends IPokerStats {
+public interface IAdvisor extends HavingStats {
 
 	/**
 	 * Return advice for action in any situation with hole cards.
-	 * @param gameInfo TODO
+	 * 
+	 * @param gameInfo
+	 *            TODO
 	 */
 	IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo);
 
@@ -28,22 +30,7 @@ public interface IAdvisor extends IPokerStats {
 	public static final IAdvisor UNSUPPORTED = new IAdvisor() {
 
 		@Override
-		public double getWtsd() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public double getFoldFrequency() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public double getAggressionFrequency() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public double getAggressionFactor() {
+		public IPokerStats getStats() {
 			throw new UnsupportedOperationException();
 		}
 

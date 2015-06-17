@@ -9,41 +9,23 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.Log;
 
-public class EVAdvisor implements IAdvisor{
+public class EVAdvisor implements IAdvisor {
 
 	private ISpectrumHolder villainSpectrumHolder;
 	private BaseAdviceCreatorFromMap adviceCreator;
-	private IProfitCalculator profitCalculator; 
+	private IProfitCalculator profitCalculator;
 	private String DEBUG_PATH;
-	public EVAdvisor(IAdvisor villainModel, StrengthManager strengthManager, ISpectrumHolder villainSpectrumHolder, 
+
+	public EVAdvisor(IAdvisor villainModel, StrengthManager strengthManager, ISpectrumHolder villainSpectrumHolder,
 			String debug) {
 		this.villainSpectrumHolder = villainSpectrumHolder;
 		profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
 		adviceCreator = new AdviceCreatorFromMap();
 		this.DEBUG_PATH = debug;
-	}
-
-	@Override
-	public double getAggressionFactor() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public double getWtsd() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public double getAggressionFrequency() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public double getFoldFrequency() {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -59,5 +41,10 @@ public class EVAdvisor implements IAdvisor{
 	public String getName() {
 		return "EV advisor";
 	}
-	
+
+	@Override
+	public IPokerStats getStats() {
+		throw new UnsupportedOperationException();
+	}
+
 }

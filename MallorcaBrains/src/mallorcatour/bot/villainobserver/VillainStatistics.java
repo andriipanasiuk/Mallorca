@@ -122,4 +122,16 @@ public class VillainStatistics implements Serializable, IPokerStats {
     public String getName() {
         return name;
     }
+
+	@Override
+	public double getVpip() {
+		// TODO do
+		return 0;
+	}
+
+	@Override
+	public double getPfr() {
+		// TODO do
+		return 0;
+	}
 }

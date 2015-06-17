@@ -1,12 +1,14 @@
 package mallorcatour.brains.neural.gusxensen;
 
-import org.neuroph.core.NeuralNetwork;
-
+import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.neural.IPokerNeurals;
+import mallorcatour.brains.stats.PokerStats;
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.neural.core.NeuralCreator;
 
-public class GusXensen implements IPokerNeurals, IPokerStats {
+import org.neuroph.core.NeuralNetwork;
+
+public class GusXensen implements IPokerNeurals, HavingStats {
 
 	private NeuralNetwork<?> preflop, flop, turn, river;
 
@@ -38,23 +40,8 @@ public class GusXensen implements IPokerNeurals, IPokerStats {
 	}
 
 	@Override
-	public double getAggressionFactor() {
-		return 3.0;
-	}
-
-	@Override
-	public double getWtsd() {
-		return 0.4;
-	}
-
-	@Override
-	public double getAggressionFrequency() {
-		return 0.5;
-	}
-
-	@Override
-	public double getFoldFrequency() {
-		return 0.3;
+	public IPokerStats getStats() {
+		return new PokerStats(0.7, 0.4, 0.25, 0.56);
 	}
 
 }

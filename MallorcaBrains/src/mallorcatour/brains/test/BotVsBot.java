@@ -6,7 +6,7 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.bot.math.NLPostflopMathBotFactory;
-import mallorcatour.bot.modeller.VillainModel;
+import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.neural.NeuralAggroBotFactory;
 import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.random.RandomBot;
@@ -15,7 +15,6 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.brains.neural.student.WritingStudent;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
 import mallorcatour.core.game.engine.PredefinedGameEngine;
 import mallorcatour.core.game.interfaces.IGameObserver;
@@ -30,8 +29,8 @@ public class BotVsBot {
 		Log.DEBUG_PATH = DEBUG_PATH;
 		NLFullMathBotFactory nlMathBotFactory = new NLFullMathBotFactory();
 		NLPostflopMathBotFactory nlPostflopMathBotFactory = new NLPostflopMathBotFactory();
-		IPlayer postflopMathBot = nlPostflopMathBotFactory.createBot(new VillainModel(LimitType.NO_LIMIT, DEBUG_PATH), ISpectrumListener.EMPTY, 
-				IDecisionListener.EMPTY, IStudent.NONE, "MathBot", DEBUG_PATH);
+		IPlayer postflopMathBot = nlPostflopMathBotFactory.createBot(new PlayerStatModel(DEBUG_PATH),
+				ISpectrumListener.EMPTY, IDecisionListener.EMPTY, IStudent.NONE, "MathBot", DEBUG_PATH);
 
 		GusXensen gusXensen = new GusXensen();
 		WritingStudent student = new WritingStudent("Cuba");

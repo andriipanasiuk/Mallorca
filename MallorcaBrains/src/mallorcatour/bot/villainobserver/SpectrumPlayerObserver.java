@@ -41,7 +41,9 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	private NoStrengthSituationHandler situationHandler;
 	private LocalSituation situation;
 
-	public SpectrumPlayerObserver(IAdvisor model, StrengthManager strengthManager, ISpectrumListener spectrumListener,
+	private final IActionObserver actionObserver;
+
+	public SpectrumPlayerObserver(IAdvisor model, IActionObserver actionObserver, StrengthManager strengthManager, ISpectrumListener spectrumListener,
 			String hero, boolean trackHero) {
 		this.hero = hero;
 		this.trackHero = trackHero;
@@ -49,6 +51,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		situationHandler = new NoStrengthSituationHandler(LimitType.NO_LIMIT, hero, trackHero);
 		this.strengthManager = strengthManager;
 		this.spectrumListener = spectrumListener;
+		this.actionObserver = actionObserver;
 	}
 
 	private Map<HoleCards, IAdvice> calculateAdvices(LocalSituation situation, Action action) {
@@ -156,6 +159,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 			String modelPlayer = trackHero ? gameInfo.getHero(hero).getName() : gameInfo.getVillain(hero).getName();
 			Log.f(C.SITUATION + " of " + modelPlayer + " " + situation);
 			modifySpectrum(situation, action);
+			actionObserver.acted(situation, action);
 		} else if (!action.isFold()) {
 			Log.f(this.toString() + " not him acted");
 			situation = situationHandler.getSituation();

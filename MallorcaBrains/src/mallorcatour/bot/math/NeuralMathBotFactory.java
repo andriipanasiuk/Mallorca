@@ -7,6 +7,7 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.preflop.NLPreflopChart;
+import mallorcatour.bot.villainobserver.IActionObserver;
 import mallorcatour.bot.villainobserver.SpectrumPlayerObserver;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
@@ -34,8 +35,8 @@ public class NeuralMathBotFactory implements IBotFactory {
 		GusXensen player = new GusXensen();
 		LimitType limitType = LimitType.NO_LIMIT;
 		IAdvisor commonAdvisor = new NeuralAdvisor(player, player, "Gus Xensen");
-		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
-				spectrumListener, name, false);
+		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, IActionObserver.EMPTY,
+				strengthManager, spectrumListener, name, false);
 		IActionChecker actionChecker = new NLRiverActionChecker(profitCalculator, villainObserver);
 		Player bot = new Player(IAdvisor.UNSUPPORTED, new NLPreflopChart(), commonAdvisor, actionChecker, name, debug);
 

@@ -6,7 +6,7 @@ import mallorcatour.tools.MyFileWriter;
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 
-public class NNWriter {
+public class NeuralIO {
 
 	public static void weightsToJavaClass(MyFileWriter writer, NeuralNetwork<?> nn, String name) {
 		Layer[] layers = nn.getLayers();

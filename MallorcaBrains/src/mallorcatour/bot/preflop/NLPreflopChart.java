@@ -11,6 +11,7 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.ExactAdvice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.Log;
 
@@ -88,27 +89,12 @@ public class NLPreflopChart implements IAdvisor {
     }
 
 	@Override
-	public double getAggressionFactor() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public double getWtsd() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public double getAggressionFrequency() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public double getFoldFrequency() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public String getName() {
 		return "Preflop chart bot";
+	}
+
+	@Override
+	public IPokerStats getStats() {
+		throw new UnsupportedOperationException();
 	}
 }
