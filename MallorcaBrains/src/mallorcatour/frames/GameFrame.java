@@ -12,6 +12,7 @@ package mallorcatour.frames;
 
 import java.awt.EventQueue;
 
+import mallorcatour.bot.IStudent;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
@@ -66,9 +67,9 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 		villainModeller = new VillainModel(limitType, DEBUG_PATH);
 		NeuralBotFactory factory = new NeuralBotFactory();
 		playerUp = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
-				"Grantorino Up", DEBUG_PATH);
+				IStudent.NONE, "Grantorino Up", DEBUG_PATH);
 		playerDown = new NeuralBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
-				IDecisionListener.EMPTY, "Grantorino Down", DEBUG_PATH);
+				IDecisionListener.EMPTY, IStudent.NONE, "Grantorino Down", DEBUG_PATH);
 		engine = new GameEngine(playerDown, playerUp, this, DEBUG_PATH);
 		enableActionButtons(false);
 		humanDealerButton.setVisible(false);

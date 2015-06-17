@@ -1,5 +1,6 @@
 package mallorcatour.bot.modeller;
 
+import mallorcatour.bot.IStudent;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
@@ -28,7 +29,7 @@ public class NeuralModelVillainBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener villainSpectrumListener,
-			IDecisionListener decisionListener, String name, String debug) {
+			IDecisionListener decisionListener, IStudent student, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		GusXensen player = new GusXensen();
 		Player bot = new Player(IAdvisor.UNSUPPORTED, new NLPreflopChart(), new NeuralAdvisor(player, player,

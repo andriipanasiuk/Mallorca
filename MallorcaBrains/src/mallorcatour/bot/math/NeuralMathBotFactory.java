@@ -1,5 +1,6 @@
 package mallorcatour.bot.math;
 
+import mallorcatour.bot.IStudent;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
@@ -27,7 +28,7 @@ public class NeuralMathBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, String name, String debug) {
+			IDecisionListener decisionListener, IStudent student, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		IProfitCalculator profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
 		GusXensen player = new GusXensen();

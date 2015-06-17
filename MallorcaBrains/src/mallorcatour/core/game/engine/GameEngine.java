@@ -24,16 +24,16 @@ import mallorcatour.tools.UniformRandomizer;
 
 public class GameEngine implements IGameInfo {
 
-	private IGameObserver<IGameInfo> gameObserver;
-
 	public static class ActionResult {
 		public static final int START_ROUND = -1;
 		public static final int SHOWDOWN = 0;
-		public static final int NEXT_STAGE = 1;
+		public static final int TRADE_FINISHED = 1;
 		public static final int ANOTHER_PLAYER = 2;
-		public static final int START_STREET = 3;
+		public static final int START_TRADING = 3;
 		public static final int UNCONTESTED = 4;
 	}
+
+	private IGameObserver<IGameInfo> gameObserver;
 
 	private final double startingStack = 2000;
 	private final double START_BIG_BLIND = 20;
@@ -237,7 +237,7 @@ public class GameEngine implements IGameInfo {
 		potOnStreet[currentStreet.intValue()] = pot;
 		currentStreet = currentStreet.next();
 		zeroBets();
-		return ActionResult.START_STREET;
+		return ActionResult.START_TRADING;
 	}
 
 	protected IPlayer otherThan(IPlayer player) {
@@ -322,21 +322,21 @@ public class GameEngine implements IGameInfo {
 		int result = ActionResult.START_ROUND;
 		while (result != ActionResult.SHOWDOWN && result != ActionResult.UNCONTESTED) {
 			if (result == ActionResult.START_ROUND) {
-				SimplePair<IPlayer, OpenPlayerInfo> button = getPlayer(true);
-				result = playerAction(button.first, button.second);
-			} else if (result == ActionResult.NEXT_STAGE) {
+				SimplePair<IPlayer, OpenPlayerInfo> actingPlayer = getPlayer(true);
+				result = playerAction(actingPlayer.first, actingPlayer.second);
+			} else if (result == ActionResult.TRADE_FINISHED) {
 				result = changeStreet();
 				if (result != ActionResult.SHOWDOWN) {
 					player1.onStageEvent(currentStreet);
 					player2.onStageEvent(currentStreet);
 					gameObserver.onStageEvent(currentStreet);
 				}
-			} else if (result == ActionResult.START_STREET) {
+			} else if (result == ActionResult.START_TRADING) {
 				if (getBankRollAtRisk() > 0) {
-					SimplePair<IPlayer, OpenPlayerInfo> button = getPlayer(false);
-					result = playerAction(button.first, button.second);
+					SimplePair<IPlayer, OpenPlayerInfo> actingPlayer = getPlayer(false);
+					result = playerAction(actingPlayer.first, actingPlayer.second);
 				} else {
-					result = ActionResult.NEXT_STAGE;
+					result = ActionResult.TRADE_FINISHED;
 				}
 			} else if (result == ActionResult.ANOTHER_PLAYER) {
 				if (lastMovePlayer == playerInfo1) {
@@ -365,7 +365,7 @@ public class GameEngine implements IGameInfo {
 				playerInfo.stack = 0;
 			}
 			if (tradeOpened) {
-				return ActionResult.NEXT_STAGE;
+				return ActionResult.TRADE_FINISHED;
 			} else {
 				tradeOpened = true;
 				return ActionResult.ANOTHER_PLAYER;

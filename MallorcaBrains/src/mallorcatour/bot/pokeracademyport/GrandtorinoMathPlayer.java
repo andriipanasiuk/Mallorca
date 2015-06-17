@@ -4,6 +4,7 @@
  */
 package mallorcatour.bot.pokeracademyport;
 
+import mallorcatour.bot.IStudent;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.neural.NeuralBotFactory;
@@ -19,7 +20,7 @@ public class GrandtorinoMathPlayer extends AbstractPABot {
 	public GrandtorinoMathPlayer() {
 		super("MathBot");
 		myBot = new NeuralBotFactory().createBot(getVillainModeller(), ISpectrumListener.EMPTY, getDecisionListener(),
-				null, getDebugPath());
+				IStudent.NONE, null, getDebugPath());
 	}
 
 	@Override

@@ -4,6 +4,7 @@
  */
 package fellomen.bot;
 
+import mallorcatour.bot.IStudent;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
@@ -16,7 +17,7 @@ import mallorcatour.brains.IAdvisor;
  */
 public class FellOmenFactory implements IBotFactory {
 
-    public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener, IDecisionListener decisionListener, String name, String debug) {
+    public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener, IDecisionListener decisionListener, IStudent student, String name, String debug) {
         return new FellOmen2(debug);
     }
 }

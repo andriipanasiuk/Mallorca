@@ -1,5 +1,6 @@
 package mallorcatour.bot.math;
 
+import mallorcatour.bot.IStudent;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
@@ -18,7 +19,7 @@ public class NLFullMathBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, String name, String debug) {
+			IDecisionListener decisionListener, IStudent student, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
 				spectrumListener, name, false);
@@ -26,6 +27,7 @@ public class NLFullMathBotFactory implements IBotFactory {
 
 		Player bot = new Player(IAdvisor.UNSUPPORTED, IAdvisor.UNSUPPORTED, evAdvisor, IActionChecker.EMPTY, name,
 				debug);
+		bot.setStudent(student);
 		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, name);
 		bot.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager),
 				new HoleCardsObservers(villainObserver, situationHandler));

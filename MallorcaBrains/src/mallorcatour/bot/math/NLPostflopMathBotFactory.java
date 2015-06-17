@@ -1,5 +1,6 @@
 package mallorcatour.bot.math;
 
+import mallorcatour.bot.IStudent;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
@@ -25,7 +26,7 @@ public class NLPostflopMathBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, String name, String debug) {
+			IDecisionListener decisionListener, IStudent student, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, strengthManager,
 				spectrumListener, name, false);

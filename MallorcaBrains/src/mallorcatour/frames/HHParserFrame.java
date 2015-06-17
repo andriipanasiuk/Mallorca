@@ -466,14 +466,15 @@ public class HHParserFrame extends javax.swing.JFrame {
         if (pathes == null) {
             return;
         }
+        File dir = new File("");
+        dir.mkdirs();
         for (String path : pathes) {
             BaseHandHandler handler = new BaseHandHandler();
             PAHHParser.parseHandHistory(path, handler);
             long start = System.currentTimeMillis();
             List<Hand> hands = handler.buildHands();
-            int count = hands.size();
-            List<PokerLearningExample> examples =
-                    NNConverter.localSituationsToFile(hands, "./advices_cash", situationHandler);
+			int count = hands.size();
+			List<PokerLearningExample> examples = NNConverter.localSituationsToFile(dir, hands, "./advices_cash", situationHandler);
             if (examples == null) {
                 continue;
             }
