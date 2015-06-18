@@ -1,9 +1,12 @@
 package mallorcatour.brains.stats;
 
+import mallorcatour.bot.IStudent;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPokerStats;
+import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.Pair;
 
-public class PokerStatInfo implements IPokerStats {
+public class PokerStatInfo implements IPokerStats, IStudent {
 	public Pair<Double, Double> vpip = new Pair<>(0d, 0d);
 	public Pair<Double, Double> pfr = new Pair<>(0d, 0d);
 	public Pair<Double, Double> aggressionFrequency = new Pair<>(0d, 0d);
@@ -42,5 +45,16 @@ public class PokerStatInfo implements IPokerStats {
 	@Override
 	public double getPfr() {
 		return pfr.first / pfr.second;
+	}
+
+	@Override
+	public String toString() {
+		return "Vpip: " + getVpip() + " Pfr: " + getPfr() + " Aggr.: " + getAggressionFrequency() + " Fold: "
+				+ getFoldFrequency();
+	}
+
+	@Override
+	public void learn(LocalSituation situation, IAdvice advice) {
+		StatCalculator.changeStat(situation, advice, this);
 	}
 }
