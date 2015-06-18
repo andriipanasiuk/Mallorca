@@ -13,10 +13,9 @@ package bot;
 
 import java.util.Scanner;
 
+import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.C;
-import mallorcatour.bot.IStudent;
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.NLFullMathBotFactory;
@@ -102,8 +101,7 @@ public class BotParser {
 		IBotFactory factory = new NLFullMathBotFactory();
 		GusXensen gusXensen = new GusXensen();
 		NeuralAdvisor villainModel = new NeuralAdvisor(gusXensen, gusXensen, "Villain GusXensen model");
-		BotParser parser = new BotParser(factory.createBot(villainModel, ISpectrumListener.EMPTY,
-				IDecisionListener.EMPTY, IStudent.NONE, "Mallorca", ""));
+		BotParser parser = new BotParser(factory.createBot(villainModel, ISpectrumListener.EMPTY, AdvisorListener.NONE, AdvisorListener.NONE, "Mallorca", ""));
 		parser.run();
 	}
 }

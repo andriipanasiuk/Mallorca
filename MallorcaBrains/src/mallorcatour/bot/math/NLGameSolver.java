@@ -33,6 +33,7 @@ import mallorcatour.tools.Log;
  */
 public class NLGameSolver implements IGameSolver {
 
+	public static boolean CONSIDER_PREV_POT = false;
 	private final static double NEARLY_ZERO = 0.0001;
 	private final static double DEFAULT_POSITIVE_POTENTIAL = 0.1;
 	private final static double DEFAULT_NEGATIVE_POTENTIAL = 0.1;
@@ -76,7 +77,6 @@ public class NLGameSolver implements IGameSolver {
 				PokerStreet.RIVER, bigBlind, 0);
 	}
 
-	public static boolean CONSIDER_PREV_POT = false;
 	/**
 	 * pot - after call
 	 */

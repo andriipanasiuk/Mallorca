@@ -1,9 +1,8 @@
 package mallorcatour.brains.neural.gusxensen;
 
-import mallorcatour.bot.IStudent;
+import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.preflop.NLPreflopChart;
@@ -18,7 +17,7 @@ public class GusXensenAggressiveFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, IStudent student, String name, String debug) {
+			AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug) {
 		GusXensen player = new GusXensen();
 		NeuralAdvisor advisor = new NeuralAdvisor(player, player, "Gus Xensen", new AggroAdviceCreator());
 		Player realPlayer = new Player(IAdvisor.UNSUPPORTED, new NLPreflopChart(), advisor, IActionChecker.EMPTY, name,

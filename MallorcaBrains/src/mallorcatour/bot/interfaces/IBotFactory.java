@@ -4,7 +4,7 @@
  */
 package mallorcatour.bot.interfaces;
 
-import mallorcatour.bot.IStudent;
+import mallorcatour.bot.AdvisorListener;
 import mallorcatour.brains.IAdvisor;
 
 
@@ -15,5 +15,5 @@ import mallorcatour.brains.IAdvisor;
 public interface IBotFactory {
 
     IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-            IDecisionListener decisionListener, IStudent student, String name, String debug);
+            AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug);
 }

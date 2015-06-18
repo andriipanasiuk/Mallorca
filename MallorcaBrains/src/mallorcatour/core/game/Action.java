@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
-public class Action implements Serializable {
+import mallorcatour.core.game.advice.IAdvice;
+
+public class Action implements Serializable, IAdvice {
 	private static final long serialVersionUID = 1L;
 	private static final double THRESHOLD_FOR_GOING_ALLIN = 0.6D;
 	private static final double PERCENT_OF_POT_FOR_BET = 0.7D;
@@ -194,6 +196,27 @@ public class Action implements Serializable {
 			this.type = Type.AGGRESSIVE;
 		else
 			throw new IllegalArgumentException();
+	}
+
+
+	@Override
+	public Action getAction() {
+		return this;
+	}
+
+	@Override
+	public double getFold() {
+		return isFold() ? 1 : 0;
+	}
+
+	@Override
+	public double getPassive() {
+		return isPassive() ? 1 : 0;
+	}
+
+	@Override
+	public double getAggressive() {
+		return isAggressive() ? 1 : 0;
 	}
 
 	private static class Type implements Serializable {

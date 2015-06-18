@@ -1,12 +1,10 @@
 package mallorcatour.bot.math;
 
-import mallorcatour.bot.IStudent;
+import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.villainobserver.SpectrumPlayerObserver;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
@@ -20,19 +18,18 @@ public class NLFullMathBotFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
-			IDecisionListener decisionListener, IStudent student, String name, String debug) {
+			AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug) {
 		StrengthManager strengthManager = new StrengthManager(false);
-		PlayerStatModel model = new PlayerStatModel(debug);
-		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(model, model, strengthManager,
-				spectrumListener, name, false);
-		EVAdvisor evAdvisor = new EVAdvisor(model, strengthManager, villainObserver, debug);
+		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, villainListener,
+				strengthManager, spectrumListener, name, false);
+		EVAdvisor evAdvisor = new EVAdvisor(villainModel, strengthManager, villainObserver, debug);
 
-		Player bot = new Player(IAdvisor.UNSUPPORTED, IAdvisor.UNSUPPORTED, evAdvisor, IActionChecker.EMPTY, name,
+		Player player = new Player(IAdvisor.UNSUPPORTED, IAdvisor.UNSUPPORTED, evAdvisor, IActionChecker.EMPTY, name,
 				debug);
-		bot.setStudent(student);
+		player.setStudent(heroListener);
 		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, name);
-		bot.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager),
+		player.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager),
 				new HoleCardsObservers(villainObserver, situationHandler));
-		return bot;
+		return player;
 	}
 }

@@ -3,8 +3,8 @@ package mallorcatour.bot.villainobserver;
 import java.util.HashMap;
 import java.util.Map;
 
+import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.C;
-import mallorcatour.bot.interfaces.IActionObserver;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IAdvisor;
@@ -42,9 +42,9 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	private NoStrengthSituationHandler situationHandler;
 	private LocalSituation situation;
 
-	private final IActionObserver actionObserver;
+	private final AdvisorListener adviceListener;
 
-	public SpectrumPlayerObserver(IAdvisor model, IActionObserver actionObserver, StrengthManager strengthManager, ISpectrumListener spectrumListener,
+	public SpectrumPlayerObserver(IAdvisor model, AdvisorListener actionObserver, StrengthManager strengthManager, ISpectrumListener spectrumListener,
 			String hero, boolean trackHero) {
 		this.hero = hero;
 		this.trackHero = trackHero;
@@ -52,7 +52,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		situationHandler = new NoStrengthSituationHandler(LimitType.NO_LIMIT, hero, trackHero);
 		this.strengthManager = strengthManager;
 		this.spectrumListener = spectrumListener;
-		this.actionObserver = actionObserver;
+		this.adviceListener = actionObserver;
 	}
 
 	private Map<HoleCards, IAdvice> calculateAdvices(LocalSituation situation, Action action) {
@@ -160,7 +160,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 			String modelPlayer = trackHero ? gameInfo.getHero(hero).getName() : gameInfo.getVillain(hero).getName();
 			Log.f(C.SITUATION + " of " + modelPlayer + " " + situation);
 			modifySpectrum(situation, action);
-			actionObserver.acted(situation, action);
+			adviceListener.onAdvice(situation, action);
 		} else if (!action.isFold()) {
 			Log.f(this.toString() + " not him acted");
 			situation = situationHandler.getSituation();

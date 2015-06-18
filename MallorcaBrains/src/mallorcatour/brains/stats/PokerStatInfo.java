@@ -1,12 +1,12 @@
 package mallorcatour.brains.stats;
 
-import mallorcatour.bot.IStudent;
+import mallorcatour.bot.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.Pair;
 
-public class PokerStatInfo implements IPokerStats, IStudent {
+public class PokerStatInfo implements IPokerStats, AdvisorListener {
 	public Pair<Double, Double> vpip = new Pair<>(0d, 0d);
 	public Pair<Double, Double> pfr = new Pair<>(0d, 0d);
 	public Pair<Double, Double> aggressionFrequency = new Pair<>(0d, 0d);
@@ -54,7 +54,7 @@ public class PokerStatInfo implements IPokerStats, IStudent {
 	}
 
 	@Override
-	public void learn(LocalSituation situation, IAdvice advice) {
+	public void onAdvice(LocalSituation situation, IAdvice advice) {
 		StatCalculator.changeStat(situation, advice, this);
 	}
 }

@@ -20,14 +20,14 @@ public class StatCalculatorTest {
 			Log.d("Aggr.: " + stats.getAggressionFrequency() + " Fold: " + stats.getFoldFrequency());
 		}
 		{
-			String path = "Germany";
+			String path = "France";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
 			Log.d("Vpip: " + stats.getVpip() + " Pfr: " + stats.getPfr());
 			Log.d("Aggr.: " + stats.getAggressionFrequency() + " Fold: " + stats.getFoldFrequency());
 		}
 		{
-			String path = "learning_examples/GusXensen";
+			String path = "GusXensen";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
 			Log.d("Vpip: " + stats.getVpip() + " Pfr: " + stats.getPfr());

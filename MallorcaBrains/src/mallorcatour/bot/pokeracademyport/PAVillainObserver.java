@@ -7,7 +7,6 @@ package mallorcatour.bot.pokeracademyport;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.villainobserver.IVillainListener;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.bot.villainobserver.VillainStatistics;
@@ -28,7 +27,7 @@ import org.neuroph.nnet.learning.MomentumBackpropagation;
  *
  * @author Andrew
  */
-public class PAVillainObserver implements IVillainObserver, IDecisionListener {
+public class PAVillainObserver implements IVillainObserver {
 
     private final static int ITERATION_COUNT = 15000;
     private final static int LEARN_PREFLOP_EVERY_HAND = 5;

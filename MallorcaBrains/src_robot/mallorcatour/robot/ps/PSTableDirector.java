@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import mallorcatour.bot.IStudent;
+import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
@@ -344,10 +344,10 @@ public class PSTableDirector {
         IPlayer player;
         if (limitType == LimitType.FIXED_LIMIT) {
             player = FLbotFactory.createBot(villainModeller,
-                    ISpectrumListener.EMPTY, IDecisionListener.EMPTY, IStudent.NONE, null, debug);
+                    ISpectrumListener.EMPTY, AdvisorListener.NONE, AdvisorListener.NONE, null, debug);
         } else if (limitType == LimitType.NO_LIMIT) {
             player = NLbotFactory.createBot(villainModeller,
-                    ISpectrumListener.EMPTY, IDecisionListener.EMPTY, IStudent.NONE, null, debug);
+                    ISpectrumListener.EMPTY, AdvisorListener.NONE, AdvisorListener.NONE, null, debug);
         } else {
             throw new RuntimeException();
         }

@@ -4,7 +4,6 @@
  */
 package mallorcatour.bot.pokeracademyport;
 
-import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.core.game.PokerStreet;
@@ -46,10 +45,6 @@ public abstract class AbstractPABot implements Player {
 
     protected PlayerStatModel getVillainModeller() {
         return modeller;
-    }
-
-    protected IDecisionListener getDecisionListener() {
-        return villainObserver;
     }
 
     protected String getDebugPath() {

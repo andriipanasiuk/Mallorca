@@ -18,7 +18,7 @@ public class Player extends ObservingPlayer {
 	private final IAdvisor preflopAdvisor;
 	private final IAdvisor postflopAdvisor;
 	private final IAdvisor preflopChart;
-	private IStudent student = IStudent.NONE;
+	private AdvisorListener student = AdvisorListener.NONE;
 	private IActionChecker actionChecker;
 
 	public Player(IAdvisor preflopAdvisor, IAdvisor preflopChart, IAdvisor commonAdvisor, IActionChecker actionChecker,
@@ -33,7 +33,7 @@ public class Player extends ObservingPlayer {
 		this.actionChecker = actionChecker;
 	}
 
-	public void setStudent(IStudent student) {
+	public void setStudent(AdvisorListener student) {
 		this.student = student;
 	}
 
@@ -61,7 +61,7 @@ public class Player extends ObservingPlayer {
 			advice = postflopAdvisor.getAdvice(situation, cards, gameInfo);
 		}
 
-		student.learn(situation, advice);
+		student.onAdvice(situation, advice);
 
 		Log.f(DEBUG_PATH, C.ADVICE + ": " + advice.toString());
 		Action action = advice.getAction();
