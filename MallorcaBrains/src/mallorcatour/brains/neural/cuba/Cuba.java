@@ -1,4 +1,4 @@
-package mallorcatour.brains.neural.gusxensen;
+package mallorcatour.brains.neural.cuba;
 
 import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.neural.IPokerNeurals;
@@ -8,11 +8,11 @@ import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
 
-public class GusXensen implements IPokerNeurals, HavingStats {
+public class Cuba implements IPokerNeurals, HavingStats {
 
 	private NeuralNetwork<?> preflop, flop, turn, river;
 
-	public GusXensen() {
+	public Cuba() {
 		preflop = NeuralCreator.createPerceptron(new PreflopNeuralInfo());
 		flop = NeuralCreator.createPerceptron(new FlopNeuralInfo());
 		turn = NeuralCreator.createPerceptron(new TurnNeuralInfo());
@@ -41,7 +41,7 @@ public class GusXensen implements IPokerNeurals, HavingStats {
 
 	@Override
 	public IPokerStats getStats() {
-		return new PokerStats(0.79, 0.49, 0.37, 0.56);
+		return new PokerStats(0.92, 0.42, 0.91, 0.29);
 	}
 
 }

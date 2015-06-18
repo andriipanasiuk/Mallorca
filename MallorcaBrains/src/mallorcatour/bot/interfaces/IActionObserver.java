@@ -1,4 +1,4 @@
-package mallorcatour.bot.villainobserver;
+package mallorcatour.bot.interfaces;
 
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.situation.LocalSituation;

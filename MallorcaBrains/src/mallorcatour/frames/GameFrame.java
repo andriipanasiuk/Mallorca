@@ -17,9 +17,9 @@ import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.modeller.PlayerStatModel;
-import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
@@ -65,10 +65,10 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 		Log.WRITE_TO_ERR = false;
 		DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		villainModeller = new PlayerStatModel(DEBUG_PATH);
-		NeuralBotFactory factory = new NeuralBotFactory();
+		GusXensenFactory factory = new GusXensenFactory();
 		playerUp = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
 				IStudent.NONE, "Grantorino Up", DEBUG_PATH);
-		playerDown = new NeuralBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+		playerDown = new GusXensenFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, IStudent.NONE, "Grantorino Down", DEBUG_PATH);
 		engine = new GameEngine(playerDown, playerUp, this, DEBUG_PATH);
 		enableActionButtons(false);

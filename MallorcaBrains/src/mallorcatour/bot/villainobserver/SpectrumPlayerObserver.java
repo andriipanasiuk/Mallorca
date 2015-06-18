@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.bot.C;
+import mallorcatour.bot.interfaces.IActionObserver;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IAdvisor;

@@ -2,12 +2,12 @@ package mallorcatour.bot.math;
 
 import mallorcatour.bot.IStudent;
 import mallorcatour.bot.Player;
+import mallorcatour.bot.interfaces.IActionObserver;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.preflop.NLPreflopChart;
-import mallorcatour.bot.villainobserver.IActionObserver;
 import mallorcatour.bot.villainobserver.SpectrumPlayerObserver;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;

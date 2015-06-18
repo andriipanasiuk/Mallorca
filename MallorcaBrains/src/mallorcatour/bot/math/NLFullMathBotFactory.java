@@ -25,7 +25,7 @@ public class NLFullMathBotFactory implements IBotFactory {
 		PlayerStatModel model = new PlayerStatModel(debug);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(model, model, strengthManager,
 				spectrumListener, name, false);
-		EVAdvisor evAdvisor = new EVAdvisor(villainModel, strengthManager, villainObserver, debug);
+		EVAdvisor evAdvisor = new EVAdvisor(model, strengthManager, villainObserver, debug);
 
 		Player bot = new Player(IAdvisor.UNSUPPORTED, IAdvisor.UNSUPPORTED, evAdvisor, IActionChecker.EMPTY, name,
 				debug);

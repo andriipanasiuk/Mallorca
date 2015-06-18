@@ -20,7 +20,6 @@ public class NLProfitCalculator implements IProfitCalculator {
 	public NLProfitCalculator(IAdvisor villainModeller, StrengthManager strengthManager) {
 		gameSolver = new NLGameSolver(villainModeller);
 		this.strengthManager = strengthManager;
-		;
 	}
 
 	private final NLGameSolver gameSolver;

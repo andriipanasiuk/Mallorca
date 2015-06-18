@@ -41,7 +41,10 @@ public class NeuralAdvisor implements IAdvisor {
 	private final IPokerNeurals neurals;
 	private final IPokerStats stats;
 	private final String name;
-	private NeuralNetwork<?> preflopNN, flopNN, turnNN, riverNN;
+	private NeuralNetwork<?> preflopNN;
+	private NeuralNetwork<?> flopNN;
+	private NeuralNetwork<?> turnNN;
+	private NeuralNetwork<?> riverNN;
 	private AdviceCreator adviceCreator;
 
 	public NeuralAdvisor(IPokerNeurals nnStreaming, HavingStats stats, String name) {

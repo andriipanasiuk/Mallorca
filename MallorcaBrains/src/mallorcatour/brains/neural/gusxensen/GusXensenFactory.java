@@ -1,4 +1,4 @@
-package mallorcatour.bot.neural;
+package mallorcatour.brains.neural.gusxensen;
 
 import mallorcatour.bot.IStudent;
 import mallorcatour.bot.Player;
@@ -10,11 +10,10 @@ import mallorcatour.bot.preflop.NLPreflopChart;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
-import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.SituationHandler;
 
-public class NeuralBotFactory implements IBotFactory {
+public class GusXensenFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,

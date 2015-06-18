@@ -8,13 +8,11 @@ import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.bot.math.NLPostflopMathBotFactory;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.neural.NeuralAggroBotFactory;
-import mallorcatour.bot.neural.NeuralBotFactory;
 import mallorcatour.bot.random.RandomBot;
 import mallorcatour.bot.sklansky.PushBot;
 import mallorcatour.brains.IAdvisor;
-import mallorcatour.brains.neural.NeuralAdvisor;
-import mallorcatour.brains.neural.gusxensen.GusXensen;
-import mallorcatour.brains.neural.student.WritingStudent;
+import mallorcatour.brains.neural.cuba.CubaFactory;
+import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
 import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
 import mallorcatour.core.game.engine.PredefinedGameEngine;
 import mallorcatour.core.game.interfaces.IGameObserver;
@@ -32,40 +30,42 @@ public class BotVsBot {
 		IPlayer postflopMathBot = nlPostflopMathBotFactory.createBot(new PlayerStatModel(DEBUG_PATH),
 				ISpectrumListener.EMPTY, IDecisionListener.EMPTY, IStudent.NONE, "MathBot", DEBUG_PATH);
 
-		GusXensen gusXensen = new GusXensen();
-		WritingStudent student = new WritingStudent("Cuba");
-		NeuralAdvisor villainModel = new NeuralAdvisor(gusXensen, gusXensen, "GusXensen model");
-		IPlayer fullMathBot = nlMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY,
+		WritingStudent student = new WritingStudent("Germany");
+		IPlayer fullMathBot = nlMathBotFactory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, student, "Full MathBot", DEBUG_PATH);
 
-		NeuralBotFactory factory = new NeuralBotFactory();
-		IPlayer neuralStandart = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, IDecisionListener.EMPTY,
-				IStudent.NONE, "Grantorino Up", DEBUG_PATH);
+		GusXensenFactory factory = new GusXensenFactory();
+		IPlayer neuralGusXensen = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+				IDecisionListener.EMPTY, IStudent.NONE, "Grantorino Up", DEBUG_PATH);
+
+		CubaFactory cubaFactory = new CubaFactory();
+		IPlayer neuralCuba = cubaFactory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+				IDecisionListener.EMPTY, IStudent.NONE, "Cuba", DEBUG_PATH);
+
 		IPlayer neuralAggro = new NeuralAggroBotFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				IDecisionListener.EMPTY, IStudent.NONE, "Grantorino Down", DEBUG_PATH);
 		IPlayer random = new RandomBot("RandomBot", DEBUG_PATH);
 		IPlayer pushBot = new PushBot("PushBot", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralStandart, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(neuralGusXensen, neuralCuba, IGameObserver.EMPTY,
 				DEBUG_PATH);
-//		engine.button(fullMathBot).cards(fullMathBot, "TsTc").cards(neuralStandart, "KcAs").stack(fullMathBot, 1800)
-//				.stack(neuralStandart, 1980).flop("KsKdJc");
+		// engine.button(fullMathBot).cards(fullMathBot,
+		// "TsTc").cards(neuralStandart, "KcAs").stack(fullMathBot, 1800)
+		// .stack(neuralStandart, 1980).flop("KsKdJc");
 		int count1 = 0, count2 = 0;
-//		engine.playRound();
-//		for (int i = 0; i < 0; i++) {
-		for (int j = 0; j < 100; j++) {
-			for (int i = 0; i < 100; i++) {
-				TournamentSummary summary = engine.playGame();
-				if (summary.winner.equals(fullMathBot.getName())) {
-					count1++;
-				} else {
-					count2++;
-				}
-				Log.d("Game # " + i + " has been played. Hands " + summary.handsCount);
-				Log.d(count1 + " " + count2);
+		// engine.playRound();
+		// for (int i = 0; i < 0; i++) {
+		for (int i = 0; i < 100; i++) {
+			TournamentSummary summary = engine.playGame();
+			if (summary.winner.equals(neuralGusXensen.getName())) {
+				count1++;
+			} else {
+				count2++;
 			}
-			student.save();
-			student.reset();
+			Log.d("Game # " + i + " has been played. Hands " + summary.handsCount);
+			Log.d(count1 + " " + count2);
 		}
+		 student.save();
+		// student.reset();
 		Log.d(count1 + " " + count2);
 	}
 }

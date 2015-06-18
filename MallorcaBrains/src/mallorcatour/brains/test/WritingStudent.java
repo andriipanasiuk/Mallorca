@@ -1,4 +1,4 @@
-package mallorcatour.brains.neural.student;
+package mallorcatour.brains.test;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -7,7 +7,7 @@ package mallorcatour.bot.pokeracademyport;
 import mallorcatour.bot.IStudent;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.neural.NeuralBotFactory;
+import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
 
 /**
  * 
@@ -19,7 +19,7 @@ public class GrandtorinoMathPlayer extends AbstractPABot {
 
 	public GrandtorinoMathPlayer() {
 		super("MathBot");
-		myBot = new NeuralBotFactory().createBot(getVillainModeller(), ISpectrumListener.EMPTY, getDecisionListener(),
+		myBot = new GusXensenFactory().createBot(getVillainModeller(), ISpectrumListener.EMPTY, getDecisionListener(),
 				IStudent.NONE, null, getDebugPath());
 	}
 

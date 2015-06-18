@@ -30,7 +30,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 
-import mallorcatour.bot.neural.NeuralBotFactory;
+import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
 import mallorcatour.robot.ManageKeySettings;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.ps.PSTableDirector;
@@ -78,7 +78,7 @@ public class GameTrayFrame extends JDialog {
         gameDirector = new PSTableDirector(
                 Toolkit.getDefaultToolkit().getScreenSize());
         gameDirector.setFLBotFactory(new FellOmenFactory());
-        gameDirector.setNLBotFactory(new NeuralBotFactory());
+        gameDirector.setNLBotFactory(new GusXensenFactory());
         KeyboardHookManager.addListener(new NativeKeyboardListener() {
 
             public boolean keyPressed(NativeKeyboardEvent nke) {
