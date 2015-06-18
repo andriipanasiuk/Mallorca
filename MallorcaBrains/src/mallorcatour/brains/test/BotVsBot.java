@@ -52,17 +52,20 @@ public class BotVsBot {
 		int count1 = 0, count2 = 0;
 //		engine.playRound();
 //		for (int i = 0; i < 0; i++) {
-		for (int i = 0; i < 100; i++) {
-			TournamentSummary summary = engine.playGame();
-			if (summary.winner.equals(fullMathBot.getName())) {
-				count1++;
-			} else {
-				count2++;
+		for (int j = 0; j < 100; j++) {
+			for (int i = 0; i < 100; i++) {
+				TournamentSummary summary = engine.playGame();
+				if (summary.winner.equals(fullMathBot.getName())) {
+					count1++;
+				} else {
+					count2++;
+				}
+				Log.d("Game # " + i + " has been played. Hands " + summary.handsCount);
+				Log.d(count1 + " " + count2);
 			}
-			Log.d("Game # " + i + " has been played. Hands " + summary.handsCount);
-			Log.d(count1 + " " + count2);
+			student.save();
+			student.reset();
 		}
-		student.save();
 		Log.d(count1 + " " + count2);
 	}
 }

@@ -1780,12 +1780,12 @@ public class NNFrame extends javax.swing.JFrame {
     }
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
-        String path = FrameUtils.openFileChooser(this, "./");
+        File path = FrameUtils.openFileChooser2(this, "./");
 		if (path == null) {
 			return;
 		}
-		MyFileWriter writer = MyFileWriter.prepareForWriting(path, false);
-		NeuralIO.weightsToJavaClass(writer, multiLayerPerceptron, "Flop");
+		MyFileWriter writer = MyFileWriter.prepareForWriting(path.getAbsolutePath(), false);
+		NeuralIO.weightsToJavaClass(writer, multiLayerPerceptron, path.getName());
 		writer.endWriting();
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 

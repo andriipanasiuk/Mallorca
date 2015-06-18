@@ -14,6 +14,15 @@ public class FrameUtils {
 		return null;
 	}
 
+	public static File openFileChooser2(Component parent, String curDirectory) {
+		JFileChooser chooser = new JFileChooser(curDirectory);
+		int returnVal = chooser.showOpenDialog(parent);
+		if (returnVal == 0) {
+			return chooser.getSelectedFile();
+		}
+		return null;
+	}
+
 	public static String openDirectoryChooser(Component parent, String curDirectory) {
 		JFileChooser chooser = new JFileChooser(curDirectory);
 		chooser.setFileSelectionMode(1);

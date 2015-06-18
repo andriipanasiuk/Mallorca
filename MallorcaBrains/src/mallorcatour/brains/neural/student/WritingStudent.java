@@ -26,6 +26,10 @@ public class WritingStudent implements IStudent {
 		examples.add(new PokerLearningExample(situation, (Advice) advice));
 	}
 
+	public void reset() {
+		examples.clear();
+	}
+
 	public void save() {
 		File directory = new File(name);
 		directory.mkdirs();
