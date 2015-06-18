@@ -14,8 +14,9 @@ import mallorcatour.core.game.advice.Advice;
  *
  * @author Andrew
  */
-public class AdviceCreatorFromMap extends BaseAdviceCreatorFromMap {
+public class ActionDistributionFromMap extends BaseAdviceCreatorFromMap {
 
+	@Override
     public Advice create(Map<Action, Double> map) {
         double passive = 0;
         Double aggressive = null;
@@ -55,13 +56,7 @@ public class AdviceCreatorFromMap extends BaseAdviceCreatorFromMap {
             aggressivePercent = 0;
         } else {
             foldPercent = 1;
-        }
-        if (aggressivePercent > passivePercent) {
-            passivePercent = 0;
-        }
-        if (aggressivePercent < passivePercent) {
-            aggressivePercent = 0;
-        }
-        return Advice.create(foldPercent, passivePercent, aggressivePercent);
-    }
+		}
+		return Advice.create(foldPercent, passivePercent * passivePercent, aggressivePercent * aggressivePercent);
+	}
 }

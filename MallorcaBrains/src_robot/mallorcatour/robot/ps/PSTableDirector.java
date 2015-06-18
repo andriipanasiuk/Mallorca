@@ -18,7 +18,6 @@ import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.modeller.PlayerStatModel;
@@ -57,7 +56,8 @@ public class PSTableDirector {
     public final static String LOGGED_IN = "Logged In";
     private final static String TOURNAMENT = "Tournament";
     private final static String POKERSTARS = "PokerStars";
-    private final static String LOBBY = "Lobby";
+    @SuppressWarnings("unused")
+	private final static String LOBBY = "Lobby";
     private final static String NO_LIMIT = "No Limit";
     private final static String NL = "NL";
     private final static int PUSK_HEIGHT = 40;

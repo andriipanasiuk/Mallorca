@@ -4,6 +4,7 @@ import mallorcatour.bot.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Pair;
 
 public class PokerStatInfo implements IPokerStats, AdvisorListener {
@@ -49,8 +50,12 @@ public class PokerStatInfo implements IPokerStats, AdvisorListener {
 
 	@Override
 	public String toString() {
-		return "Vpip: " + getVpip() + " Pfr: " + getPfr() + " Aggr.: " + getAggressionFrequency() + " Fold: "
-				+ getFoldFrequency();
+		StringBuilder result = new StringBuilder();
+		result.append("Vpip: ").append(DoubleUtils.digitsAfterComma(getVpip(), 2));
+		result.append(" Pfr: ").append(DoubleUtils.digitsAfterComma(getPfr(), 2));
+		result.append(" Aggr.: ").append(DoubleUtils.digitsAfterComma(getAggressionFrequency(), 2));
+		result.append(" Fold: ").append(DoubleUtils.digitsAfterComma(getFoldFrequency(), 2));
+		return result.toString();
 	}
 
 	@Override

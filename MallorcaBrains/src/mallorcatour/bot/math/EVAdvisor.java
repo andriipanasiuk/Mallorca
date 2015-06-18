@@ -24,7 +24,8 @@ public class EVAdvisor implements IAdvisor {
 			String debug) {
 		this.villainSpectrumHolder = villainSpectrumHolder;
 		profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
-		adviceCreator = new AdviceCreatorFromMap();
+		adviceCreator = new ActionDistributionFromMap();
+//		adviceCreator = new MostProfitActionFromMap();
 		this.DEBUG_PATH = debug;
 	}
 

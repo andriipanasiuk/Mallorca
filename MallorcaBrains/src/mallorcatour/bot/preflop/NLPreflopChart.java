@@ -8,7 +8,6 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.advice.ExactAdvice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.IPokerStats;
@@ -69,7 +68,7 @@ public class NLPreflopChart implements IAdvisor {
             } else {
             	Action action = pushFoldChart.getAction(cards, bbsInES);
             	Log.f("Decision by push/fold chart");
-            	return new ExactAdvice(action);
+            	return action;
             }
 		} else if (vsRaise(situation) && situation.getPotToStackOdds() < 0.4 && situation.getPotOdds() < 0.4) {
 			return vsRaiseChart.getAdvice(cards);

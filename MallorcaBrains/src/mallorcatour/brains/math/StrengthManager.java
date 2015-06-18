@@ -103,8 +103,6 @@ public class StrengthManager implements IGameObserver<IGameInfo> {
 				river.put(holeCards, eq);
 			}
 		}
-		Log.d("Strength map for " + street + " was calculated in " + (System.currentTimeMillis() - start)
-				+ " ms");
 	}
 
 	@Override

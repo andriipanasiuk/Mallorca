@@ -13,11 +13,9 @@ package mallorcatour.frames;
 import java.awt.EventQueue;
 
 import mallorcatour.bot.AdvisorListener;
-import mallorcatour.bot.interfaces.IDecisionListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.modeller.PlayerStatModel;
-import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
 import mallorcatour.core.game.Action;
@@ -33,7 +31,6 @@ import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.ExecutorUtils;
 import mallorcatour.tools.Log;
 import mallorcatour.tools.OnExceptionListener;
-import mallorcatour.tools.SerializatorUtils;
 import mallorcatour.util.frames.FrameUtils;
 
 /**

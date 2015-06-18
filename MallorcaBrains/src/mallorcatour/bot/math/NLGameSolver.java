@@ -48,7 +48,7 @@ public class NLGameSolver implements IGameSolver {
 			double effectiveStack, double pot, double toCall, Spectrum villainSpectrum, HoleCards heroCards,
 			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, aggressionInfo, effectiveStack, pot, toCall, 0, villainSpectrum,
-				new Card[] {}, heroCards, strengthMap, isHeroOnButton, PokerStreet.PREFLOP, bigBlind, 0);
+				new Card[] {}, heroCards, strengthMap, isHeroOnButton, PokerStreet.PREFLOP, 0);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class NLGameSolver implements IGameSolver {
 			double pot, double toCall, Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
 			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, flop.toArray(),
-				heroCards, strengthMap, isHeroOnButton, PokerStreet.FLOP, bigBlind, 0);
+				heroCards, strengthMap, isHeroOnButton, PokerStreet.FLOP, 0);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class NLGameSolver implements IGameSolver {
 			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] {
 				flop.first, flop.second, flop.third, turn }, heroCards, strengthMap, isHeroOnButton, PokerStreet.TURN,
-				bigBlind, 0);
+				0);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class NLGameSolver implements IGameSolver {
 			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] {
 				flop.first, flop.second, flop.third, turn, river }, heroCards, strengthMap, isHeroOnButton,
-				PokerStreet.RIVER, bigBlind, 0);
+				PokerStreet.RIVER, 0);
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class NLGameSolver implements IGameSolver {
 	private Map<Action, Double> onSecondActionRecursive(IGameInfo gameInfo, IAggressionInfo info,
 			double effectiveStack, double pot, double toCall, double heroInvestment, Spectrum villainSpectrum,
 			Card[] board, HoleCards heroCards, Map<HoleCards, StreetEquity> villainStrengthMap, boolean onButton,
-			PokerStreet street, double bigBlind, int depth) {
+			PokerStreet street, int depth) {
 		Map<Action, Double> result = new HashMap<Action, Double>();
 		// if hero folds
 		String prefix = "";
@@ -128,7 +128,7 @@ public class NLGameSolver implements IGameSolver {
 		// if hero calls
 		Log.f(prefix + "If " + C.HERO + " " + C.CALL + " " + toCall);
 		double passiveProfit = calculatePassiveProfit(gameInfo, pot + toCall, heroInvestment + toCall, street,
-				heroCards, board, villainSpectrum, depth);
+				heroCards, board, villainSpectrum, depth + 1);
 		Log.f(prefix + C.HERO + " " + C.WINS + " " + passiveProfit);
 		result.put(Action.callAction(toCall), passiveProfit);
 		// if hero cannot raise
@@ -146,7 +146,7 @@ public class NLGameSolver implements IGameSolver {
 		double effectiveStackAfterAction = effectiveStack - amount;
 		double aggressiveProfit = calculateHeroActionProfit(gameInfo, info, amount, effectiveStackAfterAction,
 				potAfterAction, heroInvestmentAfterAction, villainSpectrum, board, heroCards, toCall != 0, true,
-				onButton, street, villainStrengthMap, bigBlind, depth + 1);
+				onButton, street, villainStrengthMap, depth + 1);
 		Log.f(prefix + C.HERO + " " + C.WINS + " " + aggressiveProfit);
 
 		result.put(heroReraiseAction, aggressiveProfit);
@@ -164,10 +164,10 @@ public class NLGameSolver implements IGameSolver {
 
 		double toCall = bigBlind / 2;
 		Log.f("If " + C.HERO + " " + C.CALL + " " + toCall);
-		double callProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot + bigBlind / 2,
-				bigBlind / 2, villainSpectrum, new Card[] {}, heroCards, wasVillainPreviousAggressive, false,
-				isHeroOnButton, PokerStreet.PREFLOP, strengthMap, bigBlind, 1);
-		result.put(Action.callAction(bigBlind / 2), callProfit);
+		double callProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot + toCall,
+				toCall, villainSpectrum, new Card[] {}, heroCards, wasVillainPreviousAggressive, false,
+				isHeroOnButton, PokerStreet.PREFLOP, strengthMap, 1);
+		result.put(Action.callAction(toCall), callProfit);
 
 		Log.f(C.HERO + " " + C.WINS + " " + callProfit);
 
@@ -178,7 +178,7 @@ public class NLGameSolver implements IGameSolver {
 
 		double aggressiveProfit = calculateHeroActionProfit(gameInfo, info, raiseAmount, effectiveStack - raiseAmount,
 				pot + toCall + raiseAmount, toCall + raiseAmount, villainSpectrum, new Card[] {}, heroCards,
-				wasVillainPreviousAggressive, true, isHeroOnButton, PokerStreet.PREFLOP, strengthMap, bigBlind, 1);
+				wasVillainPreviousAggressive, true, isHeroOnButton, PokerStreet.PREFLOP, strengthMap, 1);
 		result.put(heroRaiseAction, aggressiveProfit);
 		Log.f(C.HERO + " " + C.WINS + " " + aggressiveProfit);
 		return result;
@@ -225,8 +225,7 @@ public class NLGameSolver implements IGameSolver {
 		// if hero checks
 		Log.f("If " + C.HERO + " " + C.CHECK);
 		double checkProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot, 0, villainSpectrum,
-				board, heroCards, wasVillainPreviousAggressive, false, isHeroOnButton, street, villainStrengthMap,
-				bigBlind, 1);
+				board, heroCards, wasVillainPreviousAggressive, false, isHeroOnButton, street, villainStrengthMap, 1);
 		result.put(Action.checkAction(), checkProfit);
 		Log.f(C.HERO + " " + C.WINS + " " + checkProfit);
 
@@ -242,7 +241,7 @@ public class NLGameSolver implements IGameSolver {
 
 		double aggressiveProfit = calculateHeroActionProfit(gameInfo, info, betAmount, effectiveStack - betAmount, pot
 				+ betAmount, betAmount, villainSpectrum, board, heroCards, wasVillainPreviousAggressive, true, isHeroOnButton,
-				street, villainStrengthMap, bigBlind, 1);
+				street, villainStrengthMap, 1);
 
 		Log.f(C.HERO + " " + C.WINS + " " + aggressiveProfit);
 
@@ -254,7 +253,7 @@ public class NLGameSolver implements IGameSolver {
 			double effectiveStack, double pot, double heroInvestment, Spectrum villainSpectrum, Card[] board,
 			HoleCards heroCards, boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive,
 			boolean isHeroOnButton, PokerStreet street, Map<HoleCards, StreetEquity> villainStrengthMap,
-			double bigBlind, int depth) {
+			int depth) {
 
 		double villainToCall = heroActionAmount;
 		double villainPot = pot;
@@ -309,7 +308,13 @@ public class NLGameSolver implements IGameSolver {
 			Log.f(prefix + C.HERO + " " + C.WINS + " " + ifVillainPassiveProfit);
 		}
 
-		Action villainAggressiveAction = Action.createRaiseAction(villainToCall, pot, villainEffectiveStack, 1);
+		double percent;
+		if (villainToCall != 0) {
+			percent = 1;
+		} else {
+			percent = 0.75;
+		}
+		Action villainAggressiveAction = Action.createRaiseAction(villainToCall, pot, villainEffectiveStack, percent);
 		double villainReraiseAmount = villainAggressiveAction.getAmount();
 
 		double ifVillainAggressiveProfit;
@@ -324,7 +329,7 @@ public class NLGameSolver implements IGameSolver {
 			newInfo.plusVillainAction(true);
 			Map<Action, Double> map = onSecondActionRecursive(gameInfo, newInfo, effectiveStackAfterVillainAggressive,
 					potAfterVillainAggressive, villainReraiseAmount, heroInvestment, aggressiveSpectrum, board,
-					heroCards, villainStrengthMap, isHeroOnButton, street, bigBlind, depth + 1);
+					heroCards, villainStrengthMap, isHeroOnButton, street, depth + 1);
 			ifVillainAggressiveProfit = CollectionUtils.maxValue(map);
 			Log.f(prefix + C.HERO + " " + C.WINS + " " + ifVillainAggressiveProfit);
 		}
