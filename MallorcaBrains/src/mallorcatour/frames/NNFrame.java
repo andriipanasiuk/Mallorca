@@ -1640,7 +1640,7 @@ public class NNFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        String path = FrameUtils.openFileChooser(this);
+        String path = FrameUtils.openFileChooser(this, "./");
         multiLayerPerceptron.save(path);
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 

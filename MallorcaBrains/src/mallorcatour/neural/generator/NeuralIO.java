@@ -10,7 +10,7 @@ public class NeuralIO {
 
 	public static void weightsToJavaClass(MyFileWriter writer, NeuralNetwork<?> nn, String name) {
 		Layer[] layers = nn.getLayers();
-		writer.append("public class " + name + " implements INeuralInfo {\n");
+		writer.append("class " + name + " implements INeuralInfo {\n");
 		writer.append("private int[] layerSizeArray = new int[] ");
 		writer.append("{");
 		for (int i = 0; i < layers.length; i++) {
