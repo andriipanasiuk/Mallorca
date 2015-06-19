@@ -29,7 +29,7 @@ public class BotVsBot {
 		NLFullMathBotFactory fullMathBotFactory = new NLFullMathBotFactory();
 		PokerStatInfo pokerStats = new PokerStatInfo();
 		WritingStudent student = new WritingStudent();
-		PlayerStatModel villainModel = new PlayerStatModel(PlayerStatModel.FRANCE_NL_NEURAL, true, DEBUG_PATH);
+		PlayerStatModel villainModel = new PlayerStatModel(DEBUG_PATH);
 		IPlayer fullMathBot = fullMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY, villainModel,
 				pokerStats, "Full MathBot", DEBUG_PATH);
 
@@ -60,7 +60,7 @@ public class BotVsBot {
 		// engine.playRound();
 		int handCount = 0;
 //		for (int j = 0; j < 100; j++) {
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 10; i++) {
 				TournamentSummary summary = engine.playGame();
 				if (summary.winner.equals(fullMathBot.getName())) {
 					count1++;

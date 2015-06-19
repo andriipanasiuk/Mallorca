@@ -91,13 +91,6 @@ public class GameEngine implements IGameInfo {
 
 		dealButton(player2, playerInfo2);
 
-		Log.f(DEBUG_PATH, "*************************");
-		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.stack + (playerInfo1.isOnButton ? " *" : ""));
-		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.stack + (playerInfo2.isOnButton ? " *" : ""));
-		Log.f(DEBUG_PATH, "");
-		Log.f(DEBUG_PATH, playerInfo1.name + " posts " + (playerInfo1.isOnButton ? BIG_BLIND / 2 : BIG_BLIND));
-		Log.f(DEBUG_PATH, playerInfo2.name + " posts " + (playerInfo2.isOnButton ? BIG_BLIND / 2 : BIG_BLIND));
-		Log.f(DEBUG_PATH, "");
 
 		playerInfo1.stack -= BIG_BLIND / 2;
 		playerInfo2.stack -= BIG_BLIND / 2;
@@ -121,6 +114,17 @@ public class GameEngine implements IGameInfo {
 
 		dealCards(player1, playerInfo1);
 		dealCards(player2, playerInfo2);
+
+		Log.f(DEBUG_PATH, "*************************");
+		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.stack + (playerInfo1.isOnButton ? " *" : "")
+				+ " " + playerInfo1.holeCard1 + " " + playerInfo1.holeCard2);
+		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.stack + (playerInfo2.isOnButton ? " *" : "")
+				+ " " + playerInfo2.holeCard1 + " " + playerInfo2.holeCard2);
+		Log.f(DEBUG_PATH, "");
+		Log.f(DEBUG_PATH, playerInfo1.name + " posts " + (playerInfo1.isOnButton ? BIG_BLIND / 2 : BIG_BLIND));
+		Log.f(DEBUG_PATH, playerInfo2.name + " posts " + (playerInfo2.isOnButton ? BIG_BLIND / 2 : BIG_BLIND));
+		Log.f(DEBUG_PATH, "");
+
 		return roundCycle();
 	}
 
