@@ -50,6 +50,7 @@ public class StrengthManager implements IGameObserver<IGameInfo> {
 		calculateStrengthMap(street);
 	}
 
+	@SuppressWarnings("unused")
 	private void calculateStrengthMap(PokerStreet street) {
 		long start = System.currentTimeMillis();
 		if (street == PokerStreet.FLOP) {

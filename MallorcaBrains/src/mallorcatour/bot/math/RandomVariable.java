@@ -74,7 +74,14 @@ public class RandomVariable extends ArrayList<Pair<Double, Double>> {
 	public String toString() {
 		return "(ev " + DoubleUtils.digitsAfterComma(getEV(), 2) + " var "
 				+ DoubleUtils.digitsAfterComma(getVariance(), 2) + " diff "
-				+ DoubleUtils.digitsAfterComma(getEV() - getVariance(), 2) + " count " + size() +")";
+				+ DoubleUtils.digitsAfterComma(getEV() - getVariance(), 2) + " count " + size() + ")";
+	}
+
+	public String printProfitability(double investment) {
+		return "(prftblty: " + (investment != 0 ? (DoubleUtils.digitsAfterComma(getEV() / investment, 2)) : "inf")
+				+ " ev " + DoubleUtils.digitsAfterComma(getEV(), 2) + " var "
+				+ DoubleUtils.digitsAfterComma(getVariance(), 2) + " diff "
+				+ DoubleUtils.digitsAfterComma(getEV() - getVariance(), 2) + ")";
 	}
 
 	public double boundary() {
@@ -98,21 +105,4 @@ public class RandomVariable extends ArrayList<Pair<Double, Double>> {
 		return result;
 	}
 
-	public static RandomVariable smart(ActionDistribution actionDistribution) {
-		double maxValue = -Double.MAX_VALUE;
-		RandomVariable result = null;
-		for (Entry<Action, RandomVariable> entry : actionDistribution.entrySet()) {
-			RandomVariable item = entry.getValue();
-			double ev = item.getEV();
-			double variance = item.getVariance();
-			if (ev - variance > maxValue) {
-				result = item;
-				maxValue = ev - variance;
-			}
-		}
-		if (result == null) {
-			throw new RuntimeException();
-		}
-		return result;
-	}
 }

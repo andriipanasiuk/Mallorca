@@ -35,5 +35,11 @@ public class FileUtils {
 		}
 	}
 
-	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	public static String LINE_SEPARATOR;
+	static {
+		LINE_SEPARATOR = System.getProperty("line.separator");
+		if (LINE_SEPARATOR == null) {
+			LINE_SEPARATOR = "\n";
+		}
+	}
 }

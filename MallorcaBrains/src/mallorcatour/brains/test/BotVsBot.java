@@ -4,6 +4,7 @@ import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.NLFullMathBotFactory;
+import mallorcatour.bot.math.NLGameSolver;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.random.RandomBot;
 import mallorcatour.bot.sklansky.PushBot;
@@ -26,10 +27,11 @@ public class BotVsBot {
 		String DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
 		Log.DEBUG_PATH = DEBUG_PATH;
 
+		NLGameSolver.LOGGING = true;
 		NLFullMathBotFactory fullMathBotFactory = new NLFullMathBotFactory();
 		PokerStatInfo pokerStats = new PokerStatInfo();
 		WritingStudent student = new WritingStudent();
-		PlayerStatModel villainModel = new PlayerStatModel(DEBUG_PATH);
+		PlayerStatModel villainModel = new PlayerStatModel(true, DEBUG_PATH);
 		IPlayer fullMathBot = fullMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY, villainModel,
 				pokerStats, "Full MathBot", DEBUG_PATH);
 
@@ -51,7 +53,7 @@ public class BotVsBot {
 
 		IPlayer random = new RandomBot("RandomBot", DEBUG_PATH);
 		IPlayer pushBot = new PushBot("PushBot", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralCuba, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGusXensen, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		// engine.button(fullMathBot).cards(fullMathBot,
 		// "TsTc").cards(neuralStandart, "KcAs").stack(fullMathBot, 1800)
@@ -60,7 +62,7 @@ public class BotVsBot {
 		// engine.playRound();
 		int handCount = 0;
 //		for (int j = 0; j < 100; j++) {
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 2; i++) {
 				TournamentSummary summary = engine.playGame();
 				if (summary.winner.equals(fullMathBot.getName())) {
 					count1++;

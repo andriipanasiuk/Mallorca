@@ -31,6 +31,7 @@ import mallorcatour.tools.Log;
  */
 public class NLGameSolver implements IGameSolver {
 
+	public static boolean LOGGING = true;
 	public static boolean CONSIDER_PREV_POT = false;
 	private final static double NEARLY_ZERO = 0.0001;
 	private final static double DEFAULT_POSITIVE_POTENTIAL = 0.1;
@@ -96,12 +97,13 @@ public class NLGameSolver implements IGameSolver {
 			} else {
 				previousStreetPot = 0;
 			}
-			Log.f(depth, C.POT + " on prev. str.: " + previousStreetPot);
+			log(depth, C.POT + " on prev. str.: " + previousStreetPot);
 			win -= previousStreetPot;
 		}
 		double lose = heroInvestment;
-		Log.f(depth, "Win " + win + " in " + (int) (100 * strength) + "%");
-		Log.f(depth, "Lose " + lose + " in " + (int) (100 * (1 - strength)) + "%");
+		// log(depth, "Win " + win + " in " + (int) (100 * strength) + "%");
+		// log(depth, "Lose " + lose + " in " + (int) (100 * (1 - strength)) +
+		// "%");
 		RandomVariable result = new RandomVariable();
 		result.add(strength, win);
 		result.add(1 - strength, -lose);
@@ -115,24 +117,29 @@ public class NLGameSolver implements IGameSolver {
 		ActionDistribution result = new ActionDistribution();
 		// if hero folds
 		double foldProfit = -heroInvestment;
-		Log.f(depth, "If " + C.HERO + " " + C.FOLD + " he " + C.WINS + " " + foldProfit);
+		log(depth, "If " + C.HERO + " " + C.FOLD + " he " + C.WINS + " " + (foldProfit != 0 ? foldProfit : 0));
 		result.put(Action.fold(), RandomVariable.create(foldProfit));
 
 		// if hero calls
-		Log.f(depth, "If " + C.HERO + " " + C.CALL + " " + toCall);
+		if (toCall != 0) {
+			log(depth, "If " + C.HERO + " " + C.CALL + " " + toCall);
+		} else {
+			log(depth, "If " + C.HERO + " " + C.CHECK);
+		}
 		RandomVariable passiveProfit = calculatePassiveProfit(gameInfo, pot + toCall, heroInvestment + toCall, street,
 				heroCards, board, villainSpectrum, depth + 1);
-		Log.f(depth, C.HERO + " " + C.WINS + " " + passiveProfit);
+		log(depth, C.HERO + " " + C.WINS + " " + passiveProfit.printProfitability(heroInvestment + toCall));
 		result.put(Action.callAction(toCall), passiveProfit);
 		// if hero cannot raise
 		if (effectiveStack == 0) {
-			Log.f(depth, C.HERO + " cannot " + C.RAISE);
+			log(depth, C.HERO + " cannot " + C.RAISE);
 			return result;
 		}
 		// if hero raises
-		Action heroReraiseAction = Action.createRaiseAction(toCall, pot, effectiveStack, 1);
+		double percent = getRaisePercent(toCall, street);
+		Action heroReraiseAction = Action.createRaiseAction(toCall, pot, effectiveStack, percent);
 		double amount = heroReraiseAction.getAmount();
-		Log.f(depth, "If " + C.HERO + " " + C.RAISE + " " + amount);
+		log(depth, "If " + C.HERO + " " + C.RAISE + " " + amount);
 
 		double potAfterAction = pot + toCall + amount;
 		double heroInvestmentAfterAction = heroInvestment + toCall + amount;
@@ -140,7 +147,7 @@ public class NLGameSolver implements IGameSolver {
 		RandomVariable aggressiveProfit = calculateHeroActionProfit(gameInfo, info, amount, effectiveStackAfterAction,
 				potAfterAction, heroInvestmentAfterAction, villainSpectrum, board, heroCards, toCall != 0, true,
 				onButton, street, villainStrengthMap, depth + 1);
-		Log.f(depth, C.HERO + " " + C.WINS + " " + aggressiveProfit);
+		log(depth, C.HERO + " " + C.WINS + " " + aggressiveProfit);
 
 		result.put(heroReraiseAction, aggressiveProfit);
 		return result;
@@ -156,24 +163,25 @@ public class NLGameSolver implements IGameSolver {
 		result.put(Action.fold(), RandomVariable.create(foldProfit));
 
 		double toCall = bigBlind / 2;
-		Log.f("If " + C.HERO + " " + C.CALL + " " + toCall);
+		log("If " + C.HERO + " " + C.CALL + " " + toCall);
 		RandomVariable callProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot + toCall, toCall,
 				villainSpectrum, new Card[] {}, heroCards, wasVillainPreviousAggressive, false, isHeroOnButton,
 				PokerStreet.PREFLOP, strengthMap, 1);
 		result.put(Action.callAction(toCall), callProfit);
 
-		Log.f(C.HERO + " " + C.WINS + " " + callProfit);
+		log(C.HERO + " " + C.WINS + " " + callProfit);
 
-		Action heroRaiseAction = Action.createRaiseAction(toCall, pot, effectiveStack, 1);
+		double percent = getRaisePercent(toCall, PokerStreet.PREFLOP);
+		Action heroRaiseAction = Action.createRaiseAction(toCall, pot, effectiveStack, percent);
 		double raiseAmount = heroRaiseAction.getAmount();
 
-		Log.f("If " + C.HERO + " " + C.RAISE + " " + raiseAmount);
+		log("If " + C.HERO + " " + C.RAISE + " " + raiseAmount);
 
-		RandomVariable aggressiveProfit = calculateHeroActionProfit(gameInfo, info, raiseAmount, effectiveStack - raiseAmount,
-				pot + toCall + raiseAmount, toCall + raiseAmount, villainSpectrum, new Card[] {}, heroCards,
-				wasVillainPreviousAggressive, true, isHeroOnButton, PokerStreet.PREFLOP, strengthMap, 1);
+		RandomVariable aggressiveProfit = calculateHeroActionProfit(gameInfo, info, raiseAmount, effectiveStack
+				- raiseAmount, pot + toCall + raiseAmount, toCall + raiseAmount, villainSpectrum, new Card[] {},
+				heroCards, wasVillainPreviousAggressive, true, isHeroOnButton, PokerStreet.PREFLOP, strengthMap, 1);
 		result.put(heroRaiseAction, aggressiveProfit);
-		Log.f(C.HERO + " " + C.WINS + " " + aggressiveProfit);
+		log(C.HERO + " " + C.WINS + " " + aggressiveProfit);
 		return result;
 	}
 
@@ -216,12 +224,12 @@ public class NLGameSolver implements IGameSolver {
 		double foldProfit = 0;
 		result.put(Action.fold(), RandomVariable.create(foldProfit));
 		// if hero checks
-		Log.f("If " + C.HERO + " " + C.CHECK);
+		log("If " + C.HERO + " " + C.CHECK);
 		RandomVariable checkProfit = calculateHeroActionProfit(gameInfo, info, 0, effectiveStack, pot, 0,
 				villainSpectrum, board, heroCards, wasVillainPreviousAggressive, false, isHeroOnButton, street,
 				villainStrengthMap, 1);
 		result.put(Action.checkAction(), checkProfit);
-		Log.f(C.HERO + " " + C.WINS + " " + checkProfit);
+		log(C.HERO + " " + C.WINS + " " + checkProfit);
 
 		// if hero bets
 		Action heroBetAction = Action.createBetAction(pot, effectiveStack, 0.75);
@@ -231,13 +239,13 @@ public class NLGameSolver implements IGameSolver {
 		} else {
 			betAmount = heroBetAction.getAmount();
 		}
-		Log.f("If " + C.HERO + " " + C.RAISE + " " + betAmount);
+		log("If " + C.HERO + " " + C.RAISE + " " + betAmount);
 
 		RandomVariable aggressiveProfit = calculateHeroActionProfit(gameInfo, info, betAmount, effectiveStack
 				- betAmount, pot + betAmount, betAmount, villainSpectrum, board, heroCards,
 				wasVillainPreviousAggressive, true, isHeroOnButton, street, villainStrengthMap, 1);
 
-		Log.f(C.HERO + " " + C.WINS + " " + aggressiveProfit);
+		log(C.HERO + " " + C.WINS + " " + aggressiveProfit);
 
 		result.put(heroBetAction, aggressiveProfit);
 		return result;
@@ -259,9 +267,9 @@ public class NLGameSolver implements IGameSolver {
 		}
 		LocalSituation villainSituation = getVillainSituationWithoutStrength(street, !isHeroOnButton, villainToCall,
 				villainPot, villainEffectiveStack, newInfo, wasVillainPreviousAggressive, wasHeroPreviousAggressive);
-		Log.f(depth, C.POT + ": " + pot + " " + C.TO_CALL + ": " + villainToCall + " " + C.EFFECTIVE_STACK + ": "
+		log(depth, C.POT + ": " + pot + " " + C.TO_CALL + ": " + villainToCall + " " + C.EFFECTIVE_STACK + ": "
 				+ villainEffectiveStack);
-		Log.f(depth, C.VILLAIN + " " + C.SITUATION + ": " + villainSituation.toString());
+		log(depth, C.VILLAIN + " " + C.SITUATION + ": " + villainSituation.toString());
 
 		Spectrum foldSpectrum = new Spectrum();
 		Spectrum passiveSpectrum = new Spectrum();
@@ -284,18 +292,17 @@ public class NLGameSolver implements IGameSolver {
 
 		result.add((foldWeight / villainSpectrumWeight), ifVillainFoldProfit);
 
-		Log.f(depth, "When " + C.VILLAIN + " " + C.FOLD + " in " + (int) (foldWeight / villainSpectrumWeight * 100)
-				+ "%");
-		Log.f(depth, C.HERO + " " + C.WINS + " " + ifVillainFoldProfit);
+		log(depth, "When " + C.VILLAIN + " " + C.FOLD + " in " + (int) (foldWeight / villainSpectrumWeight * 100) + "%");
+		log(depth, C.HERO + " " + C.WINS + " " + ifVillainFoldProfit);
 
 		if (passiveSpectrum.isEmpty()) {
-			Log.f(depth, C.VILLAIN + " will not " + C.CALL);
+			log(depth, C.VILLAIN + " will not " + C.CALL);
 		} else {
 			double passiveActionChance = passiveWeight / villainSpectrumWeight;
-			Log.f(depth, "When " + C.VILLAIN + " " + C.CALL + " in " + (int) (passiveActionChance * 100) + "%");
+			log(depth, "When " + C.VILLAIN + " " + C.CALL + " in " + (int) (passiveActionChance * 100) + "%");
 			RandomVariable ifVillainPassiveProfit = calculatePassiveProfit(gameInfo, pot + villainToCall,
 					heroInvestment, street, heroCards, board, passiveSpectrum, depth + 1);
-			Log.f(depth, C.HERO + " " + C.WINS + " " + ifVillainPassiveProfit);
+			log(depth, C.HERO + " " + C.WINS + " " + ifVillainPassiveProfit.printProfitability(heroInvestment));
 
 			result.add(passiveActionChance, ifVillainPassiveProfit);
 		}
@@ -305,20 +312,22 @@ public class NLGameSolver implements IGameSolver {
 		double villainReraiseAmount = villainAggressiveAction.getAmount();
 
 		if (aggressiveSpectrum.isEmpty()) {
-			Log.f(depth, C.VILLAIN + " won't raise");
+			log(depth, C.VILLAIN + " won't raise");
 		} else {
 			double aggressiveChance = aggressiveWeight / villainSpectrumWeight;
-			Log.f(depth, "When " + C.VILLAIN + " raise " + villainReraiseAmount + " in "
-					+ (int) (aggressiveChance * 100) + "%");
+			log(depth, "When " + C.VILLAIN + " raise " + villainReraiseAmount + " in " + (int) (aggressiveChance * 100)
+					+ "%");
 			double effectiveStackAfterVillainAggressive = villainEffectiveStack - villainReraiseAmount;
 			double potAfterVillainAggressive = pot + villainToCall + villainReraiseAmount;
 			newInfo.plusVillainAction(true);
-			ActionDistribution actionDistribution = onSecondActionRecursive(gameInfo, newInfo, effectiveStackAfterVillainAggressive,
-					potAfterVillainAggressive, villainReraiseAmount, heroInvestment, aggressiveSpectrum, board,
-					heroCards, villainStrengthMap, isHeroOnButton, street, depth + 1);
-			RandomVariable ifVillainAggressiveProfit = RandomVariable.smart(actionDistribution);
+			ActionDistribution actionDistribution = onSecondActionRecursive(gameInfo, newInfo,
+					effectiveStackAfterVillainAggressive, potAfterVillainAggressive, villainReraiseAmount,
+					heroInvestment, aggressiveSpectrum, board, heroCards, villainStrengthMap, isHeroOnButton, street,
+					depth + 1);
+			RandomVariable ifVillainAggressiveProfit = LessVarianceActionFromMap.getOptimal(actionDistribution,
+					gameInfo.getBigBlindSize());
 			result.add(aggressiveChance, ifVillainAggressiveProfit);
-			Log.f(depth, C.HERO + " " + C.WINS + " " + ifVillainAggressiveProfit);
+			log(depth, C.HERO + " " + C.WINS + " " + ifVillainAggressiveProfit);
 		}
 		return result;
 	}
@@ -331,6 +340,16 @@ public class NLGameSolver implements IGameSolver {
 			percent = 0.75;
 		}
 		return percent;
+	}
+
+	private static void log(String log) {
+		log(0, log);
+	}
+
+	private static void log(int indent, String log) {
+		if (LOGGING) {
+			Log.f(indent, log);
+		}
 	}
 
 	private void processVillainSpectrums(Spectrum villainSpectrum, Spectrum foldSpectrum, Spectrum passiveSpectrum,
