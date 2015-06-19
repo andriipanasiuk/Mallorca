@@ -106,9 +106,11 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	public void onAdvice(LocalSituation situation, IAdvice advice) {
 		situationCount++;
 		StatCalculator.changeStat(situation, advice, pokerStatInfo);
-		if (situationCount % 10 == 0 && chooseNeural) {
+		if (situationCount % 10 == 0) {
 			Log.f(DEBUG_PATH, "Villain stats: " + pokerStatInfo);
-			chooseModellingNeural();
+			if (chooseNeural) {
+				chooseModellingNeural();
+			}
 		}
 	}
 

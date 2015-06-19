@@ -4,11 +4,12 @@
  */
 package mallorcatour.bot.math;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.interfaces.IGameInfo;
 
 /**
  *
@@ -17,15 +18,16 @@ import mallorcatour.core.game.advice.Advice;
 public class MostProfitActionFromMap extends BaseAdviceCreatorFromMap {
 
 	@Override
-    public Advice create(Map<Action, Double> map) {
+    public IAdvice create(ActionDistribution map, IGameInfo gameInfo) {
         double passive = 0;
         Double aggressive = null;
-        for (Entry<Action, Double> entry : map.entrySet()) {
+        for (Entry<Action, RandomVariable> entry : map.entrySet()) {
+        	RandomVariable value = entry.getValue();
             if (entry.getKey().isPassive()) {
-                passive = entry.getValue();
-            } else if (entry.getKey().isAggressive()) {
-                aggressive = entry.getValue();
-            } else {
+                passive = value.getEV();
+			} else if (entry.getKey().isAggressive()) {
+				aggressive = value != null ? value.getEV() : null;
+			} else {
             	//do nothing
             }
         }

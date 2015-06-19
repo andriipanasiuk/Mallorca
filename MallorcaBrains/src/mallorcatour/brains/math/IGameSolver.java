@@ -2,8 +2,8 @@ package mallorcatour.brains.math;
 
 import java.util.Map;
 
+import mallorcatour.bot.math.ActionDistribution;
 import mallorcatour.core.equilator.StreetEquity;
-import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
@@ -13,34 +13,34 @@ import mallorcatour.core.spectrum.Spectrum;
 
 public interface IGameSolver {
 
-	public Map<Action, Double> onSecondActionPreflop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall,
+	public ActionDistribution onSecondActionPreflop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall,
 			Spectrum villainSpectrum, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind);
 
-	public Map<Action, Double> onSecondActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
+	public ActionDistribution onSecondActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
 			Flop flop, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton,
 			double bigBlind);
 
-	public Map<Action, Double> onSecondActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
+	public ActionDistribution onSecondActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
 			Flop flop, Card turn, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
 			boolean isHeroOnButton, double bigBlind);
 
-	public Map<Action, Double> onSecondActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
+	public ActionDistribution onSecondActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, double toCall, Spectrum villainSpectrum,
 			Flop flop, Card turn, Card river, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
 			boolean isHeroOnButton, double bigBlind);
 
-	public Map<Action, Double> onFirstActionPreFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum,
+	public ActionDistribution onFirstActionPreFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum,
 			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive,
 			boolean isHeroOnButton, double bigBlind);
 
-	public Map<Action, Double> onFirstActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
+	public ActionDistribution onFirstActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
 			HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive,
 			boolean isHeroOnButton, double bigBlind);
 
-	public Map<Action, Double> onFirstActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
+	public ActionDistribution onFirstActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
 			Card turn, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
 			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind);
 
-	public Map<Action, Double> onFirstActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
+	public ActionDistribution onFirstActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack, double pot, Spectrum villainSpectrum, Flop flop,
 			Card turn, Card river, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
 			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind);
 

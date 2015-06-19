@@ -43,6 +43,7 @@ public class Player extends ObservingPlayer {
 	 */
 	@Override
 	public Action getAction() {
+		long time = System.currentTimeMillis();
 		LocalSituation situation = situationHandler.getSituation();
 		IAdvice advice = null;
 		HoleCards cards = new HoleCards(heroCard1, heroCard2);
@@ -67,6 +68,7 @@ public class Player extends ObservingPlayer {
 		Action action = advice.getAction();
 		action = actionPreprocessor.preprocessAction(action, gameInfo);
 		Log.f(DEBUG_PATH, C.ACTION + ": " + action.toString());
+		Log.f(DEBUG_PATH, "Decision from " + this + " in " + (System.currentTimeMillis() - time) + " ms");
 		Log.f(DEBUG_PATH, "=========  End  =========");
 		action = actionChecker.checkAction(action, situation, gameInfo, cards);
 		gameObserver.onActed(action, gameInfo.getAmountToCall(), getName());
@@ -79,7 +81,7 @@ public class Player extends ObservingPlayer {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return getName();
 	}
 }

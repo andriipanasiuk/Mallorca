@@ -1,18 +1,13 @@
 package mallorcatour.bot.math;
 
-import java.util.Map;
-
 import mallorcatour.bot.C;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
-import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.spectrum.Spectrum;
-import mallorcatour.tools.CollectionUtils;
-import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 
 public class NLProfitCalculator implements IProfitCalculator {
@@ -26,11 +21,11 @@ public class NLProfitCalculator implements IProfitCalculator {
 	private final StrengthManager strengthManager;
 
 	@Override
-	public Map<Action, Double> getProfitMap(IPlayerGameInfo gameInfo, IAggressionInfo situation, Card holeCard1,
+	public ActionDistribution getProfitMap(IPlayerGameInfo gameInfo, IAggressionInfo situation, Card holeCard1,
 			Card holeCard2, Spectrum villainSpectrum) {
 		int heroActionCount = situation.getHeroActionCount();
 		boolean wasVillainPreviousAggressive = situation.wasVillainPreviousAggresive();
-		Map<Action, Double> map;
+		ActionDistribution map;
 		if (gameInfo.isPreFlop()) {
 			if (gameInfo.onButton() && heroActionCount == 0) {
 				map = gameSolver.onFirstActionPreFlop(gameInfo, situation, gameInfo.getBankRollAtRisk(),
@@ -89,9 +84,6 @@ public class NLProfitCalculator implements IProfitCalculator {
 		} else {
 			throw new RuntimeException();
 		}
-		double profit = CollectionUtils.maxValue(map);
-		Log.f((FileUtils.LINE_SEPARATOR != null ? FileUtils.LINE_SEPARATOR : "") + C.HERO + " " + C.PROFIT + ": "
-				+ profit);
 		return map;
 	}
 

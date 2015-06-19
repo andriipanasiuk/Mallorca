@@ -4,10 +4,8 @@
  */
 package mallorcatour.bot.math;
 
-import java.util.Map;
-
-import mallorcatour.core.game.Action;
-import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.interfaces.IGameInfo;
 
 /**
  *
@@ -15,5 +13,5 @@ import mallorcatour.core.game.advice.Advice;
  */
 public abstract class BaseAdviceCreatorFromMap {
 
-    abstract Advice create(Map<Action, Double> map);
+    abstract IAdvice create(ActionDistribution map, IGameInfo gameInfo);
 }

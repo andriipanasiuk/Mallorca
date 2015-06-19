@@ -104,7 +104,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		if (spectrum.isEmpty()) {
 			spectrum = randomSpectrum;
 		}
-		Log.f(C.SPECTRUM + " " + C.WEIGHT + ": " + spectrum.summaryWeight());
+		Log.f(C.SPECTRUM + " " + C.WEIGHT + ": " + spectrum.normalizedWeight());
 		spectrumListener.onSpectrumChanged(spectrum, "");
 	}
 

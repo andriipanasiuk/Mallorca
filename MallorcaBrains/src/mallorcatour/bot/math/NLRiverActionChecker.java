@@ -1,6 +1,5 @@
 package mallorcatour.bot.math;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import mallorcatour.bot.interfaces.ISpectrumHolder;
@@ -29,25 +28,25 @@ public class NLRiverActionChecker implements IActionChecker {
 		if (!gameInfo.isRiver() || gameInfo.getLimitType() != LimitType.NO_LIMIT) {
 			return action;
 		}
-		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, cards.first,
+		ActionDistribution map = profitCalculator.getProfitMap(gameInfo, situation, cards.first,
 				cards.second, villainSpectrumHolder.getSpectrum());
 		if (gameInfo.getAmountToCall() > 0) {
 			if (action.isFold()) {
-				for (Entry<Action, Double> entry : map.entrySet()) {
-					if (entry.getKey().isPassive() && entry.getValue() >= MIN_VALUE_FOR_CALL_DECISION) {
+				for (Entry<Action, RandomVariable> entry : map.entrySet()) {
+					if (entry.getKey().isPassive() && entry.getValue().getEV() >= MIN_VALUE_FOR_CALL_DECISION) {
 						return Action.callAction(gameInfo.getAmountToCall());
 					}
 				}
 			} else if (action.isPassive()) {
-				for (Entry<Action, Double> entry : map.entrySet()) {
-					if (entry.getKey().isPassive() && entry.getValue() < MIN_VALUE_FOR_CALL_DECISION) {
+				for (Entry<Action, RandomVariable> entry : map.entrySet()) {
+					if (entry.getKey().isPassive() && entry.getValue().getEV() < MIN_VALUE_FOR_CALL_DECISION) {
 						return Action.fold();
 					}
 				}
 			}
 		} else if (action.isAggressive()) {
-			for (Entry<Action, Double> entry : map.entrySet()) {
-				if (entry.getKey().isAggressive() && entry.getValue() < MIN_VALUE_FOR_BET_DECISION) {
+			for (Entry<Action, RandomVariable> entry : map.entrySet()) {
+				if (entry.getKey().isAggressive() && entry.getValue().getEV() < MIN_VALUE_FOR_BET_DECISION) {
 					return Action.checkAction();
 				}
 			}

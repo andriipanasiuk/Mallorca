@@ -14,6 +14,7 @@ import java.util.Set;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.FileUtils;
 
 public class Spectrum implements Iterable<HoleCards>, Serializable {
@@ -131,6 +132,15 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 			sum += ((Double) entry.getValue()).doubleValue();
 		}
 		return sum;
+	}
+
+	public double normalizedWeight() {
+		double maxWeight = maxWeight();
+		double sum = 0.0D;
+		for (Double value : this.weights.values()) {
+			sum += value.doubleValue() / maxWeight;
+		}
+		return DoubleUtils.digitsAfterComma(sum, 1);
 	}
 
 	public double maxWeight() {

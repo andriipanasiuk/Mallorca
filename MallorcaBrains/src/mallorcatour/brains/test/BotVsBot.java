@@ -51,7 +51,7 @@ public class BotVsBot {
 
 		IPlayer random = new RandomBot("RandomBot", DEBUG_PATH);
 		IPlayer pushBot = new PushBot("PushBot", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGermany, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralCuba, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		// engine.button(fullMathBot).cards(fullMathBot,
 		// "TsTc").cards(neuralStandart, "KcAs").stack(fullMathBot, 1800)
@@ -60,7 +60,7 @@ public class BotVsBot {
 		// engine.playRound();
 		int handCount = 0;
 //		for (int j = 0; j < 100; j++) {
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 20; i++) {
 				TournamentSummary summary = engine.playGame();
 				if (summary.winner.equals(fullMathBot.getName())) {
 					count1++;
