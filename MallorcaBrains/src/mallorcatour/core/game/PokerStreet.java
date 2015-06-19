@@ -2,6 +2,8 @@ package mallorcatour.core.game;
 
 import java.io.Serializable;
 
+import mallorcatour.bot.C;
+
 public class PokerStreet implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String name;
@@ -10,10 +12,10 @@ public class PokerStreet implements Serializable {
 	public static final int FLOP_VALUE = 1;
 	public static final int TURN_VALUE = 2;
 	public static final int RIVER_VALUE = 3;
-	public static final PokerStreet PREFLOP = new PokerStreet("preflop", PREFLOP_VALUE);
-	public static final PokerStreet FLOP = new PokerStreet("flop", FLOP_VALUE);
-	public static final PokerStreet TURN = new PokerStreet("turn", TURN_VALUE);
-	public static final PokerStreet RIVER = new PokerStreet("river", RIVER_VALUE);
+	public static final PokerStreet PREFLOP = new PokerStreet(C.PREFLOP, PREFLOP_VALUE);
+	public static final PokerStreet FLOP = new PokerStreet(C.FLOP, FLOP_VALUE);
+	public static final PokerStreet TURN = new PokerStreet(C.TURN, TURN_VALUE);
+	public static final PokerStreet RIVER = new PokerStreet(C.RIVER, RIVER_VALUE);
 
 	private PokerStreet(String name, int intValue) {
 		this.name = name;

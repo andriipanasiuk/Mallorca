@@ -5,6 +5,7 @@
 package mallorcatour.bot.modeller;
 
 import mallorcatour.bot.AdvisorListener;
+import mallorcatour.bot.C;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.cuba.Cuba;
@@ -18,6 +19,7 @@ import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Log;
 
 /**
@@ -34,13 +36,13 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 
 	static {
 		GusXensen player = new GusXensen();
-		GUSXENSEN_NL_NEURAL = new NeuralAdvisor(player, player, "Gus Xensen");
+		GUSXENSEN_NL_NEURAL = new NeuralAdvisor(player, player, "Gu" + "s Xensen");
 		Cuba cuba = new Cuba();
-		CUBA_NL_NEURAL = new NeuralAdvisor(cuba, cuba, "Cuba");
+		CUBA_NL_NEURAL = new NeuralAdvisor(cuba, cuba, "Cu" + "ba");
 		Germany germany = new Germany();
-		GERMANY_NL_NEURAL = new NeuralAdvisor(germany, germany, "Germany");
+		GERMANY_NL_NEURAL = new NeuralAdvisor(germany, germany, "Ger" + "many");
 		France france = new France();
-		FRANCE_NL_NEURAL = new NeuralAdvisor(france, france, "France");
+		FRANCE_NL_NEURAL = new NeuralAdvisor(france, france, "Fra" + "nce");
 		neurals = new IAdvisor[] { GUSXENSEN_NL_NEURAL, CUBA_NL_NEURAL, GERMANY_NL_NEURAL, FRANCE_NL_NEURAL };
 	}
 
@@ -77,10 +79,8 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 				currentNeural = neural;
 			}
 		}
-		Log.f(DEBUG_PATH, "Modelling by " + currentNeural.getName());
-		Log.f(DEBUG_PATH, "Difference in stats: " + minError);
-		Log.d("Modelling by " + currentNeural.getName());
-		Log.d("Difference in stats: " + minError);
+		Log.f(DEBUG_PATH, "Modelling by " + currentNeural.getName() + " after " + situationCount + " situ-ns");
+		Log.f(DEBUG_PATH, "Difference in " + C.STATS + ": " + DoubleUtils.digitsAfterComma(minError, 2));
 	}
 
 	@Override
@@ -100,7 +100,6 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		if (situationCount % 10 == 0 && chooseNeural) {
 			chooseModellingNeural();
 			Log.f(DEBUG_PATH, "Villain stats: " + pokerStatInfo);
-			Log.d("Villain stats: " + pokerStatInfo);
 		}
 	}
 

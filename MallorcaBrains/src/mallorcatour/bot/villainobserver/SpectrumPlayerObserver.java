@@ -155,13 +155,13 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	public void onActed(Action action, double toCall, String name) {
 		situationHandler.onActed(action, toCall, name);
 		if (name.equals(hero) ^ !trackHero) {
-			Log.f(this.toString() + " he acted");
+			Log.f(this.toString() + " he " + C.ACTED);
 			String modelPlayer = trackHero ? gameInfo.getHero(hero).getName() : gameInfo.getVillain(hero).getName();
 			Log.f(C.SITUATION + " of " + modelPlayer + " " + situation);
 			modifySpectrum(situation, action);
 			adviceListener.onAdvice(situation, action);
 		} else if (!action.isFold()) {
-			Log.f(this.toString() + " not him acted");
+			Log.f(this.toString() + " not him " + C.ACTED);
 			situation = situationHandler.getSituation();
 		}
 	}

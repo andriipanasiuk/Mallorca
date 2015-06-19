@@ -33,7 +33,7 @@ public class EVAdvisor implements IAdvisor {
 	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		Map<Action, Double> map = profitCalculator.getProfitMap(gameInfo, situation, cards.first, cards.second,
 				villainSpectrumHolder.getSpectrum());
-		Log.f(DEBUG_PATH, "Map<Action, Profit>: " + map.toString());
+		Log.f(DEBUG_PATH, "Profit distib: " + map.toString());
 		IAdvice advice = adviceCreator.create(map);
 		return advice;
 	}

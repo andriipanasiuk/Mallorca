@@ -19,6 +19,7 @@ import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.NLFullMathBotFactory;
+import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
@@ -54,7 +55,7 @@ public class BotParser {
 			}
 			String[] parts = line.split("\\s+");
 			if (parts.length == 3 && parts[0].equals(C.ACTION)) {
-				PokerStreet previous = gameInfo.getStage().previous(); 
+				PokerStreet previous = gameInfo.getStage().previous();
 				if (previous != null && gameInfo.getPot(previous) == -1) {
 					double previousPot = gameInfo.pot - gameInfo.heroAmountToCall;
 					gameInfo.setPot(previous, previousPot);
@@ -98,10 +99,10 @@ public class BotParser {
 	public static void main(String[] args) {
 		Log.WRITE_TO_ERR = true;
 		EquilatorPreflop.loadFrom = LoadFrom.CODE;
+		PlayerStatModel model = new PlayerStatModel(PlayerStatModel.FRANCE_NL_NEURAL, true, "");
 		IBotFactory factory = new NLFullMathBotFactory();
-		GusXensen gusXensen = new GusXensen();
-		NeuralAdvisor villainModel = new NeuralAdvisor(gusXensen, gusXensen, "Villain GusXensen model");
-		BotParser parser = new BotParser(factory.createBot(villainModel, ISpectrumListener.EMPTY, AdvisorListener.NONE, AdvisorListener.NONE, "Mallorca", ""));
+		BotParser parser = new BotParser(factory.createBot(model, ISpectrumListener.EMPTY, model, AdvisorListener.NONE,
+				"Mallorca", ""));
 		parser.run();
 	}
 }

@@ -10,6 +10,7 @@ public class C {
 	public static final String TO_CALL = "toCa" + "ll";
 	public static final String SITUATION = "Situ" + "ation";
 	public static final String ACTION = "Ac" + "tion";
+	public static final String ACTED = "ac" + "ted";
 	public static final String ADVICE = "Advi" + "ce";
 	public static final String SETTINGS = "Se" + "ttings";
 	public static final String MATCH = "Ma" + "tch";
@@ -33,4 +34,7 @@ public class C {
 	public static final String TURN = "Tu" + "rn";
 	public static final String RIVER = "Ri" + "ver";
 	public static final String PROFIT = "Pr" + "ofit";
+	public static final String STATS = "Sta" + "ts";
+	public static final String FIRST = "fir" + "st";
+	public static final String SECOND = "seco" + "nd";
 }
