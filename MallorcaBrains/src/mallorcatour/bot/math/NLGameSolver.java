@@ -325,7 +325,7 @@ public class NLGameSolver implements IGameSolver {
 					heroInvestment, aggressiveSpectrum, board, heroCards, villainStrengthMap, isHeroOnButton, street,
 					depth + 1);
 			RandomVariable ifVillainAggressiveProfit = LessVarianceActionFromMap.getOptimal(actionDistribution,
-					gameInfo.getBigBlindSize());
+					gameInfo.getBigBlindSize(), heroInvestment);
 			result.add(aggressiveChance, ifVillainAggressiveProfit);
 			log(depth, C.HERO + " " + C.WINS + " " + ifVillainAggressiveProfit);
 		}

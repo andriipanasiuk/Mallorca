@@ -12,6 +12,10 @@ public class Action implements Serializable, IAdvice {
 	private static final double PERCENT_OF_POT_FOR_BET = 0.7D;
 	private static final double PERCENT_OF_POT_FOR_RAISE = 0.7D;
 	private double amount;
+	/**
+	 * Only for raise action
+	 */
+	private double toCall;
 	private Type type;
 	private double percentOfPot;
 	private boolean isAllin = false;
@@ -27,6 +31,10 @@ public class Action implements Serializable, IAdvice {
 
 	public double getAmount() {
 		return this.amount;
+	}
+
+	public double getAmountToCall() {
+		return this.toCall;
 	}
 
 	public void setAmount(double amount) {
@@ -82,6 +90,7 @@ public class Action implements Serializable, IAdvice {
 			percent = raiseAmount / (pot + toCall);
 		}
 		Action result = new Action(Type.AGGRESSIVE, raiseAmount);
+		result.toCall = toCall;
 		result.percentOfPot = percent;
 		return result;
 	}
@@ -103,7 +112,9 @@ public class Action implements Serializable, IAdvice {
 	}
 
 	public static Action checkAction() {
-		return new Action(Type.PASSIVE, 0.0D);
+		Action result = new Action(Type.PASSIVE, 0d);
+		result.toCall = 0;
+		return result;
 	}
 
 	public static Action betAction(double amount) {
@@ -116,6 +127,7 @@ public class Action implements Serializable, IAdvice {
 
 	public static Action callAction(double toCall) {
 		Action result = new Action(Type.PASSIVE, toCall);
+		result.toCall = toCall;
 		return result;
 	}
 

@@ -99,7 +99,7 @@ public class BotParser {
 	public static void main(String[] args) {
 		Log.WRITE_TO_ERR = true;
 		EquilatorPreflop.loadFrom = LoadFrom.CODE;
-		PlayerStatModel model = new PlayerStatModel(PlayerStatModel.FRANCE_NL_NEURAL, true, "");
+		PlayerStatModel model = new PlayerStatModel(true, "");
 		IBotFactory factory = new NLFullMathBotFactory();
 		BotParser parser = new BotParser(factory.createBot(model, ISpectrumListener.EMPTY, model, AdvisorListener.NONE,
 				"Mallorca", ""));
