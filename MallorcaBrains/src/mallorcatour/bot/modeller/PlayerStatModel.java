@@ -32,6 +32,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	public static IAdvisor CUBA_NL_NEURAL;
 	public static IAdvisor GERMANY_NL_NEURAL;
 	public static IAdvisor FRANCE_NL_NEURAL;
+	public static IAdvisor random = new RandomAdvisor();
 	public static IAdvisor[] neurals;
 
 	static {
@@ -49,18 +50,26 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	private IAdvisor currentNeural = GERMANY_NL_NEURAL;
 	private final String DEBUG_PATH;
 	private final PokerStatInfo pokerStatInfo = new PokerStatInfo();
-	private boolean chooseNeural = true;
+	private final boolean chooseNeural;
 	private int situationCount;
 	private int handsCount;
 
 	public PlayerStatModel(String debug) {
-		this.DEBUG_PATH = debug;
+		this(random, false, debug);
 	}
 
 	public PlayerStatModel(IAdvisor currentAdvisor, boolean choose, String debug) {
-		this.DEBUG_PATH = debug;
 		this.currentNeural = currentAdvisor;
 		this.chooseNeural = choose;
+		this.DEBUG_PATH = debug;
+	}
+
+	public PlayerStatModel(IAdvisor currentAdvisor, String debug) {
+		this(currentAdvisor, false, debug);
+	}
+
+	public PlayerStatModel(boolean choose, String debug) {
+		this(random, choose, debug);
 	}
 
 	@Override
@@ -98,8 +107,8 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		situationCount++;
 		StatCalculator.changeStat(situation, advice, pokerStatInfo);
 		if (situationCount % 10 == 0 && chooseNeural) {
-			chooseModellingNeural();
 			Log.f(DEBUG_PATH, "Villain stats: " + pokerStatInfo);
+			chooseModellingNeural();
 		}
 	}
 

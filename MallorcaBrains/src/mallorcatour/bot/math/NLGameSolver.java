@@ -309,7 +309,7 @@ public class NLGameSolver implements IGameSolver {
 		}
 
 		double percent;
-		if (villainToCall != 0) {
+		if (villainToCall != 0 || street == PokerStreet.PREFLOP) {
 			percent = 1;
 		} else {
 			percent = 0.75;
@@ -320,9 +320,9 @@ public class NLGameSolver implements IGameSolver {
 		double ifVillainAggressiveProfit;
 		if (aggressiveSpectrum.isEmpty()) {
 			ifVillainAggressiveProfit = 0;
-			Log.f(prefix + C.VILLAIN + " cannot reraise");
+			Log.f(prefix + C.VILLAIN + " won't raise");
 		} else {
-			Log.f(prefix + "When " + C.VILLAIN + " reraise " + villainReraiseAmount + " in "
+			Log.f(prefix + "When " + C.VILLAIN + " raise " + villainReraiseAmount + " in "
 					+ (int) (aggressiveWeight / villainSpectrumWeight * 100) + "%");
 			double effectiveStackAfterVillainAggressive = villainEffectiveStack - villainReraiseAmount;
 			double potAfterVillainAggressive = pot + villainToCall + villainReraiseAmount;

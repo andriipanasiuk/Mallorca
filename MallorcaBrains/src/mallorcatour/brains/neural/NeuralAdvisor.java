@@ -7,6 +7,7 @@ package mallorcatour.brains.neural;
 import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.IAdvice;
@@ -47,12 +48,12 @@ public class NeuralAdvisor implements IAdvisor {
 	private NeuralNetwork<?> riverNN;
 	private AdviceCreator adviceCreator;
 
-	public NeuralAdvisor(IPokerNeurals nnStreaming, HavingStats stats, String name) {
-		this(nnStreaming, stats, name, null);
+	public NeuralAdvisor(IPokerNeurals neurals, HavingStats stats, String name) {
+		this(neurals, stats, name, null);
 	}
 
-	public NeuralAdvisor(IPokerNeurals nnStreaming, HavingStats stats, String name, AdviceCreator adviceCreator) {
-		this.neurals = nnStreaming;
+	public NeuralAdvisor(IPokerNeurals neurals, HavingStats stats, String name, AdviceCreator adviceCreator) {
+		this.neurals = neurals;
 		this.stats = stats.getStats();
 		this.name = name;
 		this.adviceCreator = adviceCreator;
@@ -74,19 +75,19 @@ public class NeuralAdvisor implements IAdvisor {
 		boolean canRaise = situation.canRaise();
 		int street = situation.getStreet();
 		switch (street) {
-		case 0:
+		case PokerStreet.PREFLOP_VALUE:
 			nnForUse = preflopNN;
 			adviceCreator = new SmartAdviceCreator();
 			break;
-		case 1:
+		case PokerStreet.FLOP_VALUE:
 			nnForUse = flopNN;
 			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
-		case 2:
+		case PokerStreet.TURN_VALUE:
 			nnForUse = turnNN;
 			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
-		case 3:
+		case PokerStreet.RIVER_VALUE:
 			nnForUse = riverNN;
 			adviceCreator = new SmartRiverAdviceCreator(situation.getPotOdds() == 0);
 			break;

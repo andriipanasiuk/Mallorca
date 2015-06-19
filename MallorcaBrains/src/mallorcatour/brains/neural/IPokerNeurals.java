@@ -4,12 +4,12 @@ import org.neuroph.core.NeuralNetwork;
 
 public interface IPokerNeurals {
 
-	public abstract NeuralNetwork<?> getRiver();
+	NeuralNetwork<?> getRiver();
 
-	public abstract NeuralNetwork<?> getTurn();
+	NeuralNetwork<?> getTurn();
 
-	public abstract NeuralNetwork<?> getFlop();
+	NeuralNetwork<?> getFlop();
 
-	public abstract NeuralNetwork<?> getPreflop();
-	
+	NeuralNetwork<?> getPreflop();
+
 }
