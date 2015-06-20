@@ -142,7 +142,8 @@ public class AiGamesController {
 			} else if (key.equals(C.HAND)) {
 				// Hand of the opponent on a showdown, not stored
 			} else if (key.equals(C.FOLD) || key.equals(C.CHECK) || key.equals(C.CALL) || key.equals(C.RAISE)) {
-				Log.d(C.VILLAIN + " " + key + " " + amountStr);
+				int amount = Integer.valueOf(amountStr);
+				Log.d(C.VILLAIN + " " + key + " " + (amount != 0 ? amount : ""));
 				Action action = fromString(key, amountStr);
 				this.bot.onActed(action, -1, villainName);
 			}

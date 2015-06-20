@@ -30,9 +30,11 @@ public class ActionDistribution extends HashMap<Action, RandomVariable> {
 		StringBuilder builder = new StringBuilder();
 		builder.append("{ ");
 		for (java.util.Map.Entry<Action, RandomVariable> entry : entrySet()) {
-			builder.append(entry.getKey());
+			Action action = entry.getKey();
+			builder.append(action);
 			builder.append(" = ");
-			builder.append(entry.getValue());
+			RandomVariable profit = entry.getValue();
+			builder.append(profit.printProfitability(action));
 			builder.append(FileUtils.LINE_SEPARATOR);
 		}
 		builder.append("}");

@@ -2,7 +2,7 @@ package mallorcatour.brains.neural.gusxensen;
 
 import mallorcatour.neural.core.INeuralInfo;
 
-public class RiverNeuralInfo implements INeuralInfo {
+class RiverNeuralGX implements INeuralInfo {
 	private int[] layerSizeArray = new int[] { 13, 26, 3 };
 	private double[] weights = new double[] { 23.079154346707746, 25.93538476462984, 32.674455129460085,
 			76.32529364055311, 71.38750663766479, 99.05926493067831, -2.832224146543045, 2.466268118325654,

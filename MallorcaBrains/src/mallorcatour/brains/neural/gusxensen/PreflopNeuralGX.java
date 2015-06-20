@@ -2,7 +2,7 @@ package mallorcatour.brains.neural.gusxensen;
 
 import mallorcatour.neural.core.INeuralInfo;
 
-public class PreflopNeuralInfo implements INeuralInfo{
+class PreflopNeuralGX implements INeuralInfo{
 private int[] layerSizeArray = new int[] {13, 26, 3};
 private double[] weights = new double[] {-50.977071778073096, 
 348.90306740084054, 215.73268157945674, 58.25998122294223, 600.4661320691943, 280.11879395047987, 215.78198612292445, 479.16549589190043, 15.613387863621622, 443.21971618244334, 384.7140845251058, 

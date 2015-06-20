@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.tools.Log;
 
 /**
  *
@@ -53,7 +52,7 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 			RandomVariable item = entry.getValue();
 			double ev = item.getEV();
 			double profitability = actionInvestment == 0 ? Double.MAX_VALUE : ev / actionInvestment;
-			Log.f("Prftblt of " + action + " = " + profitability);
+//			Log.f("Prftblt of " + action + " = " + profitability);
 			double variance = item.getVariance();
 			if (condition(profitability, variance, bigBlind) && ev > maxValue) {
 				maxValue = ev;

@@ -3,8 +3,8 @@ package mallorcatour.brains.neural.test;
 import java.util.Arrays;
 import java.util.Random;
 
-import mallorcatour.brains.neural.gusxensen.FlopNeuralInfo;
-import mallorcatour.brains.neural.gusxensen.RiverNeuralInfo;
+import mallorcatour.brains.neural.gusxensen.FlopNeuralGX;
+import mallorcatour.brains.neural.gusxensen.RiverNeuralGX;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
 import mallorcatour.core.vector.BaseVector;
@@ -17,7 +17,7 @@ import org.neuroph.core.NeuralNetwork;
 public class TestNeural {
 	public static void equalFromCodeFile() {
 		NeuralNetwork<?> networkFromFile = NeuralNetwork.createFromFile("GusXensenNeurals/river.mlp");
-		NeuralNetwork<?> networkFromCode = NeuralCreator.createPerceptron(new RiverNeuralInfo());
+		NeuralNetwork<?> networkFromCode = NeuralCreator.createPerceptron(new RiverNeuralGX());
 		Log.d("From file info: " + networkFromFile.getLayersCount());
 		Log.d("From code info: " + networkFromCode.getLayersCount());
 		Log.d("From file info: " + Arrays.toString(networkFromFile.getWeights()));
@@ -42,7 +42,7 @@ public class TestNeural {
 	}
 
 	public static void testInput(String input){
-		NeuralNetwork<?> networkFromCode = NeuralCreator.createPerceptron(new FlopNeuralInfo());
+		NeuralNetwork<?> networkFromCode = NeuralCreator.createPerceptron(new FlopNeuralGX());
 		BaseVector vector = BaseVector.valueOf(input);
 		networkFromCode.setInput(new VectorInterpreter(true).createInput(vector));
 		networkFromCode.calculate();

@@ -21,11 +21,12 @@ public class Log {
 		for (int i = 0; i < indent; i++) {
 			prefix += "	";
 		}
+		log = prefix + log;
 		if (WRITE_TO_ERR) {
 			System.err.println(log);
 		} else {
 			MyFileWriter fileWriter = MyFileWriter.prepareForWriting(path, true);
-			fileWriter.addToFile(prefix + log, true);
+			fileWriter.addToFile(log, true);
 			fileWriter.endWriting();
 		}
 	}

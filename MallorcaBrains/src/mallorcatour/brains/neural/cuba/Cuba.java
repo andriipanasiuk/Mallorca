@@ -14,7 +14,7 @@ public class Cuba implements IPokerNeurals, HavingStats {
 
 	public Cuba() {
 		preflop = NeuralCreator.createPerceptron(new PreflopNeuralInfo());
-		flop = NeuralCreator.createPerceptron(new FlopNeuralInfo());
+		flop = NeuralCreator.createPerceptron(new FlopNeuralC());
 		turn = NeuralCreator.createPerceptron(new TurnNeuralInfo());
 		river = NeuralCreator.createPerceptron(new RiverNeuralInfo());
 	}

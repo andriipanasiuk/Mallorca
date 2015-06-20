@@ -31,7 +31,7 @@ public class BotVsBot {
 		NLFullMathBotFactory fullMathBotFactory = new NLFullMathBotFactory();
 		PokerStatInfo pokerStats = new PokerStatInfo();
 		WritingStudent student = new WritingStudent();
-		PlayerStatModel villainModel = new PlayerStatModel(false, DEBUG_PATH);
+		PlayerStatModel villainModel = new PlayerStatModel(true, DEBUG_PATH);
 		IPlayer fullMathBot = fullMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY, villainModel,
 				pokerStats, "Full MathBot", DEBUG_PATH);
 
@@ -53,7 +53,7 @@ public class BotVsBot {
 
 		IPlayer random = new RandomBot("RandomBot", DEBUG_PATH);
 		IPlayer pushBot = new PushBot("PushBot", DEBUG_PATH);
-		PredefinedGameEngine engine = new PredefinedGameEngine(neuralFrance, neuralGermany, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGermany, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		// engine.button(fullMathBot).cards(fullMathBot,
 		// "TsTc").cards(neuralStandart, "KcAs").stack(fullMathBot, 1800)
@@ -64,7 +64,7 @@ public class BotVsBot {
 //		for (int j = 0; j < 100; j++) {
 			for (int i = 0; i < 100; i++) {
 				TournamentSummary summary = engine.playGame();
-				if (summary.winner.equals(neuralFrance.getName())) {
+				if (summary.winner.equals(fullMathBot.getName())) {
 					count1++;
 				} else {
 					count2++;

@@ -77,6 +77,17 @@ public class RandomVariable extends ArrayList<Pair<Double, Double>> {
 				+ DoubleUtils.digitsAfterComma(getEV() - getVariance(), 2) + " count " + size() + ")";
 	}
 
+	public String printProfitability(Action action) {
+		double investment = 0;
+		if (action.isPassive()) {
+			investment += action.getAmountToCall();
+		} else if (action.isAggressive()) {
+			investment += action.getAmountToCall();
+			investment += action.getAmount();
+		}
+		return printProfitability(investment);
+	}
+
 	public String printProfitability(double investment) {
 		return "(prftblty: " + (investment != 0 ? (DoubleUtils.digitsAfterComma(getEV() / investment, 2)) : "inf")
 				+ " ev " + DoubleUtils.digitsAfterComma(getEV(), 2) + " var "

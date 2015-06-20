@@ -13,10 +13,10 @@ public class GusXensen implements IPokerNeurals, HavingStats {
 	private NeuralNetwork<?> preflop, flop, turn, river;
 
 	public GusXensen() {
-		preflop = NeuralCreator.createPerceptron(new PreflopNeuralInfo());
-		flop = NeuralCreator.createPerceptron(new FlopNeuralInfo());
-		turn = NeuralCreator.createPerceptron(new TurnNeuralInfo());
-		river = NeuralCreator.createPerceptron(new RiverNeuralInfo());
+		preflop = NeuralCreator.createPerceptron(new PreflopNeuralGX());
+		flop = NeuralCreator.createPerceptron(new FlopNeuralGX());
+		turn = NeuralCreator.createPerceptron(new TurnNeuralGX());
+		river = NeuralCreator.createPerceptron(new RiverNeuralGX());
 	}
 
 	@Override

@@ -29,10 +29,10 @@ public class EVAdvisor implements IAdvisor {
 
 	@Override
 	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
-		ActionDistribution map = profitCalculator.getProfitMap(gameInfo, situation, cards.first, cards.second,
+		ActionDistribution actionProfitMap = profitCalculator.getProfitMap(gameInfo, situation, cards.first, cards.second,
 				villainSpectrumHolder.getSpectrum());
-		Log.f(DEBUG_PATH, map.toString());
-		IAdvice advice = adviceCreator.create(map, gameInfo);
+		Log.f(DEBUG_PATH, actionProfitMap.toString());
+		IAdvice advice = adviceCreator.create(actionProfitMap, gameInfo);
 		return advice;
 	}
 

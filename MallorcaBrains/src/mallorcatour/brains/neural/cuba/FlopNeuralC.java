@@ -2,7 +2,7 @@ package mallorcatour.brains.neural.cuba;
 
 import mallorcatour.neural.core.INeuralInfo;
 
-class FlopNeuralInfo implements INeuralInfo {
+class FlopNeuralC implements INeuralInfo {
 private int[] layerSizeArray = new int[] {13, 27, 3};
 private double[] weights = new double[] {-18.152156881213568, 
 -89.85095022132802, 19.21823885954487, 129.861356587997, 217.93802743625525, -128.72610722348224, 5.327922272978715, 21.273226954854756, 20.26316387656109, 20.88433836746145, -42.609097474745916, 

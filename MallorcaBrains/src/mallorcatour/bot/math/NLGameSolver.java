@@ -312,7 +312,7 @@ public class NLGameSolver implements IGameSolver {
 		double villainReraiseAmount = villainAggressiveAction.getAmount();
 
 		if (aggressiveSpectrum.isEmpty()) {
-			log(depth, C.VILLAIN + " won't raise");
+			log(depth, C.VILLAIN + " willnot raise");
 		} else {
 			double aggressiveChance = aggressiveWeight / villainSpectrumWeight;
 			log(depth, "When " + C.VILLAIN + " raise " + villainReraiseAmount + " in " + (int) (aggressiveChance * 100)

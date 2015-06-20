@@ -14,7 +14,7 @@ public class Germany implements IPokerNeurals, HavingStats {
 
 	public Germany() {
 		preflop = NeuralCreator.createPerceptron(new Preflop());
-		flop = NeuralCreator.createPerceptron(new FlopNeural());
+		flop = NeuralCreator.createPerceptron(new FlopNeuralG());
 	}
 
 	@Override
