@@ -13,6 +13,7 @@ import mallorcatour.interfaces.IDistanceCalculator;
  */
 public class PokerStatsDistance implements IDistanceCalculator<IPokerStats> {
 
+	@Override
 	public double getDistance(IPokerStats one, IPokerStats other) {
 		double sum = 0;
 		if (one.getAggressionFrequency() != Double.NaN && other.getAggressionFrequency() != Double.NaN) {

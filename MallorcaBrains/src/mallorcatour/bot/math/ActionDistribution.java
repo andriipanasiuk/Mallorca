@@ -7,19 +7,6 @@ import mallorcatour.tools.FileUtils;
 
 public class ActionDistribution extends HashMap<Action, RandomVariable> {
 
-	public static class ActionProfit extends SimpleEntry<Action, RandomVariable> {
-
-		public ActionProfit(Action arg0, RandomVariable arg1) {
-			super(arg0, arg1);
-		}
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -7986077498025705358L;
-
-	}
-
 	/**
 	 * 
 	 */

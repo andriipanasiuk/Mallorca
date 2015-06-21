@@ -8,6 +8,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PlayerInfo;
+import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.tools.SimplePair;
 
@@ -18,7 +19,7 @@ public class PredefinedGameEngine extends GameEngine {
 	private List<SimplePair<IPlayer, Double>> predefinedStacks = new ArrayList<>();
 	private String flop;
 
-	public PredefinedGameEngine(IPlayer player1, IPlayer player2, IGameObserver observer, String debug) {
+	public PredefinedGameEngine(IPlayer player1, IPlayer player2, IGameObserver<IGameInfo> observer, String debug) {
 		super(player1, player2, observer, debug);
 	}
 
@@ -39,12 +40,12 @@ public class PredefinedGameEngine extends GameEngine {
 	}
 
 	@Override
-	protected void dealButton(IPlayer player, OpenPlayerInfo playerInfo) {
+	protected void dealButton(int handNumber, IPlayer player, OpenPlayerInfo playerInfo) {
 		if (this.buttonPlayer != null) {
 			playerInfo.isOnButton = (player == this.buttonPlayer);
 			otherThan(playerInfo).isOnButton = (player != this.buttonPlayer);
 		} else {
-			super.dealButton(player, playerInfo);
+			super.dealButton(handNumber, player, playerInfo);
 		}
 	}
 

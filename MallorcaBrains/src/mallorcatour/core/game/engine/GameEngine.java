@@ -24,6 +24,8 @@ import mallorcatour.tools.UniformRandomizer;
 
 public class GameEngine implements IGameInfo {
 
+	public static int BLINDS_CHANGE = 10;
+
 	public static class ActionResult {
 		public static final int START_ROUND = -1;
 		public static final int SHOWDOWN = 0;
@@ -47,7 +49,6 @@ public class GameEngine implements IGameInfo {
 	private int firstButtonFlip;
 
 	private boolean tradeOpened;
-	private int currentHandNumber = -1;
 	private LimitType limitType;
 
 	private double[] potOnStreet = new double[4];
@@ -58,7 +59,7 @@ public class GameEngine implements IGameInfo {
 	private PlayerInfo lastMovePlayer;
 	private OpenPlayerInfo playerInfo1, playerInfo2;
 
-	public GameEngine(IPlayer player1, IPlayer player2, IGameObserver observer, String debug) {
+	public GameEngine(IPlayer player1, IPlayer player2, IGameObserver<IGameInfo> observer, String debug) {
 		this.player1 = player1;
 		this.player2 = player2;
 		this.gameObserver = observer;
@@ -75,21 +76,24 @@ public class GameEngine implements IGameInfo {
 		playerInfo.stack = startingStack;
 	}
 
-	protected void dealButton(IPlayer player, OpenPlayerInfo playerInfo) {
-		boolean flip = currentHandNumber % 2 == firstButtonFlip;
+	protected void dealButton(int handNumber, IPlayer player, OpenPlayerInfo playerInfo) {
+		boolean flip = handNumber % 2 == firstButtonFlip;
 		playerInfo.isOnButton = flip;
 		otherThan(playerInfo).isOnButton = !flip;
 	}
 
-	private HandSummary deal() {
+	private HandSummary deal(int handNumber, boolean changeBlind) {
 		tradeOpened = false;
-		currentHandNumber++;
-		BIG_BLIND = BLINDS[(currentHandNumber - 1) / 10];
+		if (changeBlind) {
+			BIG_BLIND = BLINDS[(handNumber - 1) / BLINDS_CHANGE];
+		}else{
+			BIG_BLIND = BLINDS[0];
+		}
 
 		currentStreet = PokerStreet.PREFLOP;
 		nonUsedCards = new ArrayList<Card>(Deck.getCards());
 
-		dealButton(player2, playerInfo2);
+		dealButton(handNumber, player2, playerInfo2);
 
 
 		playerInfo1.stack -= BIG_BLIND / 2;
@@ -133,29 +137,51 @@ public class GameEngine implements IGameInfo {
 		public int handsCount;
 	}
 
+	public static class CashSummary {
+		public String winner;
+		public double gain;
+	}
+
 	public static class HandSummary {
 		public String winner;
 		public double payout;
 	}
 
+	public CashSummary playCash(int handCount) {
+		firstButtonFlip = randomizer.getRandom(0, 2);
+		String winner = null;
+		double gain = 0;
+		for (int i = 0; i < handCount; i++) {
+			setStartStack(player1, playerInfo1);
+			setStartStack(player2, playerInfo2);
+			HandSummary handSummary = deal(i + 1, false);
+			if (winner != null) {
+				if (handSummary.winner != null) {
+					if (handSummary.winner.equals(winner)) {
+						gain += handSummary.payout;
+					} else {
+						gain -= handSummary.payout;
+					}
+				}
+			} else {
+				winner = handSummary.winner;
+				gain += handSummary.payout;
+			}
+		}
+		CashSummary summary = new CashSummary();
+		summary.winner = winner;
+		summary.gain = gain;
+		return summary;
+	}
+
 	public TournamentSummary playGame() {
-		return gameCycle();
-	}
-
-	public HandSummary playRound() {
-		setStartStack(player1, playerInfo1);
-		setStartStack(player2, playerInfo2);
-		return deal();
-	}
-
-	private TournamentSummary gameCycle() {
-		currentHandNumber = 0;
 		firstButtonFlip = randomizer.getRandom(0, 2);
 		BIG_BLIND = START_BIG_BLIND;
 		setStartStack(player1, playerInfo1);
 		setStartStack(player2, playerInfo2);
+		int handNumber = 1;
 		while (playerInfo1.stack > 0 && playerInfo2.stack > 0) {
-			deal();
+			deal(handNumber++, true);
 		}
 		if (playerInfo1.stack != 4000 && playerInfo2.stack != 4000) {
 			Log.d(playerInfo1.stack + " " + playerInfo2.stack);
@@ -166,7 +192,7 @@ public class GameEngine implements IGameInfo {
 		} else {
 			result.winner = playerInfo2.name;
 		}
-		result.handsCount = currentHandNumber;
+		result.handsCount = handNumber;
 		return result;
 	}
 
@@ -205,16 +231,16 @@ public class GameEngine implements IGameInfo {
 			long player1Combination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(player1Cards));
 			long player2Combination = PokerEquilatorBrecher.combination(Card.convertToIntBrecherArray(player2Cards));
 			if (player1Combination > player2Combination) {
-				return endOfHand(playerInfo1);
+				return endOfHand(playerInfo1, result);
 			} else if (player1Combination < player2Combination) {
-				return endOfHand(playerInfo2);
+				return endOfHand(playerInfo2, result);
 			} else {
-				return endOfHand(null);
+				return endOfHand(null, result);
 			}
 		} else if (result == ActionResult.UNCONTESTED && lastMovePlayer == playerInfo2) {
-			return endOfHand(playerInfo1);
+			return endOfHand(playerInfo1, result);
 		} else if (result == ActionResult.UNCONTESTED) {
-			return endOfHand(playerInfo2);
+			return endOfHand(playerInfo2, result);
 		} else {
 			throw new RuntimeException("Shouldn't be");
 		}
@@ -291,16 +317,21 @@ public class GameEngine implements IGameInfo {
 		boardCards.add(c);
 	}
 
-	private HandSummary endOfHand(OpenPlayerInfo winner) {
+	private HandSummary endOfHand(OpenPlayerInfo winner, int actionResult) {
 		Log.f(DEBUG_PATH, playerInfo1.name + " " + playerInfo1.holeCard1 + " " + playerInfo1.holeCard2);
 		Log.f(DEBUG_PATH, playerInfo2.name + " " + playerInfo2.holeCard1 + " " + playerInfo2.holeCard2);
 		HandSummary result = new HandSummary();
 		if (winner != null) {
-			result.payout = pot / 2;
+			if (actionResult == ActionResult.UNCONTESTED) {
+				result.payout = (pot - lastToCall) / 2;
+			} else {
+				result.payout = pot / 2;
+			}
 			result.winner = winner.name;
 			winner.stack += pot;
 			Log.f(DEBUG_PATH, winner.name + " wins " + pot);
 		} else {
+			result.payout = 0;
 			playerInfo1.stack += pot / 2;
 			playerInfo2.stack += pot / 2;
 			Log.f(DEBUG_PATH, "Draw Pot: " + pot);
@@ -353,10 +384,13 @@ public class GameEngine implements IGameInfo {
 		return calculateWinner(result);
 	}
 
+	double lastToCall;
+
 	private int playerActed(Action action, OpenPlayerInfo playerInfo) {
 		lastMovePlayer = playerInfo;
 		Log.f(DEBUG_PATH, playerInfo.name + " " + action.getActString());
 		double toCall = otherThan(playerInfo).bet - playerInfo.bet;
+		lastToCall = toCall;
 		if (action.isFold()) {
 			return ActionResult.UNCONTESTED;
 		} else if (action.isPassive()) {

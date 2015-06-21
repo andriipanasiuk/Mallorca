@@ -42,4 +42,8 @@ public class Germany implements IPokerNeurals, HavingStats {
 		return new PokerStats(0.7, 0.32, 0.65, 0.22);
 	}
 
+	@Override
+	public String getName() {
+		return "Germany";
+	}
 }

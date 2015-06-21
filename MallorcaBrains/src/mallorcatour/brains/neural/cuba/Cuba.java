@@ -44,4 +44,9 @@ public class Cuba implements IPokerNeurals, HavingStats {
 		return new PokerStats(0.92, 0.42, 0.91, 0.29);
 	}
 
+	@Override
+	public String getName() {
+		return "Cuba";
+	}
+
 }

@@ -5,6 +5,7 @@
 
 package mallorcatour.brains;
 
+import mallorcatour.bot.interfaces.HasName;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
@@ -15,7 +16,7 @@ import mallorcatour.core.game.situation.LocalSituation;
  * 
  * @author Andrew
  */
-public interface IAdvisor extends HavingStats {
+public interface IAdvisor extends HavingStats, HasName {
 
 	/**
 	 * Return advice for action in any situation with hole cards.
@@ -24,8 +25,6 @@ public interface IAdvisor extends HavingStats {
 	 *            TODO
 	 */
 	IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo);
-
-	String getName();
 
 	public static final IAdvisor UNSUPPORTED = new IAdvisor() {
 

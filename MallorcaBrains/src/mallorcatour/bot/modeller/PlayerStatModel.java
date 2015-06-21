@@ -83,6 +83,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		PokerStatsDistance distance = new PokerStatsDistance();
 		for (IAdvisor neural : neurals) {
 			double error = distance.getDistance(this.getStats(), neural.getStats());
+			Log.f(DEBUG_PATH, "Difference between " + neural.getName() + ": " + error);
 			if (error < minError) {
 				minError = error;
 				currentNeural = neural;
@@ -107,7 +108,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		situationCount++;
 		StatCalculator.changeStat(situation, advice, pokerStatInfo);
 		if (situationCount % 10 == 0) {
-			Log.f(DEBUG_PATH, "Villain stats: " + pokerStatInfo);
+			Log.f(DEBUG_PATH, C.VILLAIN + " " + C.STATS + ": " + pokerStatInfo);
 			if (chooseNeural) {
 				chooseModellingNeural();
 			}

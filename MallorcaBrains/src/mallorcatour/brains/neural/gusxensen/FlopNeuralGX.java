@@ -2,7 +2,7 @@ package mallorcatour.brains.neural.gusxensen;
 
 import mallorcatour.neural.core.INeuralInfo;
 
-class FlopNeuralGX implements INeuralInfo {
+public class FlopNeuralGX implements INeuralInfo {
 	private int[] layerSizeArray = new int[] { 13, 26, 3 };
 	private double[] weights = new double[] { -468.97786440106546, -72.0645339490218, 193.96979375152313,
 			173.63360035302273, 42.33095924511223, 120.22942985497573, -139.08704962421785, 98.00293125902535,

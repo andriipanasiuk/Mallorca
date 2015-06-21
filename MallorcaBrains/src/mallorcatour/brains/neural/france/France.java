@@ -44,4 +44,8 @@ public class France implements IPokerNeurals, HavingStats {
 		return new PokerStats(0.79, 0.51, 0.37, 0.24);
 	}
 
+	@Override
+	public String getName() {
+		return "France";
+	}
 }

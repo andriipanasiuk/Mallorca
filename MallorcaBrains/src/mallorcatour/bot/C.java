@@ -34,7 +34,7 @@ public class C {
 	public static final String TURN = "Tu" + "rn";
 	public static final String RIVER = "Ri" + "ver";
 	public static final String PROFIT = "Pr" + "ofit";
-	public static final String STATS = "Sta" + "ts";
+	public static final String STATS = "St" + "ats";
 	public static final String FIRST = "fir" + "st";
 	public static final String SECOND = "seco" + "nd";
 }

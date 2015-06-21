@@ -65,30 +65,30 @@ public class NeuralAdvisor implements IAdvisor {
 		flopNN = neurals.getFlop();
 		turnNN = neurals.getTurn();
 		riverNN = neurals.getRiver();
-		Log.d("BasePokerNN. Neural networks inited");
+		Log.d("Neural network " + neurals.getName() + " has been inited");
 	}
 
 	@Override
 	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
-		NeuralNetwork<?> nnForUse = null;
-		AdviceCreator adviceCreator = null;
+		NeuralNetwork<?> neural;
+		AdviceCreator adviceCreator;
 		boolean canRaise = situation.canRaise();
 		int street = situation.getStreet();
 		switch (street) {
 		case PokerStreet.PREFLOP_VALUE:
-			nnForUse = preflopNN;
+			neural = preflopNN;
 			adviceCreator = new SmartAdviceCreator();
 			break;
 		case PokerStreet.FLOP_VALUE:
-			nnForUse = flopNN;
+			neural = flopNN;
 			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
 		case PokerStreet.TURN_VALUE:
-			nnForUse = turnNN;
+			neural = turnNN;
 			adviceCreator = new SmartPostflopAdviceCreator();
 			break;
 		case PokerStreet.RIVER_VALUE:
-			nnForUse = riverNN;
+			neural = riverNN;
 			adviceCreator = new SmartRiverAdviceCreator(situation.getPotOdds() == 0);
 			break;
 		default:
@@ -97,9 +97,9 @@ public class NeuralAdvisor implements IAdvisor {
 		if (this.adviceCreator != null) {
 			adviceCreator = this.adviceCreator;
 		}
-		nnForUse.setInput(new LocalSituationInterpreter().createInput(situation));
-		nnForUse.calculate();
-		double[] advice = nnForUse.getOutput();
+		neural.setInput(new LocalSituationInterpreter().createInput(situation));
+		neural.calculate();
+		double[] advice = neural.getOutput();
 		Advice result = Advice.create(adviceCreator, canRaise, advice);
 		return result;
 	}

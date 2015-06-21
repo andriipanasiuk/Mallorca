@@ -44,4 +44,8 @@ public class GusXensen implements IPokerNeurals, HavingStats {
 		return new PokerStats(0.79, 0.49, 0.37, 0.56);
 	}
 
+	@Override
+	public String getName() {
+		return "GusXensen";
+	}
 }
