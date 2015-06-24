@@ -41,7 +41,7 @@ public class GusXensen implements IPokerNeurals, HavingStats {
 
 	@Override
 	public IPokerStats getStats() {
-		return new PokerStats(0.79, 0.49, 0.37, 0.56);
+		return new PokerStats(0.79, 0.52, 0.37, 0.56);
 	}
 
 	@Override

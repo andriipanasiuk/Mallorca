@@ -1,4 +1,4 @@
-package mallorcatour.brains.neural.germany;
+package mallorcatour.brains.neural.checkburn;
 
 import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.neural.IPokerNeurals;
@@ -8,23 +8,25 @@ import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
 
-public class Germany implements IPokerNeurals, HavingStats {
+public class CheckBurn implements IPokerNeurals, HavingStats {
 
-	private NeuralNetwork<?> preflop, flop;
+	private NeuralNetwork<?> preflop, flop, turn, river;
 
-	public Germany() {
-		preflop = NeuralCreator.createPerceptron(new Preflop());
-		flop = NeuralCreator.createPerceptron(new FlopNeuralG());
+	public CheckBurn() {
+		preflop = NeuralCreator.createPerceptron(new PreflopNeuralCCB());
+		flop = NeuralCreator.createPerceptron(new FlopNeuralCCB());
+		turn = NeuralCreator.createPerceptron(new TurnNeuralCCB());
+		river = NeuralCreator.createPerceptron(new RiverNeuralCCB());
 	}
 
 	@Override
 	public NeuralNetwork<?> getRiver() {
-		return flop;
+		return river;
 	}
 
 	@Override
 	public NeuralNetwork<?> getTurn() {
-		return flop;
+		return turn;
 	}
 
 	@Override
@@ -39,11 +41,12 @@ public class Germany implements IPokerNeurals, HavingStats {
 
 	@Override
 	public IPokerStats getStats() {
-		return new PokerStats(0.7, 0.28, 0.65, 0.22);
+		return new PokerStats(0.5, 0.1, 0.29, 0.67);
 	}
 
 	@Override
 	public String getName() {
-		return "Germany";
+		return "CheckCheckBurn";
 	}
+
 }

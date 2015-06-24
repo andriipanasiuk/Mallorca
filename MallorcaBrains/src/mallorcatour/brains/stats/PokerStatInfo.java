@@ -13,6 +13,17 @@ public class PokerStatInfo implements IPokerStats, AdvisorListener {
 	public Pair<Double, Double> aggressionFrequency = new Pair<>(0d, 0d);
 	public Pair<Double, Double> foldFrequency = new Pair<>(0d, 0d);
 
+	public void reset(){
+		vpip.first = 0d;
+		vpip.second = 0d;
+		pfr.first = 0d;
+		pfr.second = 0d;
+		aggressionFrequency.first = 0d;
+		aggressionFrequency.second = 0d;
+		foldFrequency.first = 0d;
+		foldFrequency.second = 0d;
+	}
+
 	public void addAggressionFrequencyInfo(Pair<Integer, Integer> aggressionFreq) {
 		this.aggressionFrequency.first += aggressionFreq.first;
 		this.aggressionFrequency.second += aggressionFreq.second;

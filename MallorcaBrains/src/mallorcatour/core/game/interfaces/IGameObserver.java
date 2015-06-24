@@ -4,6 +4,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.PokerStreet;
 
 public interface IGameObserver<P extends IGameInfo> {
+	@SuppressWarnings("rawtypes")
 	public static final IGameObserver EMPTY = new IGameObserver() {
 
 		@Override

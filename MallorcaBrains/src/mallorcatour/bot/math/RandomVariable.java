@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Pair;
 
@@ -27,6 +28,21 @@ public class RandomVariable extends ArrayList<Pair<Double, Double>> {
 			variance = calculateVariance(this);
 		}
 		return variance;
+	}
+
+	private double sum() {
+		double sum = 0;
+		for (Pair<Double, Double> pair : this) {
+			sum += pair.first;
+		}
+		return sum;
+	}
+
+	public void normalize() {
+		double sum = sum();
+		for (Pair<Double, Double> pair : this) {
+			pair.first = pair.first / sum;
+		}
 	}
 
 	public static RandomVariable create(double constant) {
@@ -73,30 +89,40 @@ public class RandomVariable extends ArrayList<Pair<Double, Double>> {
 	@Override
 	public String toString() {
 		return "(ev " + DoubleUtils.digitsAfterComma(getEV(), 2) + " var "
-				+ DoubleUtils.digitsAfterComma(getVariance(), 2) + " diff "
-				+ DoubleUtils.digitsAfterComma(getEV() - getVariance(), 2) + " count " + size() + ")";
+				+ DoubleUtils.digitsAfterComma(getVariance(), 2)
+				+ " count " + size() + ")";
 	}
 
-	public String printProfitability(Action action) {
-		double investment = 0;
-		if (action.isPassive()) {
-			investment += action.getAmountToCall();
-		} else if (action.isAggressive()) {
-			investment += action.getAmountToCall();
-			investment += action.getAmount();
-		}
-		return printProfitability(investment);
+	public String printProfitability(Action action, double ES, double bb) {
+//		double investment = 0;
+//		if (action.isPassive()) {
+//			investment += action.getAmountToCall();
+//		} else if (action.isAggressive()) {
+//			investment += action.getAmountToCall();
+//			investment += action.getAmount();
+//		}
+		return printProfitability(ES, bb);
 	}
 
-	public String printProfitability(double investment) {
-		return "(prftblty: " + (investment != 0 ? (DoubleUtils.digitsAfterComma(getEV() / investment, 2)) : "inf")
-				+ " ev " + DoubleUtils.digitsAfterComma(getEV(), 2) + " var "
-				+ DoubleUtils.digitsAfterComma(getVariance(), 2) + " diff "
-				+ DoubleUtils.digitsAfterComma(getEV() - getVariance(), 2) + ")";
+	public String printProfitability(IGameInfo gameInfo) {
+		return printProfitability(gameInfo.getBankRollAtRisk(), gameInfo.getBigBlindSize());
 	}
 
-	public double boundary() {
-		return 1.65 * getVariance() / Math.sqrt(size());
+	public String printProfitability(double heroES, double bb) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("(");
+		builder.append("EV/BB: ");
+		builder.append(DoubleUtils.digitsAfterComma(getEV() / bb, 2));
+		builder.append(" EV/Var: ");
+		builder.append(DoubleUtils.digitsAfterComma(getEV() / getVariance(), 2));
+		builder.append(" Var/BB: ");
+		builder.append(DoubleUtils.digitsAfterComma(getVariance() / bb, 2));
+		builder.append(" EV: ");
+		builder.append(DoubleUtils.digitsAfterComma(getEV(), 2));
+		builder.append(" Var: ");
+		builder.append(DoubleUtils.digitsAfterComma(getVariance(), 2));
+		builder.append(")");
+		return builder.toString();
 	}
 
 	public static RandomVariable maxEV(ActionDistribution actionDistribution) {

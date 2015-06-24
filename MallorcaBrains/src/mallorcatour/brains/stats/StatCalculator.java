@@ -3,7 +3,6 @@ package mallorcatour.brains.stats;
 import java.util.List;
 
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
@@ -15,8 +14,8 @@ public class StatCalculator {
 		PokerStatInfo info = new PokerStatInfo();
 		for (PokerLearningExample item : list) {
 			LocalSituation situation = item.getSituation();
-			Advice advice = item.getAdvice();
-			StatCalculator.changeStat(situation, advice, info);
+			IAdvice advice = item.getAdvice();
+			changeStat(situation, advice, info);
 		}
 		return info;
 	}
@@ -30,9 +29,9 @@ public class StatCalculator {
 			info.aggressionFrequency.first += advice.getAggressive();
 			info.aggressionFrequency.second += (1 - advice.getFold());
 		} else {
-			info.pfr.second += 1;
-			info.pfr.first += advice.getAggressive();
 			if (situation.getHeroActionCount() == 0) {
+				info.pfr.second += 1;
+				info.pfr.first += advice.getAggressive();
 				info.vpip.second += 1;
 				if (situation.getVillainActionCount() == 0) {
 					info.vpip.first += (1 - advice.getFold());

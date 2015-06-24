@@ -14,8 +14,8 @@ import mallorcatour.tools.Log;
 
 public class EquilatorStrength {
 
-	public static StreetEquity equityVsSpectrumToRiver(Card heroCard1, Card heroCard2, Card[] boardCards,
-			Spectrum spectrum) {
+	public static double profitVsSpectrum(Card heroCard1, Card heroCard2, Card[] boardCards, Spectrum spectrum) {
+		long time = System.currentTimeMillis();
 		int boardSize = boardCards.length;
 		if (boardSize < 3) {
 			throw new IllegalArgumentException("Cannot calculate for empty board");
@@ -34,6 +34,10 @@ public class EquilatorStrength {
 		int[] nonUsedCards = Deck.getIntCardsForBrecher();
 
 		double count = 0, wins = 0, draw = 0;
+		boolean enumerateTurn = boardSize == 3;
+		boolean enumerateRiver = boardSize <= 4;
+		int turns = enumerateTurn ? nonUsedCards.length : 1;
+		int rivers = enumerateRiver ? nonUsedCards.length : 1;
 		for (Entry<HoleCards, Double> entry : spectrum.weightsIterator()) {
 			HoleCards cards = entry.getKey();
 			double weight = entry.getValue();
@@ -49,14 +53,9 @@ public class EquilatorStrength {
 			allOpponentCards[1] = opponentCard2;
 			int myCombination;
 			int opponentCombination;
-			boolean enumerateTurn = boardSize == 3;
-			boolean enumerateRiver = boardSize <= 4;
-			int turns = enumerateTurn ? nonUsedCards.length : 1;
-			int rivers = enumerateRiver ? nonUsedCards.length : 1;
 			for (int t = 0; t < turns; t++) {
-				int turn;
 				if (enumerateTurn) {
-					turn = nonUsedCards[t];
+					int turn = nonUsedCards[t];
 					if (ArrayUtils.containsElement(allHeroCards, turn)) {
 						continue;
 					}
@@ -93,10 +92,8 @@ public class EquilatorStrength {
 		if (LOGGING) {
 			Log.d("Wins = " + wins + " Count = " + count + " Draw = " + draw);
 		}
-		StreetEquity result = new StreetEquity();
-		result.strength = ((double) draw / 2 + wins) / count;
-		result.draw = (double) draw / count;
-		return result;
+		double strength = ((double) draw / 2 + wins) / count;
+		return strength;
 	}
 
 	public static void test() {
@@ -106,11 +103,11 @@ public class EquilatorStrength {
 		spectrum.add(HoleCards.valueOf("6dTd"), 0.2);
 		spectrum.add(HoleCards.valueOf("7dKd"), 0.7);
 		spectrum.add(HoleCards.valueOf("8dTd"), 0.4);
-		StreetEquity equity = equityVsSpectrumToRiver(
+		double equity = profitVsSpectrum(
 				Card.valueOf("As"),
 				Card.valueOf("Qs"),
 				new Card[] { Card.valueOf("Jc"), Card.valueOf("Qc"), Card.valueOf("6c"), Card.valueOf("8c"),
 						Card.valueOf("9d") }, spectrum);
-		Log.d("Result: " + equity.strength);
+		Log.d("Result: " + equity);
 	}
 }

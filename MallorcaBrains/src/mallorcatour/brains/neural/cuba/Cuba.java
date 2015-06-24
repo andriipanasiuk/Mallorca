@@ -41,7 +41,7 @@ public class Cuba implements IPokerNeurals, HavingStats {
 
 	@Override
 	public IPokerStats getStats() {
-		return new PokerStats(0.92, 0.42, 0.91, 0.29);
+		return new PokerStats(0.91, 0.44, 0.9, 0.28);
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package mallorcatour.core.game;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import mallorcatour.core.game.advice.IAdvice;
 
@@ -255,5 +257,14 @@ public class Action implements Serializable, IAdvice {
 			}
 			return true;
 		}
+	}
+
+	@Override
+	public List<Number> getValues() {
+		List<Number> result = new ArrayList<Number>();
+        result.add(getFold());
+        result.add(getPassive());
+        result.add(getAggressive());
+        return result;
 	}
 }

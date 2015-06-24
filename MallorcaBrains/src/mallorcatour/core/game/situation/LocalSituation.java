@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
@@ -347,4 +348,26 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
         this.stackProportion = stackProportion;
     }
 
+	public String toSmartString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("At ");
+		builder.append(PokerStreet.valueOf(getStreet()).toString());
+		builder.append(" ");
+		if (isHeroOnButton()) {
+			builder.append("On button");
+		} else {
+			builder.append("OOP");
+		}
+		builder.append(" ");
+		if (getStreet() == PokerStreet.PREFLOP_VALUE && getPotOdds() == 0) {
+			builder.append("opp call SB");
+		} else {
+			if (isHeroOnButton() && getHeroActionCount() == 0) {
+				builder.append("UO");
+			} else {
+				builder.append("vs raise");
+			}
+		}
+		return builder.toString();
+   }
 }

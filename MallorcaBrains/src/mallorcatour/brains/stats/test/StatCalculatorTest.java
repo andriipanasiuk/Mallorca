@@ -13,25 +13,28 @@ public class StatCalculatorTest {
 
 	public static void main(String... args) {
 		{
-			String path = "Cuba";
+			String path = "CheckCheckBurn";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
-			Log.d("Vpip: " + stats.getVpip() + " Pfr: " + stats.getPfr());
-			Log.d("Aggr.: " + stats.getAggressionFrequency() + " Fold: " + stats.getFoldFrequency());
+			Log.d(stats.toString());
 		}
 		{
-			String path = "France";
+			String path = "PBX";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
-			Log.d("Vpip: " + stats.getVpip() + " Pfr: " + stats.getPfr());
-			Log.d("Aggr.: " + stats.getAggressionFrequency() + " Fold: " + stats.getFoldFrequency());
+			Log.d(stats.toString());
+		}
+		{
+			String path = "Germany";
+			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
+			IPokerStats stats = StatCalculator.calculate(list);
+			Log.d(stats.toString());
 		}
 		{
 			String path = "GusXensen";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
-			Log.d("Vpip: " + stats.getVpip() + " Pfr: " + stats.getPfr());
-			Log.d("Aggr.: " + stats.getAggressionFrequency() + " Fold: " + stats.getFoldFrequency());
+			Log.d(stats.toString());
 		}
 	}
 

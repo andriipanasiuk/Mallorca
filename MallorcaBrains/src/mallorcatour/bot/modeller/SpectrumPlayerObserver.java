@@ -1,4 +1,4 @@
-package mallorcatour.bot.villainobserver;
+package mallorcatour.bot.modeller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +44,8 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 
 	private final AdvisorListener adviceListener;
 
-	public SpectrumPlayerObserver(IAdvisor model, AdvisorListener actionObserver, StrengthManager strengthManager, ISpectrumListener spectrumListener,
-			String hero, boolean trackHero) {
+	public SpectrumPlayerObserver(IAdvisor model, AdvisorListener actionObserver, StrengthManager strengthManager,
+			ISpectrumListener spectrumListener, String hero, boolean trackHero) {
 		this.hero = hero;
 		this.trackHero = trackHero;
 		this.model = model;

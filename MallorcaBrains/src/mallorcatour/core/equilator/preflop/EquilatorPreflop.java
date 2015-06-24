@@ -1,5 +1,8 @@
 package mallorcatour.core.equilator.preflop;
 
+import java.util.Map.Entry;
+
+import mallorcatour.bot.math.RandomVariable;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Card;
@@ -140,6 +143,26 @@ public class EquilatorPreflop {
 			Log.d("Calculated vs " + log + " villain cards");
 		}
 		return ((double) wins) / count;
+	}
+
+	public static RandomVariable profitVsSpectrum(Card heroCard1, Card heroCard2, Spectrum spectrum, double win,
+			double lose) {
+		int log = 0;
+		RandomVariable result = new RandomVariable();
+		HoleCards heroCards = new HoleCards(heroCard1, heroCard2);
+		double sumWeight = spectrum.summaryWeight();
+		for (Entry<HoleCards, Double> item : spectrum.weightsIterator()) {
+			log++;
+			HoleCards villainHoleCards = item.getKey();
+			double weight = item.getValue();
+			double strength = preflopStrength(heroCards, villainHoleCards);
+			result.add(strength * (weight / sumWeight), win);
+			result.add((1 - strength) * (weight / sumWeight), -lose);
+		}
+		if (PokerEquilatorBrecher.LOGGING) {
+			Log.d("Calculated vs " + log + " villain cards");
+		}
+		return result;
 	}
 
 }

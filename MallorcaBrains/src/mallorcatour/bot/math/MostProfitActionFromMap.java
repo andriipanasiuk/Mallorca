@@ -7,6 +7,7 @@ package mallorcatour.bot.math;
 import java.util.Map.Entry;
 
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
@@ -18,7 +19,7 @@ import mallorcatour.core.game.interfaces.IGameInfo;
 public class MostProfitActionFromMap extends BaseAdviceCreatorFromMap {
 
 	@Override
-    public IAdvice create(ActionDistribution map, IGameInfo gameInfo) {
+    public IAdvice create(ActionDistribution map, IGameInfo gameInfo, HoleCards cards) {
         double passive = 0;
         Double aggressive = null;
         for (Entry<Action, RandomVariable> entry : map.entrySet()) {

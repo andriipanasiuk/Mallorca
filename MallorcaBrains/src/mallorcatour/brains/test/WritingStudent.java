@@ -6,7 +6,6 @@ import java.util.List;
 
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.hhparser.SituationIO;
@@ -19,7 +18,7 @@ public class WritingStudent implements AdvisorListener {
 
 	@Override
 	public void onAdvice(LocalSituation situation, IAdvice advice) {
-		examples.add(new PokerLearningExample(situation, (Advice) advice));
+		examples.add(new PokerLearningExample(situation, advice));
 	}
 
 	public void reset() {

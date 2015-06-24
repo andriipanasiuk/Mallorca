@@ -8,6 +8,7 @@ import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.C;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
+import mallorcatour.brains.neural.checkburn.CheckBurn;
 import mallorcatour.brains.neural.cuba.Cuba;
 import mallorcatour.brains.neural.france.France;
 import mallorcatour.brains.neural.germany.Germany;
@@ -32,6 +33,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	public static IAdvisor CUBA_NL_NEURAL;
 	public static IAdvisor GERMANY_NL_NEURAL;
 	public static IAdvisor FRANCE_NL_NEURAL;
+	public static IAdvisor CHECKBURN_NL_NEURAL;
 	public static IAdvisor random = new RandomAdvisor();
 	public static IAdvisor[] neurals;
 
@@ -44,10 +46,13 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		GERMANY_NL_NEURAL = new NeuralAdvisor(germany, germany, "Ger" + "many");
 		France france = new France();
 		FRANCE_NL_NEURAL = new NeuralAdvisor(france, france, "Fra" + "nce");
-		neurals = new IAdvisor[] { GUSXENSEN_NL_NEURAL, CUBA_NL_NEURAL, GERMANY_NL_NEURAL, FRANCE_NL_NEURAL };
+		CheckBurn checkBurn = new CheckBurn();
+		CHECKBURN_NL_NEURAL = new NeuralAdvisor(checkBurn, checkBurn, "Chec" + "kBurn");
+		neurals = new IAdvisor[] { GUSXENSEN_NL_NEURAL, CUBA_NL_NEURAL, GERMANY_NL_NEURAL, FRANCE_NL_NEURAL,
+				CHECKBURN_NL_NEURAL };
 	}
 
-	private IAdvisor currentNeural = GERMANY_NL_NEURAL;
+	private IAdvisor currentNeural;
 	private final String DEBUG_PATH;
 	private final PokerStatInfo pokerStatInfo = new PokerStatInfo();
 	private final boolean chooseNeural;
@@ -55,7 +60,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	private int handsCount;
 
 	public PlayerStatModel(String debug) {
-		this(random, false, debug);
+		this(false, debug);
 	}
 
 	public PlayerStatModel(IAdvisor currentAdvisor, boolean choose, String debug) {
@@ -95,7 +100,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 
 	@Override
 	public String getName() {
-		return "Player model";
+		return "Player model by " + currentNeural.getName();
 	}
 
 	@Override

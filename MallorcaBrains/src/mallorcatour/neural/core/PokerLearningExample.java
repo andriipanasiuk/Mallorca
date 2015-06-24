@@ -10,17 +10,18 @@ import java.io.Serializable;
 
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
 
 /**
  *
  * @author Andrew
  */
-public class PokerLearningExample implements ILearningExample<LocalSituation, Advice>, Serializable {
+public class PokerLearningExample implements ILearningExample<LocalSituation, IAdvice>, Serializable {
 
     private final static long serialVersionUID = 1L;
     private LocalSituation situation;
-    private Advice advice;
+    private IAdvice advice;
     private Hand hand;
 
     public PokerLearningExample() {
@@ -31,7 +32,7 @@ public class PokerLearningExample implements ILearningExample<LocalSituation, Ad
         this.situation = situation;
     }
 
-    public PokerLearningExample(LocalSituation situation, Advice advice) {
+    public PokerLearningExample(LocalSituation situation, IAdvice advice) {
         this.situation = situation;
         this.advice = advice;
     }
@@ -53,7 +54,7 @@ public class PokerLearningExample implements ILearningExample<LocalSituation, Ad
     /**
      * @return the advice
      */
-    public Advice getAdvice() {
+    public IAdvice getAdvice() {
         return getOutput();
     }
 
@@ -94,7 +95,7 @@ public class PokerLearningExample implements ILearningExample<LocalSituation, Ad
 	}
 
 	@Override
-	public Advice getOutput() {
+	public IAdvice getOutput() {
 		return advice;
 	}
 

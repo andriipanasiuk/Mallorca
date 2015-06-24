@@ -4,6 +4,7 @@
  */
 package mallorcatour.bot.math;
 
+import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
 
@@ -13,5 +14,5 @@ import mallorcatour.core.game.interfaces.IGameInfo;
  */
 public abstract class BaseAdviceCreatorFromMap {
 
-    abstract IAdvice create(ActionDistribution map, IGameInfo gameInfo);
+    abstract IAdvice create(ActionDistribution map, IGameInfo gameInfo, HoleCards cards);
 }

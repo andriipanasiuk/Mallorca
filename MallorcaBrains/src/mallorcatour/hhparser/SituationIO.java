@@ -9,6 +9,7 @@ import java.util.List;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.neural.core.LearningExample;
 import mallorcatour.neural.core.PokerLearningExample;
@@ -36,7 +37,7 @@ public class SituationIO {
 		int preflop = 0, flop = 0, turn = 0, river = 0;
 		for (int index = 0; index < examples.size(); index++) {
 			LocalSituation situation = examples.get(index).getInput();
-			Advice advice = examples.get(index).getOutput();
+			IAdvice advice = examples.get(index).getOutput();
 			switch (situation.getStreet()) {
 			case PokerStreet.PREFLOP_VALUE:
 				preflop++;

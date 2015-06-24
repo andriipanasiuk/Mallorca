@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.Advice;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.AdviceReader;
 import mallorcatour.hhparser.HandParser;
@@ -411,14 +412,14 @@ public class HHParserFrame extends javax.swing.JFrame {
         return result;
     }
 
-    private boolean isSame(Advice one, Advice two) {
-        if (two.getAggressivePercent() == 100 && one.getAggressivePercent() == 0) {
+    private boolean isSame(IAdvice one, IAdvice two) {
+        if (two.getAggressive() != one.getAggressive()) {
             return false;
         }
-        if (two.getPassivePercent() == 100 && one.getPassivePercent() == 0) {
+        if (two.getPassive() != one.getPassive()) {
             return false;
         }
-        if (two.getFoldPercent() == 100 && one.getFoldPercent() == 0) {
+        if (two.getFold() != one.getFold()) {
             return false;
         }
         return true;

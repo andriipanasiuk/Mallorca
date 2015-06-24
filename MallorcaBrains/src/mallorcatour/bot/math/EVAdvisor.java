@@ -22,8 +22,6 @@ public class EVAdvisor implements IAdvisor {
 		this.villainSpectrumHolder = villainSpectrumHolder;
 		profitCalculator = new NLProfitCalculator(villainModel, strengthManager);
 		adviceCreator = new LessVarianceActionFromMap();
-//		adviceCreator = new ActionDistributionFromMap();
-//		adviceCreator = new MostProfitActionFromMap();
 		this.DEBUG_PATH = debug;
 	}
 
@@ -31,8 +29,8 @@ public class EVAdvisor implements IAdvisor {
 	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		ActionDistribution actionProfitMap = profitCalculator.getProfitMap(gameInfo, situation, cards.first, cards.second,
 				villainSpectrumHolder.getSpectrum());
-		Log.f(DEBUG_PATH, actionProfitMap.toString());
-		IAdvice advice = adviceCreator.create(actionProfitMap, gameInfo);
+		Log.f(DEBUG_PATH, actionProfitMap.toSmartString(gameInfo.getBigBlindSize(), gameInfo.getBankRollAtRisk()));
+		IAdvice advice = adviceCreator.create(actionProfitMap, gameInfo, cards);
 		return advice;
 	}
 

@@ -41,7 +41,7 @@ public class France implements IPokerNeurals, HavingStats {
 
 	@Override
 	public IPokerStats getStats() {
-		return new PokerStats(0.79, 0.51, 0.37, 0.24);
+		return new PokerStats(0.79, 0.53, 0.37, 0.24);
 	}
 
 	@Override
