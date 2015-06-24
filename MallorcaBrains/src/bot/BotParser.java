@@ -20,8 +20,6 @@ import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.bot.modeller.PlayerStatModel;
-import mallorcatour.brains.neural.NeuralAdvisor;
-import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop.LoadFrom;
 import mallorcatour.core.game.Action;

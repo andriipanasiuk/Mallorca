@@ -6,7 +6,6 @@ package mallorcatour.bot.math;
 
 import java.util.Map.Entry;
 
-import mallorcatour.brains.modeller.ProfitCorrections;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
@@ -31,9 +30,6 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 		Entry<Action, RandomVariable> bestAction = getBestAction(actionDistribution, gameInfo, investment, false, cards);
 		return bestAction.getValue();
 	}
-
-	public static int PROFITABILITY_CORRECTION = 0;
-	public static int VARIANCE_CORRECTION = 0;
 
 	private static boolean profitabilityIsGood(ActionProfit actionProfit, double lowEV) {
 		if (actionProfit == null) {
@@ -105,13 +101,7 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 		if (profitabilityIsGood(raiseProfit, foldProfit.evBBKoeff)){
 			return raiseAction;
 		}
-		if (passiveProfit == null) {
-			throw new RuntimeException("Passive action must be");
-		}
 		if (profitabilityIsGood(passiveProfit, foldProfit.evBBKoeff) || toCall == 0) {
-			if(toCall == 0){
-				int i=0;
-			}
 			return passiveAction;
 		}
 		return foldAction;

@@ -1,5 +1,7 @@
 package mallorcatour.brains.modeller;
 
+import mallorcatour.bot.math.ProfitCorrections;
+
 public class PBXCorrections implements ProfitCorrections {
 
 	@Override

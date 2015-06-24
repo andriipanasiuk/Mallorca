@@ -1,4 +1,4 @@
-package mallorcatour.brains.modeller;
+package mallorcatour.bot.math;
 
 public interface ProfitCorrections {
 	double getPreflopCall();
