@@ -45,6 +45,7 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 				(evVarKoeff > 0.2 && varBBKoeff < 5) || 
 				(evVarKoeff > 0.25 && varBBKoeff < 10) || 
 				(evVarKoeff > 0.4 && varBBKoeff < 20) || 
+				(evVarKoeff > 0.48 && varBBKoeff < 38) || 
 				(evVarKoeff > 0.5 && varBBKoeff < 40) || 
 				(evVarKoeff > 0.55 && varBBKoeff < 50) || 
 				(evVarKoeff > 0.75 && varBBKoeff < 100);
