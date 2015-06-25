@@ -3,12 +3,14 @@ package mallorcatour.brains.test;
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.math.LessVarianceActionFromMap;
 import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.bot.math.NLGameSolver;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.random.RandomBot;
 import mallorcatour.bot.sklansky.PushBot;
 import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.modeller.DafishCorrections;
 import mallorcatour.brains.neural.checkburn.CheckBurnFactory;
 import mallorcatour.brains.neural.cuba.CubaFactory;
 import mallorcatour.brains.neural.france.FranceFactory;
@@ -37,7 +39,7 @@ public class BotVsBot {
 
 	private static void createBots(String DEBUG_PATH, AdvisorListener student) {
 		NLFullMathBotFactory fullMathBotFactory = new NLFullMathBotFactory();
-		PlayerStatModel villainModel = new PlayerStatModel(PlayerStatModel.CHECKBURN_NL_NEURAL, false, DEBUG_PATH);
+		PlayerStatModel villainModel = new PlayerStatModel(false, DEBUG_PATH);
 		fullMathBot = fullMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY, villainModel, student,
 				"Full MathBot", DEBUG_PATH);
 
@@ -75,16 +77,16 @@ public class BotVsBot {
 		WritingStudent student = new WritingStudent();
 		createBots(DEBUG_PATH, pokerStats);
 
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, checkBurn, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGermany, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		GameEngine.BLINDS_CHANGE = 10;
 
 		Log.f("stats.txt", "Time: " + System.currentTimeMillis());
-//		LessVarianceActionFromMap.correction = new PBXCorrections();
+		LessVarianceActionFromMap.correction = new DafishCorrections();
 		checkStats(engine, pokerStats);
-//		if (true) {
-//			return;
-//		}
+		if (true) {
+			return;
+		}
 		playSngs(engine, student, pokerStats);
 	}
 
@@ -110,7 +112,7 @@ public class BotVsBot {
 	}
 
 	private static void checkStats(GameEngine engine, PokerStatInfo pokerStats) {
-		CashSummary cashSummary = engine.playCash(0);
+		CashSummary cashSummary = engine.playCash(150);
 		Log.f("stats.txt", "MathBot stats: " + pokerStats.toString());
 		Log.d("MathBot stats: " + pokerStats.toString());
 		Log.d(cashSummary.winner + " " + cashSummary.gain);
