@@ -16,6 +16,7 @@ import mallorcatour.brains.neural.cuba.CubaFactory;
 import mallorcatour.brains.neural.france.FranceFactory;
 import mallorcatour.brains.neural.germany.GermanyFactory;
 import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
+import mallorcatour.brains.neural.pbx.PbxFactory;
 import mallorcatour.brains.stats.PokerStatInfo;
 import mallorcatour.core.game.engine.GameEngine;
 import mallorcatour.core.game.engine.GameEngine.CashSummary;
@@ -35,11 +36,12 @@ public class BotVsBot {
 	static IPlayer neuralFrance;
 	static IPlayer neuralGermany;
 	static IPlayer checkBurn;
+	static IPlayer pbx;
 	static IPlayer fullMathBot;
 
 	private static void createBots(String DEBUG_PATH, AdvisorListener student) {
 		NLFullMathBotFactory fullMathBotFactory = new NLFullMathBotFactory();
-		PlayerStatModel villainModel = new PlayerStatModel(false, DEBUG_PATH);
+		PlayerStatModel villainModel = new PlayerStatModel(PlayerStatModel.PBX_NL_NEURAL, DEBUG_PATH);
 		fullMathBot = fullMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY, villainModel, student,
 				"Full MathBot", DEBUG_PATH);
 
@@ -63,6 +65,10 @@ public class BotVsBot {
 		neuralCuba = cubaFactory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, AdvisorListener.NONE,
 				AdvisorListener.NONE, "Cuba", DEBUG_PATH);
 
+		PbxFactory pbxFactory = new PbxFactory();
+		pbx = pbxFactory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, AdvisorListener.NONE,
+				AdvisorListener.NONE, "PBX", DEBUG_PATH);
+
 		random = new RandomBot("RandomBot", DEBUG_PATH);
 		pushBot = new PushBot("PushBot", DEBUG_PATH);
 
@@ -75,14 +81,14 @@ public class BotVsBot {
 
 		PokerStatInfo pokerStats = new PokerStatInfo();
 		WritingStudent student = new WritingStudent();
-		createBots(DEBUG_PATH, student);
+		createBots(DEBUG_PATH, pokerStats);
 
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGermany, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, pbx, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		GameEngine.BLINDS_CHANGE = 10;
 
-		Log.f("stats.txt", "Time: " + System.currentTimeMillis());
-		LessVarianceActionFromMap.correction = new DafishCorrections();
+//		Log.f("stats.txt", "Time: " + System.currentTimeMillis());
+//		LessVarianceActionFromMap.correction = new DafishCorrections();
 //		checkStats(engine, pokerStats);
 //		if (true) {
 //			return;
