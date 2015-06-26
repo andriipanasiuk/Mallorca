@@ -15,7 +15,6 @@ import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.GameObservers;
 import mallorcatour.core.game.HoleCardsObservers;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.SituationHandler;
 
 /**
@@ -38,7 +37,7 @@ public class NLPostflopMathBotFactory implements IBotFactory {
 		IAdvisor chart = new NLPreflopChart();
 
 		Player bot = new Player(preflopAdvisor, chart, evAdvisor, IActionChecker.EMPTY, name, debug);
-		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, name);
+		SituationHandler situationHandler = new SituationHandler(true, name);
 		bot.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager),
 				new HoleCardsObservers(villainObserver, situationHandler));
 		return bot;

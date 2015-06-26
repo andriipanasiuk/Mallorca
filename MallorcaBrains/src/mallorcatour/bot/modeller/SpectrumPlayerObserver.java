@@ -14,7 +14,6 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.IHoleCardsObserver;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
@@ -49,7 +48,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		this.hero = hero;
 		this.trackHero = trackHero;
 		this.model = model;
-		situationHandler = new NoStrengthSituationHandler(LimitType.NO_LIMIT, hero, trackHero);
+		situationHandler = new NoStrengthSituationHandler(hero, trackHero);
 		this.strengthManager = strengthManager;
 		this.spectrumListener = spectrumListener;
 		this.adviceListener = actionObserver;

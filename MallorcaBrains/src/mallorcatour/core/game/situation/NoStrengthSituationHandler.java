@@ -2,7 +2,6 @@ package mallorcatour.core.game.situation;
 
 import mallorcatour.bot.C;
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
@@ -12,7 +11,6 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 	private int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;
 	private boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
 	protected IGameInfo gameInfo;
-	protected final LimitType limitType;
 	private double effectiveStack;
 	private double pot;
 	private final String hero;
@@ -20,8 +18,7 @@ public class NoStrengthSituationHandler implements ISituationHandler, IGameObser
 	private double toCall;
 	private double playerToCall;
 
-	public NoStrengthSituationHandler(LimitType limitType, String hero, boolean trackHero) {
-		this.limitType = limitType;
+	public NoStrengthSituationHandler(String hero, boolean trackHero) {
 		this.hero = hero;
 		this.trackHero = trackHero;
 	}

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mallorcatour.core.game.Hand;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.game.situation.SituationHandler;
 import mallorcatour.hhparser.core.Tournament;
@@ -21,7 +20,7 @@ import mallorcatour.neural.core.PokerLearningExample;
 public class TournamentParser {
 
 	public static List<PokerLearningExample> parseLocalSituations(Tournament tournament, String heroName) {
-		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, heroName);
+		SituationHandler situationHandler = new SituationHandler(true, heroName);
 		return parseLocalSituations(tournament, heroName, situationHandler);
 	}
 

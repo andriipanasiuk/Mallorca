@@ -1,4 +1,4 @@
-package mallorcatour.brains.neural.checkburn;
+package mallorcatour.brains.neural.pbx;
 
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.Player;
@@ -10,13 +10,13 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.core.game.situation.SituationHandler;
 
-public class CheckBurnFactory implements IBotFactory {
+public class PbxFactory implements IBotFactory {
 
 	@Override
 	public IPlayer createBot(IAdvisor villainModel, ISpectrumListener spectrumListener,
 			AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug) {
-		CheckBurn cuba = new CheckBurn();
-		NeuralAdvisor advisor = new NeuralAdvisor(cuba, cuba, "CheckBurn");
+		Pbx pbx = new Pbx();
+		NeuralAdvisor advisor = new NeuralAdvisor(pbx, pbx, "PBX");
 		Player player = new Player(IAdvisor.UNSUPPORTED, IAdvisor.UNSUPPORTED, advisor, IActionChecker.EMPTY, name,
 				debug);
 		player.setStudent(heroListener);

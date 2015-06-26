@@ -8,7 +8,6 @@ import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.SituationHandler;
 
 public class FranceFactory implements IBotFactory {
@@ -21,7 +20,7 @@ public class FranceFactory implements IBotFactory {
 		Player player = new Player(IAdvisor.UNSUPPORTED, IAdvisor.UNSUPPORTED, advisor, IActionChecker.EMPTY, name,
 				debug);
 		player.setStudent(heroListener);
-		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true, name);
+		SituationHandler handler = new SituationHandler(true, name);
 		player.set(handler, handler, handler);
 		return player;
 	}

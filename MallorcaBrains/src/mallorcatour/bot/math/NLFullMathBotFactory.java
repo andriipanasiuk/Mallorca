@@ -11,7 +11,6 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.game.GameObservers;
 import mallorcatour.core.game.HoleCardsObservers;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.SituationHandler;
 
 public class NLFullMathBotFactory implements IBotFactory {
@@ -27,7 +26,7 @@ public class NLFullMathBotFactory implements IBotFactory {
 		Player player = new Player(IAdvisor.UNSUPPORTED, IAdvisor.UNSUPPORTED, evAdvisor, IActionChecker.EMPTY, name,
 				debug);
 		player.setStudent(heroListener);
-		SituationHandler situationHandler = new SituationHandler(LimitType.NO_LIMIT, true, name);
+		SituationHandler situationHandler = new SituationHandler(true, name);
 		player.set(situationHandler, new GameObservers(situationHandler, villainObserver, strengthManager),
 				new HoleCardsObservers(villainObserver, situationHandler));
 		return player;

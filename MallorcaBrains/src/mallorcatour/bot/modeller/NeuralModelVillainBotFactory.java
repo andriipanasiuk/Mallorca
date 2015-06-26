@@ -13,7 +13,6 @@ import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.GameObservers;
 import mallorcatour.core.game.HoleCardsObservers;
-import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.situation.SituationHandler;
 
 /**
@@ -34,7 +33,7 @@ public class NeuralModelVillainBotFactory implements IBotFactory {
 				"Gus Xensen"), IActionChecker.EMPTY, name, debug);
 		SpectrumPlayerObserver villainObserver = new SpectrumPlayerObserver(villainModel, villainListener, strengthManager, villainSpectrumListener, name,
 				false);
-		SituationHandler handler = new SituationHandler(LimitType.NO_LIMIT, true, name);
+		SituationHandler handler = new SituationHandler(true, name);
 		bot.set(handler, new GameObservers(handler, strengthManager, villainObserver), new HoleCardsObservers(
 				villainObserver, handler));
 		return bot;

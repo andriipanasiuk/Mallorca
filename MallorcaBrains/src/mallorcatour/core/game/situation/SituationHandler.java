@@ -24,12 +24,12 @@ public class SituationHandler extends NoStrengthSituationHandler implements IHol
 	private double strength, positivePotential, negativePotential;
 
 	public SituationHandler(LimitType limitType, String hero) {
-		super(limitType, hero, true);
+		super(hero, true);
 		needFullPotentialOnFlop = false;
 	}
 
-	public SituationHandler(LimitType limitType, boolean needFullPotentialOnFlop, String hero) {
-		super(limitType, hero, true);
+	public SituationHandler(boolean needFullPotentialOnFlop, String hero) {
+		super(hero, true);
 		this.needFullPotentialOnFlop = needFullPotentialOnFlop;
 	}
 

@@ -221,7 +221,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseTournamentsWithHandler(new SituationHandler(LimitType.NO_LIMIT, true, "Andrew"));
+                parseTournamentsWithHandler(new SituationHandler(true, "Andrew"));
             }
         });
     }//GEN-LAST:event_jMenuItem1ActionPerformed
