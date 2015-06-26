@@ -10,9 +10,11 @@ import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.checkburn.CheckBurn;
 import mallorcatour.brains.neural.cuba.Cuba;
+import mallorcatour.brains.neural.dafish.Dafish;
 import mallorcatour.brains.neural.france.France;
 import mallorcatour.brains.neural.germany.Germany;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
+import mallorcatour.brains.neural.pbx.Pbx;
 import mallorcatour.brains.stats.PokerStatInfo;
 import mallorcatour.brains.stats.StatCalculator;
 import mallorcatour.core.game.HoleCards;
@@ -34,8 +36,12 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	public static IAdvisor GERMANY_NL_NEURAL;
 	public static IAdvisor FRANCE_NL_NEURAL;
 	public static IAdvisor CHECKBURN_NL_NEURAL;
+	public static IAdvisor DAFISH_NL_NEURAL;
+	public static IAdvisor PBX_NL_NEURAL;
 	public static IAdvisor random = new RandomAdvisor();
 	public static IAdvisor[] neurals;
+
+	private static final int MODEL_EVERY_SITUATION = 10;
 
 	static {
 		GusXensen player = new GusXensen();
@@ -48,8 +54,12 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		FRANCE_NL_NEURAL = new NeuralAdvisor(france, france, "Fra" + "nce");
 		CheckBurn checkBurn = new CheckBurn();
 		CHECKBURN_NL_NEURAL = new NeuralAdvisor(checkBurn, checkBurn, "Chec" + "kBurn");
+		Pbx pbx = new Pbx();
+		PBX_NL_NEURAL = new NeuralAdvisor(pbx, pbx, "P" + "BX");
+		Dafish dafish = new Dafish();
+		DAFISH_NL_NEURAL = new NeuralAdvisor(dafish, dafish, "DaF" + "ish");
 		neurals = new IAdvisor[] { GUSXENSEN_NL_NEURAL, CUBA_NL_NEURAL, GERMANY_NL_NEURAL, FRANCE_NL_NEURAL,
-				CHECKBURN_NL_NEURAL };
+				CHECKBURN_NL_NEURAL, DAFISH_NL_NEURAL, PBX_NL_NEURAL };
 	}
 
 	private IAdvisor currentNeural;
@@ -88,14 +98,14 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		PokerStatsDistance distance = new PokerStatsDistance();
 		for (IAdvisor neural : neurals) {
 			double error = distance.getDistance(this.getStats(), neural.getStats());
-			Log.f(DEBUG_PATH, "Difference between " + neural.getName() + ": " + error);
+			Log.f(DEBUG_PATH, "Difference with " + neural.getName() + ": " + error);
 			if (error < minError) {
 				minError = error;
 				currentNeural = neural;
 			}
 		}
-		Log.f(DEBUG_PATH, "Modelling by " + currentNeural.getName() + " after " + situationCount + " situ-ns");
-		Log.f(DEBUG_PATH, "Difference in " + C.STATS + ": " + DoubleUtils.digitsAfterComma(minError, 2));
+		Log.f(DEBUG_PATH, "Modelling " + currentNeural.getName() + " after " + situationCount + " situ-ns");
+		Log.f(DEBUG_PATH, "Difference " + C.STATS + ": " + DoubleUtils.digitsAfterComma(minError, 2));
 	}
 
 	@Override
@@ -112,7 +122,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	public void onAdvice(LocalSituation situation, IAdvice advice) {
 		situationCount++;
 		StatCalculator.changeStat(situation, advice, pokerStatInfo);
-		if (situationCount % 10 == 0) {
+		if (situationCount % MODEL_EVERY_SITUATION == 0) {
 			Log.f(DEBUG_PATH, C.VILLAIN + " " + C.STATS + ": " + pokerStatInfo);
 			if (chooseNeural) {
 				chooseModellingNeural();
