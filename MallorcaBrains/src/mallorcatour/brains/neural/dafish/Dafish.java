@@ -1,4 +1,4 @@
-package mallorcatour.brains.neural.pbx;
+package mallorcatour.brains.neural.dafish;
 
 import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.neural.IPokerNeurals;
@@ -8,24 +8,28 @@ import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
 
-public class Pbx implements IPokerNeurals, HavingStats {
+public class Dafish implements IPokerNeurals, HavingStats {
 
 	private NeuralNetwork<?> preflop;
 	private NeuralNetwork<?> flop;
+	private NeuralNetwork<?> turn;
+	private NeuralNetwork<?> river;
 
-	public Pbx() {
-		preflop = NeuralCreator.createPerceptron(new PreflopNeuralPBX());
-		flop = NeuralCreator.createPerceptron(new FlopNeuralPBX());
+	public Dafish() {
+		preflop = NeuralCreator.createPerceptron(new PreflopNeuralDafish());
+		flop = NeuralCreator.createPerceptron(new FlopNeuralDafish());
+		turn = NeuralCreator.createPerceptron(new TurnNeuralDafish());
+		river = NeuralCreator.createPerceptron(new RiverNeuralDafish());
 	}
 
 	@Override
 	public NeuralNetwork<?> getRiver() {
-		return flop;
+		return river;
 	}
 
 	@Override
 	public NeuralNetwork<?> getTurn() {
-		return flop;
+		return turn;
 	}
 
 	@Override
@@ -40,12 +44,12 @@ public class Pbx implements IPokerNeurals, HavingStats {
 
 	@Override
 	public IPokerStats getStats() {
-		return new PokerStats(0.99, 0.99, 0.96, 0.95);
+		return new PokerStats(0.83, 0.72, 0.33, 0.74);
 	}
 
 	@Override
 	public String getName() {
-		return "PBX";
+		return "DaFish";
 	}
 
 }

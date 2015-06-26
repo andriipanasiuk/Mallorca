@@ -1,3 +1,7 @@
+package mallorcatour.brains.neural.dafish;
+
+import mallorcatour.neural.core.INeuralInfo;
+
 class PreflopNeuralDafish implements INeuralInfo {
 private int[] layerSizeArray = new int[] {13, 27, 3};
 private double[] weights = new double[] {10.906639224472439, 
