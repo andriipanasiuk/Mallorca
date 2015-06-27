@@ -10,7 +10,7 @@ import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.random.RandomBot;
 import mallorcatour.bot.sklansky.PushBot;
 import mallorcatour.brains.IAdvisor;
-import mallorcatour.brains.modeller.DafishCorrections;
+import mallorcatour.brains.modeller.Dafish2Corrections;
 import mallorcatour.brains.neural.checkburn.CheckBurnFactory;
 import mallorcatour.brains.neural.cuba.CubaFactory;
 import mallorcatour.brains.neural.france.FranceFactory;
@@ -88,7 +88,7 @@ public class BotVsBot {
 		GameEngine.BLINDS_CHANGE = 10;
 
 //		Log.f("stats.txt", "Time: " + System.currentTimeMillis());
-//		LessVarianceActionFromMap.correction = new DafishCorrections();
+		LessVarianceActionFromMap.correction = new Dafish2Corrections();
 		checkStats(engine, pokerStats);
 		if (true) {
 			return;
