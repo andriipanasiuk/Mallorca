@@ -41,7 +41,7 @@ public class BotVsBot {
 
 	private static void createBots(String DEBUG_PATH, AdvisorListener student) {
 		NLFullMathBotFactory fullMathBotFactory = new NLFullMathBotFactory();
-		PlayerStatModel villainModel = new PlayerStatModel(PlayerStatModel.PBX_NL_NEURAL, DEBUG_PATH);
+		PlayerStatModel villainModel = new PlayerStatModel(DEBUG_PATH);
 		fullMathBot = fullMathBotFactory.createBot(villainModel, ISpectrumListener.EMPTY, villainModel, student,
 				"Full MathBot", DEBUG_PATH);
 
@@ -83,16 +83,16 @@ public class BotVsBot {
 		WritingStudent student = new WritingStudent();
 		createBots(DEBUG_PATH, pokerStats);
 
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, pbx, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGermany, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		GameEngine.BLINDS_CHANGE = 10;
 
 //		Log.f("stats.txt", "Time: " + System.currentTimeMillis());
 //		LessVarianceActionFromMap.correction = new DafishCorrections();
-//		checkStats(engine, pokerStats);
-//		if (true) {
-//			return;
-//		}
+		checkStats(engine, pokerStats);
+		if (true) {
+			return;
+		}
 		playSngs(engine, student, pokerStats);
 	}
 

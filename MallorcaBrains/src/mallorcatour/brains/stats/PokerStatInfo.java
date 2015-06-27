@@ -41,21 +41,33 @@ public class PokerStatInfo implements IPokerStats, AdvisorListener {
 
 	@Override
 	public double getFoldFrequency() {
+		if (foldFrequency.second == 0) {
+			return Double.NaN;
+		}
 		return foldFrequency.first / foldFrequency.second;
 	}
 
 	@Override
 	public double getAggressionFrequency() {
+		if (aggressionFrequency.second == 0) {
+			return Double.NaN;
+		}
 		return aggressionFrequency.first / aggressionFrequency.second;
 	}
 
 	@Override
 	public double getVpip() {
+		if (vpip.second == 0) {
+			return Double.NaN;
+		}
 		return vpip.first / vpip.second;
 	}
 
 	@Override
 	public double getPfr() {
+		if (pfr.second == 0) {
+			return Double.NaN;
+		}
 		return pfr.first / pfr.second;
 	}
 
