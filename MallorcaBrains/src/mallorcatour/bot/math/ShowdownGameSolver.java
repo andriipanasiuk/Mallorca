@@ -16,6 +16,7 @@ public class ShowdownGameSolver extends NLGameSolver {
 		super(villainModeller);
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	protected RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
 			PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton, int depth) {

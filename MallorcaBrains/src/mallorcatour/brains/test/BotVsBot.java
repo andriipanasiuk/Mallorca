@@ -3,16 +3,15 @@ package mallorcatour.brains.test;
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.bot.math.LessVarianceActionFromMap;
 import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.bot.math.NLGameSolver;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.random.RandomBot;
 import mallorcatour.bot.sklansky.PushBot;
 import mallorcatour.brains.IAdvisor;
-import mallorcatour.brains.modeller.Dafish2Corrections;
 import mallorcatour.brains.neural.checkburn.CheckBurnFactory;
 import mallorcatour.brains.neural.cuba.CubaFactory;
+import mallorcatour.brains.neural.dafish2.Dafish2Factory;
 import mallorcatour.brains.neural.france.FranceFactory;
 import mallorcatour.brains.neural.germany.GermanyFactory;
 import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
@@ -37,6 +36,7 @@ public class BotVsBot {
 	static IPlayer neuralGermany;
 	static IPlayer checkBurn;
 	static IPlayer pbx;
+	static IPlayer dafish2;
 	static IPlayer fullMathBot;
 
 	private static void createBots(String DEBUG_PATH, AdvisorListener student) {
@@ -69,6 +69,10 @@ public class BotVsBot {
 		pbx = pbxFactory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, AdvisorListener.NONE,
 				AdvisorListener.NONE, "PBX", DEBUG_PATH);
 
+		Dafish2Factory dafish2Factory = new Dafish2Factory();
+		dafish2 = dafish2Factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, AdvisorListener.NONE,
+				AdvisorListener.NONE, "DaFish2", DEBUG_PATH);
+
 		random = new RandomBot("RandomBot", DEBUG_PATH);
 		pushBot = new PushBot("PushBot", DEBUG_PATH);
 
@@ -81,13 +85,13 @@ public class BotVsBot {
 
 		PokerStatInfo pokerStats = new PokerStatInfo();
 		WritingStudent student = new WritingStudent();
-		createBots(DEBUG_PATH, student);
+		createBots(DEBUG_PATH, pokerStats);
 
-		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGermany, IGameObserver.EMPTY,
+		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, dafish2, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		GameEngine.BLINDS_CHANGE = 10;
 
-		LessVarianceActionFromMap.correction = new Dafish2Corrections();
+//		LessVarianceActionFromMap.correction = new Dafish2Corrections();
 //		checkStats(engine, pokerStats);
 //		if (true) {
 //			return;

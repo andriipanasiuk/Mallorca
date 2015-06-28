@@ -1,47 +1,47 @@
-package mallorcatour.brains.modeller;
+package mallorcatour.brains.modeller.creator;
 
 import mallorcatour.bot.math.ProfitCorrections;
 
-public class Dafish2Corrections implements ProfitCorrections {
+public class PBXCorrections implements ProfitCorrections {
 
 	@Override
 	public double getPreflopCall() {
-		return 0.05;
+		return 0;
 	}
 
 	@Override
 	public double getPreflopRaise() {
-		return 0.26;
+		return 1.25;
 	}
 
 	@Override
 	public double getPreflopCheck() {
-		return 0.1;
+		return 0;
 	}
 
 	@Override
 	public double getPreflopBet() {
-		return getPreflopRaise();
+		return 1.25;
 	}
 
 	@Override
 	public double getPostflopCall() {
-		return 0.08;
+		return -1;
 	}
 
 	@Override
 	public double getPostflopRaise() {
-		return 0.08;
+		return -0.9;
 	}
 
 	@Override
 	public double getPostflopCheck() {
-		return 0.2;
+		return -0.8;
 	}
 
 	@Override
 	public double getPostflopBet() {
-		return getPostflopRaise();
+		return 1.6;
 	}
 
 }

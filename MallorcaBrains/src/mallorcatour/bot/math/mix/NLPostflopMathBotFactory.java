@@ -1,10 +1,11 @@
-package mallorcatour.bot.math;
+package mallorcatour.bot.math.mix;
 
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.math.EVAdvisor;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.modeller.SpectrumPlayerObserver;
 import mallorcatour.bot.preflop.NLPreflopChart;

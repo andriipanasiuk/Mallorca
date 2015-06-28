@@ -79,6 +79,12 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		this.DEBUG_PATH = debug;
 	}
 
+	public PlayerStatModel(IAdvisor currentAdvisor, boolean choose) {
+		this.currentNeural = currentAdvisor;
+		this.chooseNeural = choose;
+		this.DEBUG_PATH = "";
+	}
+
 	public PlayerStatModel(IAdvisor currentAdvisor, String debug) {
 		this(currentAdvisor, false, debug);
 	}
