@@ -81,25 +81,24 @@ public class BotVsBot {
 
 		PokerStatInfo pokerStats = new PokerStatInfo();
 		WritingStudent student = new WritingStudent();
-		createBots(DEBUG_PATH, pokerStats);
+		createBots(DEBUG_PATH, student);
 
 		PredefinedGameEngine engine = new PredefinedGameEngine(fullMathBot, neuralGermany, IGameObserver.EMPTY,
 				DEBUG_PATH);
 		GameEngine.BLINDS_CHANGE = 10;
 
-//		Log.f("stats.txt", "Time: " + System.currentTimeMillis());
 		LessVarianceActionFromMap.correction = new Dafish2Corrections();
-		checkStats(engine, pokerStats);
-		if (true) {
-			return;
-		}
+//		checkStats(engine, pokerStats);
+//		if (true) {
+//			return;
+//		}
 		playSngs(engine, student, pokerStats);
 	}
 
 	private static void playSngs(GameEngine engine, WritingStudent student, PokerStatInfo stats) {
 		int count1 = 0, count2 = 0;
 		int handCount = 0;
-		for (int i = 0; i < 300; i++) {
+		for (int i = 0; i < 3600; i++) {
 			student.reset();
 			TournamentSummary summary = engine.playGame();
 			if (summary.winner.equals(fullMathBot.getName())) {
@@ -111,7 +110,7 @@ public class BotVsBot {
 			Log.d("Game # " + i + " has been played. Hands " + summary.handsCount);
 			Log.d(count1 + " " + count2);
 			Log.d(stats.toString());
-			student.save("Dafish");
+			student.save("Dafish2");
 		}
 		Log.d("Totally played " + handCount + " hands");
 		Log.d(count1 + " " + count2);

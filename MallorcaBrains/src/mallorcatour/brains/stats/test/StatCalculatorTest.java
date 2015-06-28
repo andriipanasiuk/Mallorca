@@ -13,19 +13,19 @@ public class StatCalculatorTest {
 
 	public static void main(String... args) {
 		{
-			String path = "Dafish";
+			String path = "Dafish2";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
 			Log.d(stats.toString());
 		}
 		{
-			String path = "PBX";
+			String path = "opponent_models/PBX";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
 			Log.d(stats.toString());
 		}
 		{
-			String path = "Germany";
+			String path = "opponent_models/Germany";
 			List<PokerLearningExample> list = SituationIO.readFromDir(new File(path));
 			IPokerStats stats = StatCalculator.calculate(list);
 			Log.d(stats.toString());

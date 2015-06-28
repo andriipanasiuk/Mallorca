@@ -31,7 +31,7 @@ public class Dafish2Corrections implements ProfitCorrections {
 
 	@Override
 	public double getPostflopRaise() {
-		return 0.1;
+		return 0.08;
 	}
 
 	@Override

@@ -4,6 +4,7 @@
  */
 package mallorcatour.bot.math;
 
+import java.util.List;
 import java.util.Map;
 
 import mallorcatour.bot.C;
@@ -15,6 +16,7 @@ import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
@@ -38,8 +40,8 @@ public class NLGameSolver implements IGameSolver {
 	private final static double DEFAULT_NEGATIVE_POTENTIAL = 0.1;
 	private final IAdvisor villainModel;
 
-	public NLGameSolver(IAdvisor villainModeller) {
-		this.villainModel = villainModeller;
+	public NLGameSolver(IAdvisor villainModel) {
+		this.villainModel = villainModel;
 	}
 
 	@Override
@@ -76,13 +78,44 @@ public class NLGameSolver implements IGameSolver {
 				PokerStreet.RIVER, 0);
 	}
 
-	/**
-	 * pot - after call
-	 */
-	private RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
-			PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, int depth) {
+	public static class ShowdownGameSolver extends NLGameSolver {
+
+		public ShowdownGameSolver(IAdvisor villainModeller) {
+			super(villainModeller);
+		}
+
+		@Override
+		protected RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
+				PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton, int depth) {
+			if (street == PokerStreet.RIVER) {
+				return super.calculatePassiveProfit(gameInfo, pot, heroInvestment, street, heroCards, board,
+						villainSpectrum, onButton, true, depth);
+			}
+			if (street == PokerStreet.PREFLOP) {
+				return super.calculatePassiveProfit(gameInfo, pot, heroInvestment, street, heroCards, board,
+						villainSpectrum, onButton, true, depth);
+			}
+			RandomVariable result = new RandomVariable();
+			int nextCardCount = 52 - 2 - board.length;
+			List<Card> cards = Deck.getCards();
+			for (int i = 0; i < 52; i++) {
+				Card card = cards.get(i);
+				//TODO finish this class
+			}
+			return null;
+		}
+	}
+
+	protected RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
+			PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton, int depth) {
+		return calculatePassiveProfit(gameInfo, pot, heroInvestment, street, heroCards, board, villainSpectrum, onButton, false, depth);
+	}
+
+	protected RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
+				PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton,
+				boolean considerPrevPot, int depth) {
 		double win = pot - heroInvestment;
-		if (!CONSIDER_PREV_POT) {
+		if (!considerPrevPot) {
 			double previousStreetPot;
 			if (street != PokerStreet.PREFLOP) {
 				previousStreetPot = gameInfo.getPot(street.previous());
@@ -125,7 +158,7 @@ public class NLGameSolver implements IGameSolver {
 			log(depth, "If " + C.HERO + " " + C.CHECK);
 		}
 		RandomVariable passiveProfit = calculatePassiveProfit(gameInfo, pot + toCall, heroInvestment + toCall, street,
-				heroCards, board, villainSpectrum, depth + 1);
+				heroCards, board, villainSpectrum,onButton, depth + 1);
 		log(depth, C.HERO + " " + C.WINS + " " + passiveProfit.printProfitability(gameInfo));
 		result.put(Action.callAction(toCall), passiveProfit);
 		// if hero cannot raise
@@ -252,7 +285,7 @@ public class NLGameSolver implements IGameSolver {
 	private RandomVariable calculateHeroActionProfit(IGameInfo gameInfo, IAggressionInfo info, double heroActionAmount,
 			double effectiveStack, double pot, double heroInvestment, Spectrum villainSpectrum, Card[] board,
 			HoleCards heroCards, boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive,
-			boolean isHeroOnButton, PokerStreet street, Map<HoleCards, StreetEquity> villainStrengthMap, int depth) {
+			boolean onButton, PokerStreet street, Map<HoleCards, StreetEquity> villainStrengthMap, int depth) {
 
 		RandomVariable result = new RandomVariable();
 
@@ -263,7 +296,7 @@ public class NLGameSolver implements IGameSolver {
 		if (wasHeroPreviousAggressive) {
 			newInfo.plusHeroAggressiveAction();
 		}
-		LocalSituation villainSituation = getVillainSituationWithoutStrength(street, !isHeroOnButton, villainToCall,
+		LocalSituation villainSituation = getVillainSituationWithoutStrength(street, !onButton, villainToCall,
 				villainPot, villainEffectiveStack, newInfo, wasVillainPreviousAggressive, wasHeroPreviousAggressive);
 		log(depth, C.POT + ": " + pot + " " + C.TO_CALL + ": " + villainToCall + " " + C.EFFECTIVE_STACK + ": "
 				+ villainEffectiveStack);
@@ -299,7 +332,7 @@ public class NLGameSolver implements IGameSolver {
 			double passiveActionChance = passiveWeight / villainSpectrumWeight;
 			log(depth, "When " + C.VILLAIN + " " + C.CALL + " in " + (int) (passiveActionChance * 100) + "%");
 			RandomVariable ifVillainPassiveProfit = calculatePassiveProfit(gameInfo, pot + villainToCall,
-					heroInvestment, street, heroCards, board, passiveSpectrum, depth + 1);
+					heroInvestment, street, heroCards, board, passiveSpectrum, onButton, depth + 1);
 			log(depth, C.HERO + " " + C.WINS + " " 
 					+ ifVillainPassiveProfit.printProfitability(gameInfo.getBankRollAtRisk(), gameInfo.getBigBlindSize()));
 
@@ -322,7 +355,7 @@ public class NLGameSolver implements IGameSolver {
 		newInfo.plusVillainAction(true);
 		ActionDistribution actionDistribution = onSecondActionRecursive(gameInfo, newInfo,
 				effectiveStackAfterVillainRaise, potAfterVillainRaise, villainRaiseAmount, heroInvestment,
-				aggressiveSpectrum, board, heroCards, villainStrengthMap, isHeroOnButton, street, depth + 1);
+				aggressiveSpectrum, board, heroCards, villainStrengthMap, onButton, street, depth + 1);
 		RandomVariable ifVillainAggressiveProfit = LessVarianceActionFromMap.getOptimal(actionDistribution, gameInfo,
 				heroInvestment, heroCards);
 		result.add(aggressiveChance, ifVillainAggressiveProfit);
