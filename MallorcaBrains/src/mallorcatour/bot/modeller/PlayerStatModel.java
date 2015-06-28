@@ -11,9 +11,9 @@ import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.checkburn.CheckBurn;
 import mallorcatour.brains.neural.cuba.Cuba;
 import mallorcatour.brains.neural.dafish.Dafish;
+import mallorcatour.brains.neural.dafish2.Dafish2;
 import mallorcatour.brains.neural.france.France;
 import mallorcatour.brains.neural.germany.Germany;
-import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.brains.neural.pbx.Pbx;
 import mallorcatour.brains.stats.PokerStatInfo;
 import mallorcatour.brains.stats.StatCalculator;
@@ -31,12 +31,12 @@ import mallorcatour.tools.Log;
  */
 public class PlayerStatModel implements IAdvisor, AdvisorListener {
 
-	public static IAdvisor GUSXENSEN_NL_NEURAL;
 	public static IAdvisor CUBA_NL_NEURAL;
 	public static IAdvisor GERMANY_NL_NEURAL;
 	public static IAdvisor FRANCE_NL_NEURAL;
 	public static IAdvisor CHECKBURN_NL_NEURAL;
 	public static IAdvisor DAFISH_NL_NEURAL;
+	public static IAdvisor DAFISH2_NL_NEURAL;
 	public static IAdvisor PBX_NL_NEURAL;
 	public static IAdvisor random = new RandomAdvisor();
 	public static IAdvisor[] neurals;
@@ -44,8 +44,6 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 	private static final int MODEL_EVERY_SITUATION = 10;
 
 	static {
-		GusXensen player = new GusXensen();
-		GUSXENSEN_NL_NEURAL = new NeuralAdvisor(player, player, "Gu" + "s Xensen");
 		Cuba cuba = new Cuba();
 		CUBA_NL_NEURAL = new NeuralAdvisor(cuba, cuba, "Cu" + "ba");
 		Germany germany = new Germany();
@@ -58,8 +56,10 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		PBX_NL_NEURAL = new NeuralAdvisor(pbx, pbx, "P" + "BX");
 		Dafish dafish = new Dafish();
 		DAFISH_NL_NEURAL = new NeuralAdvisor(dafish, dafish, "DaF" + "ish");
-		neurals = new IAdvisor[] { GUSXENSEN_NL_NEURAL, CUBA_NL_NEURAL, GERMANY_NL_NEURAL, FRANCE_NL_NEURAL,
-				CHECKBURN_NL_NEURAL, DAFISH_NL_NEURAL, PBX_NL_NEURAL };
+		Dafish2 dafish2 = new Dafish2();
+		DAFISH2_NL_NEURAL = new NeuralAdvisor(dafish2, dafish2, "DaF" + "ish2");
+		neurals = new IAdvisor[] { CUBA_NL_NEURAL, GERMANY_NL_NEURAL, FRANCE_NL_NEURAL, CHECKBURN_NL_NEURAL,
+				DAFISH_NL_NEURAL,DAFISH2_NL_NEURAL, PBX_NL_NEURAL };
 	}
 
 	private IAdvisor currentNeural;
