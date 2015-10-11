@@ -75,9 +75,13 @@ public class PokerStatInfo implements IPokerStats, AdvisorListener {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		result.append("Vpip: ").append(DoubleUtils.digitsAfterComma(getVpip(), 2));
+		result.append("(").append(vpip.first).append("/").append(vpip.second).append(")");
 		result.append(" Pfr: ").append(DoubleUtils.digitsAfterComma(getPfr(), 2));
+		result.append("(").append(pfr.first).append("/").append(pfr.second).append(")");
 		result.append(" Aggr.: ").append(DoubleUtils.digitsAfterComma(getAggressionFrequency(), 2));
+		result.append("(").append(aggressionFrequency.first).append("/").append(aggressionFrequency.second).append(")");
 		result.append(" Fold: ").append(DoubleUtils.digitsAfterComma(getFoldFrequency(), 2));
+		result.append("(").append(foldFrequency.first).append("/").append(foldFrequency.second).append(")");
 		return result.toString();
 	}
 

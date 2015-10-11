@@ -102,13 +102,14 @@ public class TestEquilator {
 		nonUsed = CollectionUtils.subtract(nonUsed, boardCard4);
 
 		long start = System.currentTimeMillis();
+		for (int c = 0; c < 48; c++) 
 		for (int i = 0; i < nonUsed.size(); i++) {
 			for (int j = i + 1; j < nonUsed.size(); j++) {
 				myCard1 = nonUsed.get(i);
 				myCard2 = nonUsed.get(j);
 				@SuppressWarnings("unused")
-				double equity = PokerEquilatorBrecher.strengthVsRandom(myCard1, myCard2, new Card[] { boardCard1,
-						boardCard2, boardCard3, boardCard4 });
+				StreetEquity equity = PokerEquilatorBrecher.equityOnTurn(myCard1, myCard2, boardCard1,
+						boardCard2, boardCard3, boardCard4);
 			}
 		}
 		Log.d("Brecher's time: " + (System.currentTimeMillis() - start) + " ms");
@@ -289,6 +290,6 @@ public class TestEquilator {
 	}
 
 	public static void main(String... args){
-		testPreflop();
+		testBrecherSpeed();;
 	}
 }

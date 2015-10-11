@@ -3,12 +3,14 @@ package mallorcatour.brains.test;
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
+import mallorcatour.bot.math.LessVarianceActionFromMap;
 import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.bot.math.NLGameSolver;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.random.RandomBot;
 import mallorcatour.bot.sklansky.PushBot;
 import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.modeller.creator.SkelbotCorrections;
 import mallorcatour.brains.neural.checkburn.CheckBurnFactory;
 import mallorcatour.brains.neural.cuba.CubaFactory;
 import mallorcatour.brains.neural.dafish2.Dafish2Factory;
@@ -91,11 +93,19 @@ public class BotVsBot {
 				DEBUG_PATH);
 		GameEngine.BLINDS_CHANGE = 10;
 
-//		LessVarianceActionFromMap.correction = new Dafish2Corrections();
-//		checkStats(engine, pokerStats);
-//		if (true) {
-//			return;
-//		}
+		SkelbotCorrections corrections = new SkelbotCorrections();
+		LessVarianceActionFromMap.correction = corrections;
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				corrections.postflopCall += (i - 5) * 0.02;
+				corrections.postflopRaise += (j - 5) * 0.02;
+				Log.d(i + " " + j);
+				checkStats(engine, pokerStats);
+			}
+		}
+		if (true) {
+			return;
+		}
 		playSngs(engine, student, pokerStats);
 	}
 
@@ -121,7 +131,7 @@ public class BotVsBot {
 	}
 
 	private static void checkStats(GameEngine engine, PokerStatInfo pokerStats) {
-		CashSummary cashSummary = engine.playCash(150);
+		CashSummary cashSummary = engine.playCash(300);
 		Log.f("stats.txt", "MathBot stats: " + pokerStats.toString());
 		Log.d("MathBot stats: " + pokerStats.toString());
 		Log.d(cashSummary.winner + " " + cashSummary.gain);

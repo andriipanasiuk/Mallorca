@@ -156,7 +156,6 @@ public class PokerEquilatorBrecher {
 			allMyCards[2 + i] = boardCards[i].intValueForBrecher();
 			allOpponentCards[2 + i] = boardCards[i].intValueForBrecher();
 		}
-		//
 		double count = 0, wins = 0, draw = 0;
 		int myCombination = combination(allMyCards);
 
@@ -180,7 +179,7 @@ public class PokerEquilatorBrecher {
 	}
 
 	public static StreetEquity equityOnFlop(Card card1, Card card2, Card flop1, Card flop2, Card flop3) {
-		return equityVsRandom(card1, card2, new Card[] { flop1, flop2, flop3 });
+		return equityVsRandom(card1, card2, flop1, flop2, flop3 );
 	}
 
 	public static StreetEquity equityOnFlop(Card card1, Card card2, Flop flop) {
@@ -203,8 +202,8 @@ public class PokerEquilatorBrecher {
 
 	public static StreetEquity equityOnTurn(Card myCard1, Card myCard2,
 			Card flop1, Card flop2, Card flop3, Card turn) {
-		return equityVsRandom(myCard1, myCard2, new Card[] { flop1, flop2,
-				flop3, turn });
+		return equityVsRandom(myCard1, myCard2, flop1, flop2,
+				flop3, turn);
 	}
 
 	public static double strengthOnFlop(Card myCard1, Card myCard2, Card flop1,
@@ -268,7 +267,7 @@ public class PokerEquilatorBrecher {
 	}
 
 	private static StreetEquity equityVsRandom(Card heroCard1, Card heroCard2,
-			Card[] boardCards) {
+			Card... boardCards) {
 		long start = System.currentTimeMillis();
 		boolean positive = false, drawBoolean;
 		int boardSize = boardCards.length;

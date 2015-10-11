@@ -15,7 +15,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.tools.DoubleUtils;
-import mallorcatour.tools.FileUtils;
+import mallorcatour.tools.Log;
 
 public class Spectrum implements Iterable<HoleCards>, Serializable {
 	/**
@@ -78,11 +78,6 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 			this.weights.put(cards, Double.valueOf(weight));
 	}
 
-	public Spectrum add(HoleCards cards) {
-		this.weights.put(cards, Double.valueOf(1.0D));
-		return this;
-	}
-
 	public void remove(HoleCards holeCards) {
 		this.weights.remove(holeCards);
 	}
@@ -143,7 +138,7 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 		return DoubleUtils.digitsAfterComma(sum, 1);
 	}
 
-	public double maxWeight() {
+	private double maxWeight() {
 		double maxValue = Double.MIN_VALUE;
 		for (Map.Entry<HoleCards, Double> entry : this.weights.entrySet()) {
 			if (maxValue < ((Double) entry.getValue()).doubleValue()) {
@@ -172,6 +167,7 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 		return this.weights.size();
 	}
 
+	@Override
 	public String toString() {
 		Set<Map.Entry<HoleCards, Double>> set = this.weights.entrySet();
 		List<Map.Entry<HoleCards, Double>> list = new ArrayList<>(set);
@@ -184,10 +180,10 @@ public class Spectrum implements Iterable<HoleCards>, Serializable {
 		Collections.reverse(list);
 		StringBuilder result = new StringBuilder();
 		for (Map.Entry<HoleCards, Double> item : list) {
-			result.append(item.getKey());
-			result.append(": ");
+			HoleCards cards = item.getKey();
+			result.append(cards.first).append(cards.second);
 			result.append(item.getValue());
-			result.append(FileUtils.LINE_SEPARATOR);
+			result.append(";");
 		}
 		return result.toString();
 	}

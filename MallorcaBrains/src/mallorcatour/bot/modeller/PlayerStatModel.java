@@ -33,7 +33,6 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 
 	public static IAdvisor CUBA_NL_NEURAL;
 	public static IAdvisor GERMANY_NL_NEURAL;
-	public static IAdvisor FRANCE_NL_NEURAL;
 	public static IAdvisor CHECKBURN_NL_NEURAL;
 	public static IAdvisor DAFISH_NL_NEURAL;
 	public static IAdvisor DAFISH2_NL_NEURAL;
@@ -48,8 +47,6 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		CUBA_NL_NEURAL = new NeuralAdvisor(cuba, cuba, "Cu" + "ba");
 		Germany germany = new Germany();
 		GERMANY_NL_NEURAL = new NeuralAdvisor(germany, germany, "Ger" + "many");
-		France france = new France();
-		FRANCE_NL_NEURAL = new NeuralAdvisor(france, france, "Fra" + "nce");
 		CheckBurn checkBurn = new CheckBurn();
 		CHECKBURN_NL_NEURAL = new NeuralAdvisor(checkBurn, checkBurn, "Chec" + "kBurn");
 		Pbx pbx = new Pbx();
@@ -58,7 +55,7 @@ public class PlayerStatModel implements IAdvisor, AdvisorListener {
 		DAFISH_NL_NEURAL = new NeuralAdvisor(dafish, dafish, "DaF" + "ish");
 		Dafish2 dafish2 = new Dafish2();
 		DAFISH2_NL_NEURAL = new NeuralAdvisor(dafish2, dafish2, "DaF" + "ish2");
-		neurals = new IAdvisor[] { CUBA_NL_NEURAL, GERMANY_NL_NEURAL, FRANCE_NL_NEURAL, CHECKBURN_NL_NEURAL,
+		neurals = new IAdvisor[] { CUBA_NL_NEURAL, GERMANY_NL_NEURAL, CHECKBURN_NL_NEURAL,
 				DAFISH_NL_NEURAL,DAFISH2_NL_NEURAL, PBX_NL_NEURAL };
 	}
 
