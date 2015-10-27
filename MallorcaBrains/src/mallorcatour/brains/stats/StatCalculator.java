@@ -3,18 +3,19 @@ package mallorcatour.brains.stats;
 import java.util.List;
 
 import mallorcatour.core.game.PokerStreet;
+import mallorcatour.core.game.advice.HasAdvice;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IPokerStats;
+import mallorcatour.core.game.situation.HasSituation;
+import mallorcatour.core.game.situation.KnowSituation;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.neural.core.PokerLearningExample;
 
 public class StatCalculator {
 
-	public static IPokerStats calculate(List<PokerLearningExample> list) {
+	public static <T extends KnowSituation & HasAdvice> IPokerStats calculate(List<T> list) {
 		PokerStatInfo info = new PokerStatInfo();
-		for (PokerLearningExample item : list) {
-			LocalSituation situation = item.getSituation();
-			IAdvice advice = item.getAdvice();
+		for (Object item : list) {
+			LocalSituation situation = ((HasSituation) item).getSituation();
+			IAdvice advice = ((HasAdvice) item).getAdvice();
 			changeStat(situation, advice, info);
 		}
 		return info;

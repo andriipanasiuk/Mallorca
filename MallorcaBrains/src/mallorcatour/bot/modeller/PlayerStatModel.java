@@ -4,7 +4,6 @@
  */
 package mallorcatour.bot.modeller;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.C;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
@@ -15,12 +14,13 @@ import mallorcatour.brains.neural.dafish2.Dafish2;
 import mallorcatour.brains.neural.france.France;
 import mallorcatour.brains.neural.germany.Germany;
 import mallorcatour.brains.neural.pbx.Pbx;
+import mallorcatour.brains.stats.IPokerStats;
 import mallorcatour.brains.stats.PokerStatInfo;
 import mallorcatour.brains.stats.StatCalculator;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Log;

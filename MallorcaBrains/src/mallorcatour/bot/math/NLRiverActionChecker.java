@@ -9,6 +9,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.math.RandomVariable;
 
 public class NLRiverActionChecker implements IActionChecker {
 

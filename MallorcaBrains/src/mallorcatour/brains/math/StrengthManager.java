@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
-import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.game.situation.StreetEquity;
 import mallorcatour.core.spectrum.Spectrum;
 
 /**

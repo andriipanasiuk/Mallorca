@@ -8,6 +8,7 @@ import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.math.RandomVariable;
 import mallorcatour.core.spectrum.Spectrum;
 
 public class ShowdownGameSolver extends NLGameSolver {

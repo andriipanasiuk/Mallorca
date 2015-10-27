@@ -1,8 +1,7 @@
 package mallorcatour.brains.stats;
 
-import mallorcatour.bot.AdvisorListener;
+import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Pair;

@@ -1,6 +1,6 @@
 package mallorcatour.brains;
 
-import mallorcatour.core.game.interfaces.IPokerStats;
+import mallorcatour.brains.stats.IPokerStats;
 
 public interface HavingStats {
 	IPokerStats getStats();

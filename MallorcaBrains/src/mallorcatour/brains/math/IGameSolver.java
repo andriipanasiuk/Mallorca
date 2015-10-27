@@ -3,12 +3,12 @@ package mallorcatour.brains.math;
 import java.util.Map;
 
 import mallorcatour.bot.math.ActionDistribution;
-import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.situation.StreetEquity;
 import mallorcatour.core.spectrum.Spectrum;
 
 public interface IGameSolver {

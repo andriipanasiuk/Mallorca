@@ -3,24 +3,24 @@ package mallorcatour.bot.modeller;
 import java.util.HashMap;
 import java.util.Map;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.C;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
-import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
-import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.PokerStreet;
+import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.game.interfaces.ISpectrumListener;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.core.game.situation.NoStrengthSituationHandler;
+import mallorcatour.core.game.situation.StreetEquity;
 import mallorcatour.core.spectrum.Spectrum;
+import mallorcatour.situation.handler.NoStrengthSituationHandler;
 import mallorcatour.tools.Log;
 
 /**

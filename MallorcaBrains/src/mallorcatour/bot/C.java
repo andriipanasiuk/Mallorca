@@ -29,12 +29,12 @@ public class C {
 	public static final String CARDS = "ca" + "rds";
 	public static final String WEIGHT = "we" + "ight";
 	public static final String HANDLER = "han" + "dler";
-	public static final String PREFLOP = "Prefl" + "op";
-	public static final String FLOP = "Fl" + "op";
-	public static final String TURN = "Tu" + "rn";
-	public static final String RIVER = "Ri" + "ver";
 	public static final String PROFIT = "Pr" + "ofit";
 	public static final String STATS = "St" + "ats";
 	public static final String FIRST = "fir" + "st";
 	public static final String SECOND = "seco" + "nd";
+
+	public static class Preferences{
+		public static final String LOG_PATH = "./logs/log_";
+	}
 }

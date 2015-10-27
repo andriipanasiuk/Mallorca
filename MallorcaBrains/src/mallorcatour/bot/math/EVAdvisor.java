@@ -3,10 +3,10 @@ package mallorcatour.bot.math;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
+import mallorcatour.brains.stats.IPokerStats;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.Log;
 

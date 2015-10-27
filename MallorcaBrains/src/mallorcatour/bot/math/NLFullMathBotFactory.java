@@ -1,17 +1,17 @@
 package mallorcatour.bot.math;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.modeller.SpectrumPlayerObserver;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.StrengthManager;
 import mallorcatour.core.game.GameObservers;
 import mallorcatour.core.game.HoleCardsObservers;
-import mallorcatour.core.game.situation.SituationHandler;
+import mallorcatour.core.game.advice.AdvisorListener;
+import mallorcatour.core.game.interfaces.ISpectrumListener;
+import mallorcatour.situation.handler.SituationHandler;
 
 public class NLFullMathBotFactory implements IBotFactory {
 

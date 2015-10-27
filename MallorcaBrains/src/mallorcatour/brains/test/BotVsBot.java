@@ -1,8 +1,6 @@
 package mallorcatour.brains.test;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.LessVarianceActionFromMap;
 import mallorcatour.bot.math.NLFullMathBotFactory;
 import mallorcatour.bot.math.NLGameSolver;
@@ -19,12 +17,13 @@ import mallorcatour.brains.neural.germany.GermanyFactory;
 import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
 import mallorcatour.brains.neural.pbx.PbxFactory;
 import mallorcatour.brains.stats.PokerStatInfo;
+import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.engine.GameEngine;
 import mallorcatour.core.game.engine.GameEngine.CashSummary;
 import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
 import mallorcatour.core.game.engine.PredefinedGameEngine;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.robot.controller.PokerPreferences;
+import mallorcatour.core.game.interfaces.ISpectrumListener;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.Log;
 
@@ -81,7 +80,7 @@ public class BotVsBot {
 	}
 
 	public static void main(String... args) {
-		String DEBUG_PATH = PokerPreferences.DEBUG_PATTERN + DateUtils.getDate(false) + ".txt";
+		String DEBUG_PATH = "./logs/log" + DateUtils.getDate(false) + ".txt";
 		Log.DEBUG_PATH = DEBUG_PATH;
 		NLGameSolver.LOGGING = true;
 

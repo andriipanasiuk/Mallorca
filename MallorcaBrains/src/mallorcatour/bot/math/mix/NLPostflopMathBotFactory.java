@@ -1,10 +1,8 @@
 package mallorcatour.bot.math.mix;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.bot.math.EVAdvisor;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.modeller.SpectrumPlayerObserver;
@@ -16,7 +14,9 @@ import mallorcatour.brains.neural.NeuralAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensen;
 import mallorcatour.core.game.GameObservers;
 import mallorcatour.core.game.HoleCardsObservers;
-import mallorcatour.core.game.situation.SituationHandler;
+import mallorcatour.core.game.advice.AdvisorListener;
+import mallorcatour.core.game.interfaces.ISpectrumListener;
+import mallorcatour.situation.handler.SituationHandler;
 
 /**
  * Create bot with GusXensen + chart preflop and decision-tree postflop.

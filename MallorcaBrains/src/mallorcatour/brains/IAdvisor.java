@@ -6,10 +6,10 @@
 package mallorcatour.brains;
 
 import mallorcatour.bot.interfaces.HasName;
+import mallorcatour.brains.stats.IPokerStats;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
 
 /**

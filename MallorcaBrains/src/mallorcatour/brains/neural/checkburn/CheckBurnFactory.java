@@ -1,14 +1,14 @@
 package mallorcatour.brains.neural.checkburn;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.Player;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.interfaces.IPlayer;
-import mallorcatour.bot.interfaces.ISpectrumListener;
 import mallorcatour.brains.IActionChecker;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.NeuralAdvisor;
-import mallorcatour.core.game.situation.SituationHandler;
+import mallorcatour.core.game.advice.AdvisorListener;
+import mallorcatour.core.game.interfaces.ISpectrumListener;
+import mallorcatour.situation.handler.SituationHandler;
 
 public class CheckBurnFactory implements IBotFactory {
 

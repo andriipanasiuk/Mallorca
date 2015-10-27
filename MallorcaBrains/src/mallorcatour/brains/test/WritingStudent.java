@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.core.game.PokerStreet;
+import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.hhparser.SituationIO;
 import mallorcatour.neural.core.PokerLearningExample;
+import mallorcatour.neural.manager.SituationIO;
 import mallorcatour.tools.Log;
 
 public class WritingStudent implements AdvisorListener {

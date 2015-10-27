@@ -2,8 +2,8 @@ package mallorcatour.brains.neural.dafish;
 
 import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.neural.IPokerNeurals;
+import mallorcatour.brains.stats.IPokerStats;
 import mallorcatour.brains.stats.PokerStats;
-import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;

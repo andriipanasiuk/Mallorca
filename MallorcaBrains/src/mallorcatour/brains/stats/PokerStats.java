@@ -1,6 +1,5 @@
 package mallorcatour.brains.stats;
 
-import mallorcatour.core.game.interfaces.IPokerStats;
 
 public class PokerStats implements IPokerStats {
 

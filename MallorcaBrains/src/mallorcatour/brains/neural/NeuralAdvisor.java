@@ -4,20 +4,19 @@
  */
 package mallorcatour.brains.neural;
 
+import mallorcatour.advice.creator.SmartAdviceCreator;
+import mallorcatour.advice.creator.SmartPostflopAdviceCreator;
+import mallorcatour.advice.creator.SmartRiverAdviceCreator;
 import mallorcatour.brains.HavingStats;
 import mallorcatour.brains.IAdvisor;
+import mallorcatour.brains.stats.IPokerStats;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.advice.SmartAdviceCreator;
-import mallorcatour.core.game.advice.SmartPostflopAdviceCreator;
-import mallorcatour.core.game.advice.SmartRiverAdviceCreator;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.interfaces.IPokerStats;
 import mallorcatour.core.game.situation.LocalSituation;
-import mallorcatour.core.game.situation.LocalSituationInterpreter;
 import mallorcatour.tools.Log;
 
 import org.neuroph.core.NeuralNetwork;

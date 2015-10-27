@@ -11,6 +11,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.math.RandomVariable;
 
 /**
  *

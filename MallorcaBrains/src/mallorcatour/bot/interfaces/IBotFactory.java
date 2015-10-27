@@ -4,8 +4,9 @@
  */
 package mallorcatour.bot.interfaces;
 
-import mallorcatour.bot.AdvisorListener;
 import mallorcatour.brains.IAdvisor;
+import mallorcatour.core.game.advice.AdvisorListener;
+import mallorcatour.core.game.interfaces.ISpectrumListener;
 
 
 /**

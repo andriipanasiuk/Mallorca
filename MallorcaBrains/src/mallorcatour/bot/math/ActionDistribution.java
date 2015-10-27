@@ -3,6 +3,7 @@ package mallorcatour.bot.math;
 import java.util.HashMap;
 
 import mallorcatour.core.game.Action;
+import mallorcatour.core.math.RandomVariable;
 import mallorcatour.tools.FileUtils;
 
 public class ActionDistribution extends HashMap<Action, RandomVariable> {

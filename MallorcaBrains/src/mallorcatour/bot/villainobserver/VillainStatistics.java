@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.core.game.interfaces.IPokerStats;
+import mallorcatour.brains.stats.IPokerStats;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.tools.Pair;
 

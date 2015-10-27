@@ -11,7 +11,6 @@ import mallorcatour.bot.math.AggressionInfoBuilder.AggressionInfo;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.math.IGameSolver;
 import mallorcatour.core.equilator.EquilatorStrength;
-import mallorcatour.core.equilator.StreetEquity;
 import mallorcatour.core.equilator.preflop.EquilatorPreflop;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -22,6 +21,8 @@ import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.math.RandomVariable;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.tools.Log;
 
