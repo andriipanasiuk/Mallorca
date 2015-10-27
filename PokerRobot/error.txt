@@ -1,0 +1,11 @@
+Exception in thread "main" java.lang.ExceptionInInitializerError
+	at mallorcatour.robot.frames.GameTrayFrame.<init>(GameTrayFrame.java:78)
+	at mallorcatour.robot.frames.GameTrayFrame.main(GameTrayFrame.java:198)
+Caused by: java.lang.RuntimeException: Some problem with file: assets/ps/finished1.png
+	at mallorcatour.robot.util.ImageUtils.fromFile(ImageUtils.java:60)
+	at mallorcatour.robot.ps.PSTableDirector.<clinit>(PSTableDirector.java:52)
+	... 2 more
+Caused by: javax.imageio.IIOException: Can't read input file!
+	at javax.imageio.ImageIO.read(Unknown Source)
+	at mallorcatour.robot.util.ImageUtils.fromFile(ImageUtils.java:58)
+	... 3 more
