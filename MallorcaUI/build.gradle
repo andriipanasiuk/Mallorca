@@ -1,0 +1,21 @@
+apply plugin: 'java'
+sourceSets {
+    main.java.srcDirs = ['src']
+    main.resources.srcDirs = ['src']
+    test.java.srcDirs = ['tests/java']
+    test.resources.srcDirs = ['tests/resources']
+}
+repositories {
+   flatDir {
+       dirs 'libs'
+   }
+}
+dependencies {
+	compile project(':Tools')
+	compile project(':MallorcaCore')
+	compile project(':MallorcaBrains')
+	compile project(':MallorcaNeural')
+	compile project(':MallorcaEquilator')
+	compile project(':HHParser')
+    compile files('./lib/swing-layout-1.0.4.jar')
+}
