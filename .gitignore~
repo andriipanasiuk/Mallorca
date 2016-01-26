@@ -1,7 +1,0 @@
-*.txt
-build/
-advices_sng/
-dist/
-bin/
-.project
-logs
