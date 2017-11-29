@@ -14,7 +14,7 @@ import mallorcatour.core.vector.IVector;
 import mallorcatour.core.vector.VectorUtils;
 
 /**
- *
+ * Переименовать в HandState
  * @author Andrew
  */
 public class LocalSituation implements IVector, Serializable, IAggressionInfo {

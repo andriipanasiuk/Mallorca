@@ -12,4 +12,5 @@ include ':Neuroph'
 include ':AiGames'
 include ':UITools'
 include ':Sandbox'
-
+include ':NeuralBot'
+include ':Sandbox'

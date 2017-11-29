@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mallorcatour.bot.preflop;
 
-import mallorcatour.brains.IAdvisor;
-import mallorcatour.brains.stats.IPokerStats;
+import mallorcatour.Advisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
@@ -14,11 +9,7 @@ import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.Log;
 
-/**
- *
- * @author Andrew
- */
-public class NLPreflopChart implements IAdvisor {
+public class NLPreflopChart implements Advisor {
 
     public static Advice PERCENT_FOLD_0 = Advice.create(0, 0, 1);
     public static Advice PERCENT_FOLD_10 = Advice.create(0.1, 0, 0.9);
@@ -92,8 +83,4 @@ public class NLPreflopChart implements IAdvisor {
 		return "Preflop chart bot";
 	}
 
-	@Override
-	public IPokerStats getStats() {
-		throw new UnsupportedOperationException();
-	}
 }

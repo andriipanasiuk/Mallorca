@@ -1,6 +1,6 @@
 package mallorcatour.bot.math;
 
-import mallorcatour.brains.IAdvisor;
+import mallorcatour.Advisor;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
@@ -9,7 +9,7 @@ import mallorcatour.core.spectrum.Spectrum;
 
 public class NLProfitCalculator implements IProfitCalculator {
 
-	public NLProfitCalculator(IAdvisor villainModel, StrengthManager strengthManager) {
+	public NLProfitCalculator(Advisor villainModel, StrengthManager strengthManager) {
 		gameSolver = new NLGameSolver(villainModel);
 		this.strengthManager = strengthManager;
 	}

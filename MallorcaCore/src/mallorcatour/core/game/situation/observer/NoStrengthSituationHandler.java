@@ -11,6 +11,7 @@ import mallorcatour.tools.Log;
 /**
  * Следит за игрой и в каждый момент может построить обьект {@link LocalSituation},
  * который определяет текущую сложившуюся ситуацию в игре между 2 игроками.
+ * Переименовать в HandStateObserver
  */
 public class NoStrengthSituationHandler implements KnowSituation, IGameObserver<IGameInfo> {
 	private int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;

@@ -10,11 +10,8 @@ import mallorcatour.core.game.situation.LocalSituation;
  *
  */
 public interface AdvisorListener {
-	AdvisorListener NONE = new AdvisorListener() {
-		@Override
-		public void onAdvice(LocalSituation situation, IAdvice advice) {
-			//do nothing
-		}
-	};
+	AdvisorListener NONE = (situation, advice) -> {
+        //do nothing
+    };
 	void onAdvice(LocalSituation situation, IAdvice advice);
 }

@@ -15,9 +15,7 @@ import java.util.Scanner;
 
 import mallorcatour.bot.C;
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.bot.math.NLFullMathBotFactory;
-import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl.LoadFrom;
 import mallorcatour.core.game.Action;
@@ -25,6 +23,8 @@ import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.interfaces.ISpectrumListener;
+import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.modeller.PlayerStatModel;
 import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 

@@ -8,7 +8,7 @@ import java.util.Map;
 
 import mallorcatour.bot.C;
 import mallorcatour.bot.math.AggressionInfoBuilder.AggressionInfo;
-import mallorcatour.brains.IAdvisor;
+import mallorcatour.Advisor;
 import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -35,9 +35,9 @@ public class NLGameSolver implements IGameSolver {
 	private final static double NEARLY_ZERO = 0.0001;
 	private final static double DEFAULT_POSITIVE_POTENTIAL = 0.1;
 	private final static double DEFAULT_NEGATIVE_POTENTIAL = 0.1;
-	private final IAdvisor villainModel;
+	private final Advisor villainModel;
 
-	public NLGameSolver(IAdvisor villainModel) {
+	public NLGameSolver(Advisor villainModel) {
 		this.villainModel = villainModel;
 	}
 

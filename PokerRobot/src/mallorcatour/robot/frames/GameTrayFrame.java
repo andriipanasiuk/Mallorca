@@ -30,7 +30,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 
-import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
+import mallorcatour.neural.bot.gusxensen.GusXensenFactory;
 import mallorcatour.robot.ManageKeySettings;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.ps.PSTableDirector;

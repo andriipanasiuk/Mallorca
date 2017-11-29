@@ -7,8 +7,7 @@ package mallorcatour.core.game.interfaces;
 import mallorcatour.core.game.Action;
 
 /**
- *
- * @author Andrew
+ * Сделать одним интерфейсом с IActionChecker.
  */
 public interface IActionPreprocessor {
 

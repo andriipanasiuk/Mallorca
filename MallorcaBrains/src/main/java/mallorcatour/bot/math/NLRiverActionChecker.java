@@ -3,7 +3,6 @@ package mallorcatour.bot.math;
 import java.util.Map.Entry;
 
 import mallorcatour.bot.interfaces.ISpectrumHolder;
-import mallorcatour.brains.IActionChecker;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
@@ -11,7 +10,7 @@ import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.core.math.RandomVariable;
 
-public class NLRiverActionChecker implements IActionChecker {
+public class NLRiverActionChecker {
 
 	private final IProfitCalculator profitCalculator;
 	private final ISpectrumHolder villainSpectrumHolder;
@@ -24,8 +23,8 @@ public class NLRiverActionChecker implements IActionChecker {
 		this.villainSpectrumHolder = villain;
 	}
 
-	@Override
-	public Action checkAction(Action action, LocalSituation situation, IPlayerGameInfo gameInfo, HoleCards cards) {
+	public Action preprocessAction(Action action, LocalSituation situation,
+								   IPlayerGameInfo gameInfo, HoleCards cards) {
 		if (!gameInfo.isRiver() || gameInfo.getLimitType() != LimitType.NO_LIMIT) {
 			return action;
 		}

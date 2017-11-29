@@ -2,7 +2,7 @@ package mallorcatour.bot.math;
 
 import java.util.List;
 
-import mallorcatour.brains.IAdvisor;
+import mallorcatour.Advisor;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
@@ -13,7 +13,7 @@ import mallorcatour.core.spectrum.Spectrum;
 
 public class ShowdownGameSolver extends NLGameSolver {
 
-	public ShowdownGameSolver(IAdvisor villainModeller) {
+	public ShowdownGameSolver(Advisor villainModeller) {
 		super(villainModeller);
 	}
 

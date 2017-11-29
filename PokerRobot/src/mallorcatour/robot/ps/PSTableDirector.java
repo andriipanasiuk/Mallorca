@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.core.player.interfaces.IPlayer;
-import mallorcatour.bot.modeller.PlayerStatModel;
+import mallorcatour.modeller.PlayerStatModel;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.AdvisorListener;
@@ -366,7 +366,7 @@ public class PSTableDirector {
         IPlayer player = createPlayer(villainModeller, limitType, debug);
 		String heroName = StringUtils.between(fullTableName, LOGGED_IN + " as ", FileUtils.LINE_SEPARATOR);
 		// TODO pass real villain model to observer
-		IVillainObserver villainObserver = new PSVillainObserver(null,  limitType, fullTableName, heroName, debug);
+		IVillainObserver villainObserver = IVillainObserver.EMPTY;
         HUGameController controller = new HUGameController(player, heroName, debug);
         final PSGameRobot robot = new PSGameRobot(controller, limitType, debug,
                 heroName, villainObserver);

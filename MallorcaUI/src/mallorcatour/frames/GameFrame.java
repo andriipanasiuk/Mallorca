@@ -15,9 +15,7 @@ import java.awt.EventQueue;
 import mallorcatour.bot.C;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.player.interfaces.IPlayer;
-import mallorcatour.bot.modeller.PlayerStatModel;
-import mallorcatour.brains.IAdvisor;
-import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
+import mallorcatour.Advisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
@@ -28,6 +26,8 @@ import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.ISpectrumListener;
+import mallorcatour.neural.bot.gusxensen.GusXensenFactory;
+import mallorcatour.modeller.PlayerStatModel;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.ExecutorUtils;
 import mallorcatour.tools.Log;
@@ -64,9 +64,9 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 		DEBUG_PATH = C.Preferences.LOG_PATH + DateUtils.getDate(false) + ".txt";
 		villainModeller = new PlayerStatModel(DEBUG_PATH);
 		GusXensenFactory factory = new GusXensenFactory();
-		playerUp = factory.createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY, AdvisorListener.NONE,
+		playerUp = factory.createBot(Advisor.UNSUPPORTED, ISpectrumListener.EMPTY, AdvisorListener.NONE,
 				AdvisorListener.NONE, "Grantorino Up", DEBUG_PATH);
-		playerDown = new GusXensenFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
+		playerDown = new GusXensenFactory().createBot(Advisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				AdvisorListener.NONE, AdvisorListener.NONE, "Grantorino Down", DEBUG_PATH);
 		engine = new GameEngine(playerDown, playerUp, this, new PokerEquilatorBrecher(), DEBUG_PATH);
 		enableActionButtons(false);

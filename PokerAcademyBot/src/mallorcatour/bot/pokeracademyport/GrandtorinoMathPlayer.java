@@ -7,7 +7,7 @@ package mallorcatour.bot.pokeracademyport;
 import mallorcatour.bot.AdvisorListener;
 import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.bot.interfaces.ISpectrumListener;
-import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
+import mallorcatour.neural.bot.gusxensen.GusXensenFactory;
 
 /**
  * 

@@ -1,7 +1,6 @@
 package mallorcatour.bot;
 
-import mallorcatour.brains.IActionChecker;
-import mallorcatour.brains.IAdvisor;
+import mallorcatour.Advisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.AdvisorListener;
@@ -16,22 +15,20 @@ import mallorcatour.tools.Log;
  */
 public class Player extends ObservingPlayer {
 
-	private final IAdvisor preflopAdvisor;
-	private final IAdvisor postflopAdvisor;
-	private final IAdvisor preflopChart;
+	private final Advisor preflopAdvisor;
+	private final Advisor postflopAdvisor;
+	private final Advisor preflopChart;
 	private AdvisorListener student = AdvisorListener.NONE;
-	private IActionChecker actionChecker;
 
-	public Player(IAdvisor preflopAdvisor, IAdvisor preflopChart, IAdvisor commonAdvisor, IActionChecker actionChecker,
-			String name, String debug) {
+	public Player(Advisor preflopAdvisor, Advisor preflopChart, Advisor commonAdvisor,
+				  String name, String debug) {
 		super(name, debug);
-		if (commonAdvisor == null || commonAdvisor == IAdvisor.UNSUPPORTED) {
+		if (commonAdvisor == null || commonAdvisor == Advisor.UNSUPPORTED) {
 			throw new IllegalArgumentException("Common advisor must not be null");
 		}
 		this.preflopAdvisor = preflopAdvisor;
 		this.postflopAdvisor = commonAdvisor;
 		this.preflopChart = preflopChart;
-		this.actionChecker = actionChecker;
 	}
 
 	public void setStudent(AdvisorListener student) {
@@ -71,7 +68,6 @@ public class Player extends ObservingPlayer {
 		Log.f(DEBUG_PATH, C.ACTION + ": " + action.toString());
 		Log.f(DEBUG_PATH, "Decision from " + this + " in " + (System.currentTimeMillis() - time) + " ms");
 		Log.f(DEBUG_PATH, "=========  End  =========");
-		action = actionChecker.checkAction(action, situation, gameInfo, cards);
 		gameObserver.onActed(action, gameInfo.getAmountToCall(), getName());
 		return action;
 	}

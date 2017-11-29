@@ -7,6 +7,7 @@ package mallorcatour.core.game.situation;
 
 /**
  *
+ * Переименовать в HandStateHolder
  * @author Andrew
  */
 public interface KnowSituation {

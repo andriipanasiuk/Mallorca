@@ -12,7 +12,7 @@ dependencies {
 	compile project(':FellOmenBot')
 	compile project(':MallorcaCore')
 	compile project(':MallorcaBrains')
-	compile project(':MallorcaNeural')
+	compile project(':NeuralBot')
 	compile project(':MallorcaEquilator')
 	compile project(':HHParser')
 	compile fileTree(dir: 'lib', include: '*.jar')
