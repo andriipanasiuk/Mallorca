@@ -18,7 +18,7 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.game.situation.StreetEquity;
 import mallorcatour.core.math.RandomVariable;
 import mallorcatour.core.spectrum.Spectrum;
@@ -265,7 +265,7 @@ public class NLGameSolver implements IGameSolver {
 		if (wasHeroPreviousAggressive) {
 			newInfo.plusHeroAggressiveAction();
 		}
-		LocalSituation villainSituation = getVillainSituationWithoutStrength(street, !onButton, villainToCall,
+		HandState villainSituation = getVillainSituationWithoutStrength(street, !onButton, villainToCall,
 				villainPot, villainEffectiveStack, newInfo, wasVillainPreviousAggressive, wasHeroPreviousAggressive);
 		log(depth, C.POT + ": " + pot + " " + C.TO_CALL + ": " + villainToCall + " " + C.EFFECTIVE_STACK + ": "
 				+ villainEffectiveStack);
@@ -353,7 +353,7 @@ public class NLGameSolver implements IGameSolver {
 	}
 
 	private void processVillainSpectrums(Spectrum villainSpectrum, Spectrum foldSpectrum, Spectrum passiveSpectrum,
-			Spectrum aggressiveSpectrum, LocalSituation villainSituation, Map<HoleCards, StreetEquity> strengthMap) {
+                                         Spectrum aggressiveSpectrum, HandState villainSituation, Map<HoleCards, StreetEquity> strengthMap) {
 		for (HoleCards villainCards : villainSpectrum) {
 			StreetEquity equity = strengthMap.get(villainCards);
 			double strength = equity.strength;
@@ -368,11 +368,11 @@ public class NLGameSolver implements IGameSolver {
 		}
 	}
 
-	private LocalSituation getVillainSituationWithoutStrength(PokerStreet street, boolean villainOnButton,
-			double toCall, double pot, double effectiveStack, IAggressionInfo info,
-			boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive) {
+	private HandState getVillainSituationWithoutStrength(PokerStreet street, boolean villainOnButton,
+                                                         double toCall, double pot, double effectiveStack, IAggressionInfo info,
+                                                         boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive) {
 		double potOdds = toCall / (toCall + pot);
-		LocalSituation result = new LocalSituation(street.intValue());
+		HandState result = new HandState(street.intValue());
 		result.setPositivePotential(DEFAULT_POSITIVE_POTENTIAL);
 		result.setNegativePotential(DEFAULT_NEGATIVE_POTENTIAL);
 		result.setAggressionInfoOnlyCount(info, true);

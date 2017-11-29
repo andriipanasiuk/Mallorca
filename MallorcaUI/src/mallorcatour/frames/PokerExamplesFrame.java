@@ -19,7 +19,7 @@ import javax.swing.JOptionPane;
 
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.game.situation.LocalSituationDistance;
 import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.EuclidDistanceMod;
@@ -620,8 +620,8 @@ public class PokerExamplesFrame extends javax.swing.JFrame {
                     != selectedExample.getSituation().getStreet()) {
                 continue;
             }
-            LocalSituation selectedSituation = selectedExample.getSituation();
-            LocalSituation currentSituation = currentExample.getSituation();
+            HandState selectedSituation = selectedExample.getSituation();
+            HandState currentSituation = currentExample.getSituation();
             if (distance.getDistance(selectedSituation,
                     currentSituation) < maxDistanceForSimilarity) {
                 List<Number> output = currentExample.getAdvice().getValues();

@@ -1,8 +1,8 @@
 package mallorcatour.neural.bot.checkburn;
 
 import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.IPokerStats;
 import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsImpl;
 import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
@@ -38,8 +38,8 @@ public class CheckBurn implements IPokerNeurals {
 		return preflop;
 	}
 
-	public IPokerStats getStats() {
-		return new PokerStats(0.5, 0.1, 0.29, 0.67);
+	public PokerStats getStats() {
+		return new PokerStatsImpl(0.5, 0.1, 0.29, 0.67);
 	}
 
 	@Override

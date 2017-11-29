@@ -11,7 +11,7 @@ import java.util.List;
 
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.hhparser.AdviceReader;
 import mallorcatour.hhparser.HandParser;
 import mallorcatour.hhparser.TournamentParser;
@@ -39,8 +39,8 @@ public class NNConverter {
         HandParser parser = new HandParser();
 
         for (Hand hand : hands) {
-            List<LocalSituation> handSituations = parser.parse(hand, heroName, handler);
-            for (LocalSituation situation : handSituations) {
+            List<HandState> handSituations = parser.parse(hand, heroName, handler);
+            for (HandState situation : handSituations) {
                 PokerLearningExample example = new PokerLearningExample(situation);
                 example.setHand(hand);
                 result.add(example);

@@ -3,25 +3,25 @@ package mallorcatour.stats;
 import java.util.List;
 
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.advice.HasAdvice;
+import mallorcatour.core.game.advice.AdviceHolder;
 import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.game.situation.HasSituation;
-import mallorcatour.core.game.situation.KnowSituation;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandStateHolder;
 
 public class StatCalculator {
 
-	public static <T extends KnowSituation & HasAdvice> IPokerStats calculate(List<T> list) {
-		PokerStatInfo info = new PokerStatInfo();
+	public static <T extends HandStateHolder & AdviceHolder> PokerStats calculate(List<T> list) {
+		PokerStatsBuffer info = new PokerStatsBuffer();
 		for (Object item : list) {
-			LocalSituation situation = ((HasSituation) item).getSituation();
-			IAdvice advice = ((HasAdvice) item).getAdvice();
+			HandState situation = ((HasSituation) item).getSituation();
+			IAdvice advice = ((AdviceHolder) item).getAdvice();
 			changeStat(situation, advice, info);
 		}
 		return info;
 	}
 
-	public static void changeStat(LocalSituation situation, IAdvice advice, PokerStatInfo info){
+	public static void changeStat(HandState situation, IAdvice advice, PokerStatsBuffer info){
 		if (situation.getStreet() != PokerStreet.PREFLOP_VALUE) {
 			if (situation.getPotOdds() != 0) {
 				info.foldFrequency.first += advice.getFold();

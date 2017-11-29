@@ -7,7 +7,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.math.RandomVariable;
 
 public class NLRiverActionChecker {
@@ -23,7 +23,7 @@ public class NLRiverActionChecker {
 		this.villainSpectrumHolder = villain;
 	}
 
-	public Action preprocessAction(Action action, LocalSituation situation,
+	public Action preprocessAction(Action action, HandState situation,
 								   IPlayerGameInfo gameInfo, HoleCards cards) {
 		if (!gameInfo.isRiver() || gameInfo.getLimitType() != LimitType.NO_LIMIT) {
 			return action;

@@ -13,21 +13,21 @@ import mallorcatour.core.vector.IVector;
  *
  * @author Andrew
  */
-public class LocalSituationDistance implements IDistanceCalculator<LocalSituation> {
+public class LocalSituationDistance implements IDistanceCalculator<HandState> {
 
     private final double MAX_POTENTIAL = 0.4;
     private static final IDistanceCalculator<IVector> DEFAULT_VECTOR_DISTANCE =
             new EuclidDistance();
 
-    public double getDistance(LocalSituation one, LocalSituation other) {
+    public double getDistance(HandState one, HandState other) {
         if (one.getStreet() != other.getStreet()) {
             throw new IllegalArgumentException("There are situations from "
                     + "different stages.");
         }
         int street = one.getStreet();
         if (street == PokerStreet.FLOP_VALUE || street == PokerStreet.TURN_VALUE) {
-            LocalSituation local1 = new LocalSituation(one);
-            LocalSituation local2 = new LocalSituation(other);
+            HandState local1 = new HandState(one);
+            HandState local2 = new HandState(other);
             double pPo11 = local1.getPositivePotential();
             double pPo12 = local2.getPositivePotential();
             double nPo11 = local1.getNegativePotential();

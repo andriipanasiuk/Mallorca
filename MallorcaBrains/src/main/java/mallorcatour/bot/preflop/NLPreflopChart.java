@@ -6,7 +6,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.tools.Log;
 
 public class NLPreflopChart implements Advisor {
@@ -46,12 +46,12 @@ public class NLPreflopChart implements Advisor {
         vsRaiseChart = new VsRaiseMinPotChart();
     }
 
-	private boolean unopened(LocalSituation situation) {
+	private boolean unopened(HandState situation) {
 		return situation.isHeroOnButton() && situation.getHeroActionCount() == 0
 				&& situation.getVillainActionCount() == 0;
 	}
     @Override
-	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
+	public IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		if (unopened(situation)) {
 			double bbsInES = convertPotToStackOddsToBBInEffectiveStack(situation.getPotToStackOdds());
             if (bbsInES > minBBsInESForPushFold) {
@@ -67,7 +67,7 @@ public class NLPreflopChart implements Advisor {
         return null;
     }
 
-	private boolean vsRaise(LocalSituation situation) {
+	private boolean vsRaise(HandState situation) {
 		return !situation.isHeroOnButton() && situation.getHeroActionCount() == 0
 				&& situation.getVillainActionCount() == 1 && situation.getVillainAggresionActionCount() == 1
 				&& !situation.wasHeroPreviousAggresive() && situation.wasVillainPreviousAggresive();

@@ -2,11 +2,11 @@ package mallorcatour.neural.bot;
 
 import java.io.InputStream;
 
-import mallorcatour.stats.IPokerStats;
+import mallorcatour.stats.PokerStats;
 
 import org.neuroph.core.NeuralNetwork;
 
-public abstract class AbstractNeurals implements ISituationData, IPokerStats, IPokerNeurals {
+public abstract class AbstractNeurals implements ISituationData, PokerStats, IPokerNeurals {
 	private NeuralNetwork<?> preflopNN;
 	private NeuralNetwork<?> flopNN;
 	private NeuralNetwork<?> turnNN;

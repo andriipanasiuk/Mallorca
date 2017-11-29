@@ -9,7 +9,7 @@ import java.util.List;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.neural.core.LearningExample;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.tools.Log;
@@ -47,7 +47,7 @@ public class PokerLEIO {
 			count++;
 			try {
 				LearningExample example = LearningExample.valueOf(buffer);
-				LocalSituation situation = new LocalSituation(example.getInput(), street.intValue());
+				HandState situation = new HandState(example.getInput(), street.intValue());
 				Advice advice = adviceCreator.create(true, example.getOutput().asArray());
 				PokerLearningExample pokerExample = new PokerLearningExample(situation, advice);
 				examples.add(pokerExample);
@@ -61,7 +61,7 @@ public class PokerLEIO {
 	public static void main(String... args) {
 		List<PokerLearningExample> list = readFromDir(new File("Cuba"));
 		for (int i = 0; i < 10; i++) {
-			LocalSituation situation = list.get(i).getSituation();
+			HandState situation = list.get(i).getSituation();
 			Log.d("Street: " + PokerStreet.valueOf(situation.getStreet()));
 			Log.d(situation.toString());
 		}

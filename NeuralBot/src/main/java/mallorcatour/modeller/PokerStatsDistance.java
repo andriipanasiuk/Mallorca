@@ -4,17 +4,17 @@
  */
 package mallorcatour.modeller;
 
-import mallorcatour.stats.IPokerStats;
+import mallorcatour.stats.PokerStats;
 import mallorcatour.core.vector.IDistanceCalculator;
 
 /**
  *
  * @author Andrew
  */
-public class PokerStatsDistance implements IDistanceCalculator<IPokerStats> {
+public class PokerStatsDistance implements IDistanceCalculator<PokerStats> {
 
 	@Override
-	public double getDistance(IPokerStats one, IPokerStats other) {
+	public double getDistance(PokerStats one, PokerStats other) {
 		double sum = 0;
 		if (!Double.isNaN(one.getAggressionFrequency()) && !Double.isNaN(other.getAggressionFrequency())) {
 			sum += Math.pow(one.getAggressionFrequency() - other.getAggressionFrequency(), 2);

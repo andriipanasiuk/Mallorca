@@ -8,7 +8,7 @@ package mallorcatour;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.player.interfaces.HasName;
 
 public interface Advisor extends HasName {
@@ -19,7 +19,7 @@ public interface Advisor extends HasName {
 	 * @param gameInfo
 	 *            TODO
 	 */
-	IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo);
+	IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo);
 
 	Advisor UNSUPPORTED = new Advisor() {
 
@@ -29,7 +29,7 @@ public interface Advisor extends HasName {
 		}
 
 		@Override
-		public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
+		public IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 			return null;
 		}
 	};

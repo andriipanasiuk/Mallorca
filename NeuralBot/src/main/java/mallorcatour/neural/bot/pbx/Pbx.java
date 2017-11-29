@@ -1,8 +1,8 @@
 package mallorcatour.neural.bot.pbx;
 
 import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.IPokerStats;
 import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsImpl;
 import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
@@ -37,8 +37,8 @@ public class Pbx implements IPokerNeurals {
 		return preflop;
 	}
 
-	public IPokerStats getStats() {
-		return new PokerStats(0.99, 0.99, 0.96, 0.95);
+	public PokerStats getStats() {
+		return new PokerStatsImpl(0.99, 0.99, 0.96, 0.95);
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import mallorcatour.neural.bot.germany.GermanyFactory;
 import mallorcatour.neural.bot.gusxensen.GusXensenFactory;
 import mallorcatour.neural.bot.pbx.PbxFactory;
 import mallorcatour.modeller.PlayerStatModel;
-import mallorcatour.stats.PokerStatInfo;
+import mallorcatour.stats.PokerStatsBuffer;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.Log;
 
@@ -86,7 +86,7 @@ public class BotVsBot {
 		Log.DEBUG_PATH = DEBUG_PATH;
 		NLGameSolver.LOGGING = true;
 
-		PokerStatInfo pokerStats = new PokerStatInfo();
+		PokerStatsBuffer pokerStats = new PokerStatsBuffer();
 		WritingAdvisorListener student = new WritingAdvisorListener();
 		createBots(DEBUG_PATH, pokerStats);
 
@@ -97,7 +97,7 @@ public class BotVsBot {
 		playSngs(engine, student, pokerStats);
 	}
 
-	private static void playSngs(GameEngine engine, WritingAdvisorListener student, PokerStatInfo stats) {
+	private static void playSngs(GameEngine engine, WritingAdvisorListener student, PokerStatsBuffer stats) {
 		int count1 = 0, count2 = 0;
 		int handCount = 0;
 		for (int i = 0; i < 3600; i++) {
@@ -118,7 +118,7 @@ public class BotVsBot {
 		Log.d(count1 + " " + count2);
 	}
 
-	private static void checkStats(GameEngine engine, PokerStatInfo pokerStats) {
+	private static void checkStats(GameEngine engine, PokerStatsBuffer pokerStats) {
 		CashSummary cashSummary = engine.playCash(300);
 		Log.f("stats.txt", "MathBot stats: " + pokerStats.toString());
 		Log.d("MathBot stats: " + pokerStats.toString());

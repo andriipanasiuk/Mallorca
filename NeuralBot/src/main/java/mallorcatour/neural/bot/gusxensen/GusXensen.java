@@ -1,8 +1,8 @@
 package mallorcatour.neural.bot.gusxensen;
 
 import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.IPokerStats;
 import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsImpl;
 import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
@@ -38,8 +38,8 @@ public class GusXensen implements IPokerNeurals {
 		return preflop;
 	}
 
-	public IPokerStats getStats() {
-		return new PokerStats(0.79, 0.52, 0.37, 0.56);
+	public PokerStats getStats() {
+		return new PokerStatsImpl(0.79, 0.52, 0.37, 0.56);
 	}
 
 	@Override

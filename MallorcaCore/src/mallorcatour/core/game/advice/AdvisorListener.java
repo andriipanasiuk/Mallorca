@@ -1,6 +1,6 @@
 package mallorcatour.core.game.advice;
 
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 
 
 /**
@@ -13,5 +13,5 @@ public interface AdvisorListener {
 	AdvisorListener NONE = (situation, advice) -> {
         //do nothing
     };
-	void onAdvice(LocalSituation situation, IAdvice advice);
+	void onAdvice(HandState situation, IAdvice advice);
 }

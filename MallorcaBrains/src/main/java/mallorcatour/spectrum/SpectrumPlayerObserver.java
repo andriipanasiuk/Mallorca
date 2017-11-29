@@ -17,7 +17,7 @@ import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.ISpectrumListener;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.game.situation.StreetEquity;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.core.game.situation.observer.NoStrengthSituationHandler;
@@ -41,7 +41,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 	private final String hero;
 	private final boolean trackHero;
 	private NoStrengthSituationHandler situationHandler;
-	private LocalSituation situation;
+	private HandState situation;
 
 	private final AdvisorListener adviceListener;
 
@@ -56,7 +56,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		this.adviceListener = actionObserver;
 	}
 
-	private Map<HoleCards, IAdvice> calculateAdvices(LocalSituation situation, Action action) {
+	private Map<HoleCards, IAdvice> calculateAdvices(HandState situation, Action action) {
 		Map<HoleCards, IAdvice> advices = new HashMap<HoleCards, IAdvice>();
 		for (HoleCards cards : spectrum) {
 			StreetEquity equity;
@@ -83,7 +83,7 @@ public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectr
 		return advices;
 	}
 
-	private void modifySpectrum(LocalSituation situation, Action action) {
+	private void modifySpectrum(HandState situation, Action action) {
 		Map<HoleCards, IAdvice> advices = calculateAdvices(situation, action);
 		for (HoleCards cards : advices.keySet()) {
 			IAdvice advice = advices.get(cards);

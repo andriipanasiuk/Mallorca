@@ -6,6 +6,7 @@ package mallorcatour.modeller;
 
 import mallorcatour.bot.C;
 import mallorcatour.Advisor;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.neural.bot.NeuralAdvisorImpl;
 import mallorcatour.neural.bot.checkburn.CheckBurn;
 import mallorcatour.neural.bot.cuba.Cuba;
@@ -13,14 +14,13 @@ import mallorcatour.neural.bot.dafish.Dafish;
 import mallorcatour.neural.bot.dafish2.Dafish2;
 import mallorcatour.neural.bot.germany.Germany;
 import mallorcatour.neural.bot.pbx.Pbx;
-import mallorcatour.stats.IPokerStats;
-import mallorcatour.stats.PokerStatInfo;
+import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsBuffer;
 import mallorcatour.stats.StatCalculator;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Log;
 
@@ -63,7 +63,7 @@ public class PlayerStatModel implements NeuralAdvisor, AdvisorListener {
 
 	private Advisor currentNeural;
 	private final String DEBUG_PATH;
-	private final PokerStatInfo pokerStatInfo = new PokerStatInfo();
+	private final PokerStatsBuffer pokerStats = new PokerStatsBuffer();
 	private final boolean chooseNeural;
 	private int situationCount;
 	private int handsCount;
@@ -93,7 +93,7 @@ public class PlayerStatModel implements NeuralAdvisor, AdvisorListener {
 	}
 
 	@Override
-	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
+	public IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		IAdvice result = currentNeural.getAdvice(situation, cards, gameInfo);
 		return result;
 	}
@@ -119,16 +119,16 @@ public class PlayerStatModel implements NeuralAdvisor, AdvisorListener {
 	}
 
 	@Override
-	public IPokerStats getStats() {
-		return pokerStatInfo;
+	public PokerStats getStats() {
+		return pokerStats;
 	}
 
 	@Override
-	public void onAdvice(LocalSituation situation, IAdvice advice) {
+	public void onAdvice(HandState situation, IAdvice advice) {
 		situationCount++;
-		StatCalculator.changeStat(situation, advice, pokerStatInfo);
+		StatCalculator.changeStat(situation, advice, pokerStats);
 		if (situationCount % MODEL_EVERY_SITUATION == 0) {
-			Log.f(DEBUG_PATH, C.VILLAIN + " " + C.STATS + ": " + pokerStatInfo);
+			Log.f(DEBUG_PATH, C.VILLAIN + " " + C.STATS + ": " + pokerStats);
 			if (chooseNeural) {
 				chooseModellingNeural();
 			}

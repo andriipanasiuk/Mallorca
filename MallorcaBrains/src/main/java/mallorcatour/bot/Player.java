@@ -5,7 +5,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.tools.Log;
 
 /**
@@ -42,7 +42,7 @@ public class Player extends ObservingPlayer {
 	@Override
 	public Action getAction() {
 		long time = System.currentTimeMillis();
-		LocalSituation situation = situationHandler.getSituation();
+		HandState situation = situationHandler.getSituation();
 		IAdvice advice = null;
 		HoleCards cards = new HoleCards(heroCard1, heroCard2);
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");

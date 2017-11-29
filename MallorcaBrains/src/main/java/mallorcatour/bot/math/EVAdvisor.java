@@ -5,7 +5,7 @@ import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.tools.Log;
 
 public class EVAdvisor implements Advisor {
@@ -24,7 +24,7 @@ public class EVAdvisor implements Advisor {
 	}
 
 	@Override
-	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
+	public IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		ActionDistribution actionProfitMap = profitCalculator.getProfitMap(gameInfo, situation, cards.first, cards.second,
 				villainSpectrumHolder.getSpectrum());
 		Log.f(DEBUG_PATH, actionProfitMap.toSmartString(gameInfo.getBigBlindSize(), gameInfo.getBankRollAtRisk()));

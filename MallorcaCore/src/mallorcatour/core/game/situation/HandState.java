@@ -17,7 +17,7 @@ import mallorcatour.core.vector.VectorUtils;
  * Переименовать в HandState
  * @author Andrew
  */
-public class LocalSituation implements IVector, Serializable, IAggressionInfo {
+public class HandState implements IVector, Serializable, IAggressionInfo {
 
     public static final double DEFAULT_POTENTIAL = 0.1;
     private final static long serialVersionUID = -762999739785198026L;
@@ -68,16 +68,16 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
         return street;
     }
 
-    public LocalSituation(int street) {
+    public HandState(int street) {
         this.street = street;
     }
 
     /**
-     * Constructor for creating LocalSituation has been read from file.
+     * Constructor for creating HandState has been read from file.
      * @param vector
      * @param street
      */
-    public LocalSituation(IVector vector, int street) {
+    public HandState(IVector vector, int street) {
         this.street = street;
         int i = 0;
         List<Number> values = vector.getValues();
@@ -95,7 +95,7 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
 		negativePotential = values.get(i++).doubleValue();
     }
 
-    public LocalSituation(LocalSituation other) {
+    public HandState(HandState other) {
         this.street = other.street;
         this.strength = other.strength;
         this.isOnButton = other.isOnButton;
@@ -114,7 +114,7 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
     }
 
     /**
-     * Method for write LocalSituation as list of numbers.
+     * Method for write HandState as list of numbers.
      * Used for write it to file.
      */
     public List<Number> getValues() {
@@ -326,10 +326,10 @@ public class LocalSituation implements IVector, Serializable, IAggressionInfo {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof LocalSituation)) {
+        if (!(obj instanceof HandState)) {
             return false;
         }
-        final LocalSituation other = (LocalSituation) obj;
+        final HandState other = (HandState) obj;
         if (this.hashCode() != other.hashCode()) {
             return false;
         }

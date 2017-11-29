@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.stats.IPokerStats;
+import mallorcatour.stats.PokerStats;
 import mallorcatour.stats.StatCalculator;
 import mallorcatour.tools.Log;
 
@@ -20,19 +20,19 @@ public class StatCalculatorTest {
         {
             String path = "Dafish2";
             List<PokerLearningExample> list = PokerLEIO.readFromDir(new File(path));
-            IPokerStats stats = StatCalculator.calculate(list);
+            PokerStats stats = StatCalculator.calculate(list);
             Log.d(stats.toString());
         }
         {
             String path = "opponent_models/PBX";
             List<PokerLearningExample> list = PokerLEIO.readFromDir(new File(path));
-            IPokerStats stats = StatCalculator.calculate(list);
+            PokerStats stats = StatCalculator.calculate(list);
             Log.d(stats.toString());
         }
         {
             String path = "opponent_models/Germany";
             List<PokerLearningExample> list = PokerLEIO.readFromDir(new File(path));
-            IPokerStats stats = StatCalculator.calculate(list);
+            PokerStats stats = StatCalculator.calculate(list);
             Log.d(stats.toString());
         }
     }

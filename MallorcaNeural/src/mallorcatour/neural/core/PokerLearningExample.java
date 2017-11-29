@@ -10,19 +10,19 @@ import java.io.Serializable;
 
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.advice.HasAdvice;
+import mallorcatour.core.game.advice.AdviceHolder;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.KnowSituation;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.situation.HandStateHolder;
 
 /**
  *
  * @author Andrew
  */
-public class PokerLearningExample implements KnowSituation, HasAdvice, ILearningExample<LocalSituation, IAdvice>, Serializable {
+public class PokerLearningExample implements HandStateHolder, AdviceHolder, ILearningExample<HandState, IAdvice>, Serializable {
 
 	private final static long serialVersionUID = 1L;
-    private LocalSituation situation;
+    private HandState situation;
     private IAdvice advice;
     private Hand hand;
 
@@ -30,11 +30,11 @@ public class PokerLearningExample implements KnowSituation, HasAdvice, ILearning
         super();
     }
 
-    public PokerLearningExample(LocalSituation situation) {
+    public PokerLearningExample(HandState situation) {
         this.situation = situation;
     }
 
-    public PokerLearningExample(LocalSituation situation, IAdvice advice) {
+    public PokerLearningExample(HandState situation, IAdvice advice) {
         this.situation = situation;
         this.advice = advice;
     }
@@ -43,14 +43,14 @@ public class PokerLearningExample implements KnowSituation, HasAdvice, ILearning
      * @return the situation
      */
     @Override
-    public LocalSituation getSituation() {
+    public HandState getSituation() {
         return getInput();
     }
 
     /**
      * @param situation the situation to set
      */
-    public void setSituation(LocalSituation situation) {
+    public void setSituation(HandState situation) {
         this.situation = situation;
     }
 
@@ -94,7 +94,7 @@ public class PokerLearningExample implements KnowSituation, HasAdvice, ILearning
 	}
 
 	@Override
-	public LocalSituation getInput() {
+	public HandState getInput() {
 		return situation;
 	}
 

@@ -13,10 +13,6 @@ import mallorcatour.core.vector.IVector;
 import mallorcatour.tools.IRandomizer;
 import mallorcatour.tools.UniformRandomizer;
 
-/**
- *
- * @author Andrew
- */
 public final class Advice implements IAdvice, IVector, Serializable {
 
 	private final static long serialVersionUID = 7789283258312255030L;

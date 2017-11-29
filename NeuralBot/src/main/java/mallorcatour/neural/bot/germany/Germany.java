@@ -1,8 +1,8 @@
 package mallorcatour.neural.bot.germany;
 
 import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.IPokerStats;
 import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsImpl;
 import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
@@ -36,8 +36,8 @@ public class Germany implements IPokerNeurals {
 		return preflop;
 	}
 
-	public IPokerStats getStats() {
-		return new PokerStats(0.7, 0.28, 0.65, 0.22);
+	public PokerStats getStats() {
+		return new PokerStatsImpl(0.7, 0.28, 0.65, 0.22);
 	}
 
 	@Override

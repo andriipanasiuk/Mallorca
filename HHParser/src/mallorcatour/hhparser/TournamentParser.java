@@ -10,7 +10,7 @@ import java.util.List;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Hand;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.core.game.situation.observer.SituationHandler;
@@ -33,8 +33,8 @@ public class TournamentParser {
 
 		HandParser parser = new HandParser();
 		for (Hand hand : tournament.getHands()) {
-			List<LocalSituation> situations = parser.parse(hand, heroName, handler);
-			for (LocalSituation situation : situations) {
+			List<HandState> situations = parser.parse(hand, heroName, handler);
+			for (HandState situation : situations) {
 				PokerLearningExample example = new PokerLearningExample(situation);
 				example.setHand(hand);
 				result.add(example);

@@ -9,11 +9,11 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.KnowSituation;
+import mallorcatour.core.game.situation.HandStateHolder;
 
 public abstract class ObservingPlayer implements IPlayer {
 	protected IPlayerGameInfo gameInfo;
-	protected KnowSituation situationHandler;
+	protected HandStateHolder situationHandler;
 	protected final IActionPreprocessor actionPreprocessor;
 	protected final String DEBUG_PATH;
 	protected Card heroCard1, heroCard2;
@@ -27,7 +27,7 @@ public abstract class ObservingPlayer implements IPlayer {
 		this.DEBUG_PATH = debug;
 	}
 
-	public void set(KnowSituation situationHandler, IGameObserver observer, IHoleCardsObserver cardsObserver) {
+	public void set(HandStateHolder situationHandler, IGameObserver observer, IHoleCardsObserver cardsObserver) {
 		this.situationHandler = situationHandler;
 		this.gameObserver = observer;
 		this.cardsObserver = cardsObserver;

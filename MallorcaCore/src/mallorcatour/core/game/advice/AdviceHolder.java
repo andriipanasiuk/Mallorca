@@ -1,6 +1,6 @@
 package mallorcatour.core.game.advice;
 
 
-public interface HasAdvice{
+public interface AdviceHolder {
 	IAdvice getAdvice();
 }

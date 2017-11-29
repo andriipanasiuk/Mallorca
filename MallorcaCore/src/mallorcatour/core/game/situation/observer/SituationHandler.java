@@ -10,7 +10,7 @@ import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.Equilator;
 import mallorcatour.core.game.interfaces.PreflopEquilator;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.game.situation.StreetEquity;
 
 /**
@@ -52,8 +52,8 @@ public class SituationHandler extends NoStrengthSituationHandler implements IHol
 	}
 
 	@Override
-	public LocalSituation getSituation() {
-		LocalSituation result = super.getSituation();
+	public HandState getSituation() {
+		HandState result = super.getSituation();
 		result.setStrength(strength);
 		result.setPositivePotential(positivePotential);
 		result.setNegativePotential(negativePotential);

@@ -6,7 +6,7 @@ package mallorcatour.bot.preflop;
 
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 
 /**
  *
@@ -14,5 +14,5 @@ import mallorcatour.core.game.situation.LocalSituation;
  */
 public interface IPreflopChart {
 
-    Action getAction(LocalSituation situation, HoleCards cards);
+    Action getAction(HandState situation, HoleCards cards);
 }

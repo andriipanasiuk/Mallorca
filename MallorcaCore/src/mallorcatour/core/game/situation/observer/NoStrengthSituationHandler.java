@@ -4,16 +4,16 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.core.game.situation.KnowSituation;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.situation.HandStateHolder;
 import mallorcatour.tools.Log;
 
 /**
- * Следит за игрой и в каждый момент может построить обьект {@link LocalSituation},
+ * Следит за игрой и в каждый момент может построить обьект {@link HandState},
  * который определяет текущую сложившуюся ситуацию в игре между 2 игроками.
  * Переименовать в HandStateObserver
  */
-public class NoStrengthSituationHandler implements KnowSituation, IGameObserver<IGameInfo> {
+public class NoStrengthSituationHandler implements HandStateHolder, IGameObserver<IGameInfo> {
 	private int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;
 	private boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
 	protected IGameInfo gameInfo;
@@ -30,7 +30,7 @@ public class NoStrengthSituationHandler implements KnowSituation, IGameObserver<
 	}
 
 	@Override
-	public LocalSituation getSituation() throws IllegalStateException {
+	public HandState getSituation() throws IllegalStateException {
 		boolean isOnButton = gameInfo.onButton(hero) ^ !trackHero;
 		double potAfterCall = playerToCall + pot;
 		double potOdds = playerToCall / potAfterCall;
@@ -41,7 +41,7 @@ public class NoStrengthSituationHandler implements KnowSituation, IGameObserver<
 		if (street == null) {
 			throw new IllegalStateException("Incorrect street value");
 		}
-		LocalSituation result = new LocalSituation(street.intValue());
+		HandState result = new HandState(street.intValue());
 		result.setHeroAggresionActionCount(countOfHeroAggressive);
 		result.setHeroActionCount(heroActionCount);
 		result.setVillainAggresionActionCount(countOfOppAggressive);

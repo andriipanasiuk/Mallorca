@@ -15,9 +15,9 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.modeller.NeuralAdvisor;
-import mallorcatour.stats.IPokerStats;
+import mallorcatour.stats.PokerStats;
 import mallorcatour.tools.Log;
 
 /**
@@ -38,7 +38,7 @@ import mallorcatour.tools.Log;
 public class NeuralAdvisorImpl implements NeuralAdvisor {
 
 	private final IPokerNeurals neurals;
-	private final IPokerStats stats;
+	private final PokerStats stats;
 	private final String name;
 	private NeuralNetwork<?> preflopNN;
 	private NeuralNetwork<?> flopNN;
@@ -46,11 +46,11 @@ public class NeuralAdvisorImpl implements NeuralAdvisor {
 	private NeuralNetwork<?> riverNN;
 	private AdviceCreator adviceCreator;
 
-	public NeuralAdvisorImpl(IPokerNeurals neurals, IPokerStats stats, String name) {
+	public NeuralAdvisorImpl(IPokerNeurals neurals, PokerStats stats, String name) {
 		this(neurals, stats, name, null);
 	}
 
-	public NeuralAdvisorImpl(IPokerNeurals neurals, IPokerStats stats, String name, AdviceCreator adviceCreator) {
+	public NeuralAdvisorImpl(IPokerNeurals neurals, PokerStats stats, String name, AdviceCreator adviceCreator) {
 		this.neurals = neurals;
 		this.stats = stats;
 		this.name = name;
@@ -67,7 +67,7 @@ public class NeuralAdvisorImpl implements NeuralAdvisor {
 	}
 
 	@Override
-	public IAdvice getAdvice(LocalSituation situation, HoleCards cards, IPlayerGameInfo gameInfo) {
+	public IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo) {
 		NeuralNetwork<?> neural;
 		AdviceCreator adviceCreator;
 		boolean canRaise = situation.canRaise();
@@ -108,7 +108,7 @@ public class NeuralAdvisorImpl implements NeuralAdvisor {
 	}
 
 	@Override
-	public IPokerStats getStats() {
+	public PokerStats getStats() {
 		return stats;
 	}
 

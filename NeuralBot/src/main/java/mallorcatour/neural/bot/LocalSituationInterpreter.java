@@ -6,7 +6,7 @@ package mallorcatour.neural.bot;
 
 import java.util.List;
 
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.IInputInterpreter;
 import mallorcatour.neural.core.VectorInterpreter;
@@ -15,12 +15,12 @@ import mallorcatour.neural.core.VectorInterpreter;
  *
  * @author Andrew
  */
-public class LocalSituationInterpreter implements IInputInterpreter<LocalSituation> {
+public class LocalSituationInterpreter implements IInputInterpreter<HandState> {
 
     private static final VectorInterpreter DEFAULT_VECTOR_INTERPRETER =
             new VectorInterpreter(true);
 
-    public double[] createInput(LocalSituation situation) {
+    public double[] createInput(HandState situation) {
         List<Number> values = situation.getValues();
         return DEFAULT_VECTOR_INTERPRETER.createInput(new BaseVector(values));
     }

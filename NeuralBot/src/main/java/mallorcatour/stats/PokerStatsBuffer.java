@@ -2,11 +2,15 @@ package mallorcatour.stats;
 
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Pair;
 
-public class PokerStatInfo implements IPokerStats, AdvisorListener {
+/**
+ * Mutable реализация {@link PokerStats}.
+ * Статистика меняется по мере накопления данных.
+ */
+public class PokerStatsBuffer implements PokerStats, AdvisorListener {
 	public Pair<Double, Double> vpip = new Pair<>(0d, 0d);
 	public Pair<Double, Double> pfr = new Pair<>(0d, 0d);
 	public Pair<Double, Double> aggressionFrequency = new Pair<>(0d, 0d);
@@ -85,7 +89,7 @@ public class PokerStatInfo implements IPokerStats, AdvisorListener {
 	}
 
 	@Override
-	public void onAdvice(LocalSituation situation, IAdvice advice) {
+	public void onAdvice(HandState situation, IAdvice advice) {
 		StatCalculator.changeStat(situation, advice, this);
 	}
 }

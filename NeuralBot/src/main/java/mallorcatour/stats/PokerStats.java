@@ -1,36 +1,12 @@
 package mallorcatour.stats;
 
+public interface PokerStats {
 
-public class PokerStats implements IPokerStats {
+	public double getVpip();
 
-	private double vpip, pfr, aggrFreq, foldFreq;
+	public double getPfr();
 
-	public PokerStats(double vpip, double pfr, double aggrFreq, double foldFreq) {
-		super();
-		this.vpip = vpip;
-		this.pfr = pfr;
-		this.aggrFreq = aggrFreq;
-		this.foldFreq = foldFreq;
-	}
+	public double getAggressionFrequency();
 
-	@Override
-	public double getVpip() {
-		return vpip;
-	}
-
-	@Override
-	public double getPfr() {
-		return pfr;
-	}
-
-	@Override
-	public double getAggressionFrequency() {
-		return aggrFreq;
-	}
-
-	@Override
-	public double getFoldFrequency() {
-		return foldFreq;
-	}
-
+	public double getFoldFrequency();
 }

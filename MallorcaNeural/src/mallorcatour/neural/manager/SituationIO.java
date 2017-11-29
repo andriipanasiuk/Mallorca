@@ -5,7 +5,7 @@ import java.util.List;
 
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.tools.Log;
 import mallorcatour.tools.MyFileWriter;
@@ -13,7 +13,7 @@ import mallorcatour.tools.MyFileWriter;
 public class SituationIO {
 
 	/**
-	 * Write list of poker examples (LocalSituation -> Advice) to 4 files for
+	 * Write list of poker examples (HandState -> Advice) to 4 files for
 	 * preflop, flop, turn and river in predefined directory
 	 */
 	public static void writeToFiles(File directory, boolean addToExamples, List<PokerLearningExample> examples) {
@@ -28,7 +28,7 @@ public class SituationIO {
 
 		int preflop = 0, flop = 0, turn = 0, river = 0;
 		for (int index = 0; index < examples.size(); index++) {
-			LocalSituation situation = examples.get(index).getInput();
+			HandState situation = examples.get(index).getInput();
 			IAdvice advice = examples.get(index).getOutput();
 			switch (situation.getStreet()) {
 			case PokerStreet.PREFLOP_VALUE:

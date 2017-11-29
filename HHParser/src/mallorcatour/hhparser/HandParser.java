@@ -16,7 +16,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PlayerAction;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.hhparser.core.HandManager;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.core.game.situation.observer.SituationHandler;
@@ -36,7 +36,7 @@ public class HandParser {
     private String heroName, villainName;
     private double bankrollAtRisk;
     private List<Card> board;
-    private List<LocalSituation> situations;
+    private List<HandState> situations;
     private Action heroPreviousAction;
     private List<PokerLearningExample> learningExamples;
 
@@ -88,11 +88,11 @@ public class HandParser {
         situationHandler.onHandEnded();
     }
 
-	public List<LocalSituation> parse(Hand hand, String heroName, SituationHandler handler) {
+	public List<HandState> parse(Hand hand, String heroName, SituationHandler handler) {
         heroPreviousAction = null;
         this.heroName = heroName;
         villainName = HandManager.getVillainName(hand, heroName);
-        situations = new ArrayList<LocalSituation>();
+        situations = new ArrayList<HandState>();
         learningExamples = new ArrayList<PokerLearningExample>();
         doParsing(hand, handler);
         return situations;
@@ -102,7 +102,7 @@ public class HandParser {
         heroPreviousAction = null;
         this.heroName = heroName;
         villainName = HandManager.getVillainName(hand, heroName);
-        situations = new ArrayList<LocalSituation>();
+        situations = new ArrayList<HandState>();
         learningExamples = new ArrayList<PokerLearningExample>();
         doParsing(hand, handler);
         return learningExamples;
@@ -173,7 +173,7 @@ public class HandParser {
     }
 
     private void onHeroAction(Action action, SituationHandler situationHandler) {
-        LocalSituation situation = situationHandler.getSituation();
+        HandState situation = situationHandler.getSituation();
         situations.add(situation);
         learningExamples.add(new PokerLearningExample(situation, createFromAction(action)));
         processPot(action);

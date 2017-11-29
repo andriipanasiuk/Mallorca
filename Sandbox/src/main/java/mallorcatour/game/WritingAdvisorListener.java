@@ -7,7 +7,7 @@ import java.util.List;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.situation.HandState;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.SituationIO;
 import mallorcatour.tools.Log;
@@ -17,7 +17,7 @@ public class WritingAdvisorListener implements AdvisorListener {
 	private List<PokerLearningExample> examples = new ArrayList<>();
 
 	@Override
-	public void onAdvice(LocalSituation situation, IAdvice advice) {
+	public void onAdvice(HandState situation, IAdvice advice) {
 		examples.add(new PokerLearningExample(situation, advice));
 	}
 

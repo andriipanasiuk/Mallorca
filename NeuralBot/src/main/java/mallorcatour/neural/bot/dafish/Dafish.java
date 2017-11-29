@@ -1,8 +1,8 @@
 package mallorcatour.neural.bot.dafish;
 
 import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.IPokerStats;
 import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsImpl;
 import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
@@ -41,8 +41,8 @@ public class Dafish implements IPokerNeurals {
 		return preflop;
 	}
 
-	public IPokerStats getStats() {
-		return new PokerStats(0.83, 0.72, 0.33, 0.74);
+	public PokerStats getStats() {
+		return new PokerStatsImpl(0.83, 0.72, 0.33, 0.74);
 	}
 
 	@Override
