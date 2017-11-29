@@ -9,3 +9,7 @@ include ':MallorcaUI'
 include ':Tools'
 include ':MallorcaNeural'
 include ':Neuroph'
+include ':AiGames'
+include ':UITools'
+include ':Sandbox'
+

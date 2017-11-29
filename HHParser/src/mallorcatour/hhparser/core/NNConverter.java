@@ -17,7 +17,7 @@ import mallorcatour.hhparser.HandParser;
 import mallorcatour.hhparser.TournamentParser;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.SituationIO;
-import mallorcatour.situation.handler.SituationHandler;
+import mallorcatour.core.game.situation.observer.SituationHandler;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.Log;
 

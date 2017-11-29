@@ -8,6 +8,8 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.Flop;
 import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.interfaces.Equilator;
+import mallorcatour.core.game.interfaces.HandEvaluator;
 import mallorcatour.core.game.situation.StreetEquity;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.tools.ArrayUtils;
@@ -18,7 +20,7 @@ import com.stevebrecher.HandEval;
 /**
  *
  */
-public class PokerEquilatorBrecher {
+public class PokerEquilatorBrecher implements HandEvaluator, Equilator {
 
 	public static long time = 0;
 	public static long timeCount = 0;
@@ -64,6 +66,11 @@ public class PokerEquilatorBrecher {
 		return key;
 	}
 
+	@Override
+	public int evaluate(int[] allCards) {
+		return combination(allCards);
+	}
+
 	public static int combination(int[] allCards) {
 		return combination(allCards, true);
 	}
@@ -97,7 +104,7 @@ public class PokerEquilatorBrecher {
 		return combination(cardsKey, how);
 	}
 
-	public static double strengthVsRandom(Card heroCard1, Card heroCard2,
+	public double strengthVsRandom(Card heroCard1, Card heroCard2,
 			Card[] boardCards) {
 		int boardSize = boardCards.length;
 		int[] heroHoleCards = new int[2];
@@ -147,7 +154,7 @@ public class PokerEquilatorBrecher {
 		return ((double) draw / 2 + wins) / count;
 	}
 
-	public static double strengthVsSpectrum(Card heroCard1, Card heroCard2, Card[] boardCards, Spectrum opponentSpectrum) {
+	public double strengthVsSpectrum(Card heroCard1, Card heroCard2, Card[] boardCards, Spectrum opponentSpectrum) {
 		int boardSize = boardCards.length;
 		int[] allMyCards = new int[2 + boardSize];
 		int[] allOpponentCards = new int[2 + boardSize];
@@ -179,11 +186,11 @@ public class PokerEquilatorBrecher {
 		return ((double) draw / 2 + wins) / count;
 	}
 
-	public static StreetEquity equityOnFlop(Card card1, Card card2, Card flop1, Card flop2, Card flop3) {
+	public StreetEquity equityOnFlop(Card card1, Card card2, Card flop1, Card flop2, Card flop3) {
 		return equityVsRandom(card1, card2, flop1, flop2, flop3 );
 	}
 
-	public static StreetEquity equityOnFlop(Card card1, Card card2, Flop flop) {
+	public StreetEquity equityOnFlop(Card card1, Card card2, Flop flop) {
 		return equityVsRandom(card1, card2, flop.toArray());
 	}
 
@@ -191,35 +198,35 @@ public class PokerEquilatorBrecher {
 		return equityVsRandomFullPotential(cards[0], cards[1], new Card[] { cards[2], cards[3], cards[4] }, flush);
 	}
 
-	public static StreetEquity equityOnFlopFull(Card card1, Card card2,
+	public StreetEquity equityOnFlopFull(Card card1, Card card2,
 			Card flop1, Card flop2, Card flop3, boolean flush) {
 		return equityVsRandomFullPotential(card1, card2, new Card[] {
 				flop1, flop2, flop3 }, flush);
 	}
 
-	public static StreetEquity equityOnFlopFull(Card card1, Card card2, Flop flop, boolean flush) {
+	public StreetEquity equityOnFlopFull(Card card1, Card card2, Flop flop, boolean flush) {
 		return equityVsRandomFullPotential(card1, card2, flop.toArray(), flush);
 	}
 
-	public static StreetEquity equityOnTurn(Card myCard1, Card myCard2,
+	public StreetEquity equityOnTurn(Card myCard1, Card myCard2,
 			Card flop1, Card flop2, Card flop3, Card turn) {
 		return equityVsRandom(myCard1, myCard2, flop1, flop2,
 				flop3, turn);
 	}
 
-	public static double strengthOnFlop(Card myCard1, Card myCard2, Card flop1,
+	public double strengthOnFlop(Card myCard1, Card myCard2, Card flop1,
 			Card flop2, Card flop3) {
 		return strengthVsRandom(myCard1, myCard2, new Card[] { flop1, flop2,
 				flop3 });
 	}
 
-	public static double strengthOnTurn(Card myCard1, Card myCard2, Card flop1,
+	public double strengthOnTurn(Card myCard1, Card myCard2, Card flop1,
 			Card flop2, Card flop3, Card turn) {
 		return strengthVsRandom(myCard1, myCard2, new Card[] { flop1, flop2,
 				flop3, turn });
 	}
 
-	public static double strengthOnRiver(Card myCard1, Card myCard2,
+	public double strengthOnRiver(Card myCard1, Card myCard2,
 			Card flop1, Card flop2, Card flop3, Card turn, Card river) {
 		return strengthVsRandom(myCard1, myCard2, new Card[] { flop1, flop2,
 				flop3, turn, river });
@@ -256,14 +263,14 @@ public class PokerEquilatorBrecher {
 				flop3, turn }, spektr);
 	}
 
-	public static double strengthOnRiverVsSpectrum(Card myCard1, Card myCard2,
+	public double strengthOnRiverVsSpectrum(Card myCard1, Card myCard2,
 			Card flop1, Card flop2, Card flop3, Card turn, Card river,
 			Spectrum spektr) {
 		return strengthVsSpectrum(myCard1, myCard2, new Card[] { flop1, flop2,
 				flop3, turn, river }, spektr);
 	}
 
-	public static double strengthVsSpectrum(HoleCards heroCards, Card[] board, Spectrum spectrum) {
+	public double strengthVsSpectrum(HoleCards heroCards, Card[] board, Spectrum spectrum) {
 		return strengthVsSpectrum(heroCards.first, heroCards.second, board, spectrum);
 	}
 

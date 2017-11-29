@@ -7,11 +7,13 @@ package mallorcatour.hhparser;
 import java.util.ArrayList;
 import java.util.List;
 
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.situation.handler.SituationHandler;
+import mallorcatour.core.game.situation.observer.SituationHandler;
 
 /**
  * 
@@ -20,7 +22,8 @@ import mallorcatour.situation.handler.SituationHandler;
 public class TournamentParser {
 
 	public static List<PokerLearningExample> parseLocalSituations(Tournament tournament, String heroName) {
-		SituationHandler situationHandler = new SituationHandler(true, heroName);
+		SituationHandler situationHandler = new SituationHandler(true, heroName, new PokerEquilatorBrecher(),
+				new PreflopEquilatorImpl());
 		return parseLocalSituations(tournament, heroName, situationHandler);
 	}
 

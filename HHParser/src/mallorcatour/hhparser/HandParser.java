@@ -19,7 +19,7 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.situation.LocalSituation;
 import mallorcatour.hhparser.core.HandManager;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.situation.handler.SituationHandler;
+import mallorcatour.core.game.situation.observer.SituationHandler;
 
 /**
  *

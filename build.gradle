@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-allprojects{
-apply plugin: 'eclipse'
+allprojects {
+    apply plugin: 'idea'
 }
 buildscript {
     repositories {

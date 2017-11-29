@@ -7,15 +7,6 @@ import mallorcatour.tools.Log;
 
 public class EquilatorQuick {
 
-	/**
-	 * @param heroCard1
-	 * @param heroCard2
-	 * @param flop1
-	 * @param flop2
-	 * @param flop3
-	 * @param combinations
-	 * @return
-	 */
 	public static StreetEquity equityVsRandomFullPotential(int heroCard1, int heroCard2, int flop1, int flop2,
 			int flop3, FlopCombinations combinations) {
 		boolean positive = false, drawBoolean;

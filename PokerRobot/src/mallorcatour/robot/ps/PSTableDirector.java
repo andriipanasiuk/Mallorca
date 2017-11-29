@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.LimitType;

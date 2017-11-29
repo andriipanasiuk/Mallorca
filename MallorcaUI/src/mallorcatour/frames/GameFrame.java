@@ -13,7 +13,8 @@ package mallorcatour.frames;
 import java.awt.EventQueue;
 
 import mallorcatour.bot.C;
-import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.bot.modeller.PlayerStatModel;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.brains.neural.gusxensen.GusXensenFactory;
@@ -67,7 +68,7 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 				AdvisorListener.NONE, "Grantorino Up", DEBUG_PATH);
 		playerDown = new GusXensenFactory().createBot(IAdvisor.UNSUPPORTED, ISpectrumListener.EMPTY,
 				AdvisorListener.NONE, AdvisorListener.NONE, "Grantorino Down", DEBUG_PATH);
-		engine = new GameEngine(playerDown, playerUp, this, DEBUG_PATH);
+		engine = new GameEngine(playerDown, playerUp, this, new PokerEquilatorBrecher(), DEBUG_PATH);
 		enableActionButtons(false);
 		humanDealerButton.setVisible(false);
 		botDealerButton.setVisible(false);

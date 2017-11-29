@@ -12,6 +12,7 @@ repositories {
 }
 dependencies {
 	compile project(':Tools')
+    compile project(':UITools')
 	compile project(':MallorcaCore')
 	compile project(':MallorcaBrains')
 	compile project(':MallorcaNeural')

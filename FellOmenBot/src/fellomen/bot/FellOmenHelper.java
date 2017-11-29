@@ -14,12 +14,9 @@ import java.util.jar.JarFile;
 
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.interfaces.Equilator;
 import mallorcatour.tools.Log;
 
-/**
- *
- * @author Andrew
- */
 class FellOmenHelper {
 
     private final static int SAME_FLOP_SUITS = 10;
@@ -28,6 +25,7 @@ class FellOmenHelper {
     private final static int RIVER_SIZE = 75;
     private final static String STRATEGY_ARCHIVES_PATH = "Strategy_FellOmen_2/";
 
+    private final static Equilator EQUILATOR = new PokerEquilatorBrecher();
     /**
      * returns the column from which to look up the raise/call/fold probabilities.
      */
@@ -444,13 +442,13 @@ class FellOmenHelper {
                 }
                 if (card1.getSuit().intValue() != 3) {
                     card2 = new Card(j, 3);
-                    equity = PokerEquilatorBrecher.strengthOnFlop(card1, card2, flop1, flop2, flop3);
+                    equity = EQUILATOR.strengthOnFlop(card1, card2, flop1, flop2, flop3);
                 } else {
                     card2 = new Card(j, 2);
                     if (card1.getValue() == card2.getValue()) {
                         equity = 0.0;
                     } else {
-                        equity = PokerEquilatorBrecher.strengthOnFlop(card1, card2, flop1, flop2, flop3);
+                        equity = EQUILATOR.strengthOnFlop(card1, card2, flop1, flop2, flop3);
                     }
                 }
                 result += equity * handWeightMatrix[i][j];

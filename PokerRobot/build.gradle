@@ -8,6 +8,7 @@ sourceSets {
 
 dependencies {
 	compile project(':Tools')
+	compile project(':UITools')
 	compile project(':FellOmenBot')
 	compile project(':MallorcaCore')
 	compile project(':MallorcaBrains')

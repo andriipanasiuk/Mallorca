@@ -18,6 +18,8 @@ import java.util.concurrent.ExecutorService;
 
 import javax.swing.JOptionPane;
 
+import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.Advice;
@@ -33,7 +35,7 @@ import mallorcatour.hhparser.core.NNConverter;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerExamples;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.situation.handler.SituationHandler;
+import mallorcatour.core.game.situation.observer.SituationHandler;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.ExecutorUtils;
 import mallorcatour.tools.Log;
@@ -207,7 +209,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseTournamentsWithHandler(new SituationHandler(true, "Andrew"));
+                parseTournamentsWithHandler(new SituationHandler(true, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
             }
         });
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -216,7 +218,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseHandsWithHandler(new SituationHandler(LimitType.FIXED_LIMIT, "Andrew"));
+                parseHandsWithHandler(new SituationHandler(LimitType.FIXED_LIMIT, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
             }
         });
     }//GEN-LAST:event_jMenuItem2ActionPerformed
@@ -225,7 +227,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseHandsWithoutAdvices("Waterhouse", new SituationHandler(LimitType.FIXED_LIMIT, "Waterhouse"));
+                parseHandsWithoutAdvices("Waterhouse", new SituationHandler(LimitType.FIXED_LIMIT, "Waterhouse", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
             }
         });
     }//GEN-LAST:event_jMenuItem3ActionPerformed
@@ -285,7 +287,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         BaseHandHandler handHandler = new BaseHandHandler();
 		PAHHParser.parseHandHistory(path, handHandler);
 		List<PokerLearningExample> examples = NNConverter.parseLocalSituationsWithoutAdvices(handHandler.buildHands(),
-				"Andrew", new SituationHandler(LimitType.FIXED_LIMIT, "Andrew"));
+				"Andrew", new SituationHandler(LimitType.FIXED_LIMIT, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
 		path = FrameUtils.openFileChooser(this, "./");
         if (path == null) {
             return;

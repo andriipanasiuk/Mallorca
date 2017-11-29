@@ -19,20 +19,20 @@ import java.util.List;
 import mallorcatour.advice.creator.SmartAdviceCreator;
 import mallorcatour.advice.creator.SmartPostflopAdviceCreator;
 import mallorcatour.advice.creator.SmartRiverAdviceCreator;
-import mallorcatour.bot.interfaces.IPlayer;
 import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
+import mallorcatour.core.game.interfaces.Equilator;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.tools.Log;
 
-//import com.ibot.HandPotential;
-/** 
+/**
  * Ian Bot Impl
  * 
  * Description: {Insert Description here}
@@ -52,6 +52,7 @@ public class FellOmen2 implements IPlayer {
     private int flopBoardIndex;
     private int preflopHistory = -1, flopHistory = -1, turnHistory = -1;
     private final String DEBUG;
+    private final static Equilator EQUILATOR = new PokerEquilatorBrecher();
 
     public FellOmen2(String debug) {
         preprocessor = new FLActionPreprocessor();
@@ -336,7 +337,7 @@ public class FellOmen2 implements IPlayer {
             Log.f(DEBUG, "FLOP: " + flop1 + " " + flop2 + " " + flop3);
             flopBoardIndex = FellOmenHelper.getFlopBoardIndex(flop1, flop2, flop3);
             Log.f(DEBUG, "Flop board index: " + flopBoardIndex);
-            flopEquity = PokerEquilatorBrecher.equityOnFlopFull(
+            flopEquity = EQUILATOR.equityOnFlopFull(
                     holeCard1, holeCard2, flop1, flop2, flop3, true);
         } else if (street == PokerStreet.TURN) {
             flop1 = board.get(0);
@@ -345,7 +346,7 @@ public class FellOmen2 implements IPlayer {
             turn = board.get(3);
             flopBoardIndex = FellOmenHelper.getFlopBoardIndex(flop1, flop2, flop3);
             Log.f(DEBUG, "TURN: " + flop1 + " " + flop2 + " " + flop3 + " " + turn);
-            turnEquity = PokerEquilatorBrecher.equityOnTurn(
+            turnEquity = EQUILATOR.equityOnTurn(
                     holeCard1, holeCard2, flop1, flop2, flop3, turn);
         } else if (street == PokerStreet.RIVER) {
             flop1 = board.get(0);
@@ -355,7 +356,7 @@ public class FellOmen2 implements IPlayer {
             river = board.get(4);
             flopBoardIndex = FellOmenHelper.getFlopBoardIndex(flop1, flop2, flop3);
             Log.f(DEBUG, "RIVER: " + flop1 + " " + flop2 + " " + flop3 + " " + turn + " " + river);
-            riverStrength = PokerEquilatorBrecher.strengthOnRiver(
+            riverStrength = EQUILATOR.strengthOnRiver(
                     holeCard1, holeCard2, flop1, flop2, flop3, turn, river);
         }
     }

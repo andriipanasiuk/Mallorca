@@ -5,7 +5,7 @@
 package fellomen.bot;
 
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.bot.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.brains.IAdvisor;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.interfaces.ISpectrumListener;
