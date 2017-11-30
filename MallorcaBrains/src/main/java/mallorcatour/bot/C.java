@@ -35,6 +35,6 @@ public class C {
 	public static final String SECOND = "seco" + "nd";
 
 	public static class Preferences{
-		public static final String LOG_PATH = "./logs/log_";
+		public static final String LOG_PATH = "./log_";
 	}
 }

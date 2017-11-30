@@ -349,9 +349,9 @@ public class GameEngine implements IGameInfo {
 
 	private SimplePair<IPlayer, OpenPlayerInfo> getPlayer(boolean onButton) {
 		if (playerInfo1.isOnButton() ^ !onButton) {
-			return new SimplePair<IPlayer, OpenPlayerInfo>(player1, playerInfo1);
+			return new SimplePair<>(player1, playerInfo1);
 		} else {
-			return new SimplePair<IPlayer, OpenPlayerInfo>(player2, playerInfo2);
+			return new SimplePair<>(player2, playerInfo2);
 		}
 	}
 

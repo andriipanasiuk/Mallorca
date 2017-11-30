@@ -48,7 +48,6 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver {
 	private final Object actionLock = new Object();
 	private final ShowingSpectrumListener spectrumListener;
 	private boolean useGoButton = false;
-	private PlayerStatModel villainModeller;
 	private final String DEBUG_PATH;
 	private GameEngine engine;
 	private Action lastMove;
@@ -61,11 +60,12 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver {
 		spectrumListener = new ShowingSpectrumListener();
 		Log.WRITE_TO_ERR = false;
 		DEBUG_PATH = C.Preferences.LOG_PATH + DateUtils.getDate(false) + ".txt";
-		villainModeller = new PlayerStatModel(DEBUG_PATH);
+		PlayerStatModel villainModeller = new PlayerStatModel(DEBUG_PATH);
 		NeuralBotFactory factory = new NeuralBotFactory(new GusXensen(), "Gus Xensen");
 		playerUp = factory.createBot(AdvisorListener.NONE,
 				AdvisorListener.NONE, "Grantorino Up", DEBUG_PATH);
-		playerDown = factory.createBot(AdvisorListener.NONE, AdvisorListener.NONE, "Grantorino Down", DEBUG_PATH);
+		playerDown = new HumanPlayer();
+//		factory.createBot(AdvisorListener.NONE, AdvisorListener.NONE, "Grantorino Down", DEBUG_PATH);
 		engine = new GameEngine(playerDown, playerUp, this, new PokerEquilatorBrecher(), DEBUG_PATH);
 		enableActionButtons(false);
 		humanDealerButton.setVisible(false);
@@ -495,7 +495,8 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver {
 	private void aggressiveButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_aggressiveButtonActionPerformed
 		botActionLabel.setText("");
 		enableActionButtons(false);
-		lastMove = Action.aggressive();
+		lastMove = Action.createRaiseAction(gameInfo.getAmountToCall("Andrew"), gameInfo.getPotSize(),
+				gameInfo.getBankRollAtRisk());
 		synchronized (actionLock) {
 			actionLock.notifyAll();
 		}
