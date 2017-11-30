@@ -35,7 +35,7 @@ public class GameEngine implements IGameInfo {
 		public static final int UNCONTESTED = 4;
 	}
 
-	private IGameObserver<IGameInfo> gameObserver;
+	private IGameObserver gameObserver;
 
 	private final double startingStack = 2000;
 	private final double START_BIG_BLIND = 20;
@@ -60,7 +60,7 @@ public class GameEngine implements IGameInfo {
 	private OpenPlayerInfo playerInfo1, playerInfo2;
 	private final HandEvaluator equilator;
 
-	public GameEngine(IPlayer player1, IPlayer player2, IGameObserver<IGameInfo> observer, HandEvaluator equilator, String debug) {
+	public GameEngine(IPlayer player1, IPlayer player2, IGameObserver observer, HandEvaluator equilator, String debug) {
 		this.player1 = player1;
 		this.player2 = player2;
 		this.gameObserver = observer;

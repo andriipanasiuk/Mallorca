@@ -15,10 +15,10 @@ public class GusXensenAggressiveFactory extends BaseBotFactory {
 	public IPlayer createBot(AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug) {
 		GusXensen player = new GusXensen();
 		NeuralAdvisorImpl advisor = new NeuralAdvisorImpl(player, player.getStats(), "Gus Xensen", new AggroAdviceCreator());
-		Player realPlayer = new Player(new NLPreflopChart(), advisor, name,
+		StrengthHandStateObserver stateObserver = createHandler(true, name);
+		Player realPlayer = new Player(new NLPreflopChart(), advisor, stateObserver, name,
 				debug);
-		StrengthHandStateObserver handler = createHandler(true, name);
-		realPlayer.set(handler, handler, handler);
+		realPlayer.set(stateObserver, stateObserver);
 		return realPlayer;
 	}
 

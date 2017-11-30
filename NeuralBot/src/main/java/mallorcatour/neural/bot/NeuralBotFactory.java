@@ -20,11 +20,11 @@ public class NeuralBotFactory extends BaseBotFactory {
     @Override
     public IPlayer createBot(AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug) {
         NeuralAdvisorImpl advisor = new NeuralAdvisorImpl(pokerNeurals, pokerNeurals.getStats(), neuralName);
-        Player player = new Player(Advisor.UNSUPPORTED, advisor, name,
+        StrengthHandStateObserver stateObserver = createHandler(true, name);
+        Player player = new Player(Advisor.UNSUPPORTED, advisor, stateObserver, name,
                 debug);
-        player.setStudent(heroListener);
-        StrengthHandStateObserver handler = createHandler(true, name);
-        player.set(handler, handler, handler);
+        player.setAdvisorListener(heroListener);
+        player.set(stateObserver, stateObserver);
         return player;
     }
 }

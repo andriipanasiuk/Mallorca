@@ -20,7 +20,7 @@ public class PredefinedGameEngine extends GameEngine {
 	private List<SimplePair<IPlayer, Double>> predefinedStacks = new ArrayList<>();
 	private String flop;
 
-	public PredefinedGameEngine(IPlayer player1, IPlayer player2, IGameObserver<IGameInfo> observer,
+	public PredefinedGameEngine(IPlayer player1, IPlayer player2, IGameObserver observer,
 								HandEvaluator equilator, String debug) {
 		super(player1, player2, observer, equilator, debug);
 	}

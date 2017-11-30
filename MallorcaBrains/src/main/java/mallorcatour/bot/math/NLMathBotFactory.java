@@ -39,11 +39,11 @@ public class NLMathBotFactory extends BaseBotFactory {
 				strengthManager, name, false);
 		EVAdvisor evAdvisor = new EVAdvisor(villainModel, strengthManager, villainObserver, debug);
 
-		Player player = new Player(preflopAdvisor, evAdvisor, name,
-				debug);
-		player.setStudent(heroListener);
 		StrengthHandStateObserver stateObserver = createHandler(true, name);
-		player.set(stateObserver, new GameObservers(stateObserver, villainObserver, strengthManager),
+		Player player = new Player(preflopAdvisor, evAdvisor, stateObserver, name,
+				debug);
+		player.setAdvisorListener(heroListener);
+		player.set(new GameObservers(stateObserver, villainObserver, strengthManager),
 				new HoleCardsObservers(villainObserver, stateObserver));
 		return player;
 	}

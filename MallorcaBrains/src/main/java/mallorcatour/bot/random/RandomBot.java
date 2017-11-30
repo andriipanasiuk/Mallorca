@@ -14,7 +14,7 @@ public class RandomBot extends ObservingPlayer implements IPlayer {
 
 	public RandomBot(String name, String debug) {
 		super(name, debug);
-		set(null, IGameObserver.EMPTY, IHoleCardsObserver.EMPTY);
+		set(IGameObserver.EMPTY, IHoleCardsObserver.EMPTY);
 	}
 
 	@Override

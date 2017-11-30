@@ -6,6 +6,7 @@ import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 import mallorcatour.core.game.state.HandStateHolder;
 
 /**
@@ -13,12 +14,11 @@ import mallorcatour.core.game.state.HandStateHolder;
  * текущим состоянием раздачи, видит карты игрока, но у него нет компетенции для того,
  * чтобы сделать правильный ход.
  */
-public abstract class ObservingPlayer implements IGameObserver<IPlayerGameInfo>, IHoleCardsObserver {
+public abstract class ObservingPlayer implements IPlayerGameObserver, IHoleCardsObserver {
 	protected IPlayerGameInfo gameInfo;
-	protected HandStateHolder situationHandler;
 	protected final String DEBUG_PATH;
 	protected Card heroCard1, heroCard2;
-	protected IGameObserver<IPlayerGameInfo> gameObserver;
+	protected IGameObserver gameObserver;
 	private IHoleCardsObserver cardsObserver;
 	protected final String name;
 
@@ -27,8 +27,7 @@ public abstract class ObservingPlayer implements IGameObserver<IPlayerGameInfo>,
 		this.DEBUG_PATH = debug;
 	}
 
-	public void set(HandStateHolder situationHandler, IGameObserver observer, IHoleCardsObserver cardsObserver) {
-		this.situationHandler = situationHandler;
+	public void set(IGameObserver observer, IHoleCardsObserver cardsObserver) {
 		this.gameObserver = observer;
 		this.cardsObserver = cardsObserver;
 	}

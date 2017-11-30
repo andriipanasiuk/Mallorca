@@ -14,7 +14,7 @@ public class PushBot extends ObservingPlayer implements IPlayer {
 
 	public PushBot(String name, String debug) {
 		super(name, debug);
-		set(null, IGameObserver.EMPTY, IHoleCardsObserver.EMPTY);
+		set(IGameObserver.EMPTY, IHoleCardsObserver.EMPTY);
 	}
 
 	@Override

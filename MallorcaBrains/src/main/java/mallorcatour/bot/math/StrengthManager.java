@@ -17,7 +17,7 @@ import mallorcatour.core.spectrum.Spectrum;
  * Следит за игрой и считает силу (эквити) всех возможных карманных карт
  * на каждой улице.
  */
-public class StrengthManager implements IGameObserver<IGameInfo> {
+public class StrengthManager implements IGameObserver {
 
 	public Map<HoleCards, StreetEquity> preflop = new HashMap<>();
 	public Map<HoleCards, StreetEquity> flop = new HashMap<>();

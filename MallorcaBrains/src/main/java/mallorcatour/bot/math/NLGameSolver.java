@@ -18,23 +18,29 @@ import mallorcatour.core.game.state.HandState;
 import mallorcatour.core.game.state.StreetEquity;
 import mallorcatour.core.math.RandomVariable;
 import mallorcatour.core.spectrum.Spectrum;
+import mallorcatour.equilator.SpectrumEquilatorImpl;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.tools.Log;
 
 /**
- * 
- * @author Andrew
+ * Основополагающий класс для мат-бота, в котором реализована логика
+ * рассчёта прибыли (или убытка) после каждого из возможных ходов.
+ * При этом рассчитываются всевозможные варианты развития раздачи
+ * до окончания улицы (то есть до того, как кто-то из игроков уравняет ставку или сбросит карты).
+ * Просчитывая варианты развития событий мы предполагаем с какими картами противник походит именно так.
+ * Это делается для того, чтобы на момент уравнивания ставки мы считали нашу ожидаемую прибыль
+ * исходя из того с какими картами противник
+ * мог бы дойти до сложившегося состояния раздачи.
  */
 public class NLGameSolver implements IGameSolver {
 
 	public static boolean LOGGING = true;
-	public static boolean CONSIDER_PREV_POT = false;
 	private final static double NEARLY_ZERO = 0.0001;
 	private final static double DEFAULT_POSITIVE_POTENTIAL = 0.1;
 	private final static double DEFAULT_NEGATIVE_POTENTIAL = 0.1;
 	private final Advisor villainModel;
-	//TODO
-	private final PreflopEquilator preflopEquilator = null;
-	private final SpectrumEquilator spectrumEquilator = null;
+	private final PreflopEquilator preflopEquilator = new PreflopEquilatorImpl();
+	private final SpectrumEquilator spectrumEquilator = new SpectrumEquilatorImpl();
 
 	public NLGameSolver(Advisor villainModel) {
 		this.villainModel = villainModel;

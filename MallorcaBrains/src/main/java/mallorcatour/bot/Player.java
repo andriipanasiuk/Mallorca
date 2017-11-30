@@ -8,6 +8,7 @@ import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.HandStateHolder;
 import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.tools.Log;
 
@@ -21,11 +22,13 @@ public class Player extends ObservingPlayer implements IPlayer {
 	private final IActionPreprocessor actionPreprocessor = new NLActionPreprocessor();
 	private final Advisor preflopAdvisor;
 	private final Advisor postflopAdvisor;
+	private final HandStateHolder stateHolder;
 	private AdvisorListener student = AdvisorListener.NONE;
 
 	public Player(Advisor preflopAdvisor, Advisor commonAdvisor,
-				  String name, String debug) {
+				  HandStateHolder stateHolder, String name, String debug) {
 		super(name, debug);
+		this.stateHolder = stateHolder;
 		if (commonAdvisor == null || commonAdvisor == Advisor.UNSUPPORTED) {
 			throw new IllegalArgumentException("Common advisor must not be null");
 		}
@@ -33,7 +36,7 @@ public class Player extends ObservingPlayer implements IPlayer {
 		this.postflopAdvisor = commonAdvisor;
 	}
 
-	public void setStudent(AdvisorListener student) {
+	public void setAdvisorListener(AdvisorListener student) {
 		this.student = student;
 	}
 
@@ -44,7 +47,7 @@ public class Player extends ObservingPlayer implements IPlayer {
 	@Override
 	public Action getAction() {
 		long time = System.currentTimeMillis();
-		HandState situation = situationHandler.getSituation();
+		HandState situation = stateHolder.getSituation();
 		IAdvice advice = null;
 		HoleCards cards = new HoleCards(heroCard1, heroCard2);
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");

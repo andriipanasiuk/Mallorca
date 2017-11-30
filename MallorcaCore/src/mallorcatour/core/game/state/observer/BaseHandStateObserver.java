@@ -13,7 +13,7 @@ import mallorcatour.tools.Log;
  * который определяет текущую сложившуюся ситуацию в игре между 2 игроками.
  * Переименовать в HandStateObserver
  */
-public class BaseHandStateObserver implements HandStateHolder, IGameObserver<IGameInfo> {
+public class BaseHandStateObserver implements HandStateHolder, IGameObserver {
 	private int heroActionCount, countOfHeroAggressive, villainActionCount, countOfOppAggressive;
 	private boolean wasHeroPreviousAggressive, wasVillainPreviousAggressive;
 	protected IGameInfo gameInfo;

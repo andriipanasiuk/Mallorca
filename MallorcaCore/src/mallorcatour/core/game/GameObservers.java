@@ -38,4 +38,5 @@ public class GameObservers implements IGameObserver {
 			observer.onHandEnded();
 		}
 	}
+
 }

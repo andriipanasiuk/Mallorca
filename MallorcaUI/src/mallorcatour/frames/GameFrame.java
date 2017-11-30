@@ -38,7 +38,7 @@ import mallorcatour.util.frames.FrameUtils;
  * 
  * @author Andrew
  */
-public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGameInfo> {
+public class GameFrame extends javax.swing.JFrame implements IGameObserver {
 
 	/**
 	 * 

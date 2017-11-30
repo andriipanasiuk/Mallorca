@@ -31,7 +31,7 @@ import mallorcatour.tools.Log;
  * @author andriipanasiuk
  * 
  */
-public class SpectrumPlayerObserver implements IGameObserver<IGameInfo>, ISpectrumHolder, IHoleCardsObserver {
+public class SpectrumPlayerObserver implements IGameObserver, ISpectrumHolder, IHoleCardsObserver {
 	private Spectrum spectrum;
 	private Spectrum randomSpectrum;
 	private Advisor model;
