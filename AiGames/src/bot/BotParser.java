@@ -23,7 +23,7 @@ import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.equilator.preflop.PreflopEquilatorImpl.LoadFrom;
-import mallorcatour.modeller.PlayerStatModel;
+import mallorcatour.neural.modeller.PlayerStatModel;
 import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 

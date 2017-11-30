@@ -3,7 +3,6 @@ package mallorcatour.bot.math;
 import java.util.Map;
 
 import mallorcatour.bot.C;
-import mallorcatour.bot.math.AggressionInfoBuilder.AggressionInfo;
 import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
@@ -261,7 +260,7 @@ public class NLGameSolver implements IGameSolver {
 		double villainToCall = heroActionAmount;
 		double villainPot = pot;
 		double villainEffectiveStack = effectiveStack;
-		AggressionInfo newInfo = AggressionInfoBuilder.build(info).plusHeroAction();
+		AggressionInfoBuffer newInfo = AggressionInfoBuilder.build(info).plusHeroAction();
 		if (wasHeroPreviousAggressive) {
 			newInfo.plusHeroAggressiveAction();
 		}

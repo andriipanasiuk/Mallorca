@@ -1,4 +1,4 @@
-package mallorcatour.modeller;
+package mallorcatour.neural.modeller;
 
 import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.core.game.HoleCards;

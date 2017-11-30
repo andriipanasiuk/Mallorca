@@ -12,7 +12,7 @@ import mallorcatour.core.game.engine.PredefinedGameEngine;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.equilator.PokerEquilatorBrecher;
-import mallorcatour.modeller.PlayerStatModel;
+import mallorcatour.neural.modeller.PlayerStatModel;
 import mallorcatour.neural.bot.NeuralBotFactory;
 import mallorcatour.neural.bot.checkburn.CheckBurn;
 import mallorcatour.neural.bot.cuba.Cuba;

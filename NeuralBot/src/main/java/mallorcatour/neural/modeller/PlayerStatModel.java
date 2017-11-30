@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mallorcatour.modeller;
+package mallorcatour.neural.modeller;
 
 import mallorcatour.bot.C;
 import mallorcatour.core.game.advice.Advisor;

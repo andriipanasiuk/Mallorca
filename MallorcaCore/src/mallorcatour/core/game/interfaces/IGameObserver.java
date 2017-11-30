@@ -5,7 +5,7 @@ import mallorcatour.core.game.PokerStreet;
 
 public interface IGameObserver<P extends IGameInfo> {
 	@SuppressWarnings("rawtypes")
-	public static final IGameObserver EMPTY = new IGameObserver() {
+	IGameObserver EMPTY = new IGameObserver() {
 
 		@Override
 		public void onStageEvent(PokerStreet street) {
@@ -31,7 +31,7 @@ public interface IGameObserver<P extends IGameInfo> {
 	/**
 	 * A new betting round has started. Not called on preflop.
 	 */
-	public void onStageEvent(PokerStreet street);
+	void onStageEvent(PokerStreet street);
 
 	/**
 	 * A new game has been started.
@@ -39,9 +39,9 @@ public interface IGameObserver<P extends IGameInfo> {
 	 * @param gi
 	 *            the game stat information
 	 */
-	public void onActed(Action action, double toCall, String name);
+	void onActed(Action action, double toCall, String name);
 
-	public void onHandStarted(P gameInfo);
+	void onHandStarted(P gameInfo);
 
-	public void onHandEnded();
+	void onHandEnded();
 }

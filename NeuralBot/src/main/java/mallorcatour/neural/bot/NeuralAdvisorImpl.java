@@ -16,7 +16,7 @@ import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.state.HandState;
-import mallorcatour.modeller.NeuralAdvisor;
+import mallorcatour.neural.modeller.NeuralAdvisor;
 import mallorcatour.stats.PokerStats;
 import mallorcatour.tools.Log;
 
