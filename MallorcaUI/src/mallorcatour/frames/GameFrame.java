@@ -13,9 +13,9 @@ package mallorcatour.frames;
 import java.awt.EventQueue;
 
 import mallorcatour.bot.C;
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.player.interfaces.IPlayer;
-import mallorcatour.Advisor;
+import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
@@ -25,9 +25,9 @@ import mallorcatour.core.game.engine.GameEngine;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.interfaces.ISpectrumListener;
-import mallorcatour.neural.bot.gusxensen.GusXensenFactory;
 import mallorcatour.modeller.PlayerStatModel;
+import mallorcatour.neural.bot.NeuralBotFactory;
+import mallorcatour.neural.bot.gusxensen.GusXensen;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.ExecutorUtils;
 import mallorcatour.tools.Log;
@@ -63,11 +63,10 @@ public class GameFrame extends javax.swing.JFrame implements IGameObserver<IGame
 		Log.WRITE_TO_ERR = false;
 		DEBUG_PATH = C.Preferences.LOG_PATH + DateUtils.getDate(false) + ".txt";
 		villainModeller = new PlayerStatModel(DEBUG_PATH);
-		GusXensenFactory factory = new GusXensenFactory();
-		playerUp = factory.createBot(Advisor.UNSUPPORTED, ISpectrumListener.EMPTY, AdvisorListener.NONE,
+		NeuralBotFactory factory = new NeuralBotFactory(new GusXensen(), "Gus Xensen");
+		playerUp = factory.createBot(AdvisorListener.NONE,
 				AdvisorListener.NONE, "Grantorino Up", DEBUG_PATH);
-		playerDown = new GusXensenFactory().createBot(Advisor.UNSUPPORTED, ISpectrumListener.EMPTY,
-				AdvisorListener.NONE, AdvisorListener.NONE, "Grantorino Down", DEBUG_PATH);
+		playerDown = factory.createBot(AdvisorListener.NONE, AdvisorListener.NONE, "Grantorino Down", DEBUG_PATH);
 		engine = new GameEngine(playerDown, playerUp, this, new PokerEquilatorBrecher(), DEBUG_PATH);
 		enableActionButtons(false);
 		humanDealerButton.setVisible(false);

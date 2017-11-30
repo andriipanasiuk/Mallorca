@@ -1,18 +1,11 @@
 package mallorcatour.neural.bot.dafish2;
 
-import mallorcatour.neural.bot.IPokerNeurals;
+import mallorcatour.neural.bot.BaseNeural;
+import mallorcatour.neural.core.NeuralCreator;
 import mallorcatour.stats.PokerStats;
 import mallorcatour.stats.PokerStatsImpl;
-import mallorcatour.neural.core.NeuralCreator;
 
-import org.neuroph.core.NeuralNetwork;
-
-public class Dafish2 implements IPokerNeurals {
-
-	private NeuralNetwork<?> preflop;
-	private NeuralNetwork<?> flop;
-	private NeuralNetwork<?> turn;
-	private NeuralNetwork<?> river;
+public class Dafish2 extends BaseNeural {
 
 	public Dafish2() {
 		preflop = NeuralCreator.createPerceptron(new PreflopNeuralDafish2());
@@ -21,33 +14,13 @@ public class Dafish2 implements IPokerNeurals {
 		river = NeuralCreator.createPerceptron(new RiverNeuralDafish2());
 	}
 
-	@Override
-	public NeuralNetwork<?> getRiver() {
-		return river;
-	}
-
-	@Override
-	public NeuralNetwork<?> getTurn() {
-		return turn;
-	}
-
-	@Override
-	public NeuralNetwork<?> getFlop() {
-		return flop;
-	}
-
-	@Override
-	public NeuralNetwork<?> getPreflop() {
-		return preflop;
-	}
-
 	public PokerStats getStats() {
 		return new PokerStatsImpl(0.66, 0.53, 0.35, 0.62);
 	}
 
 	@Override
-	public String getName() {
-		return "DaFish2";
+	public String toString() {
+		return "DaFish2 Neural";
 	}
 
 }

@@ -9,12 +9,10 @@ import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
-/**
- *
- * @author Andrew
- */
-public interface IPlayer extends IGameObserver<IPlayerGameInfo>, IHoleCardsObserver, HasName {
+public interface IPlayer extends IGameObserver<IPlayerGameInfo>, IHoleCardsObserver/*, HasName*/ {
 
     Action getAction();
+
+    String getName();
 
 }

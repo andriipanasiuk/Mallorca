@@ -19,7 +19,7 @@ import java.util.List;
 import mallorcatour.advice.creator.SmartAdviceCreator;
 import mallorcatour.advice.creator.SmartPostflopAdviceCreator;
 import mallorcatour.advice.creator.SmartRiverAdviceCreator;
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;
@@ -28,7 +28,7 @@ import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.interfaces.Equilator;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.game.state.StreetEquity;
 import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.tools.Log;
 

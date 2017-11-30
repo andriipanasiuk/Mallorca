@@ -2,7 +2,7 @@ package mallorcatour.core.game.interfaces;
 
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
-import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.game.state.StreetEquity;
 
 public interface Equilator {
     double strengthOnRiver(Card holeCard1, Card holeCard2, Card flop1, Card flop2, Card flop3, Card turn, Card river);

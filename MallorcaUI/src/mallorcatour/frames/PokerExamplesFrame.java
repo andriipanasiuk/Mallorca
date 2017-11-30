@@ -19,8 +19,8 @@ import javax.swing.JOptionPane;
 
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.situation.HandState;
-import mallorcatour.core.game.situation.LocalSituationDistance;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.HandStateDifference;
 import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.EuclidDistanceMod;
 import mallorcatour.core.vector.VectorUtils;
@@ -607,7 +607,7 @@ public class PokerExamplesFrame extends javax.swing.JFrame {
         if (selectedExample == null) {
             return;
         }
-        LocalSituationDistance distance = new LocalSituationDistance();
+        HandStateDifference distance = new HandStateDifference();
         sameExamplesModel.clear();
         int count = 0;
         double[] averageOutput = new double[examples.get(0).getAdvice().getValues().size()];

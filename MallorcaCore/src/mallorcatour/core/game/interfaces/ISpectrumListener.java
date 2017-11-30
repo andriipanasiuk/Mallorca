@@ -10,6 +10,7 @@ import mallorcatour.core.spectrum.Spectrum;
  *
  * @author Andrew
  */
+//убрать этот интерфейс
 public interface ISpectrumListener {
 
     public static final ISpectrumListener EMPTY = new ISpectrumListener() {

@@ -10,12 +10,12 @@ import mallorcatour.core.game.interfaces.Equilator;
 import mallorcatour.core.game.interfaces.IGameInfo;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.PreflopEquilator;
-import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.game.state.StreetEquity;
 import mallorcatour.core.spectrum.Spectrum;
 
 /**
- * @author andriipanasiuk
- *
+ * Следит за игрой и считает силу (эквити) всех возможных карманных карт
+ * на каждой улице.
  */
 public class StrengthManager implements IGameObserver<IGameInfo> {
 
@@ -60,8 +60,8 @@ public class StrengthManager implements IGameObserver<IGameInfo> {
 	private void calculateStrengthMap(PokerStreet street) {
 		long start = System.currentTimeMillis();
 		if (street == PokerStreet.FLOP) {
-			flop = new HashMap<HoleCards, StreetEquity>();
-			Map<Integer, StreetEquity> cache = new HashMap<Integer, StreetEquity>();
+			flop = new HashMap<>();
+			Map<Integer, StreetEquity> cache = new HashMap<>();
 			for (HoleCards holeCards : randomSpectrum) {
 				double strength = equilator.strengthOnFlop(holeCards.first, holeCards.second,
 						gameInfo.getFlop().first, gameInfo.getFlop().second, gameInfo.getFlop().third);
@@ -81,8 +81,8 @@ public class StrengthManager implements IGameObserver<IGameInfo> {
 				flop.put(holeCards, equity);
 			}
 		} else if (street == PokerStreet.TURN) {
-			turn = new HashMap<HoleCards, StreetEquity>();
-			Map<Integer, StreetEquity> cache = new HashMap<Integer, StreetEquity>();
+			turn = new HashMap<>();
+			Map<Integer, StreetEquity> cache = new HashMap<>();
 			for (HoleCards holeCards : randomSpectrum) {
 				double strength = equilator.strengthOnTurn(holeCards.first, holeCards.second,
 						gameInfo.getFlop().first, gameInfo.getFlop().second, gameInfo.getFlop().third,
@@ -99,7 +99,7 @@ public class StrengthManager implements IGameObserver<IGameInfo> {
 				turn.put(holeCards, eq);
 			}
 		} else if (street == PokerStreet.RIVER) {
-			river = new HashMap<HoleCards, StreetEquity>();
+			river = new HashMap<>();
 			for (HoleCards holeCards : randomSpectrum) {
 				double strength = equilator.strengthOnRiver(holeCards.first, holeCards.second,
 						gameInfo.getFlop().first, gameInfo.getFlop().second, gameInfo.getFlop().third,
@@ -115,7 +115,7 @@ public class StrengthManager implements IGameObserver<IGameInfo> {
 	public void onHandStarted(IGameInfo gameInfo) {
 		this.gameInfo = gameInfo;
 		randomSpectrum = Spectrum.random();
-		preflop = new HashMap<HoleCards, StreetEquity>();
+		preflop = new HashMap<>();
 		for (HoleCards holeCards : randomSpectrum) {
 			StreetEquity eq = preflopEquilator.equityVsRandom(holeCards.first, holeCards.second);
 			preflop.put(holeCards, eq);

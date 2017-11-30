@@ -1,6 +1,6 @@
 package mallorcatour.modeller;
 
-import mallorcatour.Advisor;
+import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.stats.PokerStats;
 
 /**

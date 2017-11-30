@@ -1,8 +1,8 @@
 package mallorcatour.core.equilator;
 
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Card;
-import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.game.state.StreetEquity;
+import mallorcatour.equilator.PokerEquilatorBrecher;
 
 /**
  * Песочница для проверок корректности эквилятора на картах, где присутствует флэш.

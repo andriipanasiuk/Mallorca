@@ -6,6 +6,11 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.math.RandomVariable;
 import mallorcatour.tools.FileUtils;
 
+/**
+ * Проецирует действия игрока на его возможный выигрыш впоследствии этого действия.
+ * Причем выигрыш задается значением {@link RandomVariable}, которое помимо
+ * математического ожидания выигрыша содержит еще информацию о дисперсии.
+ */
 public class ActionDistribution extends HashMap<Action, RandomVariable> {
 
 	/**

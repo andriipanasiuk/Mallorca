@@ -2,7 +2,7 @@ package mallorcatour.stats;
 
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Pair;
 

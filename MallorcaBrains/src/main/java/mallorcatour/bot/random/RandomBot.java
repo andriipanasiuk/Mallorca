@@ -6,10 +6,11 @@ import mallorcatour.bot.ObservingPlayer;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.interfaces.IGameObserver;
+import mallorcatour.core.player.interfaces.IPlayer;
 
-public class RandomBot extends ObservingPlayer {
+public class RandomBot extends ObservingPlayer implements IPlayer {
 
-	private Random random = new Random(System.currentTimeMillis());
+    private Random random = new Random(System.currentTimeMillis());
 
 	public RandomBot(String name, String debug) {
 		super(name, debug);
@@ -39,8 +40,8 @@ public class RandomBot extends ObservingPlayer {
 	}
 
 	@Override
-	public String getDefaultName() {
-		return "RandomBot";
+	public String getName() {
+		return name;
 	}
 
 }

@@ -5,8 +5,8 @@
 package mallorcatour.modeller;
 
 import mallorcatour.bot.C;
-import mallorcatour.Advisor;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.advice.Advisor;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.neural.bot.NeuralAdvisorImpl;
 import mallorcatour.neural.bot.checkburn.CheckBurn;
 import mallorcatour.neural.bot.cuba.Cuba;
@@ -103,19 +103,19 @@ public class PlayerStatModel implements NeuralAdvisor, AdvisorListener {
 		PokerStatsDistance distance = new PokerStatsDistance();
 		for (NeuralAdvisor neural : neurals) {
 			double error = distance.getDistance(this.getStats(), neural.getStats());
-			Log.f(DEBUG_PATH, "Difference with " + neural.getName() + ": " + error);
+			Log.f(DEBUG_PATH, "Difference with " + neural.toString() + ": " + error);
 			if (error < minError) {
 				minError = error;
 				currentNeural = neural;
 			}
 		}
-		Log.f(DEBUG_PATH, "Modelling " + currentNeural.getName() + " after " + situationCount + " situ-ns");
+		Log.f(DEBUG_PATH, "Modelling " + currentNeural.toString() + " after " + situationCount + " situ-ns");
 		Log.f(DEBUG_PATH, "Difference " + C.STATS + ": " + DoubleUtils.digitsAfterComma(minError, 2));
 	}
 
 	@Override
-	public String getName() {
-		return "Player model by " + currentNeural.getName();
+	public String toString() {
+		return "Player model by " + currentNeural.toString();
 	}
 
 	@Override

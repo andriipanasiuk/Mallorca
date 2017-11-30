@@ -27,8 +27,8 @@ import javax.swing.table.DefaultTableModel;
 import mallorcatour.advice.creator.SmartAdviceCreator;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.HandState;
-import mallorcatour.core.game.situation.LocalSituationDistance;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.HandStateDifference;
 import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.EuclidDistanceMod;
 import mallorcatour.core.vector.IVector;
@@ -1816,7 +1816,7 @@ public class NNFrame extends javax.swing.JFrame {
             if (selectedExample.getInput().getValues().size() == 10) {
                 HandState selectedSituation = new HandState(selectedExample.getInput(), PokerStreet.FLOP_VALUE);
                 HandState currentSituation = new HandState(example.getInput(), PokerStreet.FLOP_VALUE);
-                if (new LocalSituationDistance().getDistance(selectedSituation,
+                if (new HandStateDifference().getDistance(selectedSituation,
                         currentSituation) < maxDistanceForSimilarity) {
                     List<Number> output = example.getOutput().getValues();
                     int i = 0;

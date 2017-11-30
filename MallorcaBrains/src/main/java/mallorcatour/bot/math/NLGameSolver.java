@@ -1,15 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mallorcatour.bot.math;
 
 import java.util.Map;
 
 import mallorcatour.bot.C;
 import mallorcatour.bot.math.AggressionInfoBuilder.AggressionInfo;
-import mallorcatour.Advisor;
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
+import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
@@ -18,8 +13,10 @@ import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
 import mallorcatour.core.game.interfaces.IGameInfo;
-import mallorcatour.core.game.situation.HandState;
-import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.game.interfaces.PreflopEquilator;
+import mallorcatour.core.game.interfaces.SpectrumEquilator;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.StreetEquity;
 import mallorcatour.core.math.RandomVariable;
 import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.tools.Log;
@@ -36,6 +33,9 @@ public class NLGameSolver implements IGameSolver {
 	private final static double DEFAULT_POSITIVE_POTENTIAL = 0.1;
 	private final static double DEFAULT_NEGATIVE_POTENTIAL = 0.1;
 	private final Advisor villainModel;
+	//TODO
+	private final PreflopEquilator preflopEquilator = null;
+	private final SpectrumEquilator spectrumEquilator = null;
 
 	public NLGameSolver(Advisor villainModel) {
 		this.villainModel = villainModel;
@@ -97,9 +97,9 @@ public class NLGameSolver implements IGameSolver {
 		double lose = heroInvestment;
 		double strength;
 		if (board.length > 0) {
-			strength = ProfitCalculator.profitVsSpectrum(heroCards.first, heroCards.second, board, villainSpectrum);
+			strength = spectrumEquilator.strengthVsSpectrum(heroCards.first, heroCards.second, board, villainSpectrum);
 		} else {
-			strength = PreflopEquilatorImpl.strengthVsSpectrum(heroCards.first, heroCards.second, villainSpectrum);
+			strength = preflopEquilator.strengthVsSpectrum(heroCards.first, heroCards.second, villainSpectrum);
 		}
 		RandomVariable result = new RandomVariable();
 		result.add(strength, win);
@@ -117,7 +117,7 @@ public class NLGameSolver implements IGameSolver {
 		ActionDistribution result = new ActionDistribution();
 		// if hero folds
 		double foldProfit = -heroInvestment;
-		log(depth, "If " + C.HERO + " " + C.FOLD + " he " + C.WINS + " " + (foldProfit != 0 ? foldProfit : 0));
+		log(depth, "If " + C.HERO + " " + C.FOLD + " he " + C.WINS + " " + (foldProfit));
 		result.put(Action.fold(), RandomVariable.create(foldProfit));
 
 		// if hero calls

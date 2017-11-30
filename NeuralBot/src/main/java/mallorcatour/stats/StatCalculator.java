@@ -5,17 +5,16 @@ import java.util.List;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdviceHolder;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.HandState;
-import mallorcatour.core.game.situation.HasSituation;
-import mallorcatour.core.game.situation.HandStateHolder;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.HandStateHolder;
 
 public class StatCalculator {
 
 	public static <T extends HandStateHolder & AdviceHolder> PokerStats calculate(List<T> list) {
 		PokerStatsBuffer info = new PokerStatsBuffer();
-		for (Object item : list) {
-			HandState situation = ((HasSituation) item).getSituation();
-			IAdvice advice = ((AdviceHolder) item).getAdvice();
+		for (T item : list) {
+			HandState situation = item.getSituation();
+			IAdvice advice = item.getAdvice();
 			changeStat(situation, advice, info);
 		}
 		return info;

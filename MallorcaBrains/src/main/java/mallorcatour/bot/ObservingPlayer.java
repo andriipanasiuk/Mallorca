@@ -1,20 +1,21 @@
 package mallorcatour.bot;
 
-import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
-import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IActionPreprocessor;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.HandStateHolder;
+import mallorcatour.core.game.state.HandStateHolder;
 
-public abstract class ObservingPlayer implements IPlayer {
+/**
+ * Это некий активный наблюдатель за игрой, который запоминает карты, пристально следит за
+ * текущим состоянием раздачи, видит карты игрока, но у него нет компетенции для того,
+ * чтобы сделать правильный ход.
+ */
+public abstract class ObservingPlayer implements IGameObserver<IPlayerGameInfo>, IHoleCardsObserver {
 	protected IPlayerGameInfo gameInfo;
 	protected HandStateHolder situationHandler;
-	protected final IActionPreprocessor actionPreprocessor;
 	protected final String DEBUG_PATH;
 	protected Card heroCard1, heroCard2;
 	protected IGameObserver<IPlayerGameInfo> gameObserver;
@@ -23,7 +24,6 @@ public abstract class ObservingPlayer implements IPlayer {
 
 	public ObservingPlayer(String name, String debug) {
 		this.name = name;
-		actionPreprocessor = new NLActionPreprocessor();
 		this.DEBUG_PATH = debug;
 	}
 
@@ -40,8 +40,6 @@ public abstract class ObservingPlayer implements IPlayer {
 	 *            your first hole card
 	 * @param c2
 	 *            your second hole card
-	 * @param seat
-	 *            your seat number at the table
 	 */
 	@Override
 	public void onHoleCards(Card c1, Card c2) {
@@ -60,9 +58,6 @@ public abstract class ObservingPlayer implements IPlayer {
 
 	/**
 	 * A new game has been started.
-	 * 
-	 * @param gi
-	 *            the game stat information
 	 */
 	@Override
 	public void onHandStarted(IPlayerGameInfo gameInfo) {
@@ -72,7 +67,7 @@ public abstract class ObservingPlayer implements IPlayer {
 
 	@Override
 	public void onActed(Action action, double toCall, String name) {
-		if (!name.equals(getName())) {
+		if (!name.equals(this.name)) {
 			gameObserver.onActed(action, toCall, name);
 		}
 	}
@@ -82,10 +77,4 @@ public abstract class ObservingPlayer implements IPlayer {
 		gameObserver.onHandEnded();
 	}
 
-	@Override
-	public String getName() {
-		return (name != null) ? name : getDefaultName();
-	}
-
-	public abstract String getDefaultName();
 }

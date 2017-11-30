@@ -4,38 +4,29 @@
  */
 package mallorcatour.robot.humanadvisor;
 
-import mallorcatour.bot.interfaces.IExternalAdvisor;
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.HoleCards;
+import mallorcatour.core.game.advice.Advisor;
+import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.tools.ExecutorUtils;
 import mallorcatour.tools.OnExceptionListener;
 
-/**
- *
- * @author Andrew
- */
-public abstract class AbstractHumanAdvisor implements IExternalAdvisor {
+public abstract class AbstractHumanAdvisor implements Advisor {
 
-	@Override
-    public Action getAction(final IPlayerGameInfo gameInfo) {
+    @Override
+    public IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo) {
         final Action[] result = new Action[1];
         final Object lock = new Object();
-        final IActionHolder holder = new IActionHolder() {
-
-            public void actionGot(Action action) {
-                result[0] = action;
-                synchronized (lock) {
-                    lock.notifyAll();
-                }
+        final IActionHolder holder = action -> {
+            result[0] = action;
+            synchronized (lock) {
+                lock.notifyAll();
             }
         };
         ExecutorUtils.newSingleThreadExecutor(OnExceptionListener.EMPTY).
-                submit(new Runnable() {
-
-            public void run() {
-                getPreflopAction(gameInfo, holder);
-            }
-        });
+                submit(() -> getPreflopAction(gameInfo, holder));
         synchronized (lock) {
             try {
                 lock.wait();
@@ -54,4 +45,5 @@ public abstract class AbstractHumanAdvisor implements IExternalAdvisor {
     }
 
     protected abstract void getPreflopAction(IPlayerGameInfo gameInfo, final IActionHolder actionHolder);
+
 }

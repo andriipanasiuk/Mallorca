@@ -11,5 +11,6 @@ repositories {
 dependencies {
     compile project(':MallorcaBrains')
     compile project(':MallorcaNeural')
+    compile project(':AdviceCreator')
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

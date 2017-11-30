@@ -22,7 +22,6 @@ import mallorcatour.modeller.PlayerStatModel;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.AdvisorListener;
-import mallorcatour.core.game.interfaces.ISpectrumListener;
 import mallorcatour.robot.ActionSynchronizer;
 import mallorcatour.robot.ResultListener;
 import mallorcatour.robot.controller.HUGameController;
@@ -343,11 +342,11 @@ public class PSTableDirector {
             LimitType limitType, String debug) {
         IPlayer player;
         if (limitType == LimitType.FIXED_LIMIT) {
-            player = FLbotFactory.createBot(villainModeller,
-                    ISpectrumListener.EMPTY, AdvisorListener.NONE, AdvisorListener.NONE, null, debug);
+            player = FLbotFactory.createBot(
+                    AdvisorListener.NONE, AdvisorListener.NONE, null, debug);
         } else if (limitType == LimitType.NO_LIMIT) {
-            player = NLbotFactory.createBot(villainModeller,
-                    ISpectrumListener.EMPTY, AdvisorListener.NONE, AdvisorListener.NONE, null, debug);
+            player = NLbotFactory.createBot(
+                    AdvisorListener.NONE, AdvisorListener.NONE, null, debug);
         } else {
             throw new RuntimeException();
         }

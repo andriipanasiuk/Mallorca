@@ -10,4 +10,5 @@ dependencies{
 	compile project(':MallorcaBrains')
 	compile project(':MallorcaCore')
 	compile project(':MallorcaEquilator')
+    compile project(':AdviceCreator')
 }

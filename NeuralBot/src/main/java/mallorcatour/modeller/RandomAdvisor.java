@@ -1,11 +1,11 @@
 package mallorcatour.modeller;
 
-import mallorcatour.Advisor;
+import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 
 public class RandomAdvisor implements Advisor {
 
@@ -22,7 +22,7 @@ public class RandomAdvisor implements Advisor {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return "Random advisor";
 	}
 

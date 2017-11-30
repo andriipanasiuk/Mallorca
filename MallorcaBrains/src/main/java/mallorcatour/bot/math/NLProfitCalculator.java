@@ -1,6 +1,6 @@
 package mallorcatour.bot.math;
 
-import mallorcatour.Advisor;
+import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.interfaces.IAggressionInfo;

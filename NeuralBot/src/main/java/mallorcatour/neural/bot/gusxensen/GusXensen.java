@@ -1,5 +1,6 @@
 package mallorcatour.neural.bot.gusxensen;
 
+import mallorcatour.neural.bot.BaseNeural;
 import mallorcatour.neural.bot.IPokerNeurals;
 import mallorcatour.stats.PokerStats;
 import mallorcatour.stats.PokerStatsImpl;
@@ -7,35 +8,10 @@ import mallorcatour.neural.core.NeuralCreator;
 
 import org.neuroph.core.NeuralNetwork;
 
-public class GusXensen implements IPokerNeurals {
-
-	private NeuralNetwork<?> preflop, flop, turn, river;
+public class GusXensen extends BaseNeural {
 
 	public GusXensen() {
-		preflop = NeuralCreator.createPerceptron(new PreflopNeuralGX());
-		flop = NeuralCreator.createPerceptron(new FlopNeuralGX());
-		turn = NeuralCreator.createPerceptron(new TurnNeuralGX());
-		river = NeuralCreator.createPerceptron(new RiverNeuralGX());
-	}
-
-	@Override
-	public NeuralNetwork<?> getRiver() {
-		return river;
-	}
-
-	@Override
-	public NeuralNetwork<?> getTurn() {
-		return turn;
-	}
-
-	@Override
-	public NeuralNetwork<?> getFlop() {
-		return flop;
-	}
-
-	@Override
-	public NeuralNetwork<?> getPreflop() {
-		return preflop;
+		super();
 	}
 
 	public PokerStats getStats() {
@@ -43,7 +19,7 @@ public class GusXensen implements IPokerNeurals {
 	}
 
 	@Override
-	public String getName() {
-		return "GusXensen";
+	public String toString() {
+		return "GusXensen Neural";
 	}
 }

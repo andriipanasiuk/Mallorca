@@ -12,8 +12,8 @@ import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceHolder;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.HandState;
-import mallorcatour.core.game.situation.HandStateHolder;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.HandStateHolder;
 
 /**
  *
@@ -40,7 +40,7 @@ public class PokerLearningExample implements HandStateHolder, AdviceHolder, ILea
     }
 
     /**
-     * @return the situation
+     * @return the state
      */
     @Override
     public HandState getSituation() {
@@ -48,7 +48,7 @@ public class PokerLearningExample implements HandStateHolder, AdviceHolder, ILea
     }
 
     /**
-     * @param situation the situation to set
+     * @param situation the state to set
      */
     public void setSituation(HandState situation) {
         this.situation = situation;

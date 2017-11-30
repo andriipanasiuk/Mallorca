@@ -6,7 +6,7 @@ package mallorcatour.neural.bot;
 
 import java.util.List;
 
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.core.vector.BaseVector;
 import mallorcatour.core.vector.IInputInterpreter;
 import mallorcatour.neural.core.VectorInterpreter;

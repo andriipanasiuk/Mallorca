@@ -1,16 +1,13 @@
 package mallorcatour.neural.bot.pbx;
 
-import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.PokerStats;
-import mallorcatour.stats.PokerStatsImpl;
-import mallorcatour.neural.core.NeuralCreator;
-
 import org.neuroph.core.NeuralNetwork;
 
-public class Pbx implements IPokerNeurals {
+import mallorcatour.neural.bot.BaseNeural;
+import mallorcatour.neural.core.NeuralCreator;
+import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsImpl;
 
-	private NeuralNetwork<?> preflop;
-	private NeuralNetwork<?> flop;
+public class Pbx extends BaseNeural {
 
 	public Pbx() {
 		preflop = NeuralCreator.createPerceptron(new PreflopNeuralPBX());
@@ -27,23 +24,13 @@ public class Pbx implements IPokerNeurals {
 		return flop;
 	}
 
-	@Override
-	public NeuralNetwork<?> getFlop() {
-		return flop;
-	}
-
-	@Override
-	public NeuralNetwork<?> getPreflop() {
-		return preflop;
-	}
-
 	public PokerStats getStats() {
 		return new PokerStatsImpl(0.99, 0.99, 0.96, 0.95);
 	}
 
 	@Override
-	public String getName() {
-		return "PBX";
+	public String toString() {
+		return "PBX Neural";
 	}
 
 }

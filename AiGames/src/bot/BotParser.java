@@ -15,15 +15,14 @@ import java.util.Scanner;
 
 import mallorcatour.bot.C;
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.bot.math.NLFullMathBotFactory;
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl.LoadFrom;
+import mallorcatour.bot.math.NLMathBotFactory;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdvisorListener;
-import mallorcatour.core.game.interfaces.ISpectrumListener;
 import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl.LoadFrom;
 import mallorcatour.modeller.PlayerStatModel;
 import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
@@ -98,8 +97,8 @@ public class BotParser {
 		Log.WRITE_TO_ERR = true;
 		PreflopEquilatorImpl.loadFrom = LoadFrom.CODE;
 		PlayerStatModel model = new PlayerStatModel(PlayerStatModel.GERMANY_NL_NEURAL, true);
-		IBotFactory factory = new NLFullMathBotFactory();
-		BotParser parser = new BotParser(factory.createBot(model, ISpectrumListener.EMPTY, model, AdvisorListener.NONE,
+		IBotFactory factory = new NLMathBotFactory(model);
+		BotParser parser = new BotParser(factory.createBot(model, AdvisorListener.NONE,
 				"Mallorca", ""));
 		parser.run();
 	}

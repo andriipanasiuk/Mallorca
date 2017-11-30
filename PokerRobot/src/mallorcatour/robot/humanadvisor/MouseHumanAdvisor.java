@@ -35,6 +35,11 @@ public class MouseHumanAdvisor extends AbstractHumanAdvisor {
         frame.setActionHolder(holder);
     }
 
+    @Override
+    public String toString() {
+        return "MouseHumanAdvisor";
+    }
+
     private class ActionHolder implements IActionHolder {
 
         private IActionHolder actionHolder;

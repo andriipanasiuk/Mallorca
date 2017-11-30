@@ -7,13 +7,13 @@ package mallorcatour.hhparser;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
+import mallorcatour.equilator.PokerEquilatorBrecher;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Hand;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.observer.StrengthHandStateObserver;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.core.game.situation.observer.SituationHandler;
 
 /**
  * 
@@ -22,13 +22,13 @@ import mallorcatour.core.game.situation.observer.SituationHandler;
 public class TournamentParser {
 
 	public static List<PokerLearningExample> parseLocalSituations(Tournament tournament, String heroName) {
-		SituationHandler situationHandler = new SituationHandler(true, heroName, new PokerEquilatorBrecher(),
+		StrengthHandStateObserver stateObserver = new StrengthHandStateObserver(true, heroName, new PokerEquilatorBrecher(),
 				new PreflopEquilatorImpl());
-		return parseLocalSituations(tournament, heroName, situationHandler);
+		return parseLocalSituations(tournament, heroName, stateObserver);
 	}
 
 	public static List<PokerLearningExample> parseLocalSituations(Tournament tournament, String heroName,
-			SituationHandler handler) {
+			StrengthHandStateObserver handler) {
 		List<PokerLearningExample> result = new ArrayList<PokerLearningExample>();
 
 		HandParser parser = new HandParser();

@@ -1,7 +1,7 @@
 package mallorcatour.core.equilator;
 
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
-import mallorcatour.core.equilator.preflop.PreflopStrengthTable;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
+import mallorcatour.equilator.preflop.PreflopStrengthTable;
 
 public class PreflopGenerationTest {
 

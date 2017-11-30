@@ -16,16 +16,16 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PlayerAction;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.game.state.observer.StrengthHandStateObserver;
 import mallorcatour.hhparser.core.HandManager;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.core.game.situation.observer.SituationHandler;
 
 /**
  *
  * @author Andrew
  */
-//TODO think about moving SituationHandler somewhere to avoid linking Mallorca project into HHParser.
+//TODO think about moving StrengthHandStateObserver somewhere to avoid linking Mallorca project into HHParser.
 public class HandParser {
 
     private GameInfo gameInfo;
@@ -40,12 +40,12 @@ public class HandParser {
     private Action heroPreviousAction;
     private List<PokerLearningExample> learningExamples;
 
-    private void doParsing(Hand hand, SituationHandler situationHandler) {
-        newHand(hand, situationHandler);
-        situationHandler.onStageEvent(PokerStreet.PREFLOP);
+    private void doParsing(Hand hand, StrengthHandStateObserver stateObserver) {
+        newHand(hand, stateObserver);
+        stateObserver.onStageEvent(PokerStreet.PREFLOP);
         List<PlayerAction> preflopActions = hand.getPreflopActions();
         for (PlayerAction action : preflopActions) {
-            processAction(action, situationHandler);
+            processAction(action, stateObserver);
         }
         if (hand.getFlop() != null) {
             gameInfo.changeStreet(PokerStreet.FLOP);
@@ -53,42 +53,42 @@ public class HandParser {
             board.add(flop.first);
             board.add(flop.second);
             board.add(flop.third);
-            situationHandler.onStageEvent(PokerStreet.FLOP);
+            stateObserver.onStageEvent(PokerStreet.FLOP);
         }
         if (hand.hasFlopActions()) {
             List<PlayerAction> flopActions = hand.getFlopActions();
             for (PlayerAction action : flopActions) {
-                processAction(action, situationHandler);
+                processAction(action, stateObserver);
             }
         }
         if (hand.getTurn() != null) {
             gameInfo.changeStreet(PokerStreet.TURN);
             Card turn = hand.getTurn();
             board.add(turn);
-            situationHandler.onStageEvent(PokerStreet.TURN);
+            stateObserver.onStageEvent(PokerStreet.TURN);
         }
         if (hand.hasTurnActions()) {
             List<PlayerAction> turnActions = hand.getTurnActions();
             for (PlayerAction action : turnActions) {
-                processAction(action, situationHandler);
+                processAction(action, stateObserver);
             }
         }
         if (hand.getRiver() != null) {
             gameInfo.changeStreet(PokerStreet.RIVER);
             Card river = hand.getRiver();
             board.add(river);
-            situationHandler.onStageEvent(PokerStreet.RIVER);
+            stateObserver.onStageEvent(PokerStreet.RIVER);
         }
         if (hand.hasRiverActions()) {
             List<PlayerAction> riverActions = hand.getRiverActions();
             for (PlayerAction action : riverActions) {
-                processAction(action, situationHandler);
+                processAction(action, stateObserver);
             }
         }
-        situationHandler.onHandEnded();
+        stateObserver.onHandEnded();
     }
 
-	public List<HandState> parse(Hand hand, String heroName, SituationHandler handler) {
+	public List<HandState> parse(Hand hand, String heroName, StrengthHandStateObserver handler) {
         heroPreviousAction = null;
         this.heroName = heroName;
         villainName = HandManager.getVillainName(hand, heroName);
@@ -98,7 +98,7 @@ public class HandParser {
         return situations;
     }
 
-	public List<PokerLearningExample> parseWithActions(Hand hand, String heroName, SituationHandler handler) {
+	public List<PokerLearningExample> parseWithActions(Hand hand, String heroName, StrengthHandStateObserver handler) {
         heroPreviousAction = null;
         this.heroName = heroName;
         villainName = HandManager.getVillainName(hand, heroName);
@@ -108,9 +108,9 @@ public class HandParser {
         return learningExamples;
     }
 
-    private void processAction(PlayerAction action, SituationHandler situationHandler) {
+    private void processAction(PlayerAction action, StrengthHandStateObserver stateObserver) {
         if (action.getName().equals(heroName)) {
-            onHeroAction(action.getAction(), situationHandler);
+            onHeroAction(action.getAction(), stateObserver);
         } else {
             double toCall = 0;
             if (heroPreviousAction != null) {
@@ -120,14 +120,14 @@ public class HandParser {
             } else {
                 toCall = gameInfo.pot / 1.5;
             }
-            onVillainAction(action.getAction(), toCall, situationHandler);
+            onVillainAction(action.getAction(), toCall, stateObserver);
         }
         if (action.getAction().isAggressive()) {
             gameInfo.raisesOnStreet[gameInfo.getStage().intValue()]++;
         }
     }
 
-    private void newHand(Hand hand, SituationHandler situationHandler) {
+    private void newHand(Hand hand, StrengthHandStateObserver stateObserver) {
         gameInfo = new GameInfo();
         gameInfo.heroInfo = hand.getPlayerInfo(heroName);
         gameInfo.villainInfo = hand.getPlayerInfo(villainName);
@@ -149,13 +149,13 @@ public class HandParser {
         board = new ArrayList<Card>();
         gameInfo.board = board;
         //callbacks
-        situationHandler.onHandStarted(gameInfo);
-        situationHandler.onHoleCards(holeCard1, holeCard2);
+        stateObserver.onHandStarted(gameInfo);
+        stateObserver.onHoleCards(holeCard1, holeCard2);
     }
 
-    private void onVillainAction(Action action, double toCall, SituationHandler situationHandler) {
+    private void onVillainAction(Action action, double toCall, StrengthHandStateObserver stateObserver) {
         processPot(action);
-        situationHandler.onActed(action, toCall, villainName);
+        stateObserver.onActed(action, toCall, villainName);
     }
 
     private Advice createFromAction(Action action) {
@@ -172,13 +172,13 @@ public class HandParser {
         return Advice.create(values);
     }
 
-    private void onHeroAction(Action action, SituationHandler situationHandler) {
-        HandState situation = situationHandler.getSituation();
+    private void onHeroAction(Action action, StrengthHandStateObserver stateObserver) {
+        HandState situation = stateObserver.getSituation();
         situations.add(situation);
         learningExamples.add(new PokerLearningExample(situation, createFromAction(action)));
         processPot(action);
         heroPreviousAction = action;
-        situationHandler.onActed(action, -1, heroName);
+        stateObserver.onActed(action, -1, heroName);
     }
 
     private void processPot(Action action) {

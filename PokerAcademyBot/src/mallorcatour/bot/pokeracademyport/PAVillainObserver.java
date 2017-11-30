@@ -13,7 +13,7 @@ import mallorcatour.bot.villainobserver.VillainStatistics;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
-import mallorcatour.core.game.situation.LocalSituation;
+import mallorcatour.core.game.state.LocalSituation;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.LEManager;
 import mallorcatour.tools.Log;
@@ -114,7 +114,7 @@ public class PAVillainObserver implements IVillainObserver {
                 currentVillain.addAggressionFrequencyInfo(new Pair<Integer, Integer>(0, 1));
             }
 //            Log.f(DEBUG, "PAVillainObserver. processStats() Aggr freq: " + currentVillain.getAggressionFrequency());
-//            Log.f(DEBUG, "PAVillainObserver. Villain situation: " + situation);
+//            Log.f(DEBUG, "PAVillainObserver. Villain state: " + state);
 //            Log.f(DEBUG, "PAVillainObserver. Villain action: " + action);
             if (situation.getPotOdds() != 0) {
                 if (action.isFold()) {

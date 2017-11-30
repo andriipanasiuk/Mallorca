@@ -97,18 +97,5 @@ public class AggressionInfoBuilder {
 			return this;
 		}
 
-		@Override
-		@Deprecated
-		public double getHeroAggresionFrequency() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		@Deprecated
-		public double getVillainAggresionFrequency() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
 	}
 }

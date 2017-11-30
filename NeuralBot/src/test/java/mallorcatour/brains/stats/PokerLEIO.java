@@ -9,7 +9,7 @@ import java.util.List;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.neural.core.LearningExample;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.tools.Log;

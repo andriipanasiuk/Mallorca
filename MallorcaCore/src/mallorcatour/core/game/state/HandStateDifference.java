@@ -1,0 +1,53 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mallorcatour.core.game.state;
+
+import mallorcatour.core.game.PokerStreet;
+import mallorcatour.core.vector.EuclidDistance;
+import mallorcatour.core.vector.IDistanceCalculator;
+import mallorcatour.core.vector.IVector;
+
+/**
+ * Считает численную разницу между разными состояниями раздачи.
+ */
+public class HandStateDifference implements IDistanceCalculator<HandState> {
+
+    private final double MAX_POTENTIAL = 0.4;
+    private static final IDistanceCalculator<IVector> DEFAULT_VECTOR_DISTANCE =
+            new EuclidDistance();
+
+    public double getDistance(HandState one, HandState other) {
+        if (one.getStreet() != other.getStreet()) {
+            throw new IllegalArgumentException("There are situations from "
+                    + "different stages.");
+        }
+        int street = one.getStreet();
+        if (street == PokerStreet.FLOP_VALUE || street == PokerStreet.TURN_VALUE) {
+            HandState local1 = new HandState(one);
+            HandState local2 = new HandState(other);
+            double pPo11 = local1.getPositivePotential();
+            double pPo12 = local2.getPositivePotential();
+            double nPo11 = local1.getNegativePotential();
+            double nPo12 = local2.getNegativePotential();
+
+            if (pPo11 != 1) {
+                local1.setPositivePotential(pPo11 * (1d / MAX_POTENTIAL));
+            }
+            if (pPo12 != 1) {
+                local2.setPositivePotential(pPo12 * (1d / MAX_POTENTIAL));
+            }
+            if (nPo11 != 1) {
+                local1.setNegativePotential(nPo11 * (1d / MAX_POTENTIAL));
+            }
+            if (nPo12 != 1) {
+                local2.setNegativePotential(nPo12 * (1d / MAX_POTENTIAL));
+            }
+            return DEFAULT_VECTOR_DISTANCE.getDistance(local1, local2);
+        } else {
+            return DEFAULT_VECTOR_DISTANCE.getDistance(one, other);
+        }
+
+    }
+}

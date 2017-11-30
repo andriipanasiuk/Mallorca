@@ -1,10 +1,10 @@
 package mallorcatour.core.game.advice;
 
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 
 
 /**
- * Interface for listening advice in every situation.
+ * Interface for listening advice in every state.
  * Something like AdviceListener. Consider rename this interface.
  * @author andriipanasiuk
  *

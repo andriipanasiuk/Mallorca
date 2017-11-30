@@ -7,7 +7,7 @@ import java.util.List;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.neural.core.PokerLearningExample;
 import mallorcatour.neural.manager.SituationIO;
 import mallorcatour.tools.Log;

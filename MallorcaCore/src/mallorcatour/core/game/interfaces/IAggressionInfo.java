@@ -1,26 +1,17 @@
 package mallorcatour.core.game.interfaces;
 
+/**
+ * Содержит информацию об агрессивных действиях игроков в текущей раздаче.
+ */
 public interface IAggressionInfo {
 
 	public int getHeroAggresionActionCount();
 
 	public int getVillainAggresionActionCount();
 
-	/**
-	 * @return the localAggresion
-	 */
-	@Deprecated
-	public double getHeroAggresionFrequency();
-
 	public int getHeroActionCount();
 
 	public int getVillainActionCount();
-
-	/**
-	 * @return the localOpponentAggresion
-	 */
-	@Deprecated
-	public double getVillainAggresionFrequency();
 
 	/**
 	 * @return the wasOpponentPreviousAggresive

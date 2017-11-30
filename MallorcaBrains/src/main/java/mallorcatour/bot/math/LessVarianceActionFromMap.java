@@ -96,7 +96,7 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 			actionProfit.calculate(gameInfo.getBigBlindSize());
 		}
 		if (toCall == -1) {
-			throw new RuntimeException("toCall cannot be -1 in this situation");
+			throw new RuntimeException("toCall cannot be -1 in this state");
 		}
 		if (fromTop) {
 			correctProfits(gameInfo, toCall, raiseProfit, passiveProfit);

@@ -1,11 +1,14 @@
 package mallorcatour.bot;
 
-import mallorcatour.Advisor;
+import mallorcatour.bot.actionpreprocessor.NLActionPreprocessor;
+import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.interfaces.IActionPreprocessor;
+import mallorcatour.core.game.state.HandState;
+import mallorcatour.core.player.interfaces.IPlayer;
 import mallorcatour.tools.Log;
 
 /**
@@ -13,14 +16,14 @@ import mallorcatour.tools.Log;
  * 
  * @author Andrew
  */
-public class Player extends ObservingPlayer {
+public class Player extends ObservingPlayer implements IPlayer {
 
+	private final IActionPreprocessor actionPreprocessor = new NLActionPreprocessor();
 	private final Advisor preflopAdvisor;
 	private final Advisor postflopAdvisor;
-	private final Advisor preflopChart;
 	private AdvisorListener student = AdvisorListener.NONE;
 
-	public Player(Advisor preflopAdvisor, Advisor preflopChart, Advisor commonAdvisor,
+	public Player(Advisor preflopAdvisor, Advisor commonAdvisor,
 				  String name, String debug) {
 		super(name, debug);
 		if (commonAdvisor == null || commonAdvisor == Advisor.UNSUPPORTED) {
@@ -28,7 +31,6 @@ public class Player extends ObservingPlayer {
 		}
 		this.preflopAdvisor = preflopAdvisor;
 		this.postflopAdvisor = commonAdvisor;
-		this.preflopChart = preflopChart;
 	}
 
 	public void setStudent(AdvisorListener student) {
@@ -48,13 +50,7 @@ public class Player extends ObservingPlayer {
 		Log.f(DEBUG_PATH, "=========  Decision-making  =========");
 		Log.f(DEBUG_PATH, C.SITUATION + ": " + situation.toString());
 		if (gameInfo.isPreFlop()) {
-			advice = preflopChart.getAdvice(situation, cards, gameInfo);
-			if (advice != null) {
-				Log.f(DEBUG_PATH, "Advice from preflop chart");
-			}
-			if (advice == null) {
-				advice = preflopAdvisor.getAdvice(situation, cards, gameInfo);
-			}
+			advice = preflopAdvisor.getAdvice(situation, cards, gameInfo);
 		}
 		if (advice == null) {
 			advice = postflopAdvisor.getAdvice(situation, cards, gameInfo);
@@ -73,8 +69,8 @@ public class Player extends ObservingPlayer {
 	}
 
 	@Override
-	public String getDefaultName() {
-		return "NLMathBot";
+	public String getName() {
+		return name;
 	}
 
 	@Override

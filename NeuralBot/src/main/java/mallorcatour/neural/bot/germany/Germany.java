@@ -1,15 +1,13 @@
 package mallorcatour.neural.bot.germany;
 
-import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.PokerStats;
-import mallorcatour.stats.PokerStatsImpl;
-import mallorcatour.neural.core.NeuralCreator;
-
 import org.neuroph.core.NeuralNetwork;
 
-public class Germany implements IPokerNeurals {
+import mallorcatour.neural.bot.BaseNeural;
+import mallorcatour.neural.core.NeuralCreator;
+import mallorcatour.stats.PokerStats;
+import mallorcatour.stats.PokerStatsImpl;
 
-	private NeuralNetwork<?> preflop, flop;
+public class Germany extends BaseNeural {
 
 	public Germany() {
 		preflop = NeuralCreator.createPerceptron(new Preflop());
@@ -26,22 +24,12 @@ public class Germany implements IPokerNeurals {
 		return flop;
 	}
 
-	@Override
-	public NeuralNetwork<?> getFlop() {
-		return flop;
-	}
-
-	@Override
-	public NeuralNetwork<?> getPreflop() {
-		return preflop;
-	}
-
 	public PokerStats getStats() {
 		return new PokerStatsImpl(0.7, 0.28, 0.65, 0.22);
 	}
 
 	@Override
-	public String getName() {
-		return "Germany";
+	public String toString() {
+		return "Germany Neural";
 	}
 }

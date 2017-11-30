@@ -1,11 +1,11 @@
 package mallorcatour.bot.math;
 
-import mallorcatour.Advisor;
+import mallorcatour.core.game.advice.Advisor;
 import mallorcatour.bot.interfaces.ISpectrumHolder;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.tools.Log;
 
 public class EVAdvisor implements Advisor {
@@ -30,11 +30,6 @@ public class EVAdvisor implements Advisor {
 		Log.f(DEBUG_PATH, actionProfitMap.toSmartString(gameInfo.getBigBlindSize(), gameInfo.getBankRollAtRisk()));
 		IAdvice advice = adviceCreator.create(actionProfitMap, gameInfo, cards);
 		return advice;
-	}
-
-	@Override
-	public String getName() {
-		return "EV advisor";
 	}
 
 }

@@ -15,7 +15,7 @@ import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IPlayerGameInfo;
-import mallorcatour.core.game.situation.HandState;
+import mallorcatour.core.game.state.HandState;
 import mallorcatour.modeller.NeuralAdvisor;
 import mallorcatour.stats.PokerStats;
 import mallorcatour.tools.Log;
@@ -25,7 +25,7 @@ import mallorcatour.tools.Log;
  * Poker neural network that uses multi-layer perceptrons learned on hands from
  * one of PA bots. This NN does not use global parameters (see
  * IGlobalSituation). But before using of multi-layer perceptron this network
- * looking for the same situation from situation files. If there are few(count
+ * looking for the same state from state files. If there are few(count
  * of situations and the degree of similarity are defined in this class) same
  * situations result will be the average output of these situations. If there
  * are not it uses output of multi-layer perceptrons. As interpreter (see
@@ -63,7 +63,7 @@ public class NeuralAdvisorImpl implements NeuralAdvisor {
 		flopNN = neurals.getFlop();
 		turnNN = neurals.getTurn();
 		riverNN = neurals.getRiver();
-		Log.d("Neural network " + neurals.getName() + " has been inited");
+		Log.d("Neural network " + neurals + " has been inited");
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class NeuralAdvisorImpl implements NeuralAdvisor {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return name;
 	}
 

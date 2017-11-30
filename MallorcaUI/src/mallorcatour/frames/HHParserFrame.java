@@ -18,12 +18,13 @@ import java.util.concurrent.ExecutorService;
 
 import javax.swing.JOptionPane;
 
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
+import mallorcatour.equilator.PokerEquilatorBrecher;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.LimitType;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.state.observer.StrengthHandStateObserver;
 import mallorcatour.hhparser.AdviceReader;
 import mallorcatour.hhparser.LoggingTournamentHandler;
 import mallorcatour.hhparser.PAHHParser;
@@ -35,7 +36,6 @@ import mallorcatour.hhparser.core.NNConverter;
 import mallorcatour.hhparser.core.Tournament;
 import mallorcatour.neural.core.PokerExamples;
 import mallorcatour.neural.core.PokerLearningExample;
-import mallorcatour.core.game.situation.observer.SituationHandler;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.ExecutorUtils;
 import mallorcatour.tools.Log;
@@ -209,7 +209,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseTournamentsWithHandler(new SituationHandler(true, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
+                parseTournamentsWithHandler(new StrengthHandStateObserver(true, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
             }
         });
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -218,7 +218,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseHandsWithHandler(new SituationHandler(LimitType.FIXED_LIMIT, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
+                parseHandsWithHandler(new StrengthHandStateObserver(LimitType.FIXED_LIMIT, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
             }
         });
     }//GEN-LAST:event_jMenuItem2ActionPerformed
@@ -227,7 +227,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         executor.submit(new Runnable() {
 
             public void run() {
-                parseHandsWithoutAdvices("Waterhouse", new SituationHandler(LimitType.FIXED_LIMIT, "Waterhouse", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
+                parseHandsWithoutAdvices("Waterhouse", new StrengthHandStateObserver(LimitType.FIXED_LIMIT, "Waterhouse", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
             }
         });
     }//GEN-LAST:event_jMenuItem3ActionPerformed
@@ -287,7 +287,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         BaseHandHandler handHandler = new BaseHandHandler();
 		PAHHParser.parseHandHistory(path, handHandler);
 		List<PokerLearningExample> examples = NNConverter.parseLocalSituationsWithoutAdvices(handHandler.buildHands(),
-				"Andrew", new SituationHandler(LimitType.FIXED_LIMIT, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
+				"Andrew", new StrengthHandStateObserver(LimitType.FIXED_LIMIT, "Andrew", new PokerEquilatorBrecher(), new PreflopEquilatorImpl()));
 		path = FrameUtils.openFileChooser(this, "./");
         if (path == null) {
             return;
@@ -401,7 +401,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         return true;
     }
 
-    private void parseTournamentsWithHandler(SituationHandler situationHandler) {
+    private void parseTournamentsWithHandler(StrengthHandStateObserver stateObserver) {
         String[] pathes = FrameUtils.openFileChooserForMultipleFiles(this, "~/workspace-private/mallorcatour");
         if (pathes == null) {
             return;
@@ -420,7 +420,7 @@ public class HHParserFrame extends javax.swing.JFrame {
             int count = 0;
             for (Tournament tournament : handler.buildTournaments()) {
 				List<PokerLearningExample> examples = NNConverter.localSituationsToFile(subDir, tournament,
-						"./advices_sng", situationHandler);
+						"./advices_sng", stateObserver);
 				if (examples != null) {
                     allExamples.addAll(examples);
                     count++;
@@ -438,7 +438,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         }
     }
 
-    private void parseHandsWithHandler(SituationHandler situationHandler) {
+    private void parseHandsWithHandler(StrengthHandStateObserver stateObserver) {
         String[] pathes = FrameUtils.openFileChooserForMultipleFiles(this, "./../..");
         if (pathes == null) {
             return;
@@ -451,7 +451,7 @@ public class HHParserFrame extends javax.swing.JFrame {
             long start = System.currentTimeMillis();
             List<Hand> hands = handler.buildHands();
 			int count = hands.size();
-			List<PokerLearningExample> examples = NNConverter.localSituationsToFile(dir, hands, "./advices_cash", situationHandler);
+			List<PokerLearningExample> examples = NNConverter.localSituationsToFile(dir, hands, "./advices_cash", stateObserver);
             if (examples == null) {
                 continue;
             }
@@ -467,7 +467,7 @@ public class HHParserFrame extends javax.swing.JFrame {
         }
     }
 
-    private void parseHandsWithoutAdvices(String heroName, SituationHandler situationHandler) {
+    private void parseHandsWithoutAdvices(String heroName, StrengthHandStateObserver stateObserver) {
         String[] pathes = FrameUtils.openFileChooserForMultipleFiles(this, "./../..");
         if (pathes == null) {
             return;
@@ -480,7 +480,7 @@ public class HHParserFrame extends javax.swing.JFrame {
             int count = hands.size();
             Log.d("There is " + count + " hands");
             List<PokerLearningExample> examples =
-                    NNConverter.parseLocalSituationsWithoutAdvices(hands, heroName, situationHandler);
+                    NNConverter.parseLocalSituationsWithoutAdvices(hands, heroName, stateObserver);
             if (examples == null) {
                 continue;
             }

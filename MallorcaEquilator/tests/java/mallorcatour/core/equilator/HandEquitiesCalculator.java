@@ -1,13 +1,15 @@
 package mallorcatour.core.equilator;
 
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
+import mallorcatour.equilator.PokerEquilatorBrecher;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.OpenPlayerInfo;
-import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.game.state.StreetEquity;
 
 public class HandEquitiesCalculator {
 
     private static PokerEquilatorBrecher equilator = new PokerEquilatorBrecher();
+    private static PreflopEquilatorImpl preflopEquilator = new PreflopEquilatorImpl();
 
     public static HandEquities calculateEquities(final Hand hand, String heroName) {
         double preflopEquity = -1;
@@ -45,7 +47,7 @@ public class HandEquitiesCalculator {
 
     public static double getPreflopStrength(Hand hand, String player) {
         OpenPlayerInfo playerInfo = hand.getPlayerInfo(player);
-        return PreflopEquilatorImpl.strengthVsRandom(playerInfo.getHoleCards().first, playerInfo.getHoleCards().second);
+        return preflopEquilator.strengthVsRandom(playerInfo.getHoleCards().first, playerInfo.getHoleCards().second);
     }
 
     public static StreetEquity getFlopEquity(Hand hand, String player) {
@@ -72,7 +74,7 @@ public class HandEquitiesCalculator {
 
     public static double preflopEquity(Hand hand, String player) {
         OpenPlayerInfo playerInfo = hand.getPlayerInfo(player);
-        return PreflopEquilatorImpl.strengthVsRandom(playerInfo.getHoleCards().first,
+        return preflopEquilator.strengthVsRandom(playerInfo.getHoleCards().first,
                 playerInfo.getHoleCards().second);
     }
 

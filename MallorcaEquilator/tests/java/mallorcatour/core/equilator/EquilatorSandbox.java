@@ -7,12 +7,13 @@ package mallorcatour.core.equilator;
 import java.util.List;
 import java.util.Random;
 
-import mallorcatour.core.equilator.preflop.PreflopEquilatorImpl;
-import mallorcatour.core.equilator.quick.EquilatorQuick;
-import mallorcatour.core.equilator.quick.FlopCombinations;
+import mallorcatour.equilator.PokerEquilatorBrecher;
+import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
+import mallorcatour.equilator.quick.EquilatorQuick;
+import mallorcatour.equilator.quick.FlopCombinations;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
-import mallorcatour.core.game.situation.StreetEquity;
+import mallorcatour.core.game.state.StreetEquity;
 import mallorcatour.tools.ArrayUtils;
 import mallorcatour.tools.CollectionUtils;
 import mallorcatour.tools.Log;
@@ -229,7 +230,7 @@ public class EquilatorSandbox {
     public static void testPreflop() {
         Card card1 = Card.valueOf("8s");
         Card card2 = Card.valueOf("7d");
-        double strength = PreflopEquilatorImpl.strengthVsRandom(card1, card2);
+        double strength = preflopEquilator.strengthVsRandom(card1, card2);
         Log.d("Strength: " + strength);
     }
 

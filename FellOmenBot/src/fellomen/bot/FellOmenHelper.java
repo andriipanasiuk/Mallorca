@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import mallorcatour.core.equilator.PokerEquilatorBrecher;
+import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.interfaces.Equilator;
 import mallorcatour.tools.Log;
