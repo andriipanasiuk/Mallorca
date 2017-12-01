@@ -1,4 +1,4 @@
-package mallorcatour.core.equilator;
+package mallorcatour.equilator;
 
 import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.equilator.preflop.PreflopStrengthTable;

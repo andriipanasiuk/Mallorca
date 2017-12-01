@@ -1,6 +1,5 @@
-package mallorcatour.core.equilator;
+package mallorcatour.equilator;
 
-import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.OpenPlayerInfo;

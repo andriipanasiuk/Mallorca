@@ -1,4 +1,4 @@
-package mallorcatour.core.equilator;
+package mallorcatour.equilator;
 
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.state.StreetEquity;
