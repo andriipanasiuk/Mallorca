@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mallorcatour.hhparser;
 
 import java.util.ArrayList;
@@ -21,11 +17,6 @@ import mallorcatour.core.game.state.observer.StrengthHandStateObserver;
 import mallorcatour.hhparser.core.HandManager;
 import mallorcatour.neural.core.PokerLearningExample;
 
-/**
- *
- * @author Andrew
- */
-//TODO think about moving StrengthHandStateObserver somewhere to avoid linking Mallorca project into HHParser.
 public class HandParser {
 
     private GameInfo gameInfo;

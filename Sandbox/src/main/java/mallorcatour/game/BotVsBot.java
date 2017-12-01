@@ -10,7 +10,7 @@ import mallorcatour.core.game.engine.GameEngine.CashSummary;
 import mallorcatour.core.game.engine.GameEngine.TournamentSummary;
 import mallorcatour.core.game.engine.PredefinedGameEngine;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.neural.modeller.PlayerStatModel;
 import mallorcatour.neural.bot.NeuralBotFactory;
@@ -21,7 +21,7 @@ import mallorcatour.neural.bot.france.France;
 import mallorcatour.neural.bot.germany.Germany;
 import mallorcatour.neural.bot.gusxensen.GusXensen;
 import mallorcatour.neural.bot.pbx.Pbx;
-import mallorcatour.stats.PokerStatsBuffer;
+import mallorcatour.core.stats.PokerStatsBuffer;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.Log;
 
@@ -32,14 +32,14 @@ public class BotVsBot {
 
 	static RandomBot random;
 	static PushBot pushBot;
-	static IPlayer neuralCuba;
-	static IPlayer neuralGusXensen;
-	static IPlayer neuralFrance;
-	static IPlayer neuralGermany;
-	static IPlayer checkBurn;
-	static IPlayer pbx;
-	static IPlayer dafish2;
-	static IPlayer fullMathBot;
+	static Player neuralCuba;
+	static Player neuralGusXensen;
+	static Player neuralFrance;
+	static Player neuralGermany;
+	static Player checkBurn;
+	static Player pbx;
+	static Player dafish2;
+	static Player fullMathBot;
 
 	private static void createBots(String DEBUG_PATH, AdvisorListener student) {
 		PlayerStatModel villainModel = new PlayerStatModel(DEBUG_PATH);

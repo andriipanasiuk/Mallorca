@@ -15,8 +15,6 @@ import mallorcatour.core.spectrum.Spectrum;
 import mallorcatour.tools.ArrayUtils;
 import mallorcatour.tools.Log;
 
-import com.stevebrecher.HandEval;
-
 /**
  *
  */

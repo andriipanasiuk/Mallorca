@@ -22,6 +22,7 @@ import mallorcatour.robot.HumanColorTableInteractor;
 import mallorcatour.robot.ITableInteractor;
 import mallorcatour.robot.KeyboardTableInteractor;
 import mallorcatour.robot.ExtPlayerInfo;
+import mallorcatour.robot.controller.HUGameInfo;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.robot.hardwaremanager.MouseClickLimiter;
 import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
@@ -213,12 +214,12 @@ public class PSGameRobot implements IGameRobot, ITableListener {
             }
             currentHandNumber = handNumber;
             controller.onNewHand(currentHandNumber,
-                    Arrays.asList(new ExtPlayerInfo[]{heroInfo, villainInfo}),
+                    Arrays.asList(heroInfo, villainInfo),
                     holeCard1, holeCard2, boardCards, pot, limitType);
         }
 
         start1 = System.currentTimeMillis();
-        action = controller.onMyAction(boardCards, pot);
+        action = controller.onMyAction(boardCards, pot, villainInfo.stack == HUGameInfo.SITTING_OUT);
         timeDecisionMaking = System.currentTimeMillis() - start1;
         ActionSynchronizer.endOfLogic();
 

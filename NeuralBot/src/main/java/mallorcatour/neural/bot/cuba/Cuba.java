@@ -2,8 +2,8 @@ package mallorcatour.neural.bot.cuba;
 
 import mallorcatour.neural.bot.BaseNeural;
 import mallorcatour.neural.core.NeuralCreator;
-import mallorcatour.stats.PokerStats;
-import mallorcatour.stats.PokerStatsImpl;
+import mallorcatour.core.stats.PokerStats;
+import mallorcatour.core.stats.PokerStatsImpl;
 
 public class Cuba extends BaseNeural {
 

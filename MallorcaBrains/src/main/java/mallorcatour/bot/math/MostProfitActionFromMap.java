@@ -10,7 +10,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.math.RandomVariable;
 
 /**
@@ -20,7 +20,7 @@ import mallorcatour.core.math.RandomVariable;
 public class MostProfitActionFromMap extends BaseAdviceCreatorFromMap {
 
 	@Override
-    public IAdvice create(ActionDistribution map, IGameInfo gameInfo, HoleCards cards) {
+    public IAdvice create(ActionDistribution map, GameContext gameInfo, HoleCards cards) {
         double passive = 0;
         Double aggressive = null;
         for (Entry<Action, RandomVariable> entry : map.entrySet()) {

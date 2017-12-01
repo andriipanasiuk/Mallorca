@@ -1,8 +1,8 @@
 package mallorcatour.bot.actionpreprocessor;
 
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 
 /**
  * This bot currently does not use global parameters.
@@ -12,8 +12,7 @@ import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 public class NLActionPreprocessor implements IActionPreprocessor {
 
 	@Override
-	public Action preprocessAction(Action action, IPlayerGameInfo gameInfo) {
-		double toCall = gameInfo.getAmountToCall();
+	public Action preprocessAction(Action action, GameContext gameInfo, double toCall) {
 		double pot = gameInfo.getPotSize();
 		double effectiveStack = gameInfo.getBankRollAtRisk();
 		if (action.isAllin()) {
@@ -33,7 +32,7 @@ public class NLActionPreprocessor implements IActionPreprocessor {
 				return Action.checkAction();
 			}
 		} else if (action.isAggressive()) {
-			if (toCall != 0 && !gameInfo.canHeroRaise()) {
+			if (toCall != 0 && gameInfo.getBankRollAtRisk() <= 0) {
 				return Action.callAction(toCall);
 			}
 			double percent;

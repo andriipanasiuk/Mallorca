@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.bot.C;
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.GameInfo;
@@ -34,7 +34,7 @@ public class AiGamesController {
 
 	private int round;
 
-	private Map<String, String> settings = new HashMap<String, String>();
+	private Map<String, String> settings = new HashMap<>();
 
 	/**
 	 * Used for internal needs. For external we use bot.getName().
@@ -43,9 +43,11 @@ public class AiGamesController {
 	private String villainName = null;
 
 	private GameInfo gameInfo;
-	private IPlayer bot;
+	private Player bot;
 
-	public AiGamesController(GameInfo gameInfo, IPlayer observer) {
+	public double heroAmountToCall;
+
+	public AiGamesController(GameInfo gameInfo, Player observer) {
 		this.gameInfo = gameInfo;
 		this.bot = observer;
 	}
@@ -89,8 +91,8 @@ public class AiGamesController {
 			gameInfo.pot = Integer.valueOf(value);
 			Log.d(C.POT + ": " + gameInfo.pot);
 		} else if (key.equals("amount_to_call")) {
-			gameInfo.heroAmountToCall = Integer.valueOf(value);
-			Log.d(C.TO_CALL + ": " + gameInfo.heroAmountToCall);
+			heroAmountToCall = Integer.valueOf(value);
+			Log.d(C.TO_CALL + ": " + heroAmountToCall);
 		} else if (key.equals(C.TABLE_AIGAMES)) {
 			gameInfo.board = Arrays.asList(parseCards(value));
 			Log.d(C.TABLE + ": " + value);
@@ -175,8 +177,6 @@ public class AiGamesController {
 	/**
 	 * Parse the input string from the engine to actual Card objects
 	 * 
-	 * @param String
-	 *            value : input
 	 * @return Card[] : array of Card objects
 	 */
 	private Card[] parseCards(String value) {
@@ -206,7 +206,7 @@ public class AiGamesController {
 		gameInfo.pot = 0;
 		gameInfo.resetStreetPots();
 		gameInfo.board = Collections.emptyList();
-		gameInfo.heroAmountToCall = 0;
+		heroAmountToCall = 0;
 		gameInfo.bankrollAtRisk = Double.MAX_VALUE;
 	}
 

@@ -5,7 +5,7 @@
 package mallorcatour.bot.interfaces;
 
 import mallorcatour.core.game.advice.AdvisorListener;
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
 
 
 /**
@@ -14,5 +14,5 @@ import mallorcatour.core.player.interfaces.IPlayer;
  */
 public interface IBotFactory {
 
-    IPlayer createBot(AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug);
+    Player createBot(AdvisorListener villainListener, AdvisorListener heroListener, String name, String debug);
 }

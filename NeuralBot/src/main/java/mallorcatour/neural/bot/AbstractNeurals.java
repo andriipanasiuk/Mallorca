@@ -2,7 +2,7 @@ package mallorcatour.neural.bot;
 
 import java.io.InputStream;
 
-import mallorcatour.stats.PokerStats;
+import mallorcatour.core.stats.PokerStats;
 
 import org.neuroph.core.NeuralNetwork;
 

@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.math.RandomVariable;
 
 /**
@@ -21,12 +21,12 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 	public static ProfitCorrections correction;
 
 	@Override
-	public IAdvice create(ActionDistribution actionDistribution, IGameInfo gameInfo, HoleCards cards) {
+	public IAdvice create(ActionDistribution actionDistribution, GameContext gameInfo, HoleCards cards) {
 		Entry<Action, RandomVariable> bestAction = getBestAction(actionDistribution, gameInfo, 0, true, cards);
 		return bestAction.getKey();
 	}
 
-	public static RandomVariable getOptimal(ActionDistribution actionDistribution, IGameInfo gameInfo, 
+	public static RandomVariable getOptimal(ActionDistribution actionDistribution, GameContext gameInfo,
 			double investment, HoleCards cards) {
 		Entry<Action, RandomVariable> bestAction = getBestAction(actionDistribution, gameInfo, investment, false, cards);
 		return bestAction.getValue();
@@ -69,8 +69,8 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 		}
 	}
 
-	private static Entry<Action, RandomVariable> getBestAction(ActionDistribution actionDistribution, 
-			IGameInfo gameInfo, double investment, boolean fromTop, HoleCards cards) {
+	private static Entry<Action, RandomVariable> getBestAction(ActionDistribution actionDistribution,
+                                                               GameContext gameInfo, double investment, boolean fromTop, HoleCards cards) {
 		Entry<Action, RandomVariable> foldAction = null, passiveAction = null, raiseAction = null;
 		ActionProfit passiveProfit = null, raiseProfit = null, foldProfit = null;
 		double toCall = -1;
@@ -145,8 +145,8 @@ public class LessVarianceActionFromMap extends BaseAdviceCreatorFromMap {
 		}
 	}
 
-	private static void correctProfits(IGameInfo gameInfo, double toCall, ActionProfit raiseProfit,
-			ActionProfit passiveProfit) {
+	private static void correctProfits(GameContext gameInfo, double toCall, ActionProfit raiseProfit,
+                                       ActionProfit passiveProfit) {
 		double bb = gameInfo.getBigBlindSize();
 		if (raiseProfit != null) {
 			raiseProfit.evVarKoeff += getCorrection(true, toCall, gameInfo.isPreFlop());

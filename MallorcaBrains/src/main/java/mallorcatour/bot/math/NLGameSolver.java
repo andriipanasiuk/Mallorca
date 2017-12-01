@@ -11,7 +11,7 @@ import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.IAdvice;
 import mallorcatour.core.game.interfaces.IAggressionInfo;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.PreflopEquilator;
 import mallorcatour.core.game.interfaces.SpectrumEquilator;
 import mallorcatour.core.game.state.HandState;
@@ -47,47 +47,47 @@ public class NLGameSolver implements IGameSolver {
 	}
 
 	@Override
-	public ActionDistribution onSecondActionPreflop(IGameInfo gameInfo, IAggressionInfo aggressionInfo,
-			double effectiveStack, double pot, double toCall, Spectrum villainSpectrum, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+	public ActionDistribution onSecondActionPreflop(GameContext gameInfo, IAggressionInfo aggressionInfo,
+                                                    double effectiveStack, double pot, double toCall, Spectrum villainSpectrum, HoleCards heroCards,
+                                                    Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, aggressionInfo, effectiveStack, pot, toCall, 0, villainSpectrum,
 				new Card[] {}, heroCards, strengthMap, isHeroOnButton, PokerStreet.PREFLOP, 0);
 	}
 
 	@Override
-	public ActionDistribution onSecondActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, double toCall, Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+	public ActionDistribution onSecondActionFlop(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                 double pot, double toCall, Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
+                                                 Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, flop.toArray(),
 				heroCards, strengthMap, isHeroOnButton, PokerStreet.FLOP, 0);
 	}
 
 	@Override
-	public ActionDistribution onSecondActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, double toCall, Spectrum villainSpectrum, Flop flop, Card turn, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+	public ActionDistribution onSecondActionTurn(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                 double pot, double toCall, Spectrum villainSpectrum, Flop flop, Card turn, HoleCards heroCards,
+                                                 Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] {
 				flop.first, flop.second, flop.third, turn }, heroCards, strengthMap, isHeroOnButton, PokerStreet.TURN,
 				0);
 	}
 
 	@Override
-	public ActionDistribution onSecondActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, double toCall, Spectrum villainSpectrum, Flop flop, Card turn, Card river, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
+	public ActionDistribution onSecondActionRiver(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                  double pot, double toCall, Spectrum villainSpectrum, Flop flop, Card turn, Card river, HoleCards heroCards,
+                                                  Map<HoleCards, StreetEquity> strengthMap, boolean isHeroOnButton, double bigBlind) {
 		return onSecondActionRecursive(gameInfo, info, effectiveStack, pot, toCall, 0, villainSpectrum, new Card[] {
 				flop.first, flop.second, flop.third, turn, river }, heroCards, strengthMap, isHeroOnButton,
 				PokerStreet.RIVER, 0);
 	}
 
-	protected RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
-			PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton, int depth) {
+	protected RandomVariable calculatePassiveProfit(GameContext gameInfo, double pot, double heroInvestment,
+                                                    PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton, int depth) {
 		return calculatePassiveProfit(gameInfo, pot, heroInvestment, street, heroCards, board, villainSpectrum, onButton, false, depth);
 	}
 
-	protected RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
-				PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton,
-				boolean considerPrevPot, int depth) {
+	protected RandomVariable calculatePassiveProfit(GameContext gameInfo, double pot, double heroInvestment,
+                                                    PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton,
+                                                    boolean considerPrevPot, int depth) {
 		double win = pot - heroInvestment;
 		if (!considerPrevPot) {
 			double previousStreetPot;
@@ -115,10 +115,10 @@ public class NLGameSolver implements IGameSolver {
 		return result;
 	}
 
-	private ActionDistribution onSecondActionRecursive(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, double toCall, double heroInvestment, Spectrum villainSpectrum, Card[] board,
-			HoleCards heroCards, Map<HoleCards, StreetEquity> villainStrengthMap, boolean onButton, PokerStreet street,
-			int depth) {
+	private ActionDistribution onSecondActionRecursive(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                       double pot, double toCall, double heroInvestment, Spectrum villainSpectrum, Card[] board,
+                                                       HoleCards heroCards, Map<HoleCards, StreetEquity> villainStrengthMap, boolean onButton, PokerStreet street,
+                                                       int depth) {
 		ActionDistribution result = new ActionDistribution();
 		// if hero folds
 		double foldProfit = -heroInvestment;
@@ -159,9 +159,9 @@ public class NLGameSolver implements IGameSolver {
 	}
 
 	@Override
-	public ActionDistribution onFirstActionPreFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, Spectrum villainSpectrum, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
-			boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
+	public ActionDistribution onFirstActionPreFlop(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                   double pot, Spectrum villainSpectrum, HoleCards heroCards, Map<HoleCards, StreetEquity> strengthMap,
+                                                   boolean wasVillainPreviousAggressive, boolean isHeroOnButton, double bigBlind) {
 		ActionDistribution result = new ActionDistribution();
 
 		double foldProfit = 0;
@@ -191,38 +191,38 @@ public class NLGameSolver implements IGameSolver {
 	}
 
 	@Override
-	public ActionDistribution onFirstActionFlop(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
-			double bigBlind) {
+	public ActionDistribution onFirstActionFlop(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                double pot, Spectrum villainSpectrum, Flop flop, HoleCards heroCards,
+                                                Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
+                                                double bigBlind) {
 		return onFirstAction(gameInfo, info, effectiveStack, pot, villainSpectrum, flop.toArray(), heroCards,
 				strengthMap, wasVillainPreviousAggressive, isHeroOnButton, PokerStreet.FLOP, bigBlind);
 	}
 
 	@Override
-	public ActionDistribution onFirstActionTurn(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, Spectrum villainSpectrum, Flop flop, Card turn, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
-			double bigBlind) {
+	public ActionDistribution onFirstActionTurn(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                double pot, Spectrum villainSpectrum, Flop flop, Card turn, HoleCards heroCards,
+                                                Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
+                                                double bigBlind) {
 		return onFirstAction(gameInfo, info, effectiveStack, pot, villainSpectrum, new Card[] { flop.first,
 				flop.second, flop.third, turn }, heroCards, strengthMap, wasVillainPreviousAggressive, isHeroOnButton,
 				PokerStreet.TURN, bigBlind);
 	}
 
 	@Override
-	public ActionDistribution onFirstActionRiver(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, Spectrum villainSpectrum, Flop flop, Card turn, Card river, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
-			double bigBlind) {
+	public ActionDistribution onFirstActionRiver(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                                 double pot, Spectrum villainSpectrum, Flop flop, Card turn, Card river, HoleCards heroCards,
+                                                 Map<HoleCards, StreetEquity> strengthMap, boolean wasVillainPreviousAggressive, boolean isHeroOnButton,
+                                                 double bigBlind) {
 		return onFirstAction(gameInfo, info, effectiveStack, pot, villainSpectrum, new Card[] { flop.first,
 				flop.second, flop.third, turn, river }, heroCards, strengthMap, wasVillainPreviousAggressive,
 				isHeroOnButton, PokerStreet.RIVER, bigBlind);
 	}
 
-	private ActionDistribution onFirstAction(IGameInfo gameInfo, IAggressionInfo info, double effectiveStack,
-			double pot, Spectrum villainSpectrum, Card[] board, HoleCards heroCards,
-			Map<HoleCards, StreetEquity> villainStrengthMap, boolean wasVillainPreviousAggressive,
-			boolean isHeroOnButton, PokerStreet street, double bigBlind) {
+	private ActionDistribution onFirstAction(GameContext gameInfo, IAggressionInfo info, double effectiveStack,
+                                             double pot, Spectrum villainSpectrum, Card[] board, HoleCards heroCards,
+                                             Map<HoleCards, StreetEquity> villainStrengthMap, boolean wasVillainPreviousAggressive,
+                                             boolean isHeroOnButton, PokerStreet street, double bigBlind) {
 		ActionDistribution result = new ActionDistribution();
 
 		// if hero folds
@@ -256,10 +256,10 @@ public class NLGameSolver implements IGameSolver {
 		return result;
 	}
 
-	private RandomVariable calculateHeroActionProfit(IGameInfo gameInfo, IAggressionInfo info, double heroActionAmount,
-			double effectiveStack, double pot, double heroInvestment, Spectrum villainSpectrum, Card[] board,
-			HoleCards heroCards, boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive,
-			boolean onButton, PokerStreet street, Map<HoleCards, StreetEquity> villainStrengthMap, int depth) {
+	private RandomVariable calculateHeroActionProfit(GameContext gameInfo, IAggressionInfo info, double heroActionAmount,
+                                                     double effectiveStack, double pot, double heroInvestment, Spectrum villainSpectrum, Card[] board,
+                                                     HoleCards heroCards, boolean wasVillainPreviousAggressive, boolean wasHeroPreviousAggressive,
+                                                     boolean onButton, PokerStreet street, Map<HoleCards, StreetEquity> villainStrengthMap, int depth) {
 
 		RandomVariable result = new RandomVariable();
 
@@ -384,6 +384,7 @@ public class NLGameSolver implements IGameSolver {
 		result.wasOpponentPreviousAggresive(wasHeroPreviousAggressive);
 		result.wasHeroPreviousAggresive(wasVillainPreviousAggressive);
 		result.setPotOdds(potOdds);
+		result.setToCall(toCall);
 		result.isOnButton(villainOnButton);
 		result.setPotToStackOdds((pot + toCall) / (pot + toCall + effectiveStack));
 		result.canRaise(effectiveStack != 0);

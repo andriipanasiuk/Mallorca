@@ -4,7 +4,7 @@
  */
 package mallorcatour.neural.modeller;
 
-import mallorcatour.stats.PokerStats;
+import mallorcatour.core.stats.PokerStats;
 import mallorcatour.core.vector.IDistanceCalculator;
 
 /**

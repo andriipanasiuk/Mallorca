@@ -13,7 +13,7 @@ import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.ISpectrumListener;
 import mallorcatour.core.game.state.HandState;
@@ -35,7 +35,7 @@ public class SpectrumPlayerObserver implements IGameObserver, ISpectrumHolder, I
 	private Spectrum spectrum;
 	private Spectrum randomSpectrum;
 	private Advisor model;
-	private IGameInfo gameInfo;
+	private GameContext gameInfo;
 	private StrengthManager strengthManager;
 	private ISpectrumListener spectrumListener;
 	private final String hero;
@@ -129,7 +129,7 @@ public class SpectrumPlayerObserver implements IGameObserver, ISpectrumHolder, I
 	}
 
 	@Override
-	public void onHandStarted(IGameInfo gameInfo) {
+	public void onHandStarted(GameContext gameInfo) {
 		this.gameInfo = gameInfo;
 		stateObserver.onHandStarted(gameInfo);
 		if (gameInfo.onButton(hero) ^ !trackHero) {

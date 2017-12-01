@@ -14,5 +14,6 @@ include ':UITools'
 include ':Sandbox'
 include ':NeuralBot'
 include ':Sandbox'
-include 'AdviceCreator'
+include ':AdviceCreator'
+include ':GamePresenter'
 

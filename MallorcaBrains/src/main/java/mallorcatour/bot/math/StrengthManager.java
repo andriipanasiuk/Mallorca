@@ -7,7 +7,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.Equilator;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.PreflopEquilator;
 import mallorcatour.core.game.state.StreetEquity;
@@ -25,7 +25,7 @@ public class StrengthManager implements IGameObserver {
 	public Map<HoleCards, StreetEquity> river = new HashMap<>();
 
 	private Spectrum randomSpectrum;
-	private IGameInfo gameInfo;
+	private GameContext gameInfo;
 	private final boolean needFlopFullPotential;
 	private final Equilator equilator;
 	private final PreflopEquilator preflopEquilator;
@@ -112,7 +112,7 @@ public class StrengthManager implements IGameObserver {
 	}
 
 	@Override
-	public void onHandStarted(IGameInfo gameInfo) {
+	public void onHandStarted(GameContext gameInfo) {
 		this.gameInfo = gameInfo;
 		randomSpectrum = Spectrum.random();
 		preflop = new HashMap<>();

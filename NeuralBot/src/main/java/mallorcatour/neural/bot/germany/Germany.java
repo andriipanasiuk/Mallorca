@@ -4,8 +4,8 @@ import org.neuroph.core.NeuralNetwork;
 
 import mallorcatour.neural.bot.BaseNeural;
 import mallorcatour.neural.core.NeuralCreator;
-import mallorcatour.stats.PokerStats;
-import mallorcatour.stats.PokerStatsImpl;
+import mallorcatour.core.stats.PokerStats;
+import mallorcatour.core.stats.PokerStatsImpl;
 
 public class Germany extends BaseNeural {
 

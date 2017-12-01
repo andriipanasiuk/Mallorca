@@ -21,6 +21,6 @@ public interface IGameController {
             Card holeCard2, List<Card> board, double pot, LimitType limitType);
 
     Action onMyAction(List<Card> boardCards,
-            double pot);
+                      double pot, boolean villainSitOut);
 
 }

@@ -5,10 +5,10 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.interfaces.PreflopEquilator;
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 
-public class PushBot extends ObservingPlayer implements IPlayer {
+public class PushBot extends ObservingPlayer implements Player {
 
 	private final PreflopEquilator preflopEquilator = new PreflopEquilatorImpl();
 

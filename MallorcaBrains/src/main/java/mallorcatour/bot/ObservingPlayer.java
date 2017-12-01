@@ -4,10 +4,9 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.PokerStreet;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.core.game.interfaces.IPlayerGameObserver;
-import mallorcatour.core.game.state.HandStateHolder;
 
 /**
  * Это некий активный наблюдатель за игрой, который запоминает карты, пристально следит за
@@ -15,11 +14,11 @@ import mallorcatour.core.game.state.HandStateHolder;
  * чтобы сделать правильный ход.
  */
 public abstract class ObservingPlayer implements IPlayerGameObserver, IHoleCardsObserver {
-	protected IPlayerGameInfo gameInfo;
+	protected GameContext gameInfo;
 	protected final String DEBUG_PATH;
 	protected Card heroCard1, heroCard2;
-	protected IGameObserver gameObserver;
-	private IHoleCardsObserver cardsObserver;
+	protected IGameObserver gameObserver = IGameObserver.EMPTY;
+	private IHoleCardsObserver cardsObserver = IHoleCardsObserver.EMPTY;
 	protected final String name;
 
 	public ObservingPlayer(String name, String debug) {
@@ -59,7 +58,7 @@ public abstract class ObservingPlayer implements IPlayerGameObserver, IHoleCards
 	 * A new game has been started.
 	 */
 	@Override
-	public void onHandStarted(IPlayerGameInfo gameInfo) {
+	public void onHandStarted(GameContext gameInfo) {
 		this.gameInfo = gameInfo;
 		gameObserver.onHandStarted(gameInfo);
 	}

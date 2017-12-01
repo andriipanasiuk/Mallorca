@@ -20,7 +20,7 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdvisorListener;
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.equilator.preflop.PreflopEquilatorImpl;
 import mallorcatour.equilator.preflop.PreflopEquilatorImpl.LoadFrom;
 import mallorcatour.neural.modeller.PlayerStatModel;
@@ -35,9 +35,9 @@ public class BotParser {
 
 	final Scanner scan;
 
-	final IPlayer bot;
+	final Player bot;
 
-	public BotParser(IPlayer bot) {
+	public BotParser(Player bot) {
 		this.scan = new Scanner(System.in);
 		this.bot = bot;
 	}
@@ -54,7 +54,7 @@ public class BotParser {
 			if (parts.length == 3 && parts[0].equals(C.ACTION)) {
 				PokerStreet previous = gameInfo.getStage().previous();
 				if (previous != null && gameInfo.getPot(previous) == -1) {
-					double previousPot = gameInfo.pot - gameInfo.heroAmountToCall;
+					double previousPot = gameInfo.pot - controller.heroAmountToCall;
 					gameInfo.setPot(previous, previousPot);
 					Log.d("Previous " + C.POT + " for " + previous + ": " + previousPot);
 				}

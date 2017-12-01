@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import mallorcatour.bot.interfaces.IBotFactory;
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.neural.modeller.PlayerStatModel;
 import mallorcatour.bot.villainobserver.IVillainObserver;
 import mallorcatour.core.game.LimitType;
@@ -338,9 +338,9 @@ public class PSTableDirector {
         return limitType;
     }
 
-    private IPlayer createPlayer(PlayerStatModel villainModeller,
-            LimitType limitType, String debug) {
-        IPlayer player;
+    private Player createPlayer(PlayerStatModel villainModeller,
+                                LimitType limitType, String debug) {
+        Player player;
         if (limitType == LimitType.FIXED_LIMIT) {
             player = FLbotFactory.createBot(
                     AdvisorListener.NONE, AdvisorListener.NONE, null, debug);
@@ -362,7 +362,7 @@ public class PSTableDirector {
         String debug = DEBUG_BASE_PATH + DateUtils.getDate(false) + "_"
                 + shortTableName + ".txt";
         PlayerStatModel villainModeller = new PlayerStatModel(debug);
-        IPlayer player = createPlayer(villainModeller, limitType, debug);
+        Player player = createPlayer(villainModeller, limitType, debug);
 		String heroName = StringUtils.between(fullTableName, LOGGED_IN + " as ", FileUtils.LINE_SEPARATOR);
 		// TODO pass real villain model to observer
 		IVillainObserver villainObserver = IVillainObserver.EMPTY;

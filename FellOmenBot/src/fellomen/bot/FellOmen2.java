@@ -19,17 +19,19 @@ import java.util.List;
 import mallorcatour.advice.creator.SmartAdviceCreator;
 import mallorcatour.advice.creator.SmartPostflopAdviceCreator;
 import mallorcatour.advice.creator.SmartRiverAdviceCreator;
-import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.Advice;
 import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.interfaces.Equilator;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
+import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 import mallorcatour.core.game.state.StreetEquity;
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
+import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.tools.Log;
 
 /**
@@ -39,10 +41,10 @@ import mallorcatour.tools.Log;
  * 
  * @author Ian Fellows
  */
-public class FellOmen2 implements IPlayer {
+public class FellOmen2 implements Player, IPlayerGameObserver, IHoleCardsObserver {
     // constants used:
 
-    private IPlayerGameInfo gameInfo;
+    private GameContext gameInfo;
     private Card holeCard1, holeCard2;
     private Card flop1, flop2, flop3, turn, river;
     private StreetEquity flopEquity, turnEquity;
@@ -256,7 +258,7 @@ public class FellOmen2 implements IPlayer {
     }
 
     @Override
-    public void onHandStarted(IPlayerGameInfo gameInfo) {
+    public void onHandStarted(GameContext gameInfo) {
         this.gameInfo = gameInfo;
     }
 
@@ -264,7 +266,7 @@ public class FellOmen2 implements IPlayer {
     public void onHoleCards(Card card1, Card card2) {
         this.holeCard1 = card1;
         this.holeCard2 = card2;
-        this.onButton = gameInfo.onButton();
+        this.onButton = gameInfo.onButton(getName());
     }
 
     private void checkPreflopHistory() {
@@ -292,42 +294,37 @@ public class FellOmen2 implements IPlayer {
         Log.f(DEBUG, "=========  Decision-making  =========");
         Advice advice;
         Action action;
-        if (gameInfo.isVillainSitOut()) {
-            Log.f(DEBUG, "Villain is sitting out");
-            double percent = 0.5;
-            action = Action.createRaiseAction(percent
-                    * (gameInfo.getPotSize() + gameInfo.getAmountToCall()), percent);
+        if (gameInfo.isPreFlop()) {
+            advice = preFlopAction(onButton, holeCard1, holeCard2);
+        } else if (gameInfo.isFlop()) {
+            checkPreflopHistory();
+            advice = flopAction(onButton, flopEquity.strength, flopEquity.positivePotential,
+                    flopEquity.negativePotential, flopBoardIndex, preflopHistory);
+        } else if (gameInfo.isTurn()) {
+            checkPreflopHistory();
+            checkFlopHistory();
+            advice = turnAction(onButton, turnEquity.strength, turnEquity.positivePotential,
+                    turnEquity.negativePotential, flopBoardIndex, preflopHistory, flopHistory);
+        } else if (gameInfo.isRiver()) {
+            checkPreflopHistory();
+            checkFlopHistory();
+            checkTurnHistory();
+            advice = riverAction(onButton, riverStrength, flopBoardIndex,
+                    preflopHistory, flopHistory, turnHistory);
         } else {
-            if (gameInfo.isPreFlop()) {
-                advice = preFlopAction(onButton, holeCard1, holeCard2);
-            } else if (gameInfo.isFlop()) {
-                checkPreflopHistory();
-                advice = flopAction(onButton, flopEquity.strength, flopEquity.positivePotential,
-                        flopEquity.negativePotential, flopBoardIndex, preflopHistory);
-            } else if (gameInfo.isTurn()) {
-                checkPreflopHistory();
-                checkFlopHistory();
-                advice = turnAction(onButton, turnEquity.strength, turnEquity.positivePotential,
-                        turnEquity.negativePotential, flopBoardIndex, preflopHistory, flopHistory);
-            } else if (gameInfo.isRiver()) {
-                checkPreflopHistory();
-                checkFlopHistory();
-                checkTurnHistory();
-                advice = riverAction(onButton, riverStrength, flopBoardIndex,
-                        preflopHistory, flopHistory, turnHistory);
-            } else {
-                throw new RuntimeException();
-            }
-            Log.f(DEBUG, "Advice: " + advice.toString());
-            action = advice.getAction();
-            action = preprocessor.preprocessAction(action, gameInfo);
+            throw new RuntimeException();
         }
+        Log.f(DEBUG, "Advice: " + advice.toString());
+        action = advice.getAction();
+        //TODO use correct toCall value
+        action = preprocessor.preprocessAction(action, gameInfo, 100);
         Log.f(DEBUG, "Action: " + action.toString());
         Log.f(DEBUG, "===============  End  ==============");
         onPlayerActed(action, onButton);
         return action;
     }
 
+    @Override
     public void onStageEvent(PokerStreet street) {
         List<Card> board = gameInfo.getBoard();
         if (street == PokerStreet.FLOP) {

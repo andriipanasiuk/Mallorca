@@ -1,18 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mallorcatour.robot.controller;
 
 import mallorcatour.core.game.GameInfo;
-import mallorcatour.core.game.LimitType;
-import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.robot.ExtPlayerInfo;
 
-/**
- *
- * @author Andrew
- */
 public class HUGameInfo extends GameInfo {
 
     public int[] raisesOnStreet = new int[4];
@@ -25,8 +15,7 @@ public class HUGameInfo extends GameInfo {
         }
     }
 
-    @Override
-    public double getAmountToCall() {
+    double getAmountToCall() {
         double betDifference = villainInfo.getBet() - heroInfo.getBet();
         if (betDifference <= 0) {
             return 0;
@@ -35,18 +24,4 @@ public class HUGameInfo extends GameInfo {
         }
     }
 
-    @Override
-    public boolean isVillainSitOut(){
-    	return villainInfo.getStack() == HUGameInfo.SITTING_OUT;
-    }
-
-	@Override
-	public OpenPlayerInfo getVillain() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean onButton() {
-		return heroInfo.isOnButton();
-	}
 }

@@ -1,6 +1,6 @@
 package mallorcatour.neural.bot;
 
-import mallorcatour.stats.PokerStats;
+import mallorcatour.core.stats.PokerStats;
 
 import org.neuroph.core.NeuralNetwork;
 

@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.core.player.interfaces.IPlayer;
+import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.LimitType;
@@ -31,7 +31,7 @@ public class HUGameController implements IGameController {
     private static final String ALARM_WAV_PATH = "assets/sound/app-31.wav";
     private PokerStreet currentStreet;
     private HUGameInfo gameInfo;
-    protected final IPlayer player;
+    protected final Player player;
     //values must be reseted after new hand
     private List<Card> alreadyTakenCards;
     private Action heroPreviousAction, villainPreviousAction;
@@ -40,7 +40,7 @@ public class HUGameController implements IGameController {
     private final String DEBUG_PATH;
     private final String heroName;
 
-    public HUGameController(IPlayer player, String heroName, String DEBUG_PATH) {
+    public HUGameController(Player player, String heroName, String DEBUG_PATH) {
         this.player = player;
         this.DEBUG_PATH = DEBUG_PATH;
         this.heroName = heroName;
@@ -123,10 +123,15 @@ public class HUGameController implements IGameController {
     }
 
 	@Override
-    public Action onMyAction(List<Card> boardCards, double pot) {
+    public Action onMyAction(List<Card> boardCards, double pot, boolean villainSitOut) {
         sendVillainActions(boardCards, pot);
         Action heroAction;
         heroAction = player.getAction();
+        if (villainSitOut) {
+            double percent = 0.5;
+            heroAction = Action.createRaiseAction(percent
+                    * (gameInfo.getPotSize() + gameInfo.getAmountToCall()), percent);
+        }
         //calculating changing of pot
         if (villainPreviousAction != null) {
             if (villainPreviousAction.isAggressive()) {

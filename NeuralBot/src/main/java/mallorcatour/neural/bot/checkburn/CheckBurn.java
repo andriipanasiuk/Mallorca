@@ -1,12 +1,9 @@
 package mallorcatour.neural.bot.checkburn;
 
 import mallorcatour.neural.bot.BaseNeural;
-import mallorcatour.neural.bot.IPokerNeurals;
-import mallorcatour.stats.PokerStats;
-import mallorcatour.stats.PokerStatsImpl;
+import mallorcatour.core.stats.PokerStats;
+import mallorcatour.core.stats.PokerStatsImpl;
 import mallorcatour.neural.core.NeuralCreator;
-
-import org.neuroph.core.NeuralNetwork;
 
 public class CheckBurn extends BaseNeural {
 

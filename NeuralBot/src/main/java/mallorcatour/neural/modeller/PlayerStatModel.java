@@ -6,6 +6,7 @@ package mallorcatour.neural.modeller;
 
 import mallorcatour.bot.C;
 import mallorcatour.core.game.advice.Advisor;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.state.HandState;
 import mallorcatour.neural.bot.NeuralAdvisorImpl;
 import mallorcatour.neural.bot.checkburn.CheckBurn;
@@ -14,13 +15,12 @@ import mallorcatour.neural.bot.dafish.Dafish;
 import mallorcatour.neural.bot.dafish2.Dafish2;
 import mallorcatour.neural.bot.germany.Germany;
 import mallorcatour.neural.bot.pbx.Pbx;
-import mallorcatour.stats.PokerStats;
-import mallorcatour.stats.PokerStatsBuffer;
-import mallorcatour.stats.StatCalculator;
+import mallorcatour.core.stats.PokerStats;
+import mallorcatour.core.stats.PokerStatsBuffer;
+import mallorcatour.core.stats.StatCalculator;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.game.advice.IAdvice;
-import mallorcatour.core.game.interfaces.IPlayerGameInfo;
 import mallorcatour.tools.DoubleUtils;
 import mallorcatour.tools.Log;
 
@@ -93,7 +93,7 @@ public class PlayerStatModel implements NeuralAdvisor, AdvisorListener {
 	}
 
 	@Override
-	public IAdvice getAdvice(HandState situation, HoleCards cards, IPlayerGameInfo gameInfo) {
+	public IAdvice getAdvice(HandState situation, HoleCards cards, GameContext gameInfo) {
 		IAdvice result = currentNeural.getAdvice(situation, cards, gameInfo);
 		return result;
 	}
@@ -115,7 +115,7 @@ public class PlayerStatModel implements NeuralAdvisor, AdvisorListener {
 
 	@Override
 	public String toString() {
-		return "Player model by " + currentNeural.toString();
+		return "Bot model by " + currentNeural.toString();
 	}
 
 	@Override

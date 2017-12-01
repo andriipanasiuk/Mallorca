@@ -7,7 +7,7 @@ import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.core.game.interfaces.IGameInfo;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.math.RandomVariable;
 import mallorcatour.core.spectrum.Spectrum;
 
@@ -19,8 +19,8 @@ public class ShowdownGameSolver extends NLGameSolver {
 
 	@SuppressWarnings("unused")
 	@Override
-	protected RandomVariable calculatePassiveProfit(IGameInfo gameInfo, double pot, double heroInvestment,
-			PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton, int depth) {
+	protected RandomVariable calculatePassiveProfit(GameContext gameInfo, double pot, double heroInvestment,
+                                                    PokerStreet street, HoleCards heroCards, Card[] board, Spectrum villainSpectrum, boolean onButton, int depth) {
 		if (street == PokerStreet.RIVER) {
 			return super.calculatePassiveProfit(gameInfo, pot, heroInvestment, street, heroCards, board,
 					villainSpectrum, onButton, true, depth);
