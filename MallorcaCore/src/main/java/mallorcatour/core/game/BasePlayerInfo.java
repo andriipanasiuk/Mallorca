@@ -1,6 +1,9 @@
 package mallorcatour.core.game;
 
-public class BasePlayerInfo {
+/**
+ * Информация об игроке за столом, которая видна всем наблюдателям.
+ */
+public abstract class BasePlayerInfo {
 	public String name;
 	public double stack;
 

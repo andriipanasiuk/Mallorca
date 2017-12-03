@@ -4,11 +4,13 @@ import java.util.List;
 
 import mallorcatour.core.game.interfaces.GameContext;
 
-public abstract class GameInfoAdapter implements GameContext {
+//TODO есть желание переделать этот класс, так как многое тут относится к неизменяемой части раздачи,
+//а что-то меняется по ходу раздачи.
+public class GameContextImpl<T extends PlayerInfo> implements GameContext {
 	public LimitType limitType;
+	//TODO переместить в FLGameInfo
 	public int[] raisesOnStreet = new int[4];
-	public boolean canHeroRaise;
-	protected PokerStreet street;
+	private PokerStreet street;
 	public double pot;
 	public double bigBlind;
 	public List<Card> board;
@@ -16,7 +18,10 @@ public abstract class GameInfoAdapter implements GameContext {
 	public boolean onButton;
 	private double[] potOnStreet = new double[4];
 
-	public GameInfoAdapter() {
+	public T heroInfo;
+	public T villainInfo;
+
+	public GameContextImpl() {
 		resetStreetPots();
 	}
 
@@ -112,4 +117,27 @@ public abstract class GameInfoAdapter implements GameContext {
 		return board.get(4);
 	}
 
+	@Override
+	public boolean onButton(String name) {
+		if (name.equals(heroInfo.name)) {
+			return heroInfo.isOnButton;
+		} else {
+			return villainInfo.isOnButton;
+		}
+	}
+
+	@Override
+	public T getHero(String hero) {
+		return heroInfo.name.equals(hero) ? heroInfo : villainInfo;
+	}
+
+	@Override
+	public T getVillain(String hero) {
+		return heroInfo.name.equals(hero) ? villainInfo : heroInfo;
+	}
+
+	@Override
+	public double getAmountToCall(String hero) {
+		return Math.max(0, getVillain(hero).bet - getHero(hero).bet);
+	}
 }

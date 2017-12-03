@@ -36,4 +36,8 @@ public class PlayerInfo extends BasePlayerInfo implements Serializable {
 	public boolean isOnButton() {
 		return isOnButton;
 	}
+
+	public double getBet() {
+		return bet;
+	}
 }

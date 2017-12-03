@@ -2,6 +2,8 @@ package mallorcatour.presenter;
 
 import mallorcatour.bot.C;
 import mallorcatour.bot.ObservingPlayer;
+import mallorcatour.bot.math.NLMathBotFactory;
+import mallorcatour.bot.random.RandomBot;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.PokerStreet;
@@ -13,8 +15,6 @@ import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.presenter.GameViewContract.Presenter;
 import mallorcatour.presenter.GameViewContract.View;
-import mallorcatour.neural.bot.NeuralBotFactory;
-import mallorcatour.neural.bot.gusxensen.GusXensen;
 import mallorcatour.tools.DateUtils;
 import mallorcatour.tools.Log;
 
@@ -32,12 +32,12 @@ public class GameViewPresenter implements Presenter, IGameObserver {
 
     @Override
     public void start() {
+        Log.WRITE_TO_CONSOLE = true;
         DEBUG_PATH = C.Preferences.LOG_PATH + DateUtils.getDate(false) + ".txt";
-        NeuralBotFactory factory = new NeuralBotFactory(new GusXensen(), "Gus Xensen");
+        NLMathBotFactory factory = new NLMathBotFactory(new RandomBot("random", DEBUG_PATH));
         playerUp = factory.createBot(AdvisorListener.NONE,
                 AdvisorListener.NONE, "Grantorino Up", DEBUG_PATH);
         playerDown = new HumanPlayer("Andrew", DEBUG_PATH);
-        //TODO подправить
         engine = new GameEngine(playerDown, playerUp, this, new PokerEquilatorBrecher(), DEBUG_PATH);
     }
 

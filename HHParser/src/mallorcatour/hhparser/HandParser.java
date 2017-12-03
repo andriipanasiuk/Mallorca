@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.GameContextImpl;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Flop;
-import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.Hand;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.PlayerAction;
@@ -19,7 +19,7 @@ import mallorcatour.neural.core.PokerLearningExample;
 
 public class HandParser {
 
-    private GameInfo gameInfo;
+    private GameContextImpl gameInfo;
     private double effectiveStack;
     private double pot;
     private double amountToCall;
@@ -30,6 +30,7 @@ public class HandParser {
     private List<HandState> situations;
     private Action heroPreviousAction;
     private List<PokerLearningExample> learningExamples;
+    private double heroAmountToCall;
 
     private void doParsing(Hand hand, StrengthHandStateObserver stateObserver) {
         newHand(hand, stateObserver);
@@ -119,7 +120,7 @@ public class HandParser {
     }
 
     private void newHand(Hand hand, StrengthHandStateObserver stateObserver) {
-        gameInfo = new GameInfo();
+        gameInfo = new GameContextImpl();
         gameInfo.heroInfo = hand.getPlayerInfo(heroName);
         gameInfo.villainInfo = hand.getPlayerInfo(villainName);
         initPot(hand);
@@ -193,7 +194,7 @@ public class HandParser {
             return;
         }
         gameInfo.pot = pot;
-        gameInfo.heroAmountToCall = amountToCall;
+        heroAmountToCall = amountToCall;
         gameInfo.bankrollAtRisk = bankrollAtRisk;
     }
 
@@ -205,7 +206,7 @@ public class HandParser {
         bankrollAtRisk = effectiveStack - hand.getBigBlind();
         amountToCall = hand.getBigBlind() - hand.getSmallBlind();
         gameInfo.pot = pot;
-        gameInfo.heroAmountToCall = amountToCall;
+        heroAmountToCall = amountToCall;
         gameInfo.bankrollAtRisk = bankrollAtRisk;
     }
 }

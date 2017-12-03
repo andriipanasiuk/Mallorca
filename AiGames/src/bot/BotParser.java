@@ -17,7 +17,7 @@ import mallorcatour.bot.C;
 import mallorcatour.bot.interfaces.IBotFactory;
 import mallorcatour.bot.math.NLMathBotFactory;
 import mallorcatour.core.game.Action;
-import mallorcatour.core.game.GameInfo;
+import mallorcatour.core.game.GameContextImpl;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.advice.AdvisorListener;
 import mallorcatour.core.player.interfaces.Player;
@@ -43,7 +43,7 @@ public class BotParser {
 	}
 
 	public void run() {
-		GameInfo gameInfo = new GameInfo();
+		GameContextImpl gameInfo = new GameContextImpl();
 		AiGamesController controller = new AiGamesController(gameInfo, bot);
 		while (scan.hasNextLine()) {
 			String line = scan.nextLine().trim();

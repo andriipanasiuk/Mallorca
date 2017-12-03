@@ -28,7 +28,7 @@ import mallorcatour.core.game.advice.AdviceCreator;
 import mallorcatour.core.game.interfaces.Equilator;
 import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.IActionPreprocessor;
-import mallorcatour.core.game.interfaces.IPlayerGameObserver;
+import mallorcatour.core.game.interfaces.IGameObserver;
 import mallorcatour.core.game.state.StreetEquity;
 import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.equilator.PokerEquilatorBrecher;
@@ -37,11 +37,11 @@ import mallorcatour.tools.Log;
 /**
  * Ian Bot Impl
  * 
- * Description: {Insert Description here}
- * 
+ * Бот для игры в FL Texas Holdem.
+ *
  * @author Ian Fellows
  */
-public class FellOmen2 implements Player, IPlayerGameObserver, IHoleCardsObserver {
+public class FellOmen2 implements Player, IGameObserver, IHoleCardsObserver {
     // constants used:
 
     private GameContext gameInfo;

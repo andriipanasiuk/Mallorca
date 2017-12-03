@@ -4,12 +4,16 @@ import java.util.Random;
 
 import mallorcatour.bot.ObservingPlayer;
 import mallorcatour.core.game.Action;
+import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.IHoleCardsObserver;
+import mallorcatour.core.game.advice.Advisor;
+import mallorcatour.core.game.advice.IAdvice;
+import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.state.HandState;
 import mallorcatour.core.game.state.observer.BaseHandStateObserver;
 import mallorcatour.core.player.interfaces.Player;
 
-public class RandomBot extends ObservingPlayer implements Player {
+public class RandomBot extends ObservingPlayer implements Player, Advisor {
 
     private Random random = new Random(System.currentTimeMillis());
 
@@ -50,4 +54,8 @@ public class RandomBot extends ObservingPlayer implements Player {
 		return name;
 	}
 
+	@Override
+	public IAdvice getAdvice(HandState situation, HoleCards cards, GameContext gameInfo) {
+		return getAction();
+	}
 }

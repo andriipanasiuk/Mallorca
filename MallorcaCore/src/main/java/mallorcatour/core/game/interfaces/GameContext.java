@@ -17,44 +17,44 @@ import mallorcatour.core.game.PokerStreet;
  */
 public interface GameContext {
 
-	public double getBigBlindSize();
+	 double getBigBlindSize();
 
-	public PokerStreet getStage();
+	 PokerStreet getStage();
 
-	public boolean isPreFlop();
+	 boolean isPreFlop();
 
-	public boolean isPostFlop();
+	 boolean isPostFlop();
 
-	public boolean isFlop();
+	 boolean isFlop();
 
-	public boolean isTurn();
+	 boolean isTurn();
 
-	public boolean isRiver();
+	 boolean isRiver();
 
-	public List<Card> getBoard();
+	 List<Card> getBoard();
 
-	public Flop getFlop();
+	 Flop getFlop();
 
-	public Card getTurn();
+	 Card getTurn();
 
-	public Card getRiver();
+	 Card getRiver();
 
-	public double getPot(PokerStreet street);
+	 double getPot(PokerStreet street);
 
-	public double getPotSize();
+	 double getPotSize();
 
-	public double getBankRollAtRisk();
+	 double getBankRollAtRisk();
 
-	public int getNumRaises();
+	 int getNumRaises();
 
-	public LimitType getLimitType();
+	 LimitType getLimitType();
 
-	public boolean onButton(String name);
+	 boolean onButton(String name);
 
-	public PlayerInfo getHero(String hero);
+	 PlayerInfo getHero(String hero);
 
-	public PlayerInfo getVillain(String hero);
+	 PlayerInfo getVillain(String hero);
 
-	public double getAmountToCall(String hero);
+	double getAmountToCall(String hero);
 
 }

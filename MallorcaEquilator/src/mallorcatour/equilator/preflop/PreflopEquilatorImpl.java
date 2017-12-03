@@ -2,7 +2,6 @@ package mallorcatour.equilator.preflop;
 
 import java.util.Map.Entry;
 
-import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.Deck;
 import mallorcatour.core.game.HoleCards;
@@ -10,6 +9,7 @@ import mallorcatour.core.game.interfaces.PreflopEquilator;
 import mallorcatour.core.game.state.StreetEquity;
 import mallorcatour.core.math.RandomVariable;
 import mallorcatour.core.spectrum.Spectrum;
+import mallorcatour.equilator.PokerEquilatorBrecher;
 import mallorcatour.tools.Log;
 import mallorcatour.tools.SerializatorUtils;
 
@@ -21,15 +21,17 @@ public class PreflopEquilatorImpl implements PreflopEquilator {
 	public static LoadFrom loadFrom = LoadFrom.CODE;
 	public static boolean LOGGING = false;
 	private static final String PREFLOP_STRENGTH_TABLE_PATH = "prefl" + "op.eql";
-	public static double[][] preflopStrength = new double[170][170];
+	public double[][] preflopStrength = new double[170][170];
 
-	static {
-		if (loadFrom == LoadFrom.FILE) {
-			preflopStrength = SerializatorUtils.load(
-					PreflopEquilatorImpl.class.getResourceAsStream(PREFLOP_STRENGTH_TABLE_PATH), double[][].class);
-		} else if (loadFrom == LoadFrom.CODE) {
-			preflopStrength = PreflopStrengthTable.array;
-		}
+	public PreflopEquilatorImpl() {
+		preflopStrength = PreflopStrengthTable.array;
+	}
+
+	public static PreflopEquilator createFromFile() {
+		PreflopEquilatorImpl equilator = new PreflopEquilatorImpl();
+		equilator.preflopStrength = SerializatorUtils.load(
+				PreflopEquilatorImpl.class.getResourceAsStream(PREFLOP_STRENGTH_TABLE_PATH), double[][].class);
+		return equilator;
 	}
 
 	private static int combination(Card card1, Card card2) {
@@ -113,14 +115,14 @@ public class PreflopEquilatorImpl implements PreflopEquilator {
 		return result;
 	}
 
-	private static double preflopStrength(HoleCards heroCards,
+	private double preflopStrength(HoleCards heroCards,
 			HoleCards villainCards) {
 		int heroHash = heroCards.hashCodeForValues();
 		int villainHash = villainCards.hashCodeForValues();
 		return preflopStrength[heroHash][villainHash];
 	}
 
-	private static double preflopStrength(int heroHash, int villainHash) {
+	private double preflopStrength(int heroHash, int villainHash) {
 		return preflopStrength[heroHash][villainHash];
 	}
 
@@ -149,7 +151,7 @@ public class PreflopEquilatorImpl implements PreflopEquilator {
 		return ((double) wins) / count;
 	}
 
-	public static RandomVariable profitVsSpectrum(Card heroCard1, Card heroCard2, Spectrum spectrum, double win,
+	public RandomVariable profitVsSpectrum(Card heroCard1, Card heroCard2, Spectrum spectrum, double win,
 			double lose) {
 		int log = 0;
 		RandomVariable result = new RandomVariable();

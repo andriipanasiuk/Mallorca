@@ -1,37 +1,30 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mallorcatour.robot.controller;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import mallorcatour.core.player.interfaces.Player;
+import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
+import br.com.wagnerpaz.javahook.NativeKeyboardListener;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
+import mallorcatour.core.game.GameContextImpl;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.core.game.PokerStreet;
-import mallorcatour.robot.ExtPlayerInfo;
+import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.robot.hardwaremanager.KeyboardHookManager;
 import mallorcatour.robot.interfaces.IGameController;
 import mallorcatour.tools.FileUtils;
 import mallorcatour.tools.Log;
 import mp3player.Mp3Player;
-import br.com.wagnerpaz.javahook.NativeKeyboardEvent;
-import br.com.wagnerpaz.javahook.NativeKeyboardListener;
 
-/**
- *
- * @author Andrew
- */
-public class HUGameController implements IGameController {
+public class HUGameController<GI extends GameContextImpl> implements IGameController {
 
     private static final String ALARM_WAV_PATH = "assets/sound/app-31.wav";
-    private PokerStreet currentStreet;
-    private HUGameInfo gameInfo;
-    protected final Player player;
+    PokerStreet currentStreet;
+    GI gameInfo;
+    private final Player player;
     //values must be reseted after new hand
     private List<Card> alreadyTakenCards;
     private Action heroPreviousAction, villainPreviousAction;
@@ -46,8 +39,8 @@ public class HUGameController implements IGameController {
         this.heroName = heroName;
     }
 
-    private ExtPlayerInfo getHero(List<ExtPlayerInfo> players) {
-        for (ExtPlayerInfo playerInfo : players) {
+    private PlayerInfo getHero(List<PlayerInfo> players) {
+        for (PlayerInfo playerInfo : players) {
             if (playerInfo.getName().equals(heroName)) {
                 return playerInfo;
             }
@@ -55,8 +48,8 @@ public class HUGameController implements IGameController {
         throw new RuntimeException();
     }
 
-    private ExtPlayerInfo getVillain(List<ExtPlayerInfo> players) {
-        for (ExtPlayerInfo playerInfo : players) {
+    private PlayerInfo getVillain(List<PlayerInfo> players) {
+        for (PlayerInfo playerInfo : players) {
             if (!playerInfo.getName().equals(heroName)) {
                 return playerInfo;
             }
@@ -64,8 +57,8 @@ public class HUGameController implements IGameController {
         throw new RuntimeException();
     }
 
-    private double getBigBlind(List<ExtPlayerInfo> players) {
-        for (ExtPlayerInfo playerInfo : players) {
+    private double getBigBlind(List<PlayerInfo> players) {
+        for (PlayerInfo playerInfo : players) {
             if (!playerInfo.isOnButton()) {
                 return playerInfo.getBet();
             }
@@ -110,10 +103,10 @@ public class HUGameController implements IGameController {
         }
     }
 
-    private double getEffectiveStack(List<ExtPlayerInfo> players) {
+    private double getEffectiveStack(List<PlayerInfo> players) {
         double result = Double.POSITIVE_INFINITY;
         double playerAllStack;
-        for (ExtPlayerInfo playerInfo : players) {
+        for (PlayerInfo playerInfo : players) {
             playerAllStack = playerInfo.getBet() + playerInfo.getStack();
             if (playerAllStack < result) {
                 result = playerAllStack;
@@ -122,57 +115,54 @@ public class HUGameController implements IGameController {
         return result;
     }
 
-	@Override
+    protected void onHeroActed(Action action) {
+        if (villainPreviousAction != null) {
+            if (villainPreviousAction.isAggressive()) {
+                if (action.isAggressive()) {
+                    gameInfo.pot += villainPreviousAction.getAmount();
+                    double heroRaiseAmount = action.getAmount();
+                    if (heroRaiseAmount > gameInfo.bankrollAtRisk) {
+                        heroRaiseAmount = gameInfo.bankrollAtRisk;
+                    }
+                    gameInfo.pot += heroRaiseAmount;
+                    gameInfo.bankrollAtRisk -= heroRaiseAmount;
+
+                } else if (action.isPassive()) {
+                    gameInfo.pot += villainPreviousAction.getAmount();
+                }
+            } else if (villainPreviousAction.isPassive()) {
+                if (action.isAggressive()) {
+                    double heroRaiseAmount = action.getAmount();
+                    if (heroRaiseAmount > gameInfo.bankrollAtRisk) {
+                        heroRaiseAmount = gameInfo.bankrollAtRisk;
+                    }
+                    gameInfo.pot += heroRaiseAmount;
+                    gameInfo.bankrollAtRisk -= heroRaiseAmount;
+                }
+            }
+        } else if (action.isAggressive()) {
+            gameInfo.pot += gameInfo.bigBlind / 2;
+            double heroRaiseAmount = action.getAmount();
+            if (heroRaiseAmount > gameInfo.bankrollAtRisk) {
+                heroRaiseAmount = gameInfo.bankrollAtRisk;
+            }
+            gameInfo.pot += heroRaiseAmount;
+            gameInfo.bankrollAtRisk -= heroRaiseAmount;
+        } else {
+            gameInfo.pot += gameInfo.bigBlind / 2;
+        }
+        heroPreviousAction = action;
+    }
+
+    @Override
     public Action onMyAction(List<Card> boardCards, double pot, boolean villainSitOut) {
         sendVillainActions(boardCards, pot);
         Action heroAction;
         heroAction = player.getAction();
         if (villainSitOut) {
-            double percent = 0.5;
-            heroAction = Action.createRaiseAction(percent
-                    * (gameInfo.getPotSize() + gameInfo.getAmountToCall()), percent);
+            heroAction = Action.createRaiseAction(gameInfo.getPotSize(), 1);
         }
-        //calculating changing of pot
-        if (villainPreviousAction != null) {
-            if (villainPreviousAction.isAggressive()) {
-                if (heroAction.isAggressive()) {
-                    gameInfo.pot += villainPreviousAction.getAmount();
-                    double heroRaiseAmount = heroAction.getAmount();
-                    if (heroRaiseAmount > gameInfo.bankrollAtRisk) {
-                        heroRaiseAmount = gameInfo.bankrollAtRisk;
-                    }
-                    gameInfo.pot += heroRaiseAmount;
-                    gameInfo.bankrollAtRisk -= heroRaiseAmount;
-                    gameInfo.raisesOnStreet[currentStreet.intValue()]++;
-                } else if (heroAction.isPassive()) {
-                    gameInfo.pot += villainPreviousAction.getAmount();
-                }
-            } else if (villainPreviousAction.isPassive()) {
-                if (heroAction.isAggressive()) {
-                    double heroRaiseAmount = heroAction.getAmount();
-                    if (heroRaiseAmount > gameInfo.bankrollAtRisk) {
-                        heroRaiseAmount = gameInfo.bankrollAtRisk;
-                    }
-                    gameInfo.pot += heroRaiseAmount;
-                    gameInfo.bankrollAtRisk -= heroRaiseAmount;
-                    gameInfo.raisesOnStreet[currentStreet.intValue()]++;
-                }
-            }
-        } else {
-            if (heroAction.isAggressive()) {
-                gameInfo.pot += gameInfo.bigBlind / 2;
-                double heroRaiseAmount = heroAction.getAmount();
-                if (heroRaiseAmount > gameInfo.bankrollAtRisk) {
-                    heroRaiseAmount = gameInfo.bankrollAtRisk;
-                }
-                gameInfo.pot += heroRaiseAmount;
-                gameInfo.bankrollAtRisk -= heroRaiseAmount;
-                gameInfo.raisesOnStreet[currentStreet.intValue()]++;
-            } else {
-                gameInfo.pot += gameInfo.bigBlind / 2;
-            }
-        }
-        heroPreviousAction = heroAction;
+        onHeroActed(heroAction);
         return heroAction;
     }
 
@@ -285,12 +275,12 @@ public class HUGameController implements IGameController {
     }
 
 	@Override
-	public void onNewHand(long handNumber, List<ExtPlayerInfo> players, Card holeCard1, Card holeCard2, List<Card> board,
-			double pot, LimitType limitType) {
+	public void onNewHand(long handNumber, List<PlayerInfo> players, Card holeCard1, Card holeCard2, List<Card> board,
+                          double pot, LimitType limitType) {
 		villainPreviousAction = null;
 		currentStreet = calculateStreet(board);
-        alreadyTakenCards = new ArrayList<Card>();
-        gameInfo = new HUGameInfo();
+        alreadyTakenCards = new ArrayList<>();
+        gameInfo = (GI) new FLGameInfo();
         player.onHandStarted(gameInfo);
         //player infos
         gameInfo.heroInfo = getHero(players);
@@ -316,7 +306,7 @@ public class HUGameController implements IGameController {
         Log.f(DEBUG_PATH, "\n<--------------------->");
         Log.f(DEBUG_PATH, "Hand number: " + handNumber + FileUtils.LINE_SEPARATOR);
         String smallBlindLog = "", bigBlindLog = "";
-        for (ExtPlayerInfo playerInfo : players) {
+        for (PlayerInfo playerInfo : players) {
             String log;
             if (playerInfo.isOnButton()) {
                 log = playerInfo.getName() + "* " + playerInfo.getStack()

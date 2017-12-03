@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mallorcatour.bot.C;
+import mallorcatour.core.game.GameContextImpl;
 import mallorcatour.core.player.interfaces.Player;
 import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
-import mallorcatour.core.game.GameInfo;
 import mallorcatour.core.game.OpenPlayerInfo;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.tools.FileUtils;
@@ -42,12 +42,12 @@ public class AiGamesController {
 	private String heroName = null;
 	private String villainName = null;
 
-	private GameInfo gameInfo;
+	private GameContextImpl gameInfo;
 	private Player bot;
 
 	public double heroAmountToCall;
 
-	public AiGamesController(GameInfo gameInfo, Player observer) {
+	public AiGamesController(GameContextImpl gameInfo, Player observer) {
 		this.gameInfo = gameInfo;
 		this.bot = observer;
 	}

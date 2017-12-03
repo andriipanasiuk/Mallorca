@@ -16,13 +16,12 @@ import mallorcatour.core.game.Action;
 import mallorcatour.core.game.Card;
 import mallorcatour.core.game.HoleCards;
 import mallorcatour.core.game.LimitType;
+import mallorcatour.core.game.PlayerInfo;
 import mallorcatour.robot.ActionSynchronizer;
 import mallorcatour.robot.ChatTracker;
 import mallorcatour.robot.HumanColorTableInteractor;
 import mallorcatour.robot.ITableInteractor;
 import mallorcatour.robot.KeyboardTableInteractor;
-import mallorcatour.robot.ExtPlayerInfo;
-import mallorcatour.robot.controller.HUGameInfo;
 import mallorcatour.robot.controller.PokerPreferences;
 import mallorcatour.robot.hardwaremanager.MouseClickLimiter;
 import mallorcatour.robot.hardwaremanager.MouseDragLimiter;
@@ -37,12 +36,9 @@ import mallorcatour.tools.Log;
 import mallorcatour.tools.OnExceptionListener;
 import mallorcatour.tools.ThreadUtils;
 
-/**
- *
- * @author Andrew
- */
 public class PSGameRobot implements IGameRobot, ITableListener {
 
+    public static final int SITTING_OUT = -2;
     private static final int WAIT_AFTER_ACTION = 1000;
     private static final int WAIT_FOR_MY_ACTION_DELAY = 750;
     private static final int WAIT_FOR_MY_ACTION_TIMEOUT = 120000;
@@ -50,7 +46,7 @@ public class PSGameRobot implements IGameRobot, ITableListener {
     private long currentHandNumber = -1;
     private boolean paused = true;
     private boolean isGameStarted = false;
-    private ExtPlayerInfo heroInfo, villainInfo;
+    private PlayerInfo heroInfo, villainInfo;
     private ITableInteractor tableInteractor;
     private final ExecutorService executor;
     private final PSTableRecognizer tableRecognizer;
@@ -116,7 +112,7 @@ public class PSGameRobot implements IGameRobot, ITableListener {
     private void endSession() {
         Log.d("PSGameRobot " + this + " Session ended.");
         villainObserver.endSession();
-        villainInfo.changeName(PokerPreferences.DEFAULT_VILLAIN_NAME);
+        villainInfo = new PlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME);
     }
 
     private void checkForMyAction() {
@@ -165,8 +161,10 @@ public class PSGameRobot implements IGameRobot, ITableListener {
             boolean heroOnButton = tableRecognizer.isHeroOnButton();
             boolean villainOnButton = !heroOnButton;
             //creating new player infos
-            heroInfo = new ExtPlayerInfo(heroName, heroOnButton);
-            villainInfo = new ExtPlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME, villainOnButton);
+            heroInfo = new PlayerInfo(heroName);
+            heroInfo.isOnButton = heroOnButton;
+            villainInfo = new PlayerInfo(PokerPreferences.DEFAULT_VILLAIN_NAME);
+            villainInfo.isOnButton = villainOnButton;
         }
         //recognizing board cards
         List<Card> boardCards = tableRecognizer.getBoardCards();
@@ -209,7 +207,7 @@ public class PSGameRobot implements IGameRobot, ITableListener {
                 villainObserver.onHandPlayed(currentHandNumber);
                 if (villainObserver.isVillainKnown()) {
                     String newVillainName = villainObserver.getCurrentVillain().getName();
-                    villainInfo.changeName(newVillainName);
+                    villainInfo.name = newVillainName;
                 }
             }
             currentHandNumber = handNumber;
@@ -219,7 +217,7 @@ public class PSGameRobot implements IGameRobot, ITableListener {
         }
 
         start1 = System.currentTimeMillis();
-        action = controller.onMyAction(boardCards, pot, villainInfo.stack == HUGameInfo.SITTING_OUT);
+        action = controller.onMyAction(boardCards, pot, villainInfo.stack == SITTING_OUT);
         timeDecisionMaking = System.currentTimeMillis() - start1;
         ActionSynchronizer.endOfLogic();
 

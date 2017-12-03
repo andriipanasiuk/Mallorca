@@ -6,14 +6,13 @@ import mallorcatour.core.game.IHoleCardsObserver;
 import mallorcatour.core.game.PokerStreet;
 import mallorcatour.core.game.interfaces.GameContext;
 import mallorcatour.core.game.interfaces.IGameObserver;
-import mallorcatour.core.game.interfaces.IPlayerGameObserver;
 
 /**
  * Это некий активный наблюдатель за игрой, который запоминает карты, пристально следит за
  * текущим состоянием раздачи, видит карты игрока, но у него нет компетенции для того,
  * чтобы сделать правильный ход.
  */
-public abstract class ObservingPlayer implements IPlayerGameObserver, IHoleCardsObserver {
+public abstract class ObservingPlayer implements IGameObserver, IHoleCardsObserver {
 	protected GameContext gameInfo;
 	protected final String DEBUG_PATH;
 	protected Card heroCard1, heroCard2;
