@@ -72,7 +72,7 @@ public class GameTrayFrame extends JDialog {
     private MenuItem isActivatedItem;
     private CheckboxMenuItem fellOmenItem, sparItem, mathBotItem;
     private SystemTray systemTray = SystemTray.getSystemTray();
-    private final PSTableDirector gameDirector;
+    private PSTableDirector gameDirector;
     private boolean humanManage = false;
 
     public GameTrayFrame() throws IOException, AWTException {
@@ -80,6 +80,7 @@ public class GameTrayFrame extends JDialog {
                 Toolkit.getDefaultToolkit().getScreenSize());
         gameDirector.setFLBotFactory(new FellOmenFactory());
         gameDirector.setNLBotFactory(new NeuralBotFactory(new GusXensen(), "Gux Xensen"));
+        //todo how to make it work on MacOS?
         KeyboardHookManager.addListener(new NativeKeyboardListener() {
 
             public boolean keyPressed(NativeKeyboardEvent nke) {

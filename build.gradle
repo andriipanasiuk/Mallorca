@@ -4,18 +4,18 @@ allprojects {
     apply plugin: 'maven-publish'
     group = 'mallorcatour'
     version '1.0-SNAPSHOT'
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-            }
-        }
-    }
+//    publishing {
+//        publications {
+//            mavenJava(MavenPublication) {
+//                from components.java
+//            }
+//        }
+//    }
 }
 buildscript {
     repositories {
         mavenCentral()
-        mavenLocal()
+//        mavenLocal()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
