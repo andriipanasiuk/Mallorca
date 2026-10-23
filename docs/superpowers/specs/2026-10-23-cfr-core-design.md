@@ -138,7 +138,8 @@ Sizes come from the preset TOML. Values for `v1`:
 
 ### Storage
 
-- Two flat `f32` arrays for all streets: cumulative regrets and cumulative strategy weights.
+- Two flat arrays for all streets: cumulative regrets in `f32` and cumulative strategy weights in `f64`. The
+  weights are `f64` because a hot infoset's sum passes 2^24 under DCFR and `f32` adds of a probability round away.
 - Before training, the trainer prints the infoset count and the memory estimate and refuses to start when the
   estimate exceeds `memory_limit_gb` in the preset (12 by default).
 
@@ -148,15 +149,16 @@ Sizes come from the preset TOML. Values for `v1`:
 - Discounted CFR with α = 1.5, β = 0, γ = 2, applied every `discount_interval` iterations; the values sit in the
   preset so Linear CFR is a parameter change.
 - Parallel: `threads` workers (12 for `v1`) run iterations against the shared arrays without locks, Hogwild
-  style, writing through atomic `u32` cells that hold `f32` bits. A run with one thread and a fixed seed is
-  bit-reproducible; a parallel run is not, and the docs say so.
+  style, writing through atomic `u32` cells that hold `f32` bits and `u64` cells that hold `f64` bits. A run with
+  one thread and a fixed seed is bit-reproducible; a parallel run is not, and the docs say so.
 - Chance sampling deals the full deck once per iteration from the iteration seed; buckets for both seats on every
   street are looked up through the isomorphism index and the tables.
 
 ### Checkpoints
 
 - A checkpoint is written every `checkpoint_minutes` and on Ctrl-C: header (format version, fingerprint,
-  iteration count, elapsed time), then both arrays.
+  iteration count, elapsed time), then both arrays: every regret as `f32`, then every strategy weight as `f64`
+  (format version 2).
 - `train` resumes from the latest checkpoint whose fingerprint matches the preset and refuses one that does not.
 - Average positive regret per iteration is logged at each checkpoint as the convergence signal.
 

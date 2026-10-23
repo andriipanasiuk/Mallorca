@@ -1,4 +1,5 @@
 use clap::Args;
+use mallorca_core::cfr::SLOT_BYTES;
 use mallorca_core::preset::Preset;
 use mallorca_core::tree::{Node, Tree};
 use std::path::PathBuf;
@@ -29,7 +30,7 @@ pub fn run(args: &TreeArgs) -> Result<(), String> {
         }
     }
     let slots = tree.action_slot_count();
-    let bytes = slots * 8;
+    let bytes = slots * SLOT_BYTES as u64;
     println!("preset: {}", preset.name);
     println!("buckets: {:?}", tree.buckets());
     println!("nodes: {}", tree.nodes().len());

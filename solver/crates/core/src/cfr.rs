@@ -1,5 +1,5 @@
 use std::fmt;
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 use crate::preset::CfrParams;
 use crate::rng::Rng;
@@ -35,13 +35,11 @@ impl fmt::Display for StorageError {
 
 impl std::error::Error for StorageError {}
 
+pub const SLOT_BYTES: usize = 12;
+
 pub struct Storage {
     regrets: Vec<AtomicU32>,
-    strategy: Vec<AtomicU32>,
-}
-
-fn zeros(len: u64) -> Vec<AtomicU32> {
-    (0..len).map(|_| AtomicU32::new(0)).collect()
+    strategy: Vec<AtomicU64>,
 }
 
 fn load(cell: &AtomicU32) -> f32 {
@@ -52,11 +50,19 @@ fn store(cell: &AtomicU32, v: f32) {
     cell.store(v.to_bits(), Ordering::Relaxed);
 }
 
+fn load_sum(cell: &AtomicU64) -> f64 {
+    f64::from_bits(cell.load(Ordering::Relaxed))
+}
+
+fn store_sum(cell: &AtomicU64, v: f64) {
+    cell.store(v.to_bits(), Ordering::Relaxed);
+}
+
 impl Storage {
     pub fn new(len: u64) -> Storage {
         Storage {
-            regrets: zeros(len),
-            strategy: zeros(len),
+            regrets: (0..len).map(|_| AtomicU32::new(0)).collect(),
+            strategy: (0..len).map(|_| AtomicU64::new(0)).collect(),
         }
     }
 
@@ -77,13 +83,13 @@ impl Storage {
         store(cell, load(cell) + v);
     }
 
-    pub fn strategy_sum(&self, i: u64) -> f32 {
-        load(&self.strategy[i as usize])
+    pub fn strategy_sum(&self, i: u64) -> f64 {
+        load_sum(&self.strategy[i as usize])
     }
 
     pub fn add_strategy(&self, i: u64, v: f32) {
         let cell = &self.strategy[i as usize];
-        store(cell, load(cell) + v);
+        store_sum(cell, load_sum(cell) + f64::from(v));
     }
 
     pub fn discount(&self, t: u64, params: &CfrParams) {
@@ -97,45 +103,54 @@ impl Storage {
             store(cell, (f64::from(r) * factor) as f32);
         }
         for cell in &self.strategy {
-            store(cell, (f64::from(load(cell)) * strategy) as f32);
+            store_sum(cell, load_sum(cell) * strategy);
         }
     }
 
     pub fn average_strategy(&self, offset: u64, n: usize) -> Vec<f32> {
-        let sums: Vec<f32> = (0..n as u64)
+        let sums: Vec<f64> = (0..n as u64)
             .map(|a| self.strategy_sum(offset + a))
             .collect();
-        let total: f32 = sums.iter().sum();
+        let total: f64 = sums.iter().sum();
         if total > 0.0 {
-            sums.iter().map(|s| s / total).collect()
+            sums.iter().map(|s| (s / total) as f32).collect()
         } else {
             vec![1.0 / n as f32; n]
         }
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
-        let mut out = Vec::with_capacity(self.regrets.len() * 8);
-        for cell in self.regrets.iter().chain(&self.strategy) {
+        let mut out = Vec::with_capacity(self.regrets.len() * SLOT_BYTES);
+        for cell in &self.regrets {
             out.extend_from_slice(&load(cell).to_le_bytes());
+        }
+        for cell in &self.strategy {
+            out.extend_from_slice(&load_sum(cell).to_le_bytes());
         }
         out
     }
 
     pub fn from_bytes(len: u64, bytes: &[u8]) -> Result<Storage, StorageError> {
-        let expected = len as usize * 8;
-        if bytes.len() != expected {
+        let expected = (len as usize).checked_mul(SLOT_BYTES);
+        if expected != Some(bytes.len()) {
             return Err(StorageError::Length {
-                expected,
+                expected: expected.unwrap_or(usize::MAX),
                 actual: bytes.len(),
             });
         }
-        let mut regrets: Vec<AtomicU32> = bytes
+        let (regret_bytes, strategy_bytes) = bytes.split_at(len as usize * 4);
+        let regrets = regret_bytes
             .as_chunks::<4>()
             .0
             .iter()
             .map(|&c| AtomicU32::new(u32::from_le_bytes(c)))
             .collect();
-        let strategy = regrets.split_off(len as usize);
+        let strategy = strategy_bytes
+            .as_chunks::<8>()
+            .0
+            .iter()
+            .map(|&c| AtomicU64::new(u64::from_le_bytes(c)))
+            .collect();
         Ok(Storage { regrets, strategy })
     }
 }
@@ -277,10 +292,11 @@ mod tests {
         s.add_regret(2, -2.25);
         s.add_strategy(1, 7.0);
         let bytes = s.to_bytes();
-        assert_eq!(bytes.len(), 24);
+        assert_eq!(bytes.len(), 36);
         assert_eq!(&bytes[0..4], &1.5f32.to_le_bytes());
-        assert_eq!(&bytes[12..16], &0.0f32.to_le_bytes());
-        assert_eq!(&bytes[16..20], &7.0f32.to_le_bytes());
+        assert_eq!(&bytes[8..12], &(-2.25f32).to_le_bytes());
+        assert_eq!(&bytes[12..20], &0.0f64.to_le_bytes());
+        assert_eq!(&bytes[20..28], &7.0f64.to_le_bytes());
         let r = Storage::from_bytes(3, &bytes).unwrap();
         assert_eq!(r.regret(0), 1.5);
         assert_eq!(r.regret(2), -2.25);
@@ -291,13 +307,32 @@ mod tests {
     fn from_bytes_rejects_wrong_length() {
         let bytes = Storage::new(3).to_bytes();
         assert_eq!(
-            Storage::from_bytes(3, &bytes[..23]).err(),
+            Storage::from_bytes(3, &bytes[..35]).err(),
             Some(StorageError::Length {
-                expected: 24,
-                actual: 23
+                expected: 36,
+                actual: 35
             })
         );
         assert!(Storage::from_bytes(4, &bytes).is_err());
+    }
+
+    #[test]
+    fn hot_infoset_average_keeps_its_precision() {
+        let input = [0.90f32, 0.07, 0.03];
+        let s = Storage::new(3);
+        let v1 = params(1.5, 0.0, 2.0);
+        for t in 1..=22_222u64 {
+            for _ in 0..4_500 {
+                for (a, &p) in input.iter().enumerate() {
+                    s.add_strategy(a as u64, p);
+                }
+            }
+            s.discount(t, &v1);
+        }
+        let average = s.average_strategy(0, 3);
+        for (got, want) in average.iter().zip(input) {
+            assert!((got - want).abs() < 1e-3, "{average:?}");
+        }
     }
 
     #[test]

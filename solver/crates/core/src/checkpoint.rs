@@ -1,8 +1,8 @@
-use crate::cfr::Storage;
+use crate::cfr::{Storage, SLOT_BYTES};
 use std::fmt;
 
 pub const MAGIC: &[u8; 4] = b"MLCK";
-pub const FORMAT_VERSION: u16 = 1;
+pub const FORMAT_VERSION: u16 = 2;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckpointHeader {
@@ -47,7 +47,7 @@ const HEADER_LEN: usize = 66;
 
 pub fn write_checkpoint(header: &CheckpointHeader, storage: &Storage) -> Vec<u8> {
     let slots = storage.len();
-    let mut out = Vec::with_capacity(HEADER_LEN + slots as usize * 8);
+    let mut out = Vec::with_capacity(HEADER_LEN + slots as usize * SLOT_BYTES);
     out.extend_from_slice(MAGIC);
     out.extend_from_slice(&header.format_version.to_le_bytes());
     out.extend_from_slice(&header.fingerprint);
@@ -101,7 +101,7 @@ pub fn read_checkpoint(
     };
     let slots = u64::from_le_bytes(array(bytes, 58));
     let body = &bytes[HEADER_LEN..];
-    if slots.checked_mul(8) != Some(body.len() as u64) {
+    if slots.checked_mul(SLOT_BYTES as u64) != Some(body.len() as u64) {
         return Err(CheckpointError::Truncated);
     }
     let storage = Storage::from_bytes(slots, body).map_err(|_| CheckpointError::Truncated)?;
@@ -146,7 +146,8 @@ mod tests {
     fn layout_starts_with_magic_and_version() {
         let b = bytes();
         assert_eq!(&b[..4], b"MLCK");
-        assert_eq!(&b[4..6], &1u16.to_le_bytes());
+        assert_eq!(&b[4..6], &2u16.to_le_bytes());
+        assert_eq!(b.len(), 66 + 5 * 12);
         assert!(b.ends_with(&storage().to_bytes()));
     }
 
@@ -198,10 +199,10 @@ mod tests {
     #[test]
     fn unknown_version_is_rejected() {
         let mut b = bytes();
-        b[4] = 2;
+        b[4] = 1;
         assert_eq!(
             read_checkpoint(&b, &[9; 32]).err(),
-            Some(CheckpointError::UnknownVersion(2))
+            Some(CheckpointError::UnknownVersion(1))
         );
     }
 

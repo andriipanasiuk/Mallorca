@@ -60,8 +60,10 @@ Bucket tables, identical for every preset because they are indexed by canonical 
 | `river_hs.f32` | 493 MB (492,625,016 bytes) |
 
 The `v1` tree (`tree --preset presets/v1.toml`): 41,410 nodes, 1,950,352 infosets, 5.3M action slots at 128
-buckets (5,302,197). Checkpoint size scales with the action slots. The `memory estimate` printed by `tree` and
-`train` is checked against `memory_limit_gb` before training starts.
+buckets (5,302,197). Each action slot holds an `f32` regret and an `f64` strategy sum, 12 bytes, so a `v1`
+checkpoint is 63,626,430 bytes (a 66 byte header, then all regrets, then all strategy sums). The `memory estimate`
+is action slots * 12 bytes (`tree` prints that) plus the three bucket tables (`train` adds them); `train` checks it
+against `memory_limit_gb` before training starts.
 
 ### Resuming
 

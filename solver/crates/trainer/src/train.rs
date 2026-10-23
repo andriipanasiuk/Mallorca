@@ -1,7 +1,7 @@
 use crate::tree::load_preset;
 use clap::Args;
 use mallorca_core::abstraction::Abstraction;
-use mallorca_core::cfr::{iterate, Game, Storage};
+use mallorca_core::cfr::{iterate, Game, Storage, SLOT_BYTES};
 use mallorca_core::checkpoint::{
     read_checkpoint, write_checkpoint, CheckpointHeader, FORMAT_VERSION,
 };
@@ -82,7 +82,7 @@ fn read_file(path: &Path) -> Result<Vec<u8>, String> {
 }
 
 fn memory_estimate(tree: &Tree, tables: &Path) -> Result<u64, String> {
-    let mut bytes = tree.action_slot_count() * 8;
+    let mut bytes = tree.action_slot_count() * SLOT_BYTES as u64;
     for (name, _) in TABLES {
         let path = tables.join(name);
         let meta =
@@ -662,6 +662,16 @@ pub mod tests {
         let err = go(&session(&dir, Some(10), 0, None)).err().unwrap();
         assert!(err.contains("turn.bkt"), "{err}");
         std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn memory_estimate_counts_twelve_bytes_per_action_slot() {
+        let tree = Tree::build(&Preset::from_toml(TINY).unwrap());
+        let tables: u64 = SIZES.iter().map(|&s| s as u64).sum();
+        assert_eq!(
+            memory_estimate(&tree, synthetic_tables()).unwrap(),
+            tree.action_slot_count() * 12 + tables
+        );
     }
 
     #[test]
