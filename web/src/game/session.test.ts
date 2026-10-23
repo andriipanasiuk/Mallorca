@@ -7,13 +7,17 @@ import { createSession } from './session.ts';
 import type { Session } from './session.ts';
 import { callingBot, scriptedBot, shovingBot } from './testBot.ts';
 
-function open(bot: BotClient, overrides: { botDelayMs?: number; seed?: number } = {}): Session {
+function open(
+  bot: BotClient,
+  overrides: { botDelayMs?: number; seed?: number; startingStacks?: [number, number] } = {},
+): Session {
   return createSession({
     bot,
     seed: overrides.seed ?? 7,
     botDelayMs: overrides.botDelayMs ?? 0,
     humanSeat: 1,
     names: ['Mallorca', 'You'],
+    startingStacks: overrides.startingStacks,
   });
 }
 
@@ -187,6 +191,28 @@ describe('session', () => {
       await state.nextHand();
       expect(session.getState().tournament.handNumber).toBe(2);
     }
+  });
+
+  it('ends the tournament when the deal busts the short stack', async () => {
+    const bot = callingBot();
+    const session = open(bot, { seed: 1, startingStacks: [3990, 10] });
+    await session.getState().start();
+    const state = session.getState();
+    expect(state.phase).toBe('tournamentOver');
+    expect(state.tournament.winner).toBe(0);
+    expect(state.result).toMatchObject({ winner: 0, showdown: true, amount: 20 });
+    expect(bot.decideCalls).toBe(0);
+  });
+
+  it('shows the result of a hand that ends at the deal and deals the next one', async () => {
+    const session = open(callingBot(), { seed: 2, startingStacks: [3990, 10] });
+    await session.getState().start();
+    const state = session.getState();
+    expect(state.phase).toBe('handOver');
+    expect(state.result).toMatchObject({ winner: 1, showdown: true, amount: 20 });
+    expect(state.tournament.seats.map((s) => s.stack)).toEqual([3980, 20]);
+    await state.nextHand();
+    expect(session.getState().tournament.handNumber).toBe(2);
   });
 
   it('plays the tournament to the end when the human always folds', async () => {

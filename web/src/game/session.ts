@@ -52,6 +52,7 @@ export interface SessionOptions {
   botDelayMs: number;
   humanSeat: SeatIndex;
   names: [string, string];
+  startingStacks?: [number, number];
 }
 
 const STARTING_STACK = 2000;
@@ -170,7 +171,20 @@ export function createSession(options: SessionOptions): Session {
     timers.clear();
   };
 
-  const fresh = (): Tournament => createTournament(names, STARTING_STACK, 0);
+  const fresh = (): Tournament => {
+    const tournament = createTournament(names, STARTING_STACK, 0);
+    const stacks = options.startingStacks;
+    if (stacks === undefined) {
+      return tournament;
+    }
+    return {
+      ...tournament,
+      seats: [
+        { name: names[0], stack: stacks[0] },
+        { name: names[1], stack: stacks[1] },
+      ],
+    };
+  };
 
   return createStore<SessionState & SessionActions>((set, get) => {
     const record = (events: EngineEvent[]) => {
@@ -184,10 +198,7 @@ export function createSession(options: SessionOptions): Session {
       set({ log: [...get().log, ...handHistory(events, names)], lastActions });
     };
 
-    const play = (action: Action) => {
-      const step = apply(get().tournament, action);
-      set({ tournament: step.state });
-      record(step.events);
+    const conclude = (step: { state: Tournament; events: EngineEvent[] }) => {
       if (step.state.hand?.street === 'complete') {
         const { seats } = step.state;
         const paid = (seat: SeatIndex) =>
@@ -200,6 +211,13 @@ export function createSession(options: SessionOptions): Session {
           phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
         });
       }
+    };
+
+    const play = (action: Action) => {
+      const step = apply(get().tournament, action);
+      set({ tournament: step.state });
+      record(step.events);
+      conclude(step);
     };
 
     const drive = async (myEpoch: number): Promise<void> => {
@@ -245,6 +263,7 @@ export function createSession(options: SessionOptions): Session {
       bot.reset();
       set({ tournament: step.state, lastActions: [null, null], result: null });
       record(step.events);
+      conclude(step);
       return drive(epoch);
     };
 
