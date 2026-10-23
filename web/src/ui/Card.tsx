@@ -1,3 +1,4 @@
+import { useId } from 'preact/hooks';
 import { formatCard, rankOf, suitOf } from '../game/index.ts';
 import type { Card as CardValue } from '../game/index.ts';
 import { t } from './i18n.ts';
@@ -10,42 +11,90 @@ export interface CardProps {
   highlight?: boolean;
 }
 
+function Index({ rank, suit }: { rank: string; suit: string }) {
+  return (
+    <>
+      <text class="card-rank" x="26" y="74">
+        {rank}
+      </text>
+      <text class="card-index-suit" x="26" y="118">
+        {suit}
+      </text>
+    </>
+  );
+}
+
 export function Card({ card, highlight = false }: CardProps) {
+  const id = useId();
   const className = `card${highlight ? ' card-highlight' : ''}`;
   if (card === 'back') {
     return (
       <svg
         class={`${className} card-back`}
-        viewBox="0 0 70 100"
+        viewBox="0 0 250 350"
         role="img"
         aria-label={t('card.back')}
         data-testid="card-back"
       >
-        <rect class="card-body" x="1" y="1" width="68" height="98" rx="7" />
-        <rect class="card-pattern-frame" x="8" y="8" width="54" height="84" rx="4" />
-        <path class="card-pattern" d="M8 8 L62 92 M62 8 L8 92 M35 8 L35 92 M8 50 L62 50" />
+        <defs>
+          <pattern
+            id={`weave-${id}`}
+            width="14"
+            height="14"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <rect class="card-weave-ground" width="14" height="14" />
+            <path class="card-weave-line" d="M0 7h14M7 0v14" />
+          </pattern>
+        </defs>
+        <rect class="card-body" x="2" y="2" width="246" height="346" rx="18" />
+        <rect
+          class="card-weave"
+          x="16"
+          y="16"
+          width="218"
+          height="318"
+          rx="10"
+          fill={`url(#weave-${id})`}
+        />
       </svg>
     );
   }
-  const rank = rankOf(card);
+  const rank = RANKS[rankOf(card)] ?? String(rankOf(card));
   const suit = SUITS[suitOf(card)] ?? '';
   const red = suitOf(card) === 1 || suitOf(card) === 2;
   return (
     <svg
       class={`${className}${red ? ' card-red' : ' card-black'}`}
-      viewBox="0 0 70 100"
+      viewBox="0 0 250 350"
       role="img"
       aria-label={formatCard(card)}
       data-testid="card"
       data-card={formatCard(card)}
     >
-      <rect class="card-body" x="1" y="1" width="68" height="98" rx="7" />
-      <text class="card-rank" x="8" y="30">
-        {RANKS[rank] ?? String(rank)}
-      </text>
-      <text class="card-suit" x="35" y="78" text-anchor="middle">
+      <defs>
+        <linearGradient id={`paper-${id}`} x1="0" y1="0" x2="1" y2="1">
+          <stop class="card-paper-light" offset="0" />
+          <stop class="card-paper-shade" offset="1" />
+        </linearGradient>
+      </defs>
+      <rect
+        class="card-body"
+        x="2"
+        y="2"
+        width="246"
+        height="346"
+        rx="18"
+        fill={`url(#paper-${id})`}
+      />
+      <Index rank={rank} suit={suit} />
+      <text class="card-suit" x="125" y="235" text-anchor="middle">
         {suit}
       </text>
+      <g transform="rotate(180 125 175)">
+        <Index rank={rank} suit={suit} />
+      </g>
     </svg>
   );
 }
