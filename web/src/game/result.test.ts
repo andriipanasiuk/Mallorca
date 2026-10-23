@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { EngineEvent } from '../engine/index.ts';
-import { resultOf } from './session.ts';
+import { potCollected, resultOf } from './session.ts';
 
 function showdown(ranks: [number, number]): EngineEvent {
   return {
@@ -42,5 +42,21 @@ describe('resultOf', () => {
   it('names the player who got the pot when there is no showdown', () => {
     const events: EngineEvent[] = [{ type: 'potAwarded', seat: 1, amount: 60 }];
     expect(resultOf(events)).toEqual({ winner: 1, handName: null, showdown: false });
+  });
+});
+
+describe('potCollected', () => {
+  it('is twice the matched contribution for a win', () => {
+    expect(potCollected([60, 60], 0)).toBe(120);
+  });
+
+  it('excludes the uncalled refund', () => {
+    expect(potCollected([500, 2000], 1)).toBe(1000);
+    expect(potCollected([2000, 500], 1)).toBe(1000);
+  });
+
+  it('is each side share of the matched pot for a split', () => {
+    expect(potCollected([60, 60], null)).toBe(60);
+    expect(potCollected([500, 2000], null)).toBe(500);
   });
 });

@@ -100,6 +100,11 @@ export function resultOf(events: EngineEvent[]): Omit<HandResult, 'amount'> {
   };
 }
 
+export function potCollected(paid: [number, number], winner: SeatIndex | null): number {
+  const matched = Math.min(paid[0], paid[1]);
+  return winner === null ? matched : matched * 2;
+}
+
 function awardedTo(events: EngineEvent[], seat: SeatIndex): number {
   let total = 0;
   for (const event of events) {
@@ -188,7 +193,10 @@ export function createSession(options: SessionOptions): Session {
         const paid = (seat: SeatIndex) =>
           startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
         set({
-          result: { ...resultOf(step.events), amount: Math.min(paid(0), paid(1)) },
+          result: {
+            ...resultOf(step.events),
+            amount: potCollected([paid(0), paid(1)], resultOf(step.events).winner),
+          },
           phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
         });
       }
