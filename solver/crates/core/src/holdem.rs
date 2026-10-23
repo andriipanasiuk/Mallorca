@@ -138,10 +138,8 @@ mod tests {
     use crate::cfr::{iterate, Storage};
     use crate::preset::Preset;
     use std::sync::OnceLock;
-    use std::time::Instant;
 
     const TINY: &str = include_str!("../../../presets/tiny.toml");
-    const V1: &str = include_str!("../../../presets/v1.toml");
 
     fn synthetic() -> &'static Abstraction {
         static A: OnceLock<Abstraction> = OnceLock::new();
@@ -351,29 +349,5 @@ mod tests {
             nonzero |= r != 0.0;
         }
         assert!(nonzero);
-    }
-
-    #[test]
-    #[ignore]
-    fn throughput() {
-        for (name, text) in [("tiny", TINY), ("v1", V1)] {
-            let tree = Tree::build(&Preset::from_toml(text).unwrap());
-            let game = Holdem::new(&tree, synthetic());
-            let storage = Storage::new(game.infoset_len());
-            let mut rng = Rng::new(1);
-            for i in 0..2_000u64 {
-                iterate(&game, &storage, (i % 2) as u8, &mut rng);
-            }
-            let n = 200_000u64;
-            let start = Instant::now();
-            for i in 0..n {
-                iterate(&game, &storage, (i % 2) as u8, &mut rng);
-            }
-            let secs = start.elapsed().as_secs_f64();
-            println!(
-                "{name}: {:.0} iterations/s single-threaded",
-                n as f64 / secs
-            );
-        }
     }
 }
