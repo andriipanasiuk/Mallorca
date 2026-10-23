@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createSession, inProcessBot } from '../game/index.ts';
+import { createSession, inProcessBot, TOURNAMENT } from '../game/index.ts';
 import { App } from './App.tsx';
 
 afterEach(cleanup);
@@ -12,6 +12,7 @@ function setup() {
     botDelayMs: 0,
     humanSeat: 0,
     names: ['You', 'Mallorca'],
+    mode: TOURNAMENT,
   });
   const onNewTournament = vi.fn();
   render(<App session={session} humanSeat={0} onNewTournament={onNewTournament} />);

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Decision } from '../brains/index.ts';
-import { legalActionsOf, toAct } from '../engine/index.ts';
+import { CASH, legalActionsOf, toAct, TOURNAMENT } from '../engine/index.ts';
+import type { TableMode } from '../engine/index.ts';
 import type { BotClient } from './botClient.ts';
 import { inProcessBot } from './botClient.ts';
 import { createSession } from './session.ts';
@@ -9,7 +10,12 @@ import { callingBot, scriptedBot, shovingBot } from './testBot.ts';
 
 function open(
   bot: BotClient,
-  overrides: { botDelayMs?: number; seed?: number; startingStacks?: [number, number] } = {},
+  overrides: {
+    botDelayMs?: number;
+    seed?: number;
+    startingStacks?: [number, number];
+    mode?: TableMode;
+  } = {},
 ): Session {
   return createSession({
     bot,
@@ -18,6 +24,7 @@ function open(
     humanSeat: 1,
     names: ['Mallorca', 'You'],
     startingStacks: overrides.startingStacks,
+    mode: overrides.mode ?? TOURNAMENT,
   });
 }
 
@@ -332,5 +339,92 @@ describe('session', () => {
     const bot = { ...callingBot(), dispose };
     open(bot).getState().dispose();
     expect(dispose).toHaveBeenCalled();
+  });
+});
+
+const SEED = 2;
+const LOSING_SEED = 4;
+
+describe('cash session', () => {
+  it('tracks hands and net without topping the human up when only the bot busts', async () => {
+    const session = open(shovingBot(), {
+      mode: CASH,
+      seed: SEED,
+      startingStacks: [2000, 3400],
+    });
+    expect(session.getState().session).toEqual({ hands: 0, net: 1400 });
+    await session.getState().start();
+    await session.getState().act({ kind: 'fold' });
+    expect(session.getState().phase).toBe('handOver');
+    const afterFirst = session.getState();
+    expect(afterFirst.session.hands).toBe(1);
+    await afterFirst.nextHand();
+    await session.getState().act({ kind: 'raise', to: 99999 });
+    const state = session.getState();
+    expect(state.phase).toBe('handOver');
+    expect(state.table.seats[0].stack).toBe(0);
+    expect(state.table.seats[1].stack).toBeGreaterThan(3400);
+    expect(state.session).toEqual({ hands: 2, net: state.table.seats[1].stack - 2000 });
+    expect(state.session.net).toBeGreaterThan(1400);
+    await state.nextHand();
+    const next = session.getState();
+    expect(next.table.seats[1].stack + (next.table.hand?.bets[1] ?? 0)).toBeGreaterThan(3400);
+    expect(next.table.seats[0].stack + (next.table.hand?.bets[0] ?? 0)).toBe(2000);
+    expect(next.session.net + (next.table.hand?.bets[1] ?? 0)).toBe(state.session.net);
+  });
+
+  it('keeps playing after the human loses everything', async () => {
+    const session = open(shovingBot(), { mode: CASH, seed: LOSING_SEED });
+    await session.getState().start();
+    await session.getState().act({ kind: 'raise', to: 99999 });
+    const over = session.getState();
+    expect(over.phase).toBe('handOver');
+    expect(over.table.seats[1].stack).toBe(0);
+    expect(over.table.winner).toBeNull();
+    expect(over.session).toEqual({ hands: 1, net: -2000 });
+    await over.nextHand();
+    const state = session.getState();
+    expect(state.table.seats[1].stack + (state.table.hand?.bets[1] ?? 0)).toBe(2000);
+    expect(state.session.net + (state.table.hand?.bets[1] ?? 0)).toBe(-2000);
+    expect(state.session.hands).toBe(1);
+  });
+
+  it('leaves only between hands', async () => {
+    const session = open(callingBot(), { mode: CASH });
+    await session.getState().start();
+    session.getState().leave();
+    expect(session.getState().phase).toBe('humanToAct');
+    await session.getState().act({ kind: 'fold' });
+    await session.getState().act({ kind: 'fold' });
+    while (session.getState().phase === 'humanToAct') {
+      await session.getState().act({ kind: 'passive' });
+    }
+    expect(session.getState().phase).toBe('handOver');
+    session.getState().leave();
+    expect(session.getState().phase).toBe('sessionOver');
+    const log = session.getState().log.length;
+    await session.getState().act({ kind: 'passive' });
+    await session.getState().nextHand();
+    expect(session.getState().phase).toBe('sessionOver');
+    expect(session.getState().log.length).toBe(log);
+  });
+
+  it('ignores leave in a tournament', async () => {
+    const session = open(shovingBot(), { mode: TOURNAMENT });
+    await session.getState().start();
+    await session.getState().act({ kind: 'fold' });
+    const { phase } = session.getState();
+    session.getState().leave();
+    expect(session.getState().phase).toBe(phase);
+  });
+
+  it('switches mode with start(mode)', async () => {
+    const session = open(callingBot());
+    await session.getState().start(CASH);
+    expect(session.getState().table.mode).toEqual(CASH);
+    await session.getState().start();
+    expect(session.getState().table.mode).toEqual(CASH);
+    await session.getState().start(TOURNAMENT);
+    expect(session.getState().table.mode).toEqual(TOURNAMENT);
   });
 });

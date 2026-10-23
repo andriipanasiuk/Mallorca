@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { createSession, workerBot } from './game/index.ts';
+import { createSession, TOURNAMENT, workerBot } from './game/index.ts';
 import type { Session } from './game/index.ts';
 import { App } from './ui/App.tsx';
 import { t } from './ui/i18n.ts';
@@ -43,6 +43,7 @@ function mount(): void {
     botDelayMs: botDelay,
     humanSeat: HUMAN_SEAT,
     names: [t('seat.you'), t('seat.bot')],
+    mode: TOURNAMENT,
   });
   render(
     <App session={session} humanSeat={HUMAN_SEAT} onNewTournament={mount} />,

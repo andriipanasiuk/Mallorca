@@ -13,7 +13,7 @@ export const TOURNAMENT: TableMode = { kind: 'tournament' };
 
 export const CASH: TableMode = { kind: 'cash', bigBlind: 20, buyIn: 2000 };
 
-const TOURNAMENT_STACK = 2000;
+export const TOURNAMENT_STACK = 2000;
 
 export interface Table {
   mode: TableMode;

@@ -1,5 +1,5 @@
 import type { Card } from '../cards/index.ts';
-import { blindsFor, legalActionsOf, toAct } from '../engine/index.ts';
+import { legalActionsOf, rulesOf, toAct } from '../engine/index.ts';
 import type { LogEntry, SeatIndex } from '../engine/index.ts';
 import type { HandCategory } from '../equity/index.ts';
 import type { SessionState } from './session.ts';
@@ -30,10 +30,16 @@ export interface ViewModel {
     raise: RaiseControl | null;
     enabled: boolean;
   };
+  mode: 'cash' | 'tournament';
+  session: { hands: number; netBb: number; bbPer100: number | null };
   blinds: { small: number; big: number };
   handNumber: number;
   result: { winner: SeatIndex | null; category: HandCategory | null; amount: number } | null;
   tournamentWinner: SeatIndex | null;
+}
+
+function roundTenth(value: number): number {
+  return Math.round(value * 10) / 10;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -79,6 +85,9 @@ export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewMode
       },
     };
   }
+  const blinds = rulesOf(table.mode).blinds(Math.max(table.handNumber, 1));
+  const { hands, net } = state.session;
+  const netBb = net / blinds.big;
   return {
     seats: [seatView(state, 0, humanSeat), seatView(state, 1, humanSeat)],
     board: hand === null ? [] : [...hand.board],
@@ -89,7 +98,13 @@ export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewMode
       raise,
       enabled,
     },
-    blinds: hand === null ? blindsFor(1) : blindsFor(table.handNumber),
+    mode: table.mode.kind,
+    session: {
+      hands,
+      netBb: roundTenth(netBb),
+      bbPer100: hands === 0 ? null : roundTenth((netBb / hands) * 100),
+    },
+    blinds,
     handNumber: table.handNumber,
     result:
       result === null

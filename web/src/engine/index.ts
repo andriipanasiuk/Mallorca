@@ -22,6 +22,7 @@ export {
   startHand,
   toAct,
   TOURNAMENT,
+  TOURNAMENT_STACK,
 } from './table.ts';
 export type { Rules } from './rules.ts';
 export { rulesOf } from './rules.ts';

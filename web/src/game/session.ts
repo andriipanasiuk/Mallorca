@@ -6,7 +6,7 @@ import { toObservations } from '../brains/index.ts';
 import {
   apply,
   createTable,
-  TOURNAMENT,
+  TOURNAMENT_STACK,
   handHistory,
   legalActionsOf,
   startHand,
@@ -19,13 +19,20 @@ import type {
   LogEntry,
   SeatIndex,
   Table,
+  TableMode,
 } from '../engine/index.ts';
 import type { HandCategory } from '../equity/index.ts';
 import { withFallback } from './botClient.ts';
 import type { BotClient } from './botClient.ts';
 
 export type Phase =
-  'idle' | 'humanToAct' | 'botThinking' | 'animating' | 'handOver' | 'tournamentOver';
+  | 'idle'
+  | 'humanToAct'
+  | 'botThinking'
+  | 'animating'
+  | 'handOver'
+  | 'tournamentOver'
+  | 'sessionOver';
 
 export type Intent = { kind: 'fold' | 'passive' } | { kind: 'raise'; to: number };
 
@@ -44,10 +51,12 @@ export interface SessionState {
   lastDecision: Decision | null;
   seed: number;
   result: HandResult | null;
+  session: { hands: number; net: number };
 }
 
 export interface SessionActions {
-  start(): Promise<void>;
+  start(mode?: TableMode): Promise<void>;
+  leave(): void;
   nextHand(): Promise<void>;
   act(intent: Intent): Promise<void>;
   dispose(): void;
@@ -62,6 +71,7 @@ export interface SessionOptions {
   humanSeat: SeatIndex;
   names: [string, string];
   startingStacks?: [number, number];
+  mode: TableMode;
 }
 
 function label(event: Extract<EngineEvent, { type: 'acted' }>): LogEntry {
@@ -153,7 +163,10 @@ export function createSession(options: SessionOptions): Session {
   const bot = withFallback(options.bot);
   const rng = mulberry32(seed);
   let epoch = 0;
+  let mode = options.mode;
   let startStacks: [number, number] = [0, 0];
+  let hands = 0;
+  let topUps = 0;
   const timers = new Map<ReturnType<typeof setTimeout>, () => void>();
 
   const sleep = (ms: number): Promise<void> =>
@@ -174,7 +187,7 @@ export function createSession(options: SessionOptions): Session {
   };
 
   const fresh = (): Table => {
-    const table = createTable(names, TOURNAMENT, 0);
+    const table = createTable(names, mode, 0);
     const stacks = options.startingStacks;
     if (stacks === undefined) {
       return table;
@@ -188,6 +201,11 @@ export function createSession(options: SessionOptions): Session {
     };
   };
 
+  const tally = (table: Table): SessionState['session'] => {
+    const buyIn = table.mode.kind === 'cash' ? table.mode.buyIn : TOURNAMENT_STACK;
+    return { hands, net: table.seats[humanSeat].stack - buyIn - topUps };
+  };
+
   return createStore<SessionState & SessionActions>((set, get) => {
     const record = (events: EngineEvent[]) => {
       bot.observe(toObservations(events, botSeat));
@@ -197,12 +215,22 @@ export function createSession(options: SessionOptions): Session {
           lastActions[event.seat] = label(event);
         }
       }
-      set({ log: [...get().log, ...handHistory(events)], lastActions });
+      for (const event of events) {
+        if (event.type === 'toppedUp' && event.seat === humanSeat) {
+          topUps += event.amount;
+        }
+      }
+      set({
+        log: [...get().log, ...handHistory(events)],
+        lastActions,
+        session: tally(get().table),
+      });
     };
 
     const conclude = (step: { state: Table; events: EngineEvent[] }) => {
       if (step.state.hand?.street === 'complete') {
         const { seats } = step.state;
+        hands += 1;
         const paid = (seat: SeatIndex) =>
           startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
         set({
@@ -211,6 +239,7 @@ export function createSession(options: SessionOptions): Session {
             amount: potCollected([paid(0), paid(1)], resultOf(step.events).winner),
           },
           phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
+          session: tally(step.state),
         });
       }
     };
@@ -269,19 +298,39 @@ export function createSession(options: SessionOptions): Session {
       return drive(epoch);
     };
 
+    const initial = fresh();
     return {
-      table: fresh(),
+      table: initial,
       phase: 'idle',
       log: [],
       lastActions: [null, null],
       lastDecision: null,
       seed,
       result: null,
-      start() {
+      session: tally(initial),
+      start(next) {
         epoch += 1;
         cancelTimers();
-        set({ table: fresh(), log: [], lastDecision: null, result: null });
+        if (next !== undefined) {
+          mode = next;
+        }
+        hands = 0;
+        topUps = 0;
+        const table = fresh();
+        set({
+          table,
+          log: [],
+          lastDecision: null,
+          result: null,
+          session: tally(table),
+        });
         return beginHand();
+      },
+      leave() {
+        const { phase, table } = get();
+        if (table.mode.kind === 'cash' && phase === 'handOver') {
+          set({ phase: 'sessionOver' });
+        }
       },
       dispose() {
         epoch += 1;

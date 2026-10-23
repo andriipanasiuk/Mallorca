@@ -97,12 +97,17 @@ argument.
 
 ## game
 
-- `createSession({ bot, seed, botDelayMs, humanSeat, names, startingStacks? })` returns a zustand store with
-  `SessionState` (its engine state is `table`) and the actions `start`, `nextHand`, `act(intent)` and `dispose`. `seed` drives `mulberry32` for
-  every shuffle of the tournament.
+- `createSession({ bot, seed, botDelayMs, humanSeat, names, mode, startingStacks? })` returns a zustand store with
+  `SessionState` (its engine state is `table`) and the actions `start(mode?)`, `nextHand`, `act(intent)`, `leave` and
+  `dispose`. `mode` is a `TableMode`; `start(mode)` replaces the session's mode for this and later starts, and
+  `start()` keeps the current one. `seed` drives `mulberry32` for every shuffle.
 - `phase` is one of `idle` (before `start`), `humanToAct`, `botThinking` (waiting for `decide`), `animating`
-  (the `botDelayMs` pause before the bot's action is applied), `handOver` and `tournamentOver`. `act` is ignored
-  unless the phase is `humanToAct`, and `nextHand` unless it is `handOver`.
+  (the `botDelayMs` pause before the bot's action is applied), `handOver`, `tournamentOver` and `sessionOver`. `act`
+  is ignored unless the phase is `humanToAct`, and `nextHand` unless it is `handOver`. `leave` moves a cash session
+  from `handOver` to `sessionOver`, where `act` and `nextHand` do nothing; in any other mode or phase it is ignored.
+- `session` is `{ hands, net }` for the human seat: `hands` counts completed hands and
+  `net = stack - buyIn - top-ups`, where `buyIn` is the mode's in cash and 2000 in a tournament. Mid-hand `net`
+  includes the blinds already posted; after a hand it is the result.
 - `Intent` is `fold`, `passive` (check or call) or `raise` with a target. `resolveIntent` turns it into a legal
   action: a raise is rounded and clamped into `legal.raise`, a fold becomes a check when checking is free.
 - `log` holds the `LogEntry` values of the tournament. `lastActions` holds one tag per seat for the current hand,
@@ -119,10 +124,11 @@ argument.
   or `dispose`.
 - `toViewModel(state, humanSeat)` returns the `ViewModel`: per seat the name, stack, street bet, button, whether
   it is to act, the cards (`'back'` for the bot's cards until a showdown) and the last action tag; the board, pot,
-  blinds and hand number; the controls (`fold`, `passive` with its amount, `raise` with `min`, `max` and the
+  blinds (from `rulesOf(mode).blinds`) and hand number; the `mode` (`cash` or `tournament`); `session` with
+  `hands`, `netBb` and `bbPer100` (one decimal, null with no hands); the controls (`fold`, `passive` with its amount, `raise` with `min`, `max` and the
   presets `halfPot`, `pot` and `allIn`, and `enabled`); the result and the tournament winner.
-- For the ui, `game` re-exports `Card`, `formatCard`, `rankOf`, `suitOf`, `SeatIndex`, `LogEntry` and
-  `HandCategory`.
+- For the ui, `game` re-exports `Card`, `formatCard`, `rankOf`, `suitOf`, `SeatIndex`, `LogEntry`, `HandCategory`,
+  `TableMode`, `CASH` and `TOURNAMENT`.
 
 ## ui
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CASH, TOURNAMENT } from '../engine/index.ts';
 import { createSession } from './session.ts';
 import type { Session } from './session.ts';
 import type { BotClient } from './botClient.ts';
@@ -12,6 +13,7 @@ function open(bot: BotClient): Session {
     botDelayMs: 0,
     humanSeat: 1,
     names: ['Mallorca', 'You'],
+    mode: TOURNAMENT,
   });
 }
 
@@ -88,5 +90,22 @@ describe('toViewModel', () => {
     expect(vm.result?.category).toBeNull();
     expect(vm.result?.amount).toBe((state.table.seats[0].stack - 2000) * 2);
     expect(vm.result?.amount).toBeGreaterThan(0);
+  });
+
+  it('reports the mode and converts the session result to big blinds', () => {
+    const session = open(callingBot());
+    const base = session.getState();
+    expect(toViewModel(base, 1).mode).toBe('tournament');
+    expect(toViewModel(base, 1).session).toEqual({ hands: 0, netBb: 0, bbPer100: null });
+    const vm = toViewModel({ ...base, session: { hands: 40, net: 250 } }, 1);
+    expect(vm.session).toEqual({ hands: 40, netBb: 12.5, bbPer100: 31.3 });
+  });
+
+  it('uses the cash blinds in a cash session', async () => {
+    const session = open(callingBot());
+    await session.getState().start(CASH);
+    const vm = toViewModel(session.getState(), 1);
+    expect(vm.mode).toBe('cash');
+    expect(vm.blinds).toEqual({ small: 10, big: 20 });
   });
 });
