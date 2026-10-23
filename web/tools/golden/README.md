@@ -21,7 +21,8 @@ with Prettier. Two runs produce byte-identical files.
 
 ### `equity.json`
 
-`{ hero, board, range: [{ cards, weight }], strength, positivePotential, negativePotential }`. Ranges rotate through
+`{ hero, board, range, strength, positivePotential, negativePotential }`. `range` is one string of space-separated
+`<card><card>:<weight>` items, for example `"AsKd:1 QhQc:0.5"`. Ranges rotate through
 three kinds: every combination without dead cards at weight 1, a random subset with weights 0.25, 0.5 and 1, and
 pairs at 1, suited broadways at 1, offsuit broadways at 0.5, suited aces at 0.25. Flop and turn values come from
 `PokerEquilatorBrecher.equityVsSpectrum`, river strength from `PokerEquilatorBrecher.strengthVsSpectrum` with
@@ -47,6 +48,9 @@ both potentials 0.
   evaluated for the aggressive class and the raw Java action, for debugging only.
 - A hand is left out when the Java engine and the TypeScript rules disagree on stacks, bets or pot, or when the
   bot's action is not legal under the TypeScript rules. `GoldenMain` prints the counts and the reasons.
+- The current fixtures leave out two hands. In both, the bot faces a bet while the villain's remaining stack is
+  smaller than a min raise; `Action.createRaiseAction` then goes all in for the effective stack, so the raise ends
+  below the TypeScript `raise.min`.
 
 ### `preflop-strength-java.json`
 
@@ -69,6 +73,14 @@ the fixture keeps indices 0 to 168.
   path and shadows it. The one change: in `equityVsSpectrum`, the villain hole cards of the potential computation
   use `intValueForBrecher()` instead of `intValue()` (lines 579 and 580). The bot's decision path does not call this
   method; it only affects `equity.json`.
+- `src/mallorcatour/equilator/SpectrumEquilatorImpl.java` shadows the original. The one change: the dead-card
+  checks of `strengthVsSpectrum` test a `deadCards` array holding only the hero and board cards, instead of the
+  reused `allHeroCards` array whose turn and river slots keep stale cards from earlier villain combos; a river still
+  skips the current enumerated turn. Flop and turn strengths now equal exact enumeration.
+- `src/mallorcatour/bot/math/StrengthManager.java` shadows the original. The one change: on the flop and turn each
+  hole-card combo gets its own `StreetEquity` (`withStrength`) holding the cached potentials and draw of its rank
+  pair and its own strength, instead of writing its strength into the cached object shared by every combo of that
+  rank pair. The rank-pair potential cache stays.
 - Randomness: `GameEngine` and `Advice` draw from the static `Random` in `UniformRandomizer`, seeded with
   `System.nanoTime()`. `DecisionHarness` replaces that field by reflection with `new Random(seed)` before each game.
   The villain model is never sampled: `UniformRandomAdvisor`'s advice throws if `getAction()` is called.

@@ -117,7 +117,7 @@ public final class GoldenMain {
 			Card[] board = deck.subList(2, 2 + boardSize).toArray(new Card[0]);
 			List<Card> dead = deck.subList(0, 2 + boardSize);
 			Spectrum spectrum = new Spectrum();
-			List<Object> range = new ArrayList<>();
+			StringBuilder range = new StringBuilder();
 			List<Card> all = Deck.getCards();
 			for (int a = 0; a < all.size(); a++) {
 				for (int b = a + 1; b < all.size(); b++) {
@@ -131,7 +131,11 @@ public final class GoldenMain {
 						continue;
 					}
 					spectrum.add(new HoleCards(first, second), weight);
-					range.add(Json.object("cards", first + " " + second, "weight", weight));
+					if (range.length() > 0) {
+						range.append(' ');
+					}
+					String text = weight == Math.rint(weight) ? Long.toString((long) weight) : Double.toString(weight);
+					range.append(first).append(second).append(':').append(text);
 				}
 			}
 			double strength;
@@ -148,8 +152,8 @@ public final class GoldenMain {
 				positive = equity.positivePotential;
 				negative = equity.negativePotential;
 			}
-			Map<String, Object> entry = Json.object("hero", hero1 + " " + hero2, "board", join(board), "range", range,
-					"strength", strength, "positivePotential", positive, "negativePotential", negative);
+			Map<String, Object> entry = Json.object("hero", hero1 + " " + hero2, "board", join(board), "range",
+					range.toString(), "strength", strength, "positivePotential", positive, "negativePotential", negative);
 			entries.add(entry);
 		}
 		return entries;
