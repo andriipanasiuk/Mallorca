@@ -2,7 +2,8 @@
 
 A Rust workspace for a CFR poker trainer.
 
-- `crates/core`: pure game logic, cards, RNG and (later) the CFR core. Builds for `wasm32-unknown-unknown`.
+- `crates/core`: pure game logic, cards, RNG, the card abstraction, the CFR core, checkpoints, the strategy file and
+  measurement. Builds for `wasm32-unknown-unknown`.
 - `crates/trainer`: the command line trainer that owns threads, files and clocks.
 
 Start with `CLAUDE.md` for the working rules.
@@ -12,7 +13,7 @@ Checkpoints are keyed by a fingerprint of blinds, stack, buckets, bet sizes, the
 ## Overnight runbook for `v1`
 
 Run everything from `solver/` in release mode. `D=data/v1` below; the preset is `presets/v1.toml` (stack 2000,
-128 buckets per street, 12 threads, a checkpoint every 60 minutes). Bucket counts are capped at 256 by the `u8`
+128 buckets per street, 12 threads, a checkpoint every 30 minutes). Bucket counts are capped at 256 by the `u8`
 bucket tables, and a preset outside 1 to 256 is rejected when it loads; 512 buckets need a new table format.
 
 ```
@@ -30,9 +31,12 @@ mkdir -p $D
 3. Measure the speed and get the iteration count for each night length:
    `$T calibrate --preset $P --data $D --minutes 30`
    It trains in a scratch directory and deletes it, so it never touches real checkpoints.
-4. Train overnight: `$T train --preset $P --data $D --minutes 540`
-   Checkpoints are written every `checkpoint_minutes` and on exit. Ctrl-C stops after the current iterations and
-   writes a final checkpoint; a second Ctrl-C aborts without one.
+4. Train overnight, on mains power, under `caffeinate` so the M3 Pro neither sleeps nor idles for the 9 hours:
+   `caffeinate -dims $T train --preset $P --data $D --minutes 540`
+   Checkpoints are written every `checkpoint_minutes` (30) and on exit. Ctrl-C stops after the current iterations
+   and writes a final checkpoint; a second Ctrl-C aborts without one. Release builds abort on a panic, so a crash
+   writes no final checkpoint: the last periodic checkpoint is the recovery point, and running the same command
+   again resumes from it.
 5. For each checkpoint `N` (files `$D/checkpoints/N.ckpt`), export both variants and measure:
    - browser file: `$T export --preset $P --data $D --checkpoint N --streets browser --out $D/v1-N-browser.bin`
      (preflop and flop only; its gzip size is printed and goes into `RESULTS.md`)

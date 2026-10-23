@@ -105,8 +105,9 @@ solver/
 - Turn and flop: E[HS²] over the remaining cards, aggregated from the river table.
 - Buckets are equal-population percentiles of that value per street. `v1` uses 128 buckets on each of flop, turn
   and river; `tiny` uses 8.
-- Bucket tables are `u8` per canonical index, written by `buckets` to `solver/data/`. The river table is about
-  123 MB.
+- Bucket tables are `u8` per canonical index, written by `buckets` to `solver/data/` behind a 9 byte header
+  (magic `MLCB`, format version, street, bucket count) that every loader checks against the preset. The river
+  table is about 123 MB. Bucket counts are 1 to 256 per street.
 
 ### Action abstraction (v1)
 

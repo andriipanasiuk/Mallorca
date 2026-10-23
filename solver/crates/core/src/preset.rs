@@ -182,7 +182,7 @@ mod tests {
         );
         assert_eq!(p.memory_limit_gb, 12.0);
         assert_eq!(p.threads, 12);
-        assert_eq!(p.checkpoint_minutes, 60);
+        assert_eq!(p.checkpoint_minutes, 30);
     }
 
     #[test]
@@ -228,7 +228,7 @@ mod tests {
             ("first_raise_pot = [1.0]", "first_raise_pot = [-1.0]"),
             ("open_bb = 2.5", "open_bb = 0.5"),
             ("threads = 12", "threads = 0"),
-            ("checkpoint_minutes = 60", "checkpoint_minutes = 0"),
+            ("checkpoint_minutes = 30", "checkpoint_minutes = 0"),
             ("discount_interval = 1000000", "discount_interval = 0"),
         ] {
             let s = V1.replace(from, to);

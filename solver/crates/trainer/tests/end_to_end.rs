@@ -76,11 +76,39 @@ fn assert_prints_number(output: &str, marker: &str) {
         .lines()
         .find(|l| l.contains(marker))
         .unwrap_or_else(|| panic!("no {marker} line in:\n{output}"));
+    let words: Vec<&str> = line.split_whitespace().collect();
+    let unit = words
+        .iter()
+        .position(|&w| w == "mbb/hand" || w == "bb/100")
+        .filter(|&i| i > 0)
+        .unwrap_or_else(|| panic!("no mbb/hand or bb/100 figure in {line}"));
+    let figure = words[unit - 1];
     assert!(
-        line.split_whitespace()
-            .any(|w| w.trim_start_matches('+').parse::<f64>().is_ok()),
-        "no number in {line}"
+        figure.parse::<f64>().is_ok_and(f64::is_finite),
+        "{figure} before {} is not a finite figure in {line}",
+        words[unit]
     );
+}
+
+#[test]
+fn figure_check_accepts_a_finite_figure() {
+    assert_prints_number(
+        "x\nlbr: +12.50 mbb/hand ± 3.00 over 2000 hands\n",
+        "mbb/hand",
+    );
+    assert_prints_number("call: -0.50 bb/100 ± 3.21 over 2000 deals", "call: ");
+}
+
+#[test]
+#[should_panic(expected = "not a finite figure")]
+fn figure_check_rejects_nan_next_to_the_unit() {
+    assert_prints_number("lbr: NaN mbb/hand ± 3.00 over 2000 hands", "mbb/hand");
+}
+
+#[test]
+#[should_panic(expected = "not a finite figure")]
+fn figure_check_rejects_infinity_next_to_the_unit() {
+    assert_prints_number("random: +inf bb/100 ± 3.21 over 2000 deals", "random: ");
 }
 
 #[test]
