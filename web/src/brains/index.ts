@@ -31,6 +31,7 @@ export { preprocessAction, toLegalAction } from './preprocess.ts';
 export type {
   ActionDistribution,
   GameSolver,
+  HeroKnowledge,
   ProfitCorrections,
   SolverAction,
   SolverActionType,

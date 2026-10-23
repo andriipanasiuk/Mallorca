@@ -142,13 +142,17 @@ export interface GameSolver {
   onSecondAction(request: SolverRequest, toCall: number): ActionDistribution;
 }
 
+export interface HeroKnowledge {
+  readonly hero: HoleCards;
+  readonly spectrum: Spectrum;
+  readonly strength: StrengthManager;
+}
+
 export function profitMap(
   solver: GameSolver,
   game: GameContext,
   situation: HandState,
-  hero: HoleCards,
-  spectrum: Spectrum,
-  strength: StrengthManager,
+  knowledge: HeroKnowledge,
 ): ActionDistribution {
   const onButton = situation.isHeroOnButton;
   const amountToCall = situation.amountToCall;
@@ -157,9 +161,9 @@ export function profitMap(
     info: situation,
     effectiveStack: game.bankRollAtRisk,
     pot: game.pot,
-    spectrum,
-    hero,
-    strength,
+    spectrum: knowledge.spectrum,
+    hero: knowledge.hero,
+    strength: knowledge.strength,
     isHeroOnButton: onButton,
   };
   if (game.street === PREFLOP) {
