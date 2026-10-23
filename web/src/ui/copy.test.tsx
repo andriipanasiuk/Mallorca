@@ -71,6 +71,11 @@ describe('copy', () => {
     expectFromLocale(container);
   });
 
+  it('farewell start screen strings come from en.json', () => {
+    const { container } = render(<StartScreen seed={42} onStart={vi.fn()} farewell />);
+    expectFromLocale(container);
+  });
+
   it('table strings come from en.json', () => {
     const vm = viewModel();
     vm.board = [48, 41, 25];
@@ -143,9 +148,13 @@ describe('copy', () => {
       render(<ActionBar controls={viewModel().controls} onAct={vi.fn()} />).container,
     );
     cleanup();
-    expectFromLocale(render(<TournamentOver won onPlayAgain={vi.fn()} />).container);
+    expectFromLocale(
+      render(<TournamentOver won onPlayAgain={vi.fn()} onLeave={vi.fn()} />).container,
+    );
     cleanup();
-    expectFromLocale(render(<TournamentOver won={false} onPlayAgain={vi.fn()} />).container);
+    expectFromLocale(
+      render(<TournamentOver won={false} onPlayAgain={vi.fn()} onLeave={vi.fn()} />).container,
+    );
   });
 
   it('the hand log is checked and text outside en.json fails the check', () => {

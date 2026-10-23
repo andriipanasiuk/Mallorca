@@ -1,4 +1,13 @@
-import { byId, expect, FAST_URL, stackOf, test, TOTAL_CHIPS, waitForWaypoint } from './fixtures.ts';
+import {
+  byId,
+  expect,
+  FAST_URL,
+  playToTheEnd,
+  stackOf,
+  test,
+  TOTAL_CHIPS,
+  waitForWaypoint,
+} from './fixtures.ts';
 
 const ALL_IN_TIMEOUT_MS = 600_000;
 
@@ -57,6 +66,21 @@ test('all in on every hand ends the tournament and play again returns to a fresh
     expect(stack).toBeGreaterThan(1900);
     expect(stack).toBeLessThanOrEqual(2000);
   }
+});
+
+test('leaving for tonight returns to a farewell start screen', async ({ page }) => {
+  test.setTimeout(ALL_IN_TIMEOUT_MS);
+  await page.goto(FAST_URL);
+  await byId(page, 'start').click();
+  await playToTheEnd(page);
+  await byId(page, 'leave').click();
+  await expect(byId(page, 'tournament-over')).toHaveCount(0);
+  await expect(byId(page, 'farewell')).toHaveText('Sleep well. The table will be here.');
+  await byId(page, 'start').click();
+  await expect(byId(page, 'hand-number')).toContainText('1');
+  await page.reload();
+  await expect(byId(page, 'start')).toBeVisible();
+  await expect(byId(page, 'farewell')).toHaveCount(0);
 });
 
 test('reloading in the middle of a hand shows the start screen', async ({ page }) => {

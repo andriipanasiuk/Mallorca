@@ -12,6 +12,8 @@ export interface AppProps {
   session: Session;
   humanSeat: SeatIndex;
   onNewTournament: () => void;
+  onLeave: () => void;
+  farewell?: boolean;
 }
 
 function useSessionState(session: Session) {
@@ -23,10 +25,16 @@ function useSessionState(session: Session) {
   return state;
 }
 
-export function App({ session, humanSeat, onNewTournament }: AppProps) {
+export function App({ session, humanSeat, onNewTournament, onLeave, farewell = false }: AppProps) {
   const state = useSessionState(session);
   if (state.phase === 'idle') {
-    return <StartScreen seed={state.seed} onStart={() => void session.getState().start()} />;
+    return (
+      <StartScreen
+        seed={state.seed}
+        farewell={farewell}
+        onStart={() => void session.getState().start()}
+      />
+    );
   }
   const vm = toViewModel(state, humanSeat);
   const act = (intent: Intent) => void session.getState().act(intent);
@@ -70,7 +78,11 @@ export function App({ session, humanSeat, onNewTournament }: AppProps) {
           onNextHand={() => void session.getState().nextHand()}
         />
         {state.phase === 'tournamentOver' && (
-          <TournamentOver won={vm.tournamentWinner === humanSeat} onPlayAgain={onNewTournament} />
+          <TournamentOver
+            won={vm.tournamentWinner === humanSeat}
+            onPlayAgain={onNewTournament}
+            onLeave={onLeave}
+          />
         )}
       </div>
     </Scene>

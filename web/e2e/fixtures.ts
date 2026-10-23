@@ -73,3 +73,22 @@ export async function waitForWaypoint(page: Page): Promise<Waypoint> {
   }
   return 'act';
 }
+
+export async function playToTheEnd(page: Page): Promise<void> {
+  for (;;) {
+    const waypoint = await waitForWaypoint(page);
+    if (waypoint === 'tournament-over') {
+      return;
+    }
+    if (waypoint === 'next-hand') {
+      await byId(page, 'next-hand').click();
+      continue;
+    }
+    if (await byId(page, 'raise').isEnabled()) {
+      await byId(page, 'preset-allin').click();
+      await byId(page, 'raise').click();
+    } else {
+      await byId(page, 'passive').click();
+    }
+  }
+}

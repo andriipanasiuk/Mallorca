@@ -91,13 +91,40 @@ button {
 
 .start-title {
   margin: 0;
-  font-size: var(--font-size-title);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 3.25rem);
+  font-weight: 600;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
 }
 
 .start-tagline {
-  max-width: 32rem;
+  max-width: 30rem;
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.5;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
+}
+
+.start-screen .button-primary {
+  min-width: 12rem;
+  min-height: 52px;
+  margin-top: var(--space-3);
+}
+
+.dialog-line {
   margin: 0;
   color: var(--color-muted);
+  font-family: var(--font-display);
+  font-size: var(--font-size-large);
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
 }
 
 .start-seed {

@@ -38,7 +38,7 @@ if (root === null) {
   throw new Error('Missing #app element');
 }
 
-function mount(): void {
+function mount(farewell = false): void {
   session?.getState().dispose();
   const seed = nextSeed ?? randomSeed();
   nextSeed = null;
@@ -50,7 +50,13 @@ function mount(): void {
     names: [t('seat.you'), t('seat.bot')],
   });
   render(
-    <App session={session} humanSeat={HUMAN_SEAT} onNewTournament={mount} />,
+    <App
+      session={session}
+      humanSeat={HUMAN_SEAT}
+      farewell={farewell}
+      onNewTournament={() => mount()}
+      onLeave={() => mount(true)}
+    />,
     root as HTMLElement,
   );
 }

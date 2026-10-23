@@ -5,7 +5,8 @@
   "start": {
     "heading": "Heads-up against Mallorca",
     "tagline": "No-limit hold'em, 2000 chips each, blinds rise every 10 hands. Last player with chips wins.",
-    "cta": "Start tournament"
+    "cta": "Take a seat",
+    "farewell": "Sleep well. The table will be here."
   },
   "status": {
     "blinds": "Blinds {{small}}/{{big}}",
@@ -88,9 +89,11 @@
     "label": "Coach"
   },
   "over": {
+    "title": "Good game",
     "won": "You won the tournament",
     "lost": "You lost the tournament",
-    "again": "Play again"
+    "again": "Play again",
+    "leave": "That's enough for tonight"
   },
   "hands": {
     "high-card": "High card",

@@ -14,7 +14,9 @@ function setup() {
     names: ['You', 'Mallorca'],
   });
   const onNewTournament = vi.fn();
-  render(<App session={session} humanSeat={0} onNewTournament={onNewTournament} />);
+  render(
+    <App session={session} humanSeat={0} onNewTournament={onNewTournament} onLeave={vi.fn()} />,
+  );
   return { session, onNewTournament };
 }
 
