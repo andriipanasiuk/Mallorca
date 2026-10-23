@@ -1,8 +1,24 @@
+import preact from '@preact/preset-vite';
 import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['src/**/*.test.ts', 'tools/**/*.test.ts'],
-    exclude: [...configDefaults.exclude, '**/*.golden.test.ts'],
+    projects: [
+      {
+        test: {
+          name: 'node',
+          include: ['src/**/*.test.ts', 'tools/**/*.test.ts'],
+          exclude: [...configDefaults.exclude, '**/*.golden.test.ts'],
+        },
+      },
+      {
+        plugins: [preact()],
+        test: {
+          name: 'ui',
+          include: ['src/ui/**/*.test.tsx', 'src/ui/**/*.test.ts'],
+          environment: 'happy-dom',
+        },
+      },
+    ],
   },
 });

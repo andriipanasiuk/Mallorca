@@ -1,0 +1,54 @@
+{
+  "app": { "title": "Mallorca" },
+  "start": {
+    "heading": "Heads-up against Mallorca",
+    "tagline": "No-limit hold'em, 2000 chips each, blinds rise every 10 hands. Last player with chips wins.",
+    "cta": "Start tournament"
+  },
+  "status": {
+    "blinds": "Blinds {{small}}/{{big}}",
+    "hand": "Hand {{number}}",
+    "seed": "Seed {{seed}}",
+    "menu": "Menu",
+    "newTournament": "New tournament"
+  },
+  "seat": {
+    "you": "You",
+    "bot": "Mallorca",
+    "thinking": "Thinking…",
+    "dealer": "D",
+    "dealerLabel": "Dealer button",
+    "stack": "Stack",
+    "bet": "Bet {{amount}}"
+  },
+  "card": { "back": "Face down card" },
+  "board": { "label": "Board" },
+  "pot": { "label": "Pot", "amount": "Pot {{amount}}" },
+  "actions": {
+    "fold": "Fold",
+    "check": "Check",
+    "call": "Call {{amount}}",
+    "raise": "Raise",
+    "raiseTo": "Raise to {{amount}}",
+    "amount": "Raise amount",
+    "half": "Half pot",
+    "pot": "Pot",
+    "allIn": "All-in",
+    "label": "Your actions"
+  },
+  "result": {
+    "wins": "{{name}} wins",
+    "winsWith": "{{name}} wins with {{hand}}",
+    "youWin": "You win",
+    "youWinWith": "You win with {{hand}}",
+    "split": "Split pot",
+    "next": "Next hand"
+  },
+  "log": { "title": "Hand log" },
+  "coach": { "label": "Coach" },
+  "over": {
+    "won": "You won the tournament",
+    "lost": "You lost the tournament",
+    "again": "Play again"
+  }
+}

@@ -1,3 +1,53 @@
 import { render } from 'preact';
+import { createSession, workerBot } from './game/index.ts';
+import type { Session } from './game/index.ts';
+import { App } from './ui/App.tsx';
+import { t } from './ui/i18n.ts';
+import './ui/styles/tokens.css';
+import './ui/styles/layout.css';
 
-render(<div id="app" />, document.body);
+const HUMAN_SEAT = 0;
+const DEFAULT_BOT_DELAY = 700;
+
+const params = new URLSearchParams(window.location.search);
+
+function numberParam(name: string): number | null {
+  const raw = params.get(name);
+  if (raw === null || raw.trim() === '') {
+    return null;
+  }
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 ? Math.floor(value) : null;
+}
+
+function randomSeed(): number {
+  return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
+}
+
+const botDelay = numberParam('botDelay') ?? DEFAULT_BOT_DELAY;
+let nextSeed: number | null = numberParam('seed');
+let session: Session | null = null;
+
+const root = document.getElementById('app');
+if (root === null) {
+  throw new Error('Missing #app element');
+}
+
+function mount(): void {
+  session?.getState().dispose();
+  const seed = nextSeed ?? randomSeed();
+  nextSeed = null;
+  session = createSession({
+    bot: workerBot(),
+    seed,
+    botDelayMs: botDelay,
+    humanSeat: HUMAN_SEAT,
+    names: [t('seat.you'), t('seat.bot')],
+  });
+  render(
+    <App session={session} humanSeat={HUMAN_SEAT} onNewTournament={mount} />,
+    root as HTMLElement,
+  );
+}
+
+mount();

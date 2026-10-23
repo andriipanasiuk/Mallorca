@@ -11,5 +11,6 @@ export type {
   SessionState,
 } from './session.ts';
 export { createSession } from './session.ts';
+export type { SeatIndex } from '../engine/index.ts';
 export type { RaiseControl, SeatView, ViewModel } from './viewModel.ts';
 export { toViewModel } from './viewModel.ts';
