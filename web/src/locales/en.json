@@ -97,9 +97,17 @@
     "lost": "You lost the tournament",
     "again": "Play again"
   },
+  "history": {
+    "exportJson": "Export history as data",
+    "exportText": "Export history as text",
+    "exportAllJson": "Export all hands as data",
+    "exportAllText": "Export all hands as text",
+    "clear": "Clear history"
+  },
   "session": {
     "title": "Session over",
-    "summary": "{{sign}}{{bb}} bb over {{hands}} hands",
+    "summary_one": "{{sign}}{{bb}} bb over {{count}} hand",
+    "summary_other": "{{sign}}{{bb}} bb over {{count}} hands",
     "rate": "{{rate}} bb/100",
     "again": "Play again"
   },

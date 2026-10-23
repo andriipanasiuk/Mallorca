@@ -157,7 +157,12 @@ argument.
   `seat-<i>`, `stack-<i>` (with `data-stack`), `bet-<i>`, `action-<i>`, `thinking-<i>`, `card` (with
   `data-card`), `card-back`, `board`, `pot` (with `data-amount`), `result`, `next-hand`, `fold`, `passive`,
   `raise`, `raise-amount`, `preset-half`, `preset-pot`, `preset-allin`, `hand-log`, `coach`, `live-region`,
-  `tournament-over`, `session-over`, `session-summary`, `session-rate` and `play-again`.
+  `tournament-over`, `session-over`, `session-summary`, `session-rate`, `play-again`, `export-json` and `export-text` (the session dialog, current session) and
+  `export-all-json`, `export-all-text` and `clear-history` (the menu).
+- History: `main.tsx` awaits `openHandStore()` once, gives every `mount()` a fresh `crypto.randomUUID()` session id
+  and passes the store to `App`. `ui/history.ts` reads the store and calls `ui/download.ts` (Blob and a temporary
+  anchor) with `mallorca-<sessionId>.json|txt` or `mallorca-history.json|txt`; store errors are ignored. Plural
+  copy such as `session.summary_one` and `_other` is resolved by i18next from `count`.
 
 ## Conventions
 

@@ -1,5 +1,6 @@
 import { cleanup, render } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { memoryStore } from '../game/index.ts';
 import type { LogEntry } from '../game/index.ts';
 import en from '../locales/en.json';
 import { ActionBar } from './ActionBar.tsx';
@@ -150,7 +151,12 @@ describe('copy', () => {
     cleanup();
     expectFromLocale(
       render(
-        <SessionOver session={{ hands: 3, netBb: 4.5, bbPer100: 150 }} onPlayAgain={vi.fn()} />,
+        <SessionOver
+          session={{ hands: 3, netBb: 4.5, bbPer100: 150 }}
+          store={memoryStore()}
+          sessionId="x"
+          onPlayAgain={vi.fn()}
+        />,
       ).container,
     );
   });

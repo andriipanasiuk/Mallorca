@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { toViewModel } from '../game/index.ts';
-import type { Intent, Session, SeatIndex } from '../game/index.ts';
+import type { HandStore, Intent, Session, SeatIndex } from '../game/index.ts';
+import { clearHistory, exportHistory } from './history.ts';
 import { t } from './i18n.ts';
 import { StartScreen } from './StartScreen.tsx';
 import { Table } from './Table.tsx';
@@ -10,6 +11,7 @@ import { TournamentOver } from './TournamentOver.tsx';
 
 export interface AppProps {
   session: Session;
+  store: HandStore;
   humanSeat: SeatIndex;
   onNewGame: () => void;
 }
@@ -23,7 +25,7 @@ function useSessionState(session: Session) {
   return state;
 }
 
-export function App({ session, humanSeat, onNewGame }: AppProps) {
+export function App({ session, store, humanSeat, onNewGame }: AppProps) {
   const state = useSessionState(session);
   if (state.phase === 'idle') {
     return (
@@ -69,6 +71,30 @@ export function App({ session, humanSeat, onNewGame }: AppProps) {
             >
               {t('status.newGame')}
             </button>
+            <button
+              type="button"
+              class="button button-small"
+              data-testid="export-all-json"
+              onClick={() => void exportHistory(store, null, 'json')}
+            >
+              {t('history.exportAllJson')}
+            </button>
+            <button
+              type="button"
+              class="button button-small"
+              data-testid="export-all-text"
+              onClick={() => void exportHistory(store, null, 'text')}
+            >
+              {t('history.exportAllText')}
+            </button>
+            <button
+              type="button"
+              class="button button-small"
+              data-testid="clear-history"
+              onClick={() => void clearHistory(store)}
+            >
+              {t('history.clear')}
+            </button>
           </div>
         </details>
       </header>
@@ -81,7 +107,12 @@ export function App({ session, humanSeat, onNewGame }: AppProps) {
         onNextHand={() => void session.getState().nextHand()}
       />
       {state.phase === 'sessionOver' && (
-        <SessionOver session={vm.session} onPlayAgain={onNewGame} />
+        <SessionOver
+          session={vm.session}
+          store={store}
+          sessionId={state.sessionId}
+          onPlayAgain={onNewGame}
+        />
       )}
       {state.phase === 'tournamentOver' && (
         <TournamentOver won={vm.tournamentWinner === humanSeat} onPlayAgain={onNewGame} />

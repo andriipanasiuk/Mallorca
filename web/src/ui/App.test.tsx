@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CASH, createSession, inProcessBot, TOURNAMENT } from '../game/index.ts';
+import { CASH, createSession, inProcessBot, memoryStore, TOURNAMENT } from '../game/index.ts';
 import { App } from './App.tsx';
 
 afterEach(cleanup);
@@ -15,7 +15,7 @@ function setup(mode = TOURNAMENT) {
     mode,
   });
   const onNewGame = vi.fn();
-  render(<App session={session} humanSeat={0} onNewGame={onNewGame} />);
+  render(<App session={session} store={memoryStore()} humanSeat={0} onNewGame={onNewGame} />);
   return { session, onNewGame };
 }
 
@@ -62,7 +62,7 @@ describe('App', () => {
     expect(screen.queryByTestId('leave')?.hasAttribute('disabled')).toBe(false);
     fireEvent.click(screen.getByTestId('leave'));
     await waitFor(() => expect(screen.queryByTestId('session-over')).not.toBeNull());
-    expect(screen.getByTestId('session-over').textContent).toContain('+12.5 bb over 1 hands');
+    expect(screen.getByTestId('session-over').textContent).toContain('+12.5 bb over 1 hand');
     fireEvent.click(screen.getByTestId('play-again'));
     expect(onNewGame).toHaveBeenCalledOnce();
     session.getState().dispose();

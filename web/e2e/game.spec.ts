@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+import type { Page } from '@playwright/test';
 import { byId, expect, FAST_URL, stackOf, test, TOTAL_CHIPS, waitForWaypoint } from './fixtures.ts';
 
 const ALL_IN_TIMEOUT_MS = 600_000;
@@ -86,7 +88,43 @@ test('a cash game is played for a hand, left, and the session summary shows one 
   await expect(byId(page, 'leave')).toBeEnabled();
   await byId(page, 'leave').click();
   await expect(byId(page, 'session-over')).toBeVisible();
-  await expect(byId(page, 'session-summary')).toContainText('over 1 hands');
+  await expect(byId(page, 'session-summary')).toContainText('over 1 hand');
   await byId(page, 'play-again').click();
   await expect(byId(page, 'start-cash')).toBeVisible();
+});
+
+async function playHandToEnd(page: Page): Promise<void> {
+  for (;;) {
+    const waypoint = await waitForWaypoint(page);
+    if (waypoint === 'next-hand') {
+      return;
+    }
+    expect(waypoint).toBe('act');
+    await byId(page, 'passive').click();
+  }
+}
+
+async function downloadJson(page: Page, id: string): Promise<unknown[]> {
+  const pending = page.waitForEvent('download');
+  await byId(page, id).click();
+  const download = await pending;
+  const path = await download.path();
+  return JSON.parse(await readFile(path, 'utf8')) as unknown[];
+}
+
+test('hand history is exported, persists across a reload and is cleared', async ({ page }) => {
+  await page.goto('/?seed=3&botDelay=0');
+  await byId(page, 'start-cash').click();
+  await playHandToEnd(page);
+  await byId(page, 'next-hand').click();
+  await playHandToEnd(page);
+  await byId(page, 'leave').click();
+  await expect(byId(page, 'session-over')).toBeVisible();
+  expect(await downloadJson(page, 'export-json')).toHaveLength(2);
+  await page.reload();
+  await byId(page, 'start-cash').click();
+  await page.locator('summary.menu-summary').click();
+  expect((await downloadJson(page, 'export-all-json')).length).toBeGreaterThanOrEqual(2);
+  await byId(page, 'clear-history').click();
+  expect(await downloadJson(page, 'export-all-json')).toEqual([]);
 });

@@ -106,6 +106,9 @@ async function capture(browser: Browser, device: (typeof DEVICES)[number]): Prom
   await id(cash, 'fold').click();
   await id(cash, 'next-hand').waitFor();
   await snap(cash, 'cash hand over', shots);
+  await cash.locator('summary.menu-summary').click();
+  await snap(cash, 'menu open', shots);
+  await cash.locator('summary.menu-summary').click();
   await id(cash, 'leave').click();
   await id(cash, 'session-over').waitFor();
   await snap(cash, 'session over', shots);
