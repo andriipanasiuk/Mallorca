@@ -47,12 +47,6 @@ argument.
 - `Rng` has `next(): number` in [0, 1). `mulberry32(seed)` implements it. `shuffle(items, rng)` is Fisher-Yates
   and returns a copy.
 
-## Conventions
-
-- Chips are integers.
-- Cards in fixtures and text are two-character strings.
-- Tests sit next to the code as `*.test.ts`.
-
 ## engine
 
 - `startHandWith(seats, button, blinds, deck, handNumber)` takes an already shuffled deck and deals from its front.
@@ -68,6 +62,13 @@ argument.
   is null, `pot` is 0 and the stacks include the awarded pot.
 - `showdown.hands` is indexed by seat; `cards` are the hole cards.
 - `legalActions` returns no action when nobody is to act.
+- `startHand(t, rng)` and `apply(t, action)` both end the tournament when a hand completes with an empty stack:
+  they set `winner` and append `tournamentEnded`. A hand can complete inside `startHand` when a short stack is
+  all-in from the blinds.
+- `blindsFor(handNumber)` raises the level every 10 hands and holds the last level.
+- `handHistory(events)` returns `LogEntry` values, `{ key, params }`, with seat indices in `params.seat` and no
+  names or English text. `key` is a locale key under `log` (with `you` or `other` for entries that have a seat);
+  `params.category` is a `HandCategory`.
 
 ## brains
 
@@ -86,3 +87,54 @@ argument.
 - A class the solver did not consider (no raise when the effective stack is 0) is `Number.NEGATIVE_INFINITY`.
 - `npm run test:golden` checks 674 decisions of the Java bot (`src/brains/decisions.golden.test.ts`); it is
   not part of `npm test`.
+
+## game
+
+- `createSession({ bot, seed, botDelayMs, humanSeat, names, startingStacks? })` returns a zustand store with
+  `SessionState` and the actions `start`, `nextHand`, `act(intent)` and `dispose`. `seed` drives `mulberry32` for
+  every shuffle of the tournament.
+- `phase` is one of `idle` (before `start`), `humanToAct`, `botThinking` (waiting for `decide`), `animating`
+  (the `botDelayMs` pause before the bot's action is applied), `handOver` and `tournamentOver`. `act` is ignored
+  unless the phase is `humanToAct`, and `nextHand` unless it is `handOver`.
+- `Intent` is `fold`, `passive` (check or call) or `raise` with a target. `resolveIntent` turns it into a legal
+  action: a raise is rounded and clamped into `legal.raise`, a fold becomes a check when checking is free.
+- `log` holds the `LogEntry` values of the tournament. `lastActions` holds one tag per seat for the current hand,
+  `{ key, params }` with `key` under `actions` (`fold`, `check`, `call`, `raiseTo`, `allIn`).
+- `result` is set when a hand completes: `winner` (null for a split), `category` of the shown hand or null,
+  `showdown` and `amount`. `amount` is the pot collected, twice the smaller contribution, or each share for a
+  split. It equals the `win` entry of the log; an uncalled bet is its own `returned` entry.
+- `BotClient` has `observe(observations)`, `decide(legal)`, `reset()` and an optional `dispose()`. `workerBot()`
+  runs the brain in `bot.worker.ts` over the `WorkerRequest` and `WorkerReply` messages in `workerProtocol.ts`.
+  `inProcessBot()` runs it on the main thread.
+- `withFallback` wraps a client: when `decide` rejects or takes longer than 5 s, it disposes the primary, replays
+  the observations of the hand into an in-process bot and uses it from then on. It falls back once, and a failure
+  from before `reset` or `dispose` does not trigger it. The session drops a decision that arrives after `start`
+  or `dispose`.
+- `toViewModel(state, humanSeat)` returns the `ViewModel`: per seat the name, stack, street bet, button, whether
+  it is to act, the cards (`'back'` for the bot's cards until a showdown) and the last action tag; the board, pot,
+  blinds and hand number; the controls (`fold`, `passive` with its amount, `raise` with `min`, `max` and the
+  presets `halfPot`, `pot` and `allIn`, and `enabled`); the result and the tournament winner.
+- For the ui, `game` re-exports `Card`, `formatCard`, `rankOf`, `suitOf`, `SeatIndex`, `LogEntry` and
+  `HandCategory`.
+
+## ui
+
+- Preact components render only the `ViewModel`, the session phase and the log; they call the session actions
+  and hold no game rules.
+- Every string comes from `src/locales/en.json` through i18next (`ui/i18n.ts`). `ui/phrases.ts` words log
+  entries, action tags and hand categories; an entry with the human seat uses the `log.you` keys, any other seat
+  the `log.other` keys with `{{name}}`.
+- `main.tsx` reads two query parameters: `?seed=<n>` fixes the tournament seed and `?botDelay=<ms>` sets the bot
+  pause (700 ms by default). The human sits in seat 0.
+- Keyboard: `f` folds, `c` checks or calls, `r` raises, the arrow keys move the raise amount.
+- `data-testid` contract for e2e and contact sheets: `start`, `blinds`, `hand-number`, `new-tournament`,
+  `seat-<i>`, `stack-<i>` (with `data-stack`), `bet-<i>`, `action-<i>`, `thinking-<i>`, `card` (with
+  `data-card`), `card-back`, `board`, `pot` (with `data-amount`), `result`, `next-hand`, `fold`, `passive`,
+  `raise`, `raise-amount`, `preset-half`, `preset-pot`, `preset-allin`, `hand-log`, `coach`, `live-region`,
+  `tournament-over` and `play-again`.
+
+## Conventions
+
+- Chips are integers.
+- Cards in fixtures and text are two-character strings.
+- Tests sit next to the code as `*.test.ts`.
