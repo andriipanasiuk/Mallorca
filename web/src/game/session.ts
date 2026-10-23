@@ -5,7 +5,8 @@ import type { Decision } from '../brains/index.ts';
 import { toObservations } from '../brains/index.ts';
 import {
   apply,
-  createTournament,
+  createTable,
+  TOURNAMENT,
   handHistory,
   legalActionsOf,
   startHand,
@@ -17,7 +18,7 @@ import type {
   LegalActions,
   LogEntry,
   SeatIndex,
-  Tournament,
+  Table,
 } from '../engine/index.ts';
 import type { HandCategory } from '../equity/index.ts';
 import { withFallback } from './botClient.ts';
@@ -36,7 +37,7 @@ export interface HandResult {
 }
 
 export interface SessionState {
-  tournament: Tournament;
+  table: Table;
   phase: Phase;
   log: LogEntry[];
   lastActions: [LogEntry | null, LogEntry | null];
@@ -62,8 +63,6 @@ export interface SessionOptions {
   names: [string, string];
   startingStacks?: [number, number];
 }
-
-const STARTING_STACK = 2000;
 
 function label(event: Extract<EngineEvent, { type: 'acted' }>): LogEntry {
   if (event.allIn && event.action.kind !== 'fold') {
@@ -174,14 +173,14 @@ export function createSession(options: SessionOptions): Session {
     timers.clear();
   };
 
-  const fresh = (): Tournament => {
-    const tournament = createTournament(names, STARTING_STACK, 0);
+  const fresh = (): Table => {
+    const table = createTable(names, TOURNAMENT, 0);
     const stacks = options.startingStacks;
     if (stacks === undefined) {
-      return tournament;
+      return table;
     }
     return {
-      ...tournament,
+      ...table,
       seats: [
         { name: names[0], stack: stacks[0] },
         { name: names[1], stack: stacks[1] },
@@ -201,7 +200,7 @@ export function createSession(options: SessionOptions): Session {
       set({ log: [...get().log, ...handHistory(events)], lastActions });
     };
 
-    const conclude = (step: { state: Tournament; events: EngineEvent[] }) => {
+    const conclude = (step: { state: Table; events: EngineEvent[] }) => {
       if (step.state.hand?.street === 'complete') {
         const { seats } = step.state;
         const paid = (seat: SeatIndex) =>
@@ -217,24 +216,24 @@ export function createSession(options: SessionOptions): Session {
     };
 
     const play = (action: Action) => {
-      const step = apply(get().tournament, action);
-      set({ tournament: step.state });
+      const step = apply(get().table, action);
+      set({ table: step.state });
       record(step.events);
       conclude(step);
     };
 
     const drive = async (myEpoch: number): Promise<void> => {
       for (;;) {
-        const { tournament } = get();
-        if (tournament.hand === null || tournament.hand.street === 'complete') {
+        const { table } = get();
+        if (table.hand === null || table.hand.street === 'complete') {
           return;
         }
-        if (toAct(tournament) === humanSeat) {
+        if (toAct(table) === humanSeat) {
           set({ phase: 'humanToAct' });
           return;
         }
         set({ phase: 'botThinking' });
-        const legal = legalActionsOf(tournament);
+        const legal = legalActionsOf(table);
         let decision: Decision | null;
         try {
           decision = await bot.decide(legal);
@@ -260,18 +259,18 @@ export function createSession(options: SessionOptions): Session {
     };
 
     const beginHand = (): Promise<void> => {
-      const { seats } = get().tournament;
+      const { seats } = get().table;
       startStacks = [seats[0].stack, seats[1].stack];
-      const step = startHand(get().tournament, rng);
+      const step = startHand(get().table, rng);
       bot.reset();
-      set({ tournament: step.state, lastActions: [null, null], result: null });
+      set({ table: step.state, lastActions: [null, null], result: null });
       record(step.events);
       conclude(step);
       return drive(epoch);
     };
 
     return {
-      tournament: fresh(),
+      table: fresh(),
       phase: 'idle',
       log: [],
       lastActions: [null, null],
@@ -281,7 +280,7 @@ export function createSession(options: SessionOptions): Session {
       start() {
         epoch += 1;
         cancelTimers();
-        set({ tournament: fresh(), log: [], lastDecision: null, result: null });
+        set({ table: fresh(), log: [], lastDecision: null, result: null });
         return beginHand();
       },
       dispose() {
@@ -296,11 +295,11 @@ export function createSession(options: SessionOptions): Session {
         return beginHand();
       },
       act(intent) {
-        const { phase, tournament } = get();
-        if (phase !== 'humanToAct' || toAct(tournament) !== humanSeat) {
+        const { phase, table } = get();
+        if (phase !== 'humanToAct' || toAct(table) !== humanSeat) {
           return Promise.resolve();
         }
-        play(resolveIntent(intent, legalActionsOf(tournament)));
+        play(resolveIntent(intent, legalActionsOf(table)));
         return drive(epoch);
       },
     };

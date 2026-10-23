@@ -4,7 +4,16 @@ import { applyAction, startHandWith } from './hand.ts';
 import { legalActions, otherSeat } from './legal.ts';
 import type { Action, EngineEvent, Hand, LegalActions, Seat, SeatIndex, Step } from './types.ts';
 
-export interface Tournament {
+export type TableMode = { kind: 'tournament' } | { kind: 'cash'; bigBlind: number; buyIn: number };
+
+export const TOURNAMENT: TableMode = { kind: 'tournament' };
+
+export const CASH: TableMode = { kind: 'cash', bigBlind: 20, buyIn: 2000 };
+
+const TOURNAMENT_STACK = 2000;
+
+export interface Table {
+  mode: TableMode;
   seats: [Seat, Seat];
   button: SeatIndex;
   handNumber: number;
@@ -28,12 +37,14 @@ export function blindsFor(handNumber: number): { small: number; big: number } {
   return { small: Math.floor(big / 2), big };
 }
 
-export function createTournament(
+export function createTable(
   names: [string, string],
-  startingStack = 2000,
+  mode: TableMode,
   firstButton: SeatIndex = 0,
-): Tournament {
+): Table {
+  const startingStack = mode.kind === 'cash' ? mode.buyIn : TOURNAMENT_STACK;
   return {
+    mode,
     seats: [
       { name: names[0], stack: startingStack },
       { name: names[1], stack: startingStack },
@@ -45,7 +56,7 @@ export function createTournament(
   };
 }
 
-export function startHand(t: Tournament, rng: Rng): { state: Tournament; events: EngineEvent[] } {
+export function startHand(t: Table, rng: Rng): { state: Table; events: EngineEvent[] } {
   if (t.winner !== null) {
     throw new Error('The tournament is over');
   }
@@ -64,7 +75,7 @@ export function startHand(t: Tournament, rng: Rng): { state: Tournament; events:
   return conclude({ ...t, button, handNumber }, step);
 }
 
-function conclude(t: Tournament, step: Step): { state: Tournament; events: EngineEvent[] } {
+function conclude(t: Table, step: Step): { state: Table; events: EngineEvent[] } {
   const events = [...step.events];
   let winner: SeatIndex | null = null;
   if (step.hand.street === 'complete') {
@@ -77,18 +88,18 @@ function conclude(t: Tournament, step: Step): { state: Tournament; events: Engin
   return { state: { ...t, seats: step.seats, hand: step.hand, winner }, events };
 }
 
-export function legalActionsOf(t: Tournament): LegalActions {
+export function legalActionsOf(t: Table): LegalActions {
   if (t.hand === null) {
     return { fold: false, check: false, call: null, raise: null };
   }
   return legalActions(t.hand, t.seats);
 }
 
-export function toAct(t: Tournament): SeatIndex | null {
+export function toAct(t: Table): SeatIndex | null {
   return t.hand === null ? null : t.hand.toAct;
 }
 
-export function apply(t: Tournament, action: Action): { state: Tournament; events: EngineEvent[] } {
+export function apply(t: Table, action: Action): { state: Table; events: EngineEvent[] } {
   if (t.hand === null) {
     throw new Error('No hand in progress');
   }

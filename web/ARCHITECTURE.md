@@ -6,7 +6,7 @@
 web/
   src/cards/     Card, parse and format ("As Kd"), seeded RNG, shuffle
   src/equity/    hand evaluation and equity
-  src/engine/    heads-up NLHE rules as a pure reducer, tournament and blind schedule
+  src/engine/    heads-up NLHE rules as a pure reducer, table with a mode and blind schedule
   src/brains/    port of the Mallorca math bot
   src/game/      session store, turn loop, bot worker client, view-model
   src/ui/        Preact components
@@ -62,6 +62,9 @@ argument.
   is null, `pot` is 0 and the stacks include the awarded pot.
 - `showdown.hands` is indexed by seat; `cards` are the hole cards.
 - `legalActions` returns no action when nobody is to act.
+- `Table` (`engine/table.ts`) holds `mode`, `seats`, `button`, `handNumber`, `hand` and `winner`. `TableMode` is
+  `{ kind: 'tournament' }` or `{ kind: 'cash', bigBlind, buyIn }`; `createTable(names, mode, firstButton)` seats
+  2000 chips for `TOURNAMENT` and `buyIn` for a cash mode such as `CASH`.
 - `startHand(t, rng)` and `apply(t, action)` both end the tournament when a hand completes with an empty stack:
   they set `winner` and append `tournamentEnded`. A hand can complete inside `startHand` when a short stack is
   all-in from the blinds.
@@ -91,7 +94,7 @@ argument.
 ## game
 
 - `createSession({ bot, seed, botDelayMs, humanSeat, names, startingStacks? })` returns a zustand store with
-  `SessionState` and the actions `start`, `nextHand`, `act(intent)` and `dispose`. `seed` drives `mulberry32` for
+  `SessionState` (its engine state is `table`) and the actions `start`, `nextHand`, `act(intent)` and `dispose`. `seed` drives `mulberry32` for
   every shuffle of the tournament.
 - `phase` is one of `idle` (before `start`), `humanToAct`, `botThinking` (waiting for `decide`), `animating`
   (the `botDelayMs` pause before the bot's action is applied), `handOver` and `tournamentOver`. `act` is ignored

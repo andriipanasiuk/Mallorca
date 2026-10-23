@@ -31,7 +31,7 @@ describe('toViewModel', () => {
     await session.getState().start();
     const vm = toViewModel(session.getState(), 1);
     expect(vm.seats[0].cards).toEqual(['back', 'back']);
-    const hole = session.getState().tournament.hand?.holeCards[1];
+    const hole = session.getState().table.hand?.holeCards[1];
     expect(vm.seats[1].cards).toEqual(hole);
     expect(vm.seats[0].name).toBe('Mallorca');
     expect(vm.seats[1].name).toBe('You');
@@ -68,13 +68,13 @@ describe('toViewModel', () => {
     const state = session.getState();
     const vm = toViewModel(state, 1);
     expect(vm.board).toHaveLength(5);
-    expect(vm.seats[0].cards).toEqual(state.tournament.hand?.holeCards[0]);
+    expect(vm.seats[0].cards).toEqual(state.table.hand?.holeCards[0]);
     expect(vm.result).not.toBeNull();
     expect(vm.result?.category).toEqual(expect.any(String));
     expect(vm.result?.amount).toBe(vm.result?.winner === null ? 2000 : 4000);
     expect(vm.controls.enabled).toBe(false);
     expect(vm.controls.raise).toBeNull();
-    expect(vm.tournamentWinner).toBe(state.tournament.winner);
+    expect(vm.tournamentWinner).toBe(state.table.winner);
   });
 
   it('keeps the bot cards hidden when a hand ends by a fold', async () => {
@@ -86,7 +86,7 @@ describe('toViewModel', () => {
     expect(vm.seats[0].cards).toEqual(['back', 'back']);
     expect(vm.result?.winner).toBe(0);
     expect(vm.result?.category).toBeNull();
-    expect(vm.result?.amount).toBe((state.tournament.seats[0].stack - 2000) * 2);
+    expect(vm.result?.amount).toBe((state.table.seats[0].stack - 2000) * 2);
     expect(vm.result?.amount).toBeGreaterThan(0);
   });
 });

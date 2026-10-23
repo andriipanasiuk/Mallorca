@@ -41,17 +41,17 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function seatView(state: SessionState, seat: SeatIndex, humanSeat: SeatIndex): SeatView {
-  const { tournament, result } = state;
-  const { hand } = tournament;
+  const { table, result } = state;
+  const { hand } = table;
   const hole = hand?.holeCards[seat];
   const revealed = seat === humanSeat || result?.showdown === true;
   const cards: (Card | 'back')[] =
     hole === undefined ? [] : revealed ? [hole[0], hole[1]] : ['back', 'back'];
   return {
-    name: tournament.seats[seat].name,
-    stack: tournament.seats[seat].stack,
+    name: table.seats[seat].name,
+    stack: table.seats[seat].stack,
     bet: hand?.bets[seat] ?? 0,
-    isButton: hand !== null && tournament.button === seat,
+    isButton: hand !== null && table.button === seat,
     isToAct: hand?.toAct === seat,
     cards,
     lastAction: state.lastActions[seat],
@@ -59,10 +59,10 @@ function seatView(state: SessionState, seat: SeatIndex, humanSeat: SeatIndex): S
 }
 
 export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewModel {
-  const { tournament, phase, result } = state;
-  const { hand } = tournament;
-  const enabled = phase === 'humanToAct' && toAct(tournament) === humanSeat;
-  const legal = legalActionsOf(tournament);
+  const { table, phase, result } = state;
+  const { hand } = table;
+  const enabled = phase === 'humanToAct' && toAct(table) === humanSeat;
+  const legal = legalActionsOf(table);
   const call = enabled ? legal.call : null;
   let raise: RaiseControl | null = null;
   if (enabled && legal.raise !== null && hand !== null) {
@@ -89,12 +89,12 @@ export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewMode
       raise,
       enabled,
     },
-    blinds: hand === null ? blindsFor(1) : blindsFor(tournament.handNumber),
-    handNumber: tournament.handNumber,
+    blinds: hand === null ? blindsFor(1) : blindsFor(table.handNumber),
+    handNumber: table.handNumber,
     result:
       result === null
         ? null
         : { winner: result.winner, category: result.category, amount: result.amount },
-    tournamentWinner: tournament.winner,
+    tournamentWinner: table.winner,
   };
 }

@@ -11,15 +11,17 @@ export type {
 } from './types.ts';
 export { applyAction, IllegalActionError, startHandWith } from './hand.ts';
 export { legalActions } from './legal.ts';
-export type { Tournament } from './tournament.ts';
+export type { Table, TableMode } from './table.ts';
 export {
   apply,
   BIG_BLINDS,
   blindsFor,
-  createTournament,
+  CASH,
+  createTable,
   legalActionsOf,
   startHand,
   toAct,
-} from './tournament.ts';
+  TOURNAMENT,
+} from './table.ts';
 export type { LogEntry } from './history.ts';
 export { handHistory } from './history.ts';

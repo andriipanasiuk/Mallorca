@@ -37,8 +37,8 @@ describe('session', () => {
     await session.getState().start();
     const state = session.getState();
     expect(state.phase).toBe('humanToAct');
-    expect(state.tournament.handNumber).toBe(1);
-    expect(toAct(state.tournament)).toBe(1);
+    expect(state.table.handNumber).toBe(1);
+    expect(toAct(state.table)).toBe(1);
     expect(bot.decideCalls).toBe(1);
     expect(state.log.length).toBeGreaterThan(0);
     expect(state.lastActions[0]).toEqual({ key: 'call', params: { amount: 10 } });
@@ -53,18 +53,16 @@ describe('session', () => {
       second.getState().start(),
       other.getState().start(),
     ]);
-    expect(first.getState().tournament.hand?.holeCards).toEqual(
-      second.getState().tournament.hand?.holeCards,
-    );
-    expect(first.getState().tournament.hand?.holeCards).not.toEqual(
-      other.getState().tournament.hand?.holeCards,
+    expect(first.getState().table.hand?.holeCards).toEqual(second.getState().table.hand?.holeCards);
+    expect(first.getState().table.hand?.holeCards).not.toEqual(
+      other.getState().table.hand?.holeCards,
     );
   });
 
   it('clamps a raise below the minimum to the minimum', async () => {
     const session = open(callingBot());
     await session.getState().start();
-    const legal = legalActionsOf(session.getState().tournament);
+    const legal = legalActionsOf(session.getState().table);
     await session.getState().act({ kind: 'raise', to: 1 });
     expect(session.getState().lastActions[1]).toEqual({
       key: 'raiseTo',
@@ -75,7 +73,7 @@ describe('session', () => {
   it('rounds a fractional raise and clamps it to the maximum', async () => {
     const first = open(callingBot());
     await first.getState().start();
-    const legal = legalActionsOf(first.getState().tournament);
+    const legal = legalActionsOf(first.getState().table);
     const target = (legal.raise?.min ?? 0) + 10.6;
     await first.getState().act({ kind: 'raise', to: target });
     expect(first.getState().lastActions[1]).toEqual({
@@ -94,7 +92,7 @@ describe('session', () => {
     await session.getState().start();
     await session.getState().act({ kind: 'fold' });
     expect(session.getState().lastActions[1]).toEqual({ key: 'check', params: {} });
-    expect(session.getState().tournament.hand?.street).toBe('flop');
+    expect(session.getState().table.hand?.street).toBe('flop');
   });
 
   it('ignores act while the bot is thinking', async () => {
@@ -195,7 +193,7 @@ describe('session', () => {
     expect(state.result).not.toBeNull();
     if (state.phase === 'handOver') {
       await state.nextHand();
-      expect(session.getState().tournament.handNumber).toBe(2);
+      expect(session.getState().table.handNumber).toBe(2);
     }
   });
 
@@ -219,7 +217,7 @@ describe('session', () => {
     await session.getState().start();
     const state = session.getState();
     expect(state.phase).toBe('tournamentOver');
-    expect(state.tournament.winner).toBe(0);
+    expect(state.table.winner).toBe(0);
     expect(state.result).toMatchObject({ winner: 0, showdown: true, amount: 20 });
     expect(bot.decideCalls).toBe(0);
   });
@@ -230,9 +228,9 @@ describe('session', () => {
     const state = session.getState();
     expect(state.phase).toBe('handOver');
     expect(state.result).toMatchObject({ winner: 1, showdown: true, amount: 20 });
-    expect(state.tournament.seats.map((s) => s.stack)).toEqual([3980, 20]);
+    expect(state.table.seats.map((s) => s.stack)).toEqual([3980, 20]);
     await state.nextHand();
-    expect(session.getState().tournament.handNumber).toBe(2);
+    expect(session.getState().table.handNumber).toBe(2);
   });
 
   it('plays the tournament to the end when the human always folds', async () => {
@@ -248,7 +246,7 @@ describe('session', () => {
     }
     const state = session.getState();
     expect(state.phase).toBe('tournamentOver');
-    expect(state.tournament.winner).toBe(0);
+    expect(state.table.winner).toBe(0);
   });
 
   it('plays a hand against the real brain', async () => {
@@ -267,7 +265,7 @@ describe('session', () => {
     await session.getState().start();
     await session.getState().act({ kind: 'passive' });
     await session.getState().start();
-    expect(session.getState().tournament.handNumber).toBe(1);
+    expect(session.getState().table.handNumber).toBe(1);
     expect(session.getState().phase).toBe('humanToAct');
   });
 
