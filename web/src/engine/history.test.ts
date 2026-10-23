@@ -8,54 +8,53 @@ const seats: [Seat, Seat] = [
   { name: 'Mallorca', stack: 2000 },
   { name: 'You', stack: 2000 },
 ];
-const names: [string, string] = ['Mallorca', 'You'];
 
 describe('handHistory', () => {
-  it('describes a hand that goes to showdown', () => {
+  it('describes a hand that goes to showdown with locale keys and seat indices', () => {
     const deck = deckOf('Ah Ad', '7c 2d', 'Qs Jh 7d 4c 9h');
     const start = startHandWith(seats, 0, { small: 10, big: 20 }, deck, 1);
     const end = playEvents(start, raiseTo(60), call, check, check, check, check, check, check);
-    expect(handHistory(end.events, names)).toEqual([
-      'Hand 1, blinds 10/20',
-      'Mallorca posts 10',
-      'You post 20',
-      'Mallorca raises to 60',
-      'You call 40',
-      'Flop Qs Jh 7d',
-      'You check',
-      'Mallorca checks',
-      'Turn 4c',
-      'You check',
-      'Mallorca checks',
-      'River 9h',
-      'You check',
-      'Mallorca checks',
-      'Showdown: Mallorca shows 7c 2d, pair',
-      'Showdown: You show Ah Ad, pair',
-      'You win 120',
+    expect(handHistory(end.events)).toEqual([
+      { key: 'handStarted', params: { number: 1, small: 10, big: 20 } },
+      { key: 'post', params: { seat: 0, amount: 10 } },
+      { key: 'post', params: { seat: 1, amount: 20 } },
+      { key: 'raise', params: { seat: 0, amount: 60 } },
+      { key: 'call', params: { seat: 1, amount: 40 } },
+      { key: 'flop', params: { cards: 'Qs Jh 7d' } },
+      { key: 'check', params: { seat: 1 } },
+      { key: 'check', params: { seat: 0 } },
+      { key: 'turn', params: { cards: '4c' } },
+      { key: 'check', params: { seat: 1 } },
+      { key: 'check', params: { seat: 0 } },
+      { key: 'river', params: { cards: '9h' } },
+      { key: 'check', params: { seat: 1 } },
+      { key: 'check', params: { seat: 0 } },
+      { key: 'show', params: { seat: 0, cards: '7c 2d', category: 'pair' } },
+      { key: 'show', params: { seat: 1, cards: 'Ah Ad', category: 'pair' } },
+      { key: 'win', params: { seat: 1, amount: 120 } },
     ]);
   });
 
-  it('describes folds, all-ins and the end of the tournament', () => {
+  it('describes folds, uncalled bets, all-ins and the end of the tournament', () => {
     const deck = deckOf('Ah Ad', '7c 2d', 'Qs Jh 7d 4c 9h');
     const start = startHandWith(seats, 1, { small: 10, big: 20 }, deck, 4);
     const folded = playEvents(start, fold);
-    expect(handHistory(folded.events, names)).toEqual([
-      'Hand 4, blinds 10/20',
-      'You post 10',
-      'Mallorca posts 20',
-      'You fold',
-      'Uncalled bet of 10 returned to Mallorca',
-      'Mallorca wins 20',
+    expect(handHistory(folded.events)).toEqual([
+      { key: 'handStarted', params: { number: 4, small: 10, big: 20 } },
+      { key: 'post', params: { seat: 1, amount: 10 } },
+      { key: 'post', params: { seat: 0, amount: 20 } },
+      { key: 'fold', params: { seat: 1 } },
+      { key: 'returned', params: { seat: 0, amount: 10 } },
+      { key: 'win', params: { seat: 0, amount: 20 } },
     ]);
     const shove = playEvents(
       startHandWith(seats, 0, { small: 10, big: 20 }, deck, 1),
       raiseTo(2000),
       call,
     );
-    const lines = handHistory([...shove.events, { type: 'tournamentEnded', winner: 1 }], names);
-    expect(lines).toContain('Mallorca is all-in');
-    expect(lines).toContain('You are all-in');
-    expect(lines.at(-1)).toBe('You win the tournament');
+    const entries = handHistory([...shove.events, { type: 'tournamentEnded', winner: 1 }]);
+    expect(entries).toContainEqual({ key: 'allIn', params: { seat: 0 } });
+    expect(entries).toContainEqual({ key: 'allIn', params: { seat: 1 } });
+    expect(entries.at(-1)).toEqual({ key: 'winTournament', params: { seat: 1 } });
   });
 });

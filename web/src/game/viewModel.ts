@@ -1,6 +1,7 @@
 import type { Card } from '../cards/index.ts';
 import { blindsFor, legalActionsOf, toAct } from '../engine/index.ts';
-import type { SeatIndex } from '../engine/index.ts';
+import type { LogEntry, SeatIndex } from '../engine/index.ts';
+import type { HandCategory } from '../equity/index.ts';
 import type { SessionState } from './session.ts';
 
 export interface SeatView {
@@ -10,7 +11,7 @@ export interface SeatView {
   isButton: boolean;
   isToAct: boolean;
   cards: (Card | 'back')[];
-  lastAction: string | null;
+  lastAction: LogEntry | null;
 }
 
 export interface RaiseControl {
@@ -31,7 +32,7 @@ export interface ViewModel {
   };
   blinds: { small: number; big: number };
   handNumber: number;
-  result: { winner: SeatIndex | null; handName: string | null; amount: number } | null;
+  result: { winner: SeatIndex | null; category: HandCategory | null; amount: number } | null;
   tournamentWinner: SeatIndex | null;
 }
 
@@ -93,7 +94,7 @@ export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewMode
     result:
       result === null
         ? null
-        : { winner: result.winner, handName: result.handName, amount: result.amount },
+        : { winner: result.winner, category: result.category, amount: result.amount },
     tournamentWinner: tournament.winner,
   };
 }

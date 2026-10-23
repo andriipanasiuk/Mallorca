@@ -11,7 +11,15 @@ import {
   startHand,
   toAct,
 } from '../engine/index.ts';
-import type { Action, EngineEvent, LegalActions, SeatIndex, Tournament } from '../engine/index.ts';
+import type {
+  Action,
+  EngineEvent,
+  LegalActions,
+  LogEntry,
+  SeatIndex,
+  Tournament,
+} from '../engine/index.ts';
+import type { HandCategory } from '../equity/index.ts';
 import { withFallback } from './botClient.ts';
 import type { BotClient } from './botClient.ts';
 
@@ -22,7 +30,7 @@ export type Intent = { kind: 'fold' | 'passive' } | { kind: 'raise'; to: number 
 
 export interface HandResult {
   winner: SeatIndex | null;
-  handName: string | null;
+  category: HandCategory | null;
   showdown: boolean;
   amount: number;
 }
@@ -30,8 +38,8 @@ export interface HandResult {
 export interface SessionState {
   tournament: Tournament;
   phase: Phase;
-  log: string[];
-  lastActions: [string | null, string | null];
+  log: LogEntry[];
+  lastActions: [LogEntry | null, LogEntry | null];
   lastDecision: Decision | null;
   seed: number;
   result: HandResult | null;
@@ -57,24 +65,19 @@ export interface SessionOptions {
 
 const STARTING_STACK = 2000;
 
-function label(event: Extract<EngineEvent, { type: 'acted' }>): string {
+function label(event: Extract<EngineEvent, { type: 'acted' }>): LogEntry {
   if (event.allIn && event.action.kind !== 'fold') {
-    return 'All-in';
+    return { key: 'allIn', params: {} };
   }
   switch (event.action.kind) {
     case 'fold':
-      return 'Fold';
     case 'check':
-      return 'Check';
+      return { key: event.action.kind, params: {} };
     case 'call':
-      return `Call ${event.amount}`;
+      return { key: 'call', params: { amount: event.amount } };
     case 'raise':
-      return `Raise to ${event.action.to}`;
+      return { key: 'raiseTo', params: { amount: event.action.to } };
   }
-}
-
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export function resultOf(events: EngineEvent[]): Omit<HandResult, 'amount'> {
@@ -96,7 +99,7 @@ export function resultOf(events: EngineEvent[]): Omit<HandResult, 'amount'> {
   const shown = hands === null ? null : hands[winner ?? 0];
   return {
     winner,
-    handName: shown === null ? null : capitalise(shown.category.replace('-', ' ')),
+    category: shown === null ? null : shown.category,
     showdown: hands !== null,
   };
 }
@@ -189,13 +192,13 @@ export function createSession(options: SessionOptions): Session {
   return createStore<SessionState & SessionActions>((set, get) => {
     const record = (events: EngineEvent[]) => {
       bot.observe(toObservations(events, botSeat));
-      const lastActions: [string | null, string | null] = [...get().lastActions];
+      const lastActions: [LogEntry | null, LogEntry | null] = [...get().lastActions];
       for (const event of events) {
         if (event.type === 'acted') {
           lastActions[event.seat] = label(event);
         }
       }
-      set({ log: [...get().log, ...handHistory(events, names)], lastActions });
+      set({ log: [...get().log, ...handHistory(events)], lastActions });
     };
 
     const conclude = (step: { state: Tournament; events: EngineEvent[] }) => {

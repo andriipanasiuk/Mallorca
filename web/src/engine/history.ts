@@ -1,63 +1,62 @@
 import { formatCard } from '../cards/index.ts';
-import type { Action, EngineEvent } from './types.ts';
+import type { Card } from '../cards/index.ts';
+import type { Action, EngineEvent, SeatIndex } from './types.ts';
 
-const YOU = 'You';
-
-function say(name: string, verb: string): string {
-  if (name === YOU) {
-    return `${name} ${verb === 'be' ? 'are' : verb}`;
-  }
-  return `${name} ${verb === 'be' ? 'is' : `${verb}s`}`;
+export interface LogEntry {
+  key: string;
+  params: Record<string, string | number>;
 }
 
-function describeAction(name: string, action: Action, amount: number): string {
+function cardsText(cards: readonly Card[]): string {
+  return cards.map(formatCard).join(' ');
+}
+
+function describeAction(seat: SeatIndex, action: Action, amount: number): LogEntry {
   switch (action.kind) {
     case 'fold':
-      return say(name, 'fold');
     case 'check':
-      return say(name, 'check');
+      return { key: action.kind, params: { seat } };
     case 'call':
-      return `${say(name, 'call')} ${amount}`;
+      return { key: 'call', params: { seat, amount } };
     case 'raise':
-      return `${say(name, 'raise')} to ${action.to}`;
+      return { key: 'raise', params: { seat, amount: action.to } };
   }
 }
 
-function describeEvent(event: EngineEvent, names: [string, string]): string[] {
+function describeEvent(event: EngineEvent): LogEntry[] {
   switch (event.type) {
     case 'handStarted':
-      return [`Hand ${event.handNumber}, blinds ${event.smallBlind}/${event.bigBlind}`];
-    case 'blindPosted':
-      return [`${say(names[event.seat], 'post')} ${event.amount}`];
-    case 'acted': {
-      const name = names[event.seat];
-      const line = describeAction(name, event.action, event.amount);
-      return event.allIn ? [line, `${say(name, 'be')} all-in`] : [line];
-    }
-    case 'streetDealt': {
-      const label = event.street.charAt(0).toUpperCase() + event.street.slice(1);
-      return [`${label} ${event.cards.map(formatCard).join(' ')}`];
-    }
-    case 'showdown':
-      return event.hands.map((hand, seat) => {
-        const cards = hand.cards.map(formatCard).join(' ');
-        const category = hand.category.replace('-', ' ');
-        return `Showdown: ${say(names[seat as 0 | 1], 'show')} ${cards}, ${category}`;
-      });
-    case 'betReturned':
       return [
-        `Uncalled bet of ${event.amount} returned to ${names[event.seat] === YOU ? 'you' : names[event.seat]}`,
+        {
+          key: 'handStarted',
+          params: { number: event.handNumber, small: event.smallBlind, big: event.bigBlind },
+        },
       ];
+    case 'blindPosted':
+      return [{ key: 'post', params: { seat: event.seat, amount: event.amount } }];
+    case 'acted': {
+      const line = describeAction(event.seat, event.action, event.amount);
+      return event.allIn ? [line, { key: 'allIn', params: { seat: event.seat } }] : [line];
+    }
+    case 'streetDealt':
+      return [{ key: event.street, params: { cards: cardsText(event.cards) } }];
+    case 'showdown':
+      return event.hands.map((hand, seat) => ({
+        key: 'show',
+        params: { seat, cards: cardsText(hand.cards), category: hand.category },
+      }));
+    case 'betReturned':
+      return [{ key: 'returned', params: { seat: event.seat, amount: event.amount } }];
     case 'potAwarded':
-      return [`${say(names[event.seat], 'win')} ${event.amount}`];
+      return [{ key: 'win', params: { seat: event.seat, amount: event.amount } }];
     case 'tournamentEnded':
-      return [`${say(names[event.winner], 'win')} the tournament`];
+      return [{ key: 'winTournament', params: { seat: event.winner } }];
     case 'holeCards':
     case 'handEnded':
       return [];
   }
 }
 
-export function handHistory(events: EngineEvent[], names: [string, string]): string[] {
-  return events.flatMap((event) => describeEvent(event, names));
+export function handHistory(events: EngineEvent[]): LogEntry[] {
+  return events.flatMap(describeEvent);
 }

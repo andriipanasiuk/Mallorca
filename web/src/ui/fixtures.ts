@@ -19,7 +19,7 @@ export function viewModel(overrides: Partial<ViewModel['controls']> = {}): ViewM
         isButton: false,
         isToAct: false,
         cards: ['back', 'back'],
-        lastAction: 'Raise to 100',
+        lastAction: { key: 'raiseTo', params: { amount: 100 } },
       },
     ],
     board: [],
@@ -49,6 +49,6 @@ export function fixtureResult(): ViewModel {
   vm.pot = 0;
   vm.seats[1].cards = [44, 40];
   vm.seats[0].isToAct = false;
-  vm.result = { winner: 1, handName: 'Two pair', amount: 120 };
+  vm.result = { winner: 1, category: 'two-pair', amount: 120 };
   return vm;
 }

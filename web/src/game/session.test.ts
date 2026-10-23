@@ -41,7 +41,7 @@ describe('session', () => {
     expect(toAct(state.tournament)).toBe(1);
     expect(bot.decideCalls).toBe(1);
     expect(state.log.length).toBeGreaterThan(0);
-    expect(state.lastActions[0]).toBe('Call 10');
+    expect(state.lastActions[0]).toEqual({ key: 'call', params: { amount: 10 } });
   });
 
   it('deals the same cards for the same seed', async () => {
@@ -66,7 +66,10 @@ describe('session', () => {
     await session.getState().start();
     const legal = legalActionsOf(session.getState().tournament);
     await session.getState().act({ kind: 'raise', to: 1 });
-    expect(session.getState().lastActions[1]).toBe(`Raise to ${legal.raise?.min}`);
+    expect(session.getState().lastActions[1]).toEqual({
+      key: 'raiseTo',
+      params: { amount: legal.raise?.min },
+    });
   });
 
   it('rounds a fractional raise and clamps it to the maximum', async () => {
@@ -75,19 +78,22 @@ describe('session', () => {
     const legal = legalActionsOf(first.getState().tournament);
     const target = (legal.raise?.min ?? 0) + 10.6;
     await first.getState().act({ kind: 'raise', to: target });
-    expect(first.getState().lastActions[1]).toBe(`Raise to ${Math.round(target)}`);
+    expect(first.getState().lastActions[1]).toEqual({
+      key: 'raiseTo',
+      params: { amount: Math.round(target) },
+    });
 
     const second = open(callingBot());
     await second.getState().start();
     await second.getState().act({ kind: 'raise', to: 999999 });
-    expect(second.getState().lastActions[1]).toBe('All-in');
+    expect(second.getState().lastActions[1]).toEqual({ key: 'allIn', params: {} });
   });
 
   it('turns a fold into a check when checking is free', async () => {
     const session = open(callingBot());
     await session.getState().start();
     await session.getState().act({ kind: 'fold' });
-    expect(session.getState().lastActions[1]).toBe('Check');
+    expect(session.getState().lastActions[1]).toEqual({ key: 'check', params: {} });
     expect(session.getState().tournament.hand?.street).toBe('flop');
   });
 
@@ -170,7 +176,7 @@ describe('session', () => {
     await vi.advanceTimersByTimeAsync(1);
     await started;
     expect(session.getState().phase).toBe('humanToAct');
-    expect(session.getState().lastActions[0]).toBe('Call 10');
+    expect(session.getState().lastActions[0]).toEqual({ key: 'call', params: { amount: 10 } });
   });
 
   it('keeps the last bot decision', async () => {
@@ -202,8 +208,8 @@ describe('session', () => {
     const state = session.getState();
     expect(state.result).toMatchObject({ winner: 0, showdown: false, amount: 40 });
     expect(state.log.slice(-2)).toEqual([
-      'Uncalled bet of 40 returned to Mallorca',
-      `Mallorca wins ${state.result?.amount}`,
+      { key: 'returned', params: { seat: 0, amount: 40 } },
+      { key: 'win', params: { seat: 0, amount: state.result?.amount } },
     ]);
   });
 
@@ -289,10 +295,10 @@ describe('session', () => {
     releases[0]?.(stale);
     await first;
     expect(session.getState().lastActions[0]).toBeNull();
-    expect(session.getState().log.some((line) => line.includes('raise'))).toBe(false);
+    expect(session.getState().log.some((entry) => entry.key === 'raise')).toBe(false);
     releases[1]?.({ ...stale, action: { kind: 'call' } });
     await second;
-    expect(session.getState().lastActions[0]).toBe('Call 10');
+    expect(session.getState().lastActions[0]).toEqual({ key: 'call', params: { amount: 10 } });
   });
 
   it('does not fire a pending bot delay after dispose', async () => {
@@ -319,8 +325,8 @@ describe('session', () => {
     expect(session.getState().lastActions[0]).toBeNull();
     await vi.advanceTimersByTimeAsync(1);
     await second;
-    expect(session.getState().lastActions[0]).toBe('Call 10');
-    expect(session.getState().log.filter((line) => line.startsWith('Hand ')).length).toBe(1);
+    expect(session.getState().lastActions[0]).toEqual({ key: 'call', params: { amount: 10 } });
+    expect(session.getState().log.filter((entry) => entry.key === 'handStarted').length).toBe(1);
   });
 
   it('disposes the bot client', () => {

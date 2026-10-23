@@ -25,7 +25,7 @@ describe('Table result and announcements', () => {
 
   it('words a split with each share', () => {
     const vm = fixtureResult();
-    vm.result = { winner: null, handName: null, amount: 60 };
+    vm.result = { winner: null, category: null, amount: 60 };
     table(vm, 'handOver');
     expect(screen.getByTestId('result').textContent).toContain('Split pot 60 each');
   });

@@ -37,7 +37,7 @@ describe('toViewModel', () => {
     expect(vm.seats[1].name).toBe('You');
     expect(vm.seats[0].isButton).toBe(true);
     expect(vm.seats[1].isToAct).toBe(true);
-    expect(vm.seats[0].lastAction).toBe('Call 10');
+    expect(vm.seats[0].lastAction).toEqual({ key: 'call', params: { amount: 10 } });
     expect(vm.blinds).toEqual({ small: 10, big: 20 });
     expect(vm.handNumber).toBe(1);
     expect(vm.board).toEqual([]);
@@ -70,7 +70,7 @@ describe('toViewModel', () => {
     expect(vm.board).toHaveLength(5);
     expect(vm.seats[0].cards).toEqual(state.tournament.hand?.holeCards[0]);
     expect(vm.result).not.toBeNull();
-    expect(vm.result?.handName).toEqual(expect.any(String));
+    expect(vm.result?.category).toEqual(expect.any(String));
     expect(vm.result?.amount).toBe(vm.result?.winner === null ? 2000 : 4000);
     expect(vm.controls.enabled).toBe(false);
     expect(vm.controls.raise).toBeNull();
@@ -85,7 +85,7 @@ describe('toViewModel', () => {
     const vm = toViewModel(state, 1);
     expect(vm.seats[0].cards).toEqual(['back', 'back']);
     expect(vm.result?.winner).toBe(0);
-    expect(vm.result?.handName).toBeNull();
+    expect(vm.result?.category).toBeNull();
     expect(vm.result?.amount).toBe((state.tournament.seats[0].stack - 2000) * 2);
     expect(vm.result?.amount).toBeGreaterThan(0);
   });

@@ -1,5 +1,7 @@
 {
-  "app": { "title": "Mallorca" },
+  "app": {
+    "title": "Mallorca"
+  },
   "start": {
     "heading": "Heads-up against Mallorca",
     "tagline": "No-limit hold'em, 2000 chips each, blinds rise every 10 hands. Last player with chips wins.",
@@ -21,9 +23,16 @@
     "stack": "Stack",
     "bet": "Bet {{amount}}"
   },
-  "card": { "back": "Face down card" },
-  "board": { "label": "Board" },
-  "pot": { "label": "Pot", "amount": "Pot {{amount}}" },
+  "card": {
+    "back": "Face down card"
+  },
+  "board": {
+    "label": "Board"
+  },
+  "pot": {
+    "label": "Pot",
+    "amount": "Pot {{amount}}"
+  },
   "actions": {
     "fold": "Fold",
     "check": "Check",
@@ -44,11 +53,54 @@
     "split": "Split pot {{amount}} each",
     "next": "Next hand"
   },
-  "log": { "title": "Hand log" },
-  "coach": { "label": "Coach" },
+  "log": {
+    "title": "Hand log",
+    "handStarted": "Hand {{number}}, blinds {{small}}/{{big}}",
+    "flop": "Flop {{cards}}",
+    "turn": "Turn {{cards}}",
+    "river": "River {{cards}}",
+    "you": {
+      "post": "You post {{amount}}",
+      "fold": "You fold",
+      "check": "You check",
+      "call": "You call {{amount}}",
+      "raise": "You raise to {{amount}}",
+      "allIn": "You are all-in",
+      "show": "You show {{cards}} ({{hand}})",
+      "returned": "Uncalled bet of {{amount}} returned to you",
+      "win": "You win {{amount}}",
+      "winTournament": "You win the tournament"
+    },
+    "other": {
+      "post": "{{name}} posts {{amount}}",
+      "fold": "{{name}} folds",
+      "check": "{{name}} checks",
+      "call": "{{name}} calls {{amount}}",
+      "raise": "{{name}} raises to {{amount}}",
+      "allIn": "{{name}} is all-in",
+      "show": "{{name}} shows {{cards}} ({{hand}})",
+      "returned": "Uncalled bet of {{amount}} returned to {{name}}",
+      "win": "{{name}} wins {{amount}}",
+      "winTournament": "{{name}} wins the tournament"
+    }
+  },
+  "coach": {
+    "label": "Coach"
+  },
   "over": {
     "won": "You won the tournament",
     "lost": "You lost the tournament",
     "again": "Play again"
+  },
+  "hands": {
+    "high-card": "High card",
+    "pair": "Pair",
+    "two-pair": "Two pair",
+    "trips": "Three of a kind",
+    "straight": "Straight",
+    "flush": "Flush",
+    "full-house": "Full house",
+    "quads": "Four of a kind",
+    "straight-flush": "Straight flush"
   }
 }

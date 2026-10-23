@@ -1,6 +1,7 @@
 import type { SeatView } from '../game/index.ts';
 import { Card } from './Card.tsx';
 import { t } from './i18n.ts';
+import { actionTag } from './phrases.ts';
 
 export interface SeatProps {
   index: 0 | 1;
@@ -45,7 +46,7 @@ export function Seat({ index, view, thinking, winner, position }: SeatProps) {
         )}
         {!thinking && view.lastAction !== null && (
           <span class="tag tag-action" data-testid={`action-${index}`}>
-            {view.lastAction}
+            {actionTag(view.lastAction)}
           </span>
         )}
         {view.bet > 0 && (

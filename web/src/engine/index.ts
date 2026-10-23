@@ -21,4 +21,5 @@ export {
   startHand,
   toAct,
 } from './tournament.ts';
+export type { LogEntry } from './history.ts';
 export { handHistory } from './history.ts';

@@ -1,5 +1,6 @@
 import { cleanup, render } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { LogEntry } from '../game/index.ts';
 import en from '../locales/en.json';
 import { ActionBar } from './ActionBar.tsx';
 import { fixtureResult } from './fixtures.ts';
@@ -31,22 +32,38 @@ function visibleStrings(container: Element): string[] {
   const found: string[] = [];
   for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
     const text = (node.textContent ?? '').trim();
-    const inLog = node.parentElement?.closest('.hand-log-lines') !== null;
-    if (text !== '' && !inLog) {
+    if (text !== '') {
       found.push(text);
     }
   }
   return found;
 }
 
+function fromLocale(text: string): boolean {
+  return glyph.test(text) || patterns.some((pattern) => pattern.test(text));
+}
+
 function expectFromLocale(container: Element) {
   const strings = visibleStrings(container);
   expect(strings.length).toBeGreaterThan(0);
   for (const text of strings) {
-    const ok = glyph.test(text) || patterns.some((pattern) => pattern.test(text));
-    expect(ok, `"${text}" is not in en.json`).toBe(true);
+    expect(fromLocale(text), `"${text}" is not in en.json`).toBe(true);
   }
 }
+
+const log: LogEntry[] = [
+  { key: 'handStarted', params: { number: 1, small: 10, big: 20 } },
+  { key: 'post', params: { seat: 0, amount: 10 } },
+  { key: 'post', params: { seat: 1, amount: 20 } },
+  { key: 'raise', params: { seat: 1, amount: 60 } },
+  { key: 'call', params: { seat: 0, amount: 40 } },
+  { key: 'flop', params: { cards: 'Qs Jh 7d' } },
+  { key: 'allIn', params: { seat: 0 } },
+  { key: 'show', params: { seat: 1, cards: '7c 2d', category: 'pair' } },
+  { key: 'returned', params: { seat: 1, amount: 40 } },
+  { key: 'win', params: { seat: 1, amount: 120 } },
+  { key: 'winTournament', params: { seat: 0 } },
+];
 
 describe('copy', () => {
   it('start screen strings come from en.json', () => {
@@ -62,7 +79,7 @@ describe('copy', () => {
         vm={vm}
         phase="humanToAct"
         humanSeat={0}
-        log={['Bot raises to 60']}
+        log={log}
         onAct={vi.fn()}
         onNextHand={vi.fn()}
       />,
@@ -88,7 +105,7 @@ describe('copy', () => {
     );
     cleanup();
     const youWin = fixtureResult();
-    youWin.result = { winner: 0, handName: 'Flush', amount: 120 };
+    youWin.result = { winner: 0, category: 'flush', amount: 120 };
     const won = render(
       <Table
         vm={youWin}
@@ -129,6 +146,26 @@ describe('copy', () => {
     expectFromLocale(render(<TournamentOver won onPlayAgain={vi.fn()} />).container);
     cleanup();
     expectFromLocale(render(<TournamentOver won={false} onPlayAgain={vi.fn()} />).container);
+  });
+
+  it('the hand log is checked and text outside en.json fails the check', () => {
+    const vm = viewModel();
+    const { container } = render(
+      <Table
+        vm={vm}
+        phase="humanToAct"
+        humanSeat={0}
+        log={log}
+        onAct={vi.fn()}
+        onNextHand={vi.fn()}
+      />,
+    );
+    const lines = [...container.querySelectorAll('.hand-log-lines li')].map((li) => li.textContent);
+    expect(lines).toContain('Uncalled bet of 40 returned to Mallorca');
+    expect(lines).toContain('You are all-in');
+    expect(visibleStrings(container)).toEqual(expect.arrayContaining(lines));
+    expect(fromLocale('Bot shoves')).toBe(false);
+    expect(fromLocale('log.other.shove')).toBe(false);
   });
 
   it('copy has no all-caps words and no em or en dashes', () => {
