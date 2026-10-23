@@ -127,6 +127,7 @@ pub fn run(args: &ExportArgs) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::train::read_table;
     use crate::train::tests::{data_dir, go, session};
     use mallorca_core::strategy::StrategyError;
 
@@ -146,7 +147,10 @@ mod tests {
         let file = export(&dir, StreetSet::Browser).unwrap();
         assert_eq!(file.streets, 0b0011);
         assert_eq!(file.tables.len(), 1);
-        assert_eq!(file.tables[0], std::fs::read(dir.join("flop.bkt")).unwrap());
+        assert_eq!(
+            file.tables[0],
+            read_table(&dir.join("flop.bkt"), Street::Flop, 8).unwrap()
+        );
         assert_eq!((file.iterations, file.checkpoint), (200, 1));
         assert_eq!(
             (file.small_blind, file.big_blind, file.stack),
@@ -203,10 +207,16 @@ mod tests {
         let file = export(&dir, StreetSet::All).unwrap();
         assert_eq!(file.streets, 0b1111);
         assert_eq!(file.tables.len(), 3);
-        for (table, name) in file.tables.iter().zip(["flop", "turn", "river"]) {
+        let streets = [Street::Flop, Street::Turn, Street::River];
+        for ((table, name), street) in file
+            .tables
+            .iter()
+            .zip(["flop", "turn", "river"])
+            .zip(streets)
+        {
             assert_eq!(
                 table,
-                &std::fs::read(dir.join(format!("{name}.bkt"))).unwrap()
+                &read_table(&dir.join(format!("{name}.bkt")), street, 8).unwrap()
             );
         }
         assert_eq!(

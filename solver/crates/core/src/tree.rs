@@ -21,7 +21,7 @@ impl Street {
         }
     }
 
-    fn from_index(i: u8) -> Option<Street> {
+    pub fn from_index(i: u8) -> Option<Street> {
         match i {
             0 => Some(Street::Preflop),
             1 => Some(Street::Flop),

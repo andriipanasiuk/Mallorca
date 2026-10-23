@@ -1,6 +1,6 @@
 use crate::tree::load_preset;
 use clap::Args;
-use mallorca_core::abstraction::Abstraction;
+use mallorca_core::abstraction::{decode_table, Abstraction};
 use mallorca_core::cfr::{iterate, Game, Storage, SLOT_BYTES};
 use mallorca_core::checkpoint::{
     read_checkpoint, write_checkpoint, CheckpointHeader, FORMAT_VERSION,
@@ -92,10 +92,30 @@ fn memory_estimate(tree: &Tree, tables: &Path) -> Result<u64, String> {
     Ok(bytes)
 }
 
+pub fn read_table(path: &Path, street: Street, buckets: u16) -> Result<Vec<u8>, String> {
+    let (header, table) =
+        decode_table(read_file(path)?).map_err(|e| format!("{}: {e}", path.display()))?;
+    if header.street != street {
+        return Err(format!(
+            "{}: a {:?} table, expected {street:?}",
+            path.display(),
+            header.street
+        ));
+    }
+    if header.buckets != buckets {
+        return Err(format!(
+            "{}: built for {} buckets, the preset has {buckets}; rebuild it with `buckets`",
+            path.display(),
+            header.buckets
+        ));
+    }
+    Ok(table)
+}
+
 pub fn load_abstraction(preset: &Preset, dir: &Path) -> Result<Abstraction, String> {
     let mut tables: [Vec<u8>; 3] = Default::default();
-    for (slot, (name, _)) in tables.iter_mut().zip(TABLES) {
-        *slot = read_file(&dir.join(name))?;
+    for (i, (slot, (name, street))) in tables.iter_mut().zip(TABLES).enumerate() {
+        *slot = read_table(&dir.join(name), street, preset.buckets[i])?;
     }
     let abstraction = Abstraction::new(tables);
     for (i, (name, street)) in TABLES.into_iter().enumerate() {
@@ -492,6 +512,7 @@ pub fn calibrate(args: &CalibrateArgs, stop: &AtomicBool) -> Result<(), String> 
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use mallorca_core::abstraction::{encode_table, TABLE_HEADER_LEN};
     use std::sync::OnceLock;
 
     const TINY: &str = include_str!("../../../presets/tiny.toml");
@@ -506,14 +527,15 @@ pub mod tests {
         DIR.get_or_init(|| {
             let dir = scratch_root().join("trainer-tables");
             std::fs::create_dir_all(&dir).unwrap();
-            for ((name, _), size) in TABLES.into_iter().zip(SIZES) {
+            for ((name, street), size) in TABLES.into_iter().zip(SIZES) {
                 let path = dir.join(name);
-                if std::fs::metadata(&path).is_ok_and(|m| m.len() == size as u64) {
+                let expected = (TABLE_HEADER_LEN + size) as u64;
+                if std::fs::metadata(&path).is_ok_and(|m| m.len() == expected) {
                     continue;
                 }
                 let table: Vec<u8> = (0..size).map(|i| (i % 8) as u8).collect();
                 let tmp = dir.join(format!("{name}.tmp"));
-                std::fs::write(&tmp, table).unwrap();
+                std::fs::write(&tmp, encode_table(street, 8, &table)).unwrap();
                 std::fs::rename(tmp, path).unwrap();
             }
             dir
@@ -658,20 +680,67 @@ pub mod tests {
     fn wrong_table_size_is_an_error_naming_the_file() {
         let dir = data_dir("table");
         std::fs::remove_file(dir.join("turn.bkt")).unwrap();
+        std::fs::write(
+            dir.join("turn.bkt"),
+            encode_table(Street::Turn, 8, &[0u8; 100]),
+        )
+        .unwrap();
+        let err = go(&session(&dir, Some(10), 0, None)).err().unwrap();
+        assert!(
+            err.contains("turn.bkt") && err.contains("100 bytes"),
+            "{err}"
+        );
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn table_without_a_header_is_an_error_naming_the_file() {
+        let dir = data_dir("headerless");
+        std::fs::remove_file(dir.join("turn.bkt")).unwrap();
         std::fs::write(dir.join("turn.bkt"), [0u8; 100]).unwrap();
         let err = go(&session(&dir, Some(10), 0, None)).err().unwrap();
-        assert!(err.contains("turn.bkt"), "{err}");
+        assert!(
+            err.contains("turn.bkt") && err.contains("bad magic"),
+            "{err}"
+        );
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn table_of_another_street_is_an_error_naming_the_file() {
+        let dir = data_dir("street");
+        std::fs::remove_file(dir.join("river.bkt")).unwrap();
+        std::fs::hard_link(dir.join("turn.bkt"), dir.join("river.bkt")).unwrap();
+        let err = go(&session(&dir, Some(10), 0, None)).err().unwrap();
+        assert!(err.contains("river.bkt") && err.contains("Turn"), "{err}");
         std::fs::remove_dir_all(dir).unwrap();
     }
 
     #[test]
     fn memory_estimate_counts_twelve_bytes_per_action_slot() {
         let tree = Tree::build(&Preset::from_toml(TINY).unwrap());
-        let tables: u64 = SIZES.iter().map(|&s| s as u64).sum();
+        let tables: u64 = SIZES.iter().map(|&s| (TABLE_HEADER_LEN + s) as u64).sum();
         assert_eq!(
             memory_estimate(&tree, synthetic_tables()).unwrap(),
             tree.action_slot_count() * 12 + tables
         );
+    }
+
+    #[test]
+    fn tables_built_for_fewer_buckets_are_refused_naming_the_file() {
+        let dir = data_dir("bucket-count");
+        std::fs::write(
+            dir.join("tiny.toml"),
+            TINY.replace("buckets = [8, 8, 8]", "buckets = [16, 16, 16]"),
+        )
+        .unwrap();
+        let err = go(&session(&dir, Some(10), 0, None)).err().unwrap();
+        assert!(
+            err.contains("flop.bkt") && err.contains("8 buckets") && err.contains("16"),
+            "{err}"
+        );
+        assert!(!dir.join("checkpoints").exists());
+        std::fs::remove_dir_all(dir).unwrap();
     }
 
     #[test]

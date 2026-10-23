@@ -93,6 +93,8 @@ mod tests {
     use crate::buckets::{self, BucketsArgs};
     use crate::export::{build, StreetSet};
     use crate::train::tests::{data_dir, go, session};
+    use mallorca_core::abstraction::{table_header, TABLE_HEADER_LEN};
+    use std::io::Read;
     use std::path::Path;
     use std::sync::OnceLock;
 
@@ -192,7 +194,14 @@ mod tests {
         DIR.get_or_init(|| {
             let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/tmp");
             let dir = root.join("trainer-real-tables");
-            if TABLES.iter().all(|t| dir.join(t).exists()) {
+            let current = |t: &&str| {
+                let mut head = [0u8; TABLE_HEADER_LEN];
+                std::fs::File::open(dir.join(t))
+                    .and_then(|mut f| f.read_exact(&mut head))
+                    .is_ok()
+                    && table_header(&head).is_ok()
+            };
+            if TABLES.iter().all(current) {
                 return dir;
             }
             let staging = root.join("trainer-real-tables.tmp");

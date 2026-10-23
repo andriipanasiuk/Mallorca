@@ -13,7 +13,7 @@ Checkpoints are keyed by a fingerprint of blinds, stack, buckets, bet sizes, the
 
 Run everything from `solver/` in release mode. `D=data/v1` below; the preset is `presets/v1.toml` (stack 2000,
 128 buckets per street, 12 threads, a checkpoint every 60 minutes). Bucket counts are capped at 256 by the `u8`
-bucket tables; 512 buckets need a new table format.
+bucket tables, and a preset outside 1 to 256 is rejected when it loads; 512 buckets need a new table format.
 
 ```
 cargo build --release -p mallorca-trainer
@@ -50,13 +50,16 @@ the average positive regret at every checkpoint. Copy the figures into `RESULTS.
 
 ### Expected artefact sizes
 
-Bucket tables, identical for every preset because they are indexed by canonical hand class:
+Bucket tables, the same size for every preset because they are indexed by canonical hand class. Each `.bkt` file
+starts with a 9 byte header: magic `MLCB`, `u16` format version 1, `u8` street (1 flop, 2 turn, 3 river) and `u16`
+bucket count, all little-endian, then one `u8` bucket per class. `train` and `export` refuse a table whose street or
+bucket count differs from the preset, naming the file; rebuild the tables with `buckets` after changing `buckets`.
 
 | File | Size |
 | --- | --- |
-| `flop.bkt` | 1.3 MB (1,286,792 bytes) |
-| `turn.bkt` | 14 MB (13,960,050 bytes) |
-| `river.bkt` | 123 MB (123,156,254 bytes) |
+| `flop.bkt` | 1.3 MB (1,286,801 bytes) |
+| `turn.bkt` | 14 MB (13,960,059 bytes) |
+| `river.bkt` | 123 MB (123,156,263 bytes) |
 | `river_hs.f32` | 493 MB (492,625,016 bytes) |
 
 The `v1` tree (`tree --preset presets/v1.toml`): 41,410 nodes, 1,950,352 infosets, 5.3M action slots at 128

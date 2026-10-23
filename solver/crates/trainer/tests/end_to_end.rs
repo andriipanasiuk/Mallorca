@@ -1,4 +1,4 @@
-use mallorca_core::abstraction::Abstraction;
+use mallorca_core::abstraction::{decode_table, Abstraction};
 use mallorca_core::checkpoint::read_checkpoint;
 use mallorca_core::fingerprint::fingerprint;
 use mallorca_core::preset::Preset;
@@ -135,7 +135,10 @@ fn tiny_runs_through_every_subcommand() {
 
     let preset_value = Preset::from_toml(TINY).unwrap();
     let tree = Tree::build(&preset_value);
-    let read = |name: &str| std::fs::read(data.join(name)).unwrap();
+    let read = |name: &str| {
+        let (_, table) = decode_table(std::fs::read(data.join(name)).unwrap()).unwrap();
+        table
+    };
     let abstraction = Abstraction::new([read("flop.bkt"), read("turn.bkt"), read("river.bkt")]);
     let expected = fingerprint(&preset_value, &tree, &abstraction);
     let checkpoint = std::fs::read(latest_checkpoint(&data.join("checkpoints"))).unwrap();

@@ -58,7 +58,8 @@ for each included postflop street:
 
 The table of a street maps the canonical hand class index of the hole cards plus board to a bucket number, one byte
 per class. Expected lengths: flop 1286792, turn 13960050, river 123156254. The sections' `buckets_length` equals the
-sum of `4 + length` over the tables. Preflop has no table: the bucket is the preflop class index, 0 to 168.
+sum of `4 + length` over the tables. Preflop has no table: the bucket is the preflop class index, 0 to 168. The tables are
+the trainer's `.bkt` files without their 9 byte header.
 
 ## Probabilities
 

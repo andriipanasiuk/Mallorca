@@ -3,7 +3,84 @@ use crate::eval::rank;
 use crate::iso::{street_indexers, HandIndexer};
 use crate::strategy::{StrategyError, StrategyFile};
 use crate::tree::Street;
+use std::fmt;
 use std::sync::OnceLock;
+
+pub const TABLE_MAGIC: &[u8; 4] = b"MLCB";
+pub const TABLE_FORMAT_VERSION: u16 = 1;
+pub const TABLE_HEADER_LEN: usize = 9;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TableHeader {
+    pub street: Street,
+    pub buckets: u16,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TableError {
+    Truncated,
+    BadMagic,
+    UnknownVersion(u16),
+    BadStreet(u8),
+}
+
+impl fmt::Display for TableError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TableError::Truncated => write!(f, "bucket table header is truncated"),
+            TableError::BadMagic => {
+                write!(
+                    f,
+                    "not a bucket table (bad magic), rebuild it with `buckets`"
+                )
+            }
+            TableError::UnknownVersion(v) => write!(f, "unknown bucket table format version {v}"),
+            TableError::BadStreet(s) => write!(f, "bucket table has an invalid street {s}"),
+        }
+    }
+}
+
+impl std::error::Error for TableError {}
+
+pub fn encode_table(street: Street, buckets: u16, table: &[u8]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(TABLE_HEADER_LEN + table.len());
+    out.extend_from_slice(TABLE_MAGIC);
+    out.extend_from_slice(&TABLE_FORMAT_VERSION.to_le_bytes());
+    out.push(street.as_index() as u8);
+    out.extend_from_slice(&buckets.to_le_bytes());
+    out.extend_from_slice(table);
+    out
+}
+
+pub fn table_header(bytes: &[u8]) -> Result<TableHeader, TableError> {
+    if bytes.len() < TABLE_MAGIC.len() {
+        return Err(TableError::Truncated);
+    }
+    if &bytes[..4] != TABLE_MAGIC {
+        return Err(TableError::BadMagic);
+    }
+    if bytes.len() < TABLE_HEADER_LEN {
+        return Err(TableError::Truncated);
+    }
+    let version = u16::from_le_bytes([bytes[4], bytes[5]]);
+    if version != TABLE_FORMAT_VERSION {
+        return Err(TableError::UnknownVersion(version));
+    }
+    let street = match Street::from_index(bytes[6]) {
+        Some(s) if s != Street::Preflop => s,
+        _ => return Err(TableError::BadStreet(bytes[6])),
+    };
+    Ok(TableHeader {
+        street,
+        buckets: u16::from_le_bytes([bytes[7], bytes[8]]),
+    })
+}
+
+pub fn decode_table(mut bytes: Vec<u8>) -> Result<(TableHeader, Vec<u8>), TableError> {
+    let header = table_header(&bytes)?;
+    bytes.drain(..TABLE_HEADER_LEN);
+    Ok((header, bytes))
+}
 
 const LIVE_HOLES: usize = 1081;
 const LIVE_OPPONENTS: f32 = 990.0;
@@ -207,6 +284,38 @@ mod tests {
             }
         }
         score / total
+    }
+
+    #[test]
+    fn table_round_trips_with_its_header() {
+        let bytes = encode_table(Street::Turn, 256, &[3, 1, 255]);
+        assert_eq!(&bytes[..4], b"MLCB");
+        assert_eq!(bytes.len(), TABLE_HEADER_LEN + 3);
+        let (header, table) = decode_table(bytes).unwrap();
+        assert_eq!(
+            header,
+            TableHeader {
+                street: Street::Turn,
+                buckets: 256
+            }
+        );
+        assert_eq!(table, vec![3, 1, 255]);
+    }
+
+    #[test]
+    fn bad_table_headers_are_errors() {
+        let good = encode_table(Street::Flop, 8, &[0]);
+        assert_eq!(table_header(&good[..3]), Err(TableError::Truncated));
+        assert_eq!(table_header(&good[..8]), Err(TableError::Truncated));
+        assert_eq!(table_header(&[0u8; 100]), Err(TableError::BadMagic));
+        let mut b = good.clone();
+        b[4] = 7;
+        assert_eq!(table_header(&b), Err(TableError::UnknownVersion(7)));
+        let mut b = good.clone();
+        b[6] = 0;
+        assert_eq!(table_header(&b), Err(TableError::BadStreet(0)));
+        b[6] = 4;
+        assert_eq!(table_header(&b), Err(TableError::BadStreet(4)));
     }
 
     #[test]

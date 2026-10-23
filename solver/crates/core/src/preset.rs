@@ -106,8 +106,8 @@ impl Preset {
         if self.stack <= self.big_blind {
             return invalid("stack must exceed the big blind");
         }
-        if self.buckets.contains(&0) {
-            return invalid("bucket counts must be positive");
+        if self.buckets.iter().any(|b| !(1..=256).contains(b)) {
+            return invalid("bucket counts must be in 1..=256, the range of the u8 bucket tables");
         }
         let pf = &self.preflop;
         if [pf.open_bb, pf.iso_vs_limp_bb, pf.three_bet_x, pf.four_bet_x]
@@ -222,6 +222,8 @@ mod tests {
             ("big_blind = 20", "big_blind = 5"),
             ("stack = 2000", "stack = 10"),
             ("buckets = [128, 128, 128]", "buckets = [128, 0, 128]"),
+            ("buckets = [128, 128, 128]", "buckets = [128, 128, 257]"),
+            ("buckets = [128, 128, 128]", "buckets = [512, 128, 128]"),
             ("all_in_threshold = 0.6667", "all_in_threshold = 0.0"),
             ("first_raise_pot = [1.0]", "first_raise_pot = [-1.0]"),
             ("open_bb = 2.5", "open_bb = 0.5"),
@@ -235,6 +237,12 @@ mod tests {
                 "{to}"
             );
         }
+    }
+
+    #[test]
+    fn bucket_counts_up_to_256_are_accepted() {
+        let s = V1.replace("buckets = [128, 128, 128]", "buckets = [1, 256, 256]");
+        assert_eq!(Preset::from_toml(&s).unwrap().buckets, [1, 256, 256]);
     }
 
     #[test]

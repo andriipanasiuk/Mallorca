@@ -1,6 +1,6 @@
 use crate::tree::load_preset;
 use clap::Args;
-use mallorca_core::abstraction::{aggregate_hs2, percentile_buckets, river_strength};
+use mallorca_core::abstraction::{aggregate_hs2, encode_table, percentile_buckets, river_strength};
 use mallorca_core::cards::Card;
 use mallorca_core::iso::{board_indexer, street_indexers};
 use mallorca_core::tree::Street;
@@ -134,12 +134,12 @@ pub fn run(args: &BucketsArgs) -> Result<(), String> {
     let flop_values = into_floats(flop_cells);
 
     let tables = [
-        ("flop.bkt", &flop_values, preset.buckets[0]),
-        ("turn.bkt", &turn_values, preset.buckets[1]),
-        ("river.bkt", &river_hs, preset.buckets[2]),
+        ("flop.bkt", Street::Flop, &flop_values, preset.buckets[0]),
+        ("turn.bkt", Street::Turn, &turn_values, preset.buckets[1]),
+        ("river.bkt", Street::River, &river_hs, preset.buckets[2]),
     ];
-    for (name, values, buckets) in tables {
-        let table = percentile_buckets(values, buckets);
+    for (name, street, values, buckets) in tables {
+        let table = encode_table(street, buckets, &percentile_buckets(values, buckets));
         write_bytes(&args.out.join(name), &table)?;
         println!("wrote {name}: {} bytes", table.len());
     }
