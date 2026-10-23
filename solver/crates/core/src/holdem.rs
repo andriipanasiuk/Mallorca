@@ -16,6 +16,26 @@ pub struct HoldemState {
     hole: [[Card; 2]; 2],
     board: [Card; 5],
     buckets: [[u16; 4]; 2],
+    ranks: [u16; 2],
+}
+
+impl HoldemState {
+    pub fn hole(&self) -> [[Card; 2]; 2] {
+        self.hole
+    }
+
+    pub fn board(&self) -> [Card; 5] {
+        self.board
+    }
+}
+
+fn showdown_ranks(hole: &[[Card; 2]; 2], board: &[Card; 5]) -> [u16; 2] {
+    hole.map(|h| {
+        let mut cards = [0 as Card; 7];
+        cards[..2].copy_from_slice(&h);
+        cards[2..].copy_from_slice(board);
+        rank(&cards)
+    })
 }
 
 impl<'a> Holdem<'a> {
@@ -66,6 +86,7 @@ impl Game for Holdem<'_> {
             hole,
             board,
             buckets: self.deal_buckets(&hole, &board),
+            ranks: showdown_ranks(&hole, &board),
         }
     }
 
@@ -86,13 +107,7 @@ impl Game for Holdem<'_> {
             }
             Node::Showdown { committed } => {
                 let at_risk = f64::from(committed[0].min(committed[1]));
-                let strength = |seat: usize| {
-                    let mut cards = [0 as Card; 7];
-                    cards[..2].copy_from_slice(&s.hole[seat]);
-                    cards[2..].copy_from_slice(&s.board);
-                    rank(&cards)
-                };
-                match strength(me).cmp(&strength(1 - me)) {
+                match s.ranks[me].cmp(&s.ranks[1 - me]) {
                     std::cmp::Ordering::Greater => at_risk,
                     std::cmp::Ordering::Less => -at_risk,
                     std::cmp::Ordering::Equal => 0.0,
@@ -163,6 +178,7 @@ mod tests {
             hole,
             board,
             buckets: [[0; 4]; 2],
+            ranks: showdown_ranks(&hole, &board),
         }
     }
 
@@ -304,6 +320,21 @@ mod tests {
             }
         }
         assert_eq!(game.infoset_len(), tree.action_slot_count());
+    }
+
+    #[test]
+    fn root_holds_both_showdown_ranks() {
+        let tree = tiny_tree();
+        let game = Holdem::new(&tree, synthetic());
+        let mut rng = Rng::new(13);
+        for _ in 0..1_000 {
+            let s = game.root(&mut rng);
+            for seat in 0..2 {
+                let mut seven = s.hole[seat].to_vec();
+                seven.extend_from_slice(&s.board);
+                assert_eq!(s.ranks[seat], rank(&seven));
+            }
+        }
     }
 
     #[test]
