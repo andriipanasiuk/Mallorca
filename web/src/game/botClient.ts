@@ -24,7 +24,10 @@ export function inProcessBot(): BotClient {
         brain.observe(observation);
       }
     },
-    decide: (legal) => Promise.resolve().then(() => brain.decide(legal)),
+    decide(legal) {
+      const current = brain;
+      return Promise.resolve().then(() => current.decide(legal));
+    },
     reset() {
       brain = newBrain();
     },
@@ -58,23 +61,26 @@ export function withFallback(primary: BotClient, timeoutMs = BOT_TIMEOUT_MS): Bo
   let active = primary;
   let usedFallback = false;
   let seen: Observation[] = [];
+  let generation = 0;
   const client: BotClient = {
     observe(observations) {
       seen.push(...observations);
       active.observe(observations);
     },
     reset() {
+      generation += 1;
       seen = [];
       active.reset();
     },
     async decide(legal) {
+      const mine = generation;
       try {
         return await withTimeout(
           Promise.resolve().then(() => active.decide(legal)),
           timeoutMs,
         );
       } catch (error) {
-        if (usedFallback) {
+        if (usedFallback || mine !== generation) {
           throw error;
         }
         usedFallback = true;
@@ -86,6 +92,7 @@ export function withFallback(primary: BotClient, timeoutMs = BOT_TIMEOUT_MS): Bo
       }
     },
     dispose() {
+      generation += 1;
       active.dispose?.();
       primary.dispose?.();
     },

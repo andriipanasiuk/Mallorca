@@ -40,6 +40,7 @@ export interface SessionActions {
   start(): Promise<void>;
   nextHand(): Promise<void>;
   act(intent: Intent): Promise<void>;
+  dispose(): void;
 }
 
 export type Session = StoreApi<SessionState & SessionActions>;
@@ -53,12 +54,6 @@ export interface SessionOptions {
 }
 
 const STARTING_STACK = 2000;
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 function label(event: Extract<EngineEvent, { type: 'acted' }>): string {
   if (event.allIn && event.action.kind !== 'fold') {
@@ -80,7 +75,7 @@ function capitalise(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function resultOf(events: EngineEvent[]): HandResult {
+export function resultOf(events: EngineEvent[]): HandResult {
   const awards: [number, number] = [0, 0];
   let hands: Extract<EngineEvent, { type: 'showdown' }>['hands'] | null = null;
   for (const event of events) {
@@ -90,7 +85,12 @@ function resultOf(events: EngineEvent[]): HandResult {
       hands = event.hands;
     }
   }
-  const winner: SeatIndex | null = awards[0] === awards[1] ? null : awards[0] > awards[1] ? 0 : 1;
+  let winner: SeatIndex | null;
+  if (hands !== null) {
+    winner = hands[0].rank === hands[1].rank ? null : hands[0].rank > hands[1].rank ? 0 : 1;
+  } else {
+    winner = awards[0] > 0 ? 0 : 1;
+  }
   const shown = hands === null ? null : hands[winner ?? 0];
   return {
     winner,
@@ -134,6 +134,24 @@ export function createSession(options: SessionOptions): Session {
   const bot = withFallback(options.bot);
   const rng = mulberry32(seed);
   let epoch = 0;
+  const timers = new Map<ReturnType<typeof setTimeout>, () => void>();
+
+  const sleep = (ms: number): Promise<void> =>
+    new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        timers.delete(timer);
+        resolve();
+      }, ms);
+      timers.set(timer, resolve);
+    });
+
+  const cancelTimers = () => {
+    for (const [timer, resolve] of timers) {
+      clearTimeout(timer);
+      resolve();
+    }
+    timers.clear();
+  };
 
   const fresh = (): Tournament => createTournament(names, STARTING_STACK, 0);
 
@@ -215,8 +233,14 @@ export function createSession(options: SessionOptions): Session {
       result: null,
       start() {
         epoch += 1;
+        cancelTimers();
         set({ tournament: fresh(), log: [], lastDecision: null, result: null });
         return beginHand();
+      },
+      dispose() {
+        epoch += 1;
+        cancelTimers();
+        bot.dispose?.();
       },
       nextHand() {
         if (get().phase !== 'handOver') {

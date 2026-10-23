@@ -224,4 +224,69 @@ describe('session', () => {
     expect(session.getState().tournament.handNumber).toBe(1);
     expect(session.getState().phase).toBe('humanToAct');
   });
+
+  it('drops a pending bot decision when start is called again', async () => {
+    const releases: ((d: Decision) => void)[] = [];
+    const bot: BotClient = {
+      observe: () => undefined,
+      reset: () => undefined,
+      decide: () =>
+        new Promise<Decision>((resolve) => {
+          releases.push(resolve);
+        }),
+    };
+    const session = open(bot);
+    const first = session.getState().start();
+    const second = session.getState().start();
+    await vi.waitFor(() => {
+      expect(releases).toHaveLength(2);
+    });
+    const stale = {
+      action: { kind: 'raise', to: 100 },
+      solverChoice: 'aggressive',
+      evByAction: { fold: 0, passive: 0, aggressive: 0 },
+    } as const;
+    releases[0]?.(stale);
+    await first;
+    expect(session.getState().lastActions[0]).toBeNull();
+    expect(session.getState().log.some((line) => line.includes('raise'))).toBe(false);
+    releases[1]?.({ ...stale, action: { kind: 'call' } });
+    await second;
+    expect(session.getState().lastActions[0]).toBe('Call 10');
+  });
+
+  it('does not fire a pending bot delay after dispose', async () => {
+    vi.useFakeTimers();
+    const session = open(callingBot(), { botDelayMs: 700 });
+    const started = session.getState().start();
+    await vi.advanceTimersByTimeAsync(100);
+    session.getState().dispose();
+    await started;
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(session.getState().lastActions[0]).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('does not fire a pending bot delay after a restart', async () => {
+    vi.useFakeTimers();
+    const bot = callingBot();
+    const session = open(bot, { botDelayMs: 700 });
+    const first = session.getState().start();
+    await vi.advanceTimersByTimeAsync(100);
+    const second = session.getState().start();
+    await first;
+    await vi.advanceTimersByTimeAsync(699);
+    expect(session.getState().lastActions[0]).toBeNull();
+    await vi.advanceTimersByTimeAsync(1);
+    await second;
+    expect(session.getState().lastActions[0]).toBe('Call 10');
+    expect(session.getState().log.filter((line) => line.startsWith('Hand ')).length).toBe(1);
+  });
+
+  it('disposes the bot client', () => {
+    const dispose = vi.fn();
+    const bot = { ...callingBot(), dispose };
+    open(bot).getState().dispose();
+    expect(dispose).toHaveBeenCalled();
+  });
 });
