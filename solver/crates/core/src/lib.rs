@@ -9,4 +9,5 @@ pub mod holdem;
 pub mod iso;
 pub mod preset;
 pub mod rng;
+pub mod strategy;
 pub mod tree;

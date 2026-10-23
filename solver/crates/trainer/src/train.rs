@@ -70,11 +70,11 @@ pub struct Outcome {
     pub checkpoint: PathBuf,
 }
 
-struct Resume {
-    storage: Storage,
-    iterations: u64,
-    elapsed_seconds: u64,
-    checkpoint: u32,
+pub struct Resume {
+    pub storage: Storage,
+    pub iterations: u64,
+    pub elapsed_seconds: u64,
+    pub checkpoint: u32,
 }
 
 fn read_file(path: &Path) -> Result<Vec<u8>, String> {
@@ -92,7 +92,7 @@ fn memory_estimate(tree: &Tree, tables: &Path) -> Result<u64, String> {
     Ok(bytes)
 }
 
-fn load_abstraction(preset: &Preset, dir: &Path) -> Result<Abstraction, String> {
+pub fn load_abstraction(preset: &Preset, dir: &Path) -> Result<Abstraction, String> {
     let mut tables: [Vec<u8>; 3] = Default::default();
     for (slot, (name, _)) in tables.iter_mut().zip(TABLES) {
         *slot = read_file(&dir.join(name))?;
@@ -124,7 +124,7 @@ fn checkpoint_path(dir: &Path, n: u32) -> PathBuf {
     dir.join(format!("{n}.ckpt"))
 }
 
-fn latest_checkpoint(dir: &Path) -> Result<Option<u32>, String> {
+pub fn latest_checkpoint(dir: &Path) -> Result<Option<u32>, String> {
     let entries =
         std::fs::read_dir(dir).map_err(|e| format!("cannot read {}: {e}", dir.display()))?;
     let mut latest = None;
@@ -143,10 +143,12 @@ fn latest_checkpoint(dir: &Path) -> Result<Option<u32>, String> {
     Ok(latest)
 }
 
-fn resume(dir: &Path, expected: &[u8; 32], slots: u64) -> Result<Option<Resume>, String> {
-    let Some(n) = latest_checkpoint(dir)? else {
-        return Ok(None);
-    };
+pub fn load_checkpoint(
+    dir: &Path,
+    n: u32,
+    expected: &[u8; 32],
+    slots: u64,
+) -> Result<Resume, String> {
     let path = checkpoint_path(dir, n);
     let bytes = read_file(&path)?;
     let (header, storage) =
@@ -158,12 +160,19 @@ fn resume(dir: &Path, expected: &[u8; 32], slots: u64) -> Result<Option<Resume>,
             storage.len()
         ));
     }
-    Ok(Some(Resume {
+    Ok(Resume {
         storage,
         iterations: header.iterations,
         elapsed_seconds: header.elapsed_seconds,
         checkpoint: n,
-    }))
+    })
+}
+
+fn resume(dir: &Path, expected: &[u8; 32], slots: u64) -> Result<Option<Resume>, String> {
+    let Some(n) = latest_checkpoint(dir)? else {
+        return Ok(None);
+    };
+    load_checkpoint(dir, n, expected, slots).map(Some)
 }
 
 fn save(dir: &Path, header: &CheckpointHeader, storage: &Storage) -> Result<PathBuf, String> {
@@ -481,7 +490,7 @@ pub fn calibrate(args: &CalibrateArgs, stop: &AtomicBool) -> Result<(), String> 
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use std::sync::OnceLock;
 
@@ -511,7 +520,7 @@ mod tests {
         })
     }
 
-    fn data_dir(name: &str) -> PathBuf {
+    pub fn data_dir(name: &str) -> PathBuf {
         let dir = scratch_root().join(format!("trainer-{name}"));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
@@ -522,7 +531,12 @@ mod tests {
         dir
     }
 
-    fn session(dir: &Path, iterations: Option<u64>, seed: u64, threads: Option<usize>) -> Session {
+    pub fn session(
+        dir: &Path,
+        iterations: Option<u64>,
+        seed: u64,
+        threads: Option<usize>,
+    ) -> Session {
         Session {
             preset: dir.join("tiny.toml"),
             tables: dir.to_path_buf(),
@@ -538,7 +552,7 @@ mod tests {
         Duration::ZERO
     }
 
-    fn go(s: &Session) -> Result<Outcome, String> {
+    pub fn go(s: &Session) -> Result<Outcome, String> {
         train(s, &frozen, &AtomicBool::new(false))
     }
 

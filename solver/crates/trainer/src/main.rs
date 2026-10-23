@@ -1,4 +1,5 @@
 mod buckets;
+mod export;
 mod train;
 mod tree;
 
@@ -21,6 +22,7 @@ enum Command {
     Tree(tree::TreeArgs),
     Train(train::TrainArgs),
     Calibrate(train::CalibrateArgs),
+    Export(export::ExportArgs),
 }
 
 fn catch_ctrl_c() -> Result<(), String> {
@@ -42,6 +44,7 @@ fn main() -> ExitCode {
         Command::Tree(args) => tree::run(&args),
         Command::Train(args) => catch_ctrl_c().and_then(|()| train::run(&args, &STOP)),
         Command::Calibrate(args) => catch_ctrl_c().and_then(|()| train::calibrate(&args, &STOP)),
+        Command::Export(args) => export::run(&args),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,
