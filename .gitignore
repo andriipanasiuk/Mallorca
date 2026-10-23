@@ -2,6 +2,7 @@
 */out/
 *.iml
 *.txt
+!solver/crates/core/tests/fixtures/*.txt
 */build/
 advices_sng/
 */dist/
