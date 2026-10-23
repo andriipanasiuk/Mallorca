@@ -37,11 +37,11 @@
     "label": "Your actions"
   },
   "result": {
-    "wins": "{{name}} wins",
-    "winsWith": "{{name}} wins with {{hand}}",
-    "youWin": "You win",
-    "youWinWith": "You win with {{hand}}",
-    "split": "Split pot",
+    "wins": "{{name}} wins {{amount}}",
+    "winsWith": "{{name}} wins {{amount}} with {{hand}}",
+    "youWin": "You win {{amount}}",
+    "youWinWith": "You win {{amount}} with {{hand}}",
+    "split": "Split pot {{amount}} each",
     "next": "Next hand"
   },
   "log": { "title": "Hand log" },

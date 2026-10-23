@@ -84,11 +84,11 @@ describe('copy', () => {
     );
     expectFromLocale(container);
     expect(container.querySelector('[data-testid="result"]')?.textContent).toContain(
-      'Mallorca wins with Two pair',
+      'Mallorca wins 120 with Two pair',
     );
     cleanup();
     const youWin = fixtureResult();
-    youWin.result = { winner: 0, handName: 'Flush' };
+    youWin.result = { winner: 0, handName: 'Flush', amount: 120 };
     const won = render(
       <Table
         vm={youWin}
@@ -101,7 +101,7 @@ describe('copy', () => {
     );
     expectFromLocale(won.container);
     expect(won.container.querySelector('[data-testid="result"]')?.textContent).toContain(
-      'You win with Flush',
+      'You win 120 with Flush',
     );
     cleanup();
     const thinking = viewModel({ enabled: false });

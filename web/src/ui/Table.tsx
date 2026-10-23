@@ -21,17 +21,17 @@ function resultText(vm: ViewModel, humanSeat: SeatIndex): string | null {
     return null;
   }
   if (result.winner === null) {
-    return t('result.split');
+    return t('result.split', { amount: result.amount });
   }
   if (result.winner === humanSeat) {
     return result.handName === null
-      ? t('result.youWin')
-      : t('result.youWinWith', { hand: result.handName });
+      ? t('result.youWin', { amount: result.amount })
+      : t('result.youWinWith', { amount: result.amount, hand: result.handName });
   }
   const name = vm.seats[result.winner].name;
   return result.handName === null
-    ? t('result.wins', { name })
-    : t('result.winsWith', { name, hand: result.handName });
+    ? t('result.wins', { name, amount: result.amount })
+    : t('result.winsWith', { name, amount: result.amount, hand: result.handName });
 }
 
 export function Table({ vm, phase, humanSeat, log, onAct, onNextHand }: TableProps) {
@@ -40,20 +40,25 @@ export function Table({ vm, phase, humanSeat, log, onAct, onNextHand }: TablePro
   const text = resultText(vm, humanSeat);
   const raise = vm.controls.raise;
   const barKey = raise === null ? 'none' : `${raise.min}:${raise.max}`;
+  const thinking = botWaiting && vm.seats[botSeat].isToAct;
+  const announcement = text ?? (thinking ? t('seat.thinking') : '');
   const winner = vm.result?.winner ?? null;
   return (
     <div class="table-layout">
+      <div class="visually-hidden" role="status" aria-live="polite" data-testid="live-region">
+        {announcement}
+      </div>
       <div class="table-main">
         <Seat
           index={botSeat}
           view={vm.seats[botSeat]}
-          thinking={botWaiting && vm.seats[botSeat].isToAct}
+          thinking={thinking}
           winner={winner === botSeat}
           position="top"
         />
         <div class="table-center">
           <Board cards={vm.board} />
-          <Pot amount={vm.pot} />
+          {text === null && <Pot amount={vm.pot} />}
           {text !== null && (
             <div class="result" data-testid="result">
               <span class="result-text">{text}</span>

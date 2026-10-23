@@ -31,7 +31,7 @@ export interface ViewModel {
   };
   blinds: { small: number; big: number };
   handNumber: number;
-  result: { winner: SeatIndex | null; handName: string | null } | null;
+  result: { winner: SeatIndex | null; handName: string | null; amount: number } | null;
   tournamentWinner: SeatIndex | null;
 }
 
@@ -90,7 +90,10 @@ export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewMode
     },
     blinds: hand === null ? blindsFor(1) : blindsFor(tournament.handNumber),
     handNumber: tournament.handNumber,
-    result: result === null ? null : { winner: result.winner, handName: result.handName },
+    result:
+      result === null
+        ? null
+        : { winner: result.winner, handName: result.handName, amount: result.amount },
     tournamentWinner: tournament.winner,
   };
 }

@@ -71,6 +71,7 @@ describe('toViewModel', () => {
     expect(vm.seats[0].cards).toEqual(state.tournament.hand?.holeCards[0]);
     expect(vm.result).not.toBeNull();
     expect(vm.result?.handName).toEqual(expect.any(String));
+    expect(vm.result?.amount).toBe(2000);
     expect(vm.controls.enabled).toBe(false);
     expect(vm.controls.raise).toBeNull();
     expect(vm.tournamentWinner).toBe(state.tournament.winner);
@@ -83,6 +84,9 @@ describe('toViewModel', () => {
     const state = session.getState();
     const vm = toViewModel(state, 1);
     expect(vm.seats[0].cards).toEqual(['back', 'back']);
-    expect(vm.result).toEqual({ winner: 0, handName: null });
+    expect(vm.result?.winner).toBe(0);
+    expect(vm.result?.handName).toBeNull();
+    expect(vm.result?.amount).toBe(state.tournament.seats[0].stack - 2000);
+    expect(vm.result?.amount).toBeGreaterThan(0);
   });
 });

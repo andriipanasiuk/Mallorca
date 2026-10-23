@@ -24,6 +24,7 @@ export interface HandResult {
   winner: SeatIndex | null;
   handName: string | null;
   showdown: boolean;
+  amount: number;
 }
 
 export interface SessionState {
@@ -75,7 +76,7 @@ function capitalise(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function resultOf(events: EngineEvent[]): HandResult {
+export function resultOf(events: EngineEvent[]): Omit<HandResult, 'amount'> {
   const awards: [number, number] = [0, 0];
   let hands: Extract<EngineEvent, { type: 'showdown' }>['hands'] | null = null;
   for (const event of events) {
@@ -97,6 +98,16 @@ export function resultOf(events: EngineEvent[]): HandResult {
     handName: shown === null ? null : capitalise(shown.category.replace('-', ' ')),
     showdown: hands !== null,
   };
+}
+
+function awardedTo(events: EngineEvent[], seat: SeatIndex): number {
+  let total = 0;
+  for (const event of events) {
+    if (event.type === 'potAwarded' && event.seat === seat) {
+      total += event.amount;
+    }
+  }
+  return total;
 }
 
 export function toIntent(action: Action): Intent {
@@ -134,6 +145,7 @@ export function createSession(options: SessionOptions): Session {
   const bot = withFallback(options.bot);
   const rng = mulberry32(seed);
   let epoch = 0;
+  let startStacks: [number, number] = [0, 0];
   const timers = new Map<ReturnType<typeof setTimeout>, () => void>();
 
   const sleep = (ms: number): Promise<void> =>
@@ -172,8 +184,11 @@ export function createSession(options: SessionOptions): Session {
       set({ tournament: step.state });
       record(step.events);
       if (step.state.hand?.street === 'complete') {
+        const { seats } = step.state;
+        const paid = (seat: SeatIndex) =>
+          startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
         set({
-          result: resultOf(step.events),
+          result: { ...resultOf(step.events), amount: Math.min(paid(0), paid(1)) },
           phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
         });
       }
@@ -216,6 +231,8 @@ export function createSession(options: SessionOptions): Session {
     };
 
     const beginHand = (): Promise<void> => {
+      const { seats } = get().tournament;
+      startStacks = [seats[0].stack, seats[1].stack];
       const step = startHand(get().tournament, rng);
       bot.reset();
       set({ tournament: step.state, lastActions: [null, null], result: null });
