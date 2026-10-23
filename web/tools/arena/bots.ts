@@ -50,3 +50,5 @@ export const BOTS: Record<'math' | 'always-call' | 'always-raise' | 'random', Bo
   'always-raise': alwaysRaise,
   random,
 };
+
+export type BotName = keyof typeof BOTS;

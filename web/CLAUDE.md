@@ -10,6 +10,7 @@
 - No comments in code or config, in any language.
 - UI copy: no all-caps words, no em or en dashes as sentence punctuation.
 - `npm run contact` builds, plays a seeded game and writes `e2e/contact/phone.png` and `e2e/contact/desktop.png` (gitignored); it is not part of `test:e2e`.
+- `npm run arena -- --a math --b always-call --pairs 2000` plays duplicate matches between two bots over worker threads and prints bb/100 with a 95% interval (`tools/arena/README.md`).
 - Review screenshots as one contact sheet per device, not one file at a time.
 - Git: feature branches, atomic conventional commits with the layer as scope (`feat(engine): ...`), never push to `main`, PRs are squash-merged. Run `git branch --show-current` before committing.
 - Deploy: `.github/workflows/web-deploy.yml` publishes `web/dist` to GitHub Pages on every push to `master` that touches `web/`, built with `BASE_PATH=/mallorca/`. Pages must be set to "GitHub Actions" in the repository settings, a one-time manual step for the owner.

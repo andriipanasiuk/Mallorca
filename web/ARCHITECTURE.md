@@ -164,6 +164,16 @@ argument.
   anchor) with `mallorca-<sessionId>.json|txt` or `mallorca-history.json|txt`; store errors are ignored. Plural
   copy such as `session.summary_one` and `_other` is resolved by i18next from `count`.
 
+## arena
+
+- `tools/arena` is a Node script outside the app bundle; it imports `engine`, `brains`, `cards` and
+  `game/records/record.ts` and nothing from `ui`. Node 24 runs the `.ts` files directly, including in workers.
+- `bots.ts` holds the named bot factories, `match.ts` plays a pair (one deck, seats swapped) and returns the net
+  chips of the first bot, `stats.ts` turns pair nets into bb/100 and a 95% interval.
+- `run.ts` splits pair indices into contiguous chunks, runs them in process (one worker) or in `worker_threads`
+  (`worker.ts`), gathers results in index order and builds the `Report`; the result does not depend on the worker
+  count. `cli.ts` parses flags, writes `--out` and `--save-hands` and prints one line.
+
 ## Conventions
 
 - Chips are integers.
