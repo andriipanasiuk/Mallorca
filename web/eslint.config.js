@@ -3,24 +3,29 @@ import tseslint from 'typescript-eslint';
 
 const pure = ['src/cards', 'src/equity', 'src/engine', 'src/brains'];
 
-const layer = (dir, allowed) => ({
-  files: [`src/${dir}/**/*.ts`, `src/${dir}/**/*.tsx`],
-  rules: {
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            regex: `(^|/)(${['cards', 'equity', 'engine', 'brains', 'game', 'ui']
-              .filter((l) => l !== dir && !allowed.includes(l))
-              .join('|')})(/|$)`,
-            message: `src/${dir} may import only from ${allowed.length ? allowed.join(', ') : 'itself'}`,
-          },
-        ],
-      },
-    ],
-  },
-});
+const LAYERS = ['cards', 'equity', 'engine', 'brains', 'game', 'ui'];
+
+const layer = (
+  dir,
+  allowed,
+  typeOnly = [],
+  files = [`src/${dir}/**/*.ts`, `src/${dir}/**/*.tsx`],
+) => {
+  const forbidden = LAYERS.filter(
+    (l) => l !== dir && !allowed.includes(l) && !typeOnly.includes(l),
+  );
+  const allowedText = allowed.length ? allowed.join(', ') : 'itself';
+  const typesText = typeOnly.length ? ` and types from ${typeOnly.join(', ')}` : '';
+  const message = `src/${dir} may import only from ${allowedText}${typesText}`;
+  const patterns = [{ regex: `(^|/)(${forbidden.join('|')})(/|$)`, message }];
+  if (typeOnly.length) {
+    patterns.push({ regex: `(^|/)(${typeOnly.join('|')})(/|$)`, message, allowTypeImports: true });
+  }
+  return {
+    files,
+    rules: { '@typescript-eslint/no-restricted-imports': ['error', { patterns }] },
+  };
+};
 
 export default tseslint.config(
   {
@@ -38,7 +43,8 @@ export default tseslint.config(
   layer('cards', []),
   layer('equity', ['cards']),
   layer('engine', ['cards', 'equity']),
-  layer('brains', ['cards', 'equity', 'engine']),
+  layer('brains', ['cards', 'equity'], ['engine']),
+  layer('brains', ['cards', 'equity', 'engine'], [], ['src/brains/**/*.test.ts']),
   layer('game', ['cards', 'equity', 'engine', 'brains']),
   layer('ui', ['game']),
   ...pure.map((dir) => ({

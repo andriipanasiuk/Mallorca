@@ -30,7 +30,9 @@ web/
 `ui` imports only from `game`. For the table, `game` re-exports `Card`, `formatCard`, `rankOf` and `suitOf`
 from `cards`.
 
-ESLint enforces the table with a `no-restricted-imports` rule per directory.
+ESLint enforces the table with a `@typescript-eslint/no-restricted-imports` rule per directory. For `brains` the
+rule sets `allowTypeImports` on `engine`; the tests in `brains` (`*.test.ts`) may also import `engine` code to build
+events.
 
 ## Purity
 
