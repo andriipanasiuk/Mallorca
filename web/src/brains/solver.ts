@@ -66,7 +66,7 @@ interface Hand {
   readonly strengthMap: StrengthMap | undefined;
 }
 
-interface Node {
+interface SolverNode {
   readonly info: AggressionInfo;
   readonly effectiveStack: number;
   readonly pot: number;
@@ -98,7 +98,11 @@ interface VillainResponses {
   readonly aggressive: VillainResponse;
 }
 
-function villainSituationWithoutStrength(hand: Hand, node: Node, action: HeroAction): HandState {
+function villainSituationWithoutStrength(
+  hand: Hand,
+  node: SolverNode,
+  action: HeroAction,
+): HandState {
   const toCall = action.amount;
   const pot = node.pot;
   const effectiveStack = node.effectiveStack;
@@ -231,7 +235,7 @@ export class NLGameSolver implements GameSolver {
     return { game, hero, board: [...game.board], street, onButton, strengthMap };
   }
 
-  private secondActionRecursive(hand: Hand, node: Node, toCall: number): ActionDistribution {
+  private secondActionRecursive(hand: Hand, node: SolverNode, toCall: number): ActionDistribution {
     const result: ActionDistribution = [];
     result.push({ action: fold(), profit: RandomVariable.constant(-node.heroInvestment) });
     const passiveProfit = this.calculatePassiveProfit(hand, {
@@ -265,7 +269,7 @@ export class NLGameSolver implements GameSolver {
     return result;
   }
 
-  private heroActionProfit(hand: Hand, node: Node, action: HeroAction): RandomVariable {
+  private heroActionProfit(hand: Hand, node: SolverNode, action: HeroAction): RandomVariable {
     const result = new RandomVariable();
     const villainToCall = action.amount;
     const info = new AggressionInfoBuffer(node.info).plusHeroAction();
@@ -298,7 +302,7 @@ export class NLGameSolver implements GameSolver {
     return result;
   }
 
-  private ifVillainRaises(hand: Hand, node: Node, villainToCall: number): RandomVariable {
+  private ifVillainRaises(hand: Hand, node: SolverNode, villainToCall: number): RandomVariable {
     const villainRaise = createRaiseAction(
       villainToCall,
       node.pot,
