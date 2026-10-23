@@ -52,6 +52,28 @@ describe('Scene', () => {
     expect(getByTestId('scene').classList.contains('scene-dimmed')).toBe(true);
   });
 
+  it('draws the simple table without loading the photo', () => {
+    const { container, getByTestId } = render(
+      <Scene simple>
+        <p>x</p>
+      </Scene>,
+    );
+    expect(container.querySelector('picture')).toBeNull();
+    expect(getByTestId('scene').classList.contains('scene-simple')).toBe(true);
+    expect(getByTestId('scene').getAttribute('style') ?? '').not.toContain('blur.webp');
+  });
+
+  it('lays the simple table flat', () => {
+    const { getByTestId } = render(
+      <Scene simple>
+        <p>x</p>
+      </Scene>,
+    );
+    const style = getByTestId('scene').getAttribute('style') ?? '';
+    expect(style).toContain('--l-felt-tilt: 0deg');
+    expect(style).toContain('--p-felt-tilt: 0deg');
+  });
+
   it('keeps its children inside the scene content', () => {
     const { getByTestId } = render(
       <Scene>

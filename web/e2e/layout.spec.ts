@@ -49,6 +49,28 @@ test('long amounts stay inside the small phone', async ({ page }) => {
 });
 
 for (const viewport of [
+  { width: 360, height: 740 },
+  { width: 1440, height: 900 },
+]) {
+  test(`the simple table keeps every control visible at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem('mallorca.tableStyle', 'simple'));
+    await page.setViewportSize(viewport);
+    await page.goto(FAST_URL);
+    await expect(byId(page, 'scene')).toHaveClass(/scene-simple/);
+    await byId(page, 'start').click();
+    await expect(byId(page, 'passive')).toBeEnabled();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      viewport.width,
+    );
+    for (const id of [...CONTROLS, 'preset-half', 'preset-pot', 'preset-allin', 'raise-amount']) {
+      await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
+    }
+  });
+}
+
+for (const viewport of [
   { width: 844, height: 390 },
   { width: 1280, height: 600 },
 ]) {

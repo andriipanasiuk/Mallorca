@@ -5,11 +5,12 @@ export interface StartScreenProps {
   onStart: () => void;
   seed: number;
   farewell?: boolean;
+  simple?: boolean;
 }
 
-export function StartScreen({ onStart, seed, farewell = false }: StartScreenProps) {
+export function StartScreen({ onStart, seed, farewell = false, simple = false }: StartScreenProps) {
   return (
-    <Scene dimmed>
+    <Scene dimmed simple={simple}>
       <main class="start-screen">
         <h1 class="start-title">{t('start.heading')}</h1>
         {farewell ? (

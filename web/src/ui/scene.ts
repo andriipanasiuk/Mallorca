@@ -28,6 +28,26 @@ export const PORTRAIT: PlateGeometry = {
   cardScale: 'clamp(44px, 12vw, 56px)',
 };
 
+export const SIMPLE_LANDSCAPE: PlateGeometry = {
+  focusX: '50%',
+  focusY: '50%',
+  feltTilt: '0deg',
+  opponentY: '24%',
+  boardY: '50%',
+  heroBottom: '24px',
+  cardScale: 'clamp(48px, 4.6vw, 72px)',
+};
+
+export const SIMPLE_PORTRAIT: PlateGeometry = {
+  focusX: '50%',
+  focusY: '50%',
+  feltTilt: '0deg',
+  opponentY: '22%',
+  boardY: '48%',
+  heroBottom: '132px',
+  cardScale: 'clamp(44px, 12vw, 56px)',
+};
+
 const NAMES: Record<keyof PlateGeometry, string> = {
   focusX: 'focus-x',
   focusY: 'focus-y',

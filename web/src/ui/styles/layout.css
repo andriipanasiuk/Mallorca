@@ -857,3 +857,32 @@ button {
 .pill {
   border-radius: var(--radius-pill);
 }
+
+.scene-simple {
+  background-color: var(--color-felt);
+  background-image:
+    radial-gradient(ellipse 60% 45% at 50% 48%, rgba(240, 190, 120, 0.16), transparent 70%),
+    radial-gradient(ellipse 90% 80% at 50% 50%, #2a5d66 0%, var(--color-felt) 55%, #102a30 100%);
+}
+
+.scene-simple .glass,
+.scene-simple .button {
+  background-color: var(--color-glass-strong);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.scene-simple .button-primary,
+.scene-simple .button-raise {
+  background-color: transparent;
+}
+
+.scene-simple .felt-plane,
+.scene-simple .seat-top .card,
+.scene-simple .seat-bottom .card {
+  transform: none;
+}
+
+.scene-simple .seat-bottom .seat-cards {
+  gap: var(--space-2);
+}

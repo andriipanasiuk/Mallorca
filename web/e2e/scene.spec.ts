@@ -69,6 +69,35 @@ test('the showdown result leaves both shown hands and the board visible', async 
   expect(covered).toEqual([]);
 });
 
+test('the simple table is flat, skips the photo and is remembered', async ({ page }) => {
+  const plates: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().endsWith('.webp')) {
+      plates.push(request.url());
+    }
+  });
+  await page.goto(FAST_URL);
+  await byId(page, 'start').click();
+  await expect(byId(page, 'passive')).toBeEnabled();
+  await page.locator('.menu-summary').click();
+  await byId(page, 'simple-table').check();
+  plates.length = 0;
+  await page.reload();
+  await expect(byId(page, 'scene')).toHaveClass(/scene-simple/);
+  await byId(page, 'start').click();
+  await expect(byId(page, 'passive')).toBeEnabled();
+  const transforms = await page.evaluate(() =>
+    ['.felt-plane', '.seat-top .card', '.seat-bottom .card'].map(
+      (selector) => getComputedStyle(document.querySelector(selector) as Element).transform,
+    ),
+  );
+  expect(transforms).toEqual(['none', 'none', 'none']);
+  expect(plates).toEqual([]);
+  for (const id of ['fold', 'passive', 'raise']) {
+    await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
+  }
+});
+
 test('reduced motion turns off the deal animation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(FAST_URL);

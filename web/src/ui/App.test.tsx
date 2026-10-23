@@ -21,6 +21,35 @@ function setup() {
 }
 
 describe('App', () => {
+  it('switches to the simple table from the menu and remembers it', async () => {
+    localStorage.clear();
+    const { session } = setup();
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(false);
+    fireEvent.click(screen.getByTestId('start'));
+    await waitFor(() => expect(session.getState().phase).toBe('humanToAct'));
+    const handBefore = screen.getByTestId('hand-number').textContent;
+    const toggle = screen.getByTestId('simple-table') as HTMLInputElement;
+    expect(toggle.checked).toBe(false);
+    fireEvent.click(toggle);
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(true);
+    expect(localStorage.getItem('mallorca.tableStyle')).toBe('simple');
+    expect(screen.getByTestId('hand-number').textContent).toBe(handBefore);
+    expect(session.getState().phase).toBe('humanToAct');
+    fireEvent.click(screen.getByTestId('simple-table'));
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(false);
+    expect(localStorage.getItem('mallorca.tableStyle')).toBe('room');
+    session.getState().dispose();
+    localStorage.clear();
+  });
+
+  it('opens on the simple table when it was chosen before', () => {
+    localStorage.setItem('mallorca.tableStyle', 'simple');
+    const { session } = setup();
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(true);
+    session.getState().dispose();
+    localStorage.clear();
+  });
+
   it('starts on the start screen and deals after Start', async () => {
     const { session } = setup();
     expect(screen.getByTestId('start')).not.toBeNull();

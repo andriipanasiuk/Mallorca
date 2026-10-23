@@ -2,6 +2,8 @@ import { useEffect, useState } from 'preact/hooks';
 import { toViewModel } from '../game/index.ts';
 import type { Intent, Session, SeatIndex } from '../game/index.ts';
 import { HandLog } from './HandLog.tsx';
+import { readTableStyle, writeTableStyle } from './preferences.ts';
+import type { TableStyle } from './preferences.ts';
 import { t } from './i18n.ts';
 import { Scene } from './Scene.tsx';
 import { StartScreen } from './StartScreen.tsx';
@@ -27,10 +29,18 @@ function useSessionState(session: Session) {
 
 export function App({ session, humanSeat, onNewTournament, onLeave, farewell = false }: AppProps) {
   const state = useSessionState(session);
+  const [tableStyle, setTableStyle] = useState<TableStyle>(readTableStyle);
+  const simple = tableStyle === 'simple';
+  const toggleSimple = () => {
+    const next: TableStyle = simple ? 'room' : 'simple';
+    writeTableStyle(next);
+    setTableStyle(next);
+  };
   if (state.phase === 'idle') {
     return (
       <StartScreen
         seed={state.seed}
+        simple={simple}
         farewell={farewell}
         onStart={() => void session.getState().start()}
       />
@@ -39,7 +49,7 @@ export function App({ session, humanSeat, onNewTournament, onLeave, farewell = f
   const vm = toViewModel(state, humanSeat);
   const act = (intent: Intent) => void session.getState().act(intent);
   return (
-    <Scene>
+    <Scene simple={simple}>
       <div class="app">
         <header class="scene-top">
           <span class="status-pill glass pill" data-testid="blinds">
@@ -51,6 +61,15 @@ export function App({ session, humanSeat, onNewTournament, onLeave, farewell = f
           <details class="menu">
             <summary class="menu-summary glass pill">{t('status.menu')}</summary>
             <div class="menu-body glass">
+              <label class="menu-toggle">
+                <input
+                  type="checkbox"
+                  data-testid="simple-table"
+                  checked={simple}
+                  onChange={toggleSimple}
+                />
+                <span>{t('status.simpleTable')}</span>
+              </label>
               <span>{t('status.seed', { seed: state.seed })}</span>
               <button
                 type="button"

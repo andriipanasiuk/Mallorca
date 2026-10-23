@@ -13,7 +13,8 @@
     "hand": "Hand {{number}}",
     "seed": "Seed {{seed}}",
     "menu": "Menu",
-    "newTournament": "New tournament"
+    "newTournament": "New tournament",
+    "simpleTable": "Simple table"
   },
   "seat": {
     "you": "You",
