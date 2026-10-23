@@ -35,7 +35,28 @@ describe('blindsFor', () => {
     expect(blindsFor(500)).toEqual({ small: 1200, big: 2400 });
     expect(BIG_BLINDS).toHaveLength(21);
   });
+
+  it('changes level exactly after every tenth hand', () => {
+    expect(blindsFor(0)).toEqual({ small: 10, big: 20 });
+    expect(blindsFor(20)).toEqual({ small: 15, big: 30 });
+    expect(blindsFor(21)).toEqual({ small: 20, big: 40 });
+    expect(blindsFor(200)).toEqual({ small: 1000, big: 2000 });
+    expect(blindsFor(201)).toEqual({ small: 1200, big: 2400 });
+  });
 });
+
+function shortStack(): Tournament {
+  return {
+    seats: [
+      { name: 'Mallorca', stack: 3990 },
+      { name: 'You', stack: 10 },
+    ],
+    button: 1,
+    handNumber: 0,
+    hand: null,
+    winner: null,
+  };
+}
 
 describe('tournament', () => {
   it('creates a tournament with equal stacks and no hand', () => {
@@ -77,6 +98,44 @@ describe('tournament', () => {
     expect(t.winner).not.toBeNull();
     expect(ended).toEqual([{ type: 'tournamentEnded', winner: t.winner }]);
     expect(t.seats[t.winner as 0 | 1].stack).toBe(4000);
+  });
+
+  it('ends the tournament when the deal itself busts a player', () => {
+    const started = startHand(shortStack(), mulberry32(2));
+    expect(started.state.hand?.street).toBe('complete');
+    expect(started.state.seats.map((s) => s.stack)).toEqual([4000, 0]);
+    expect(started.state.winner).toBe(0);
+    expect(started.events.at(-1)).toEqual({ type: 'tournamentEnded', winner: 0 });
+    expect(toAct(started.state)).toBeNull();
+    expect(() => startHand(started.state, mulberry32(2))).toThrow('The tournament is over');
+  });
+
+  it('completes a hand that ends at the deal without busting anyone', () => {
+    const started = startHand(shortStack(), mulberry32(1));
+    expect(started.state.hand?.street).toBe('complete');
+    expect(started.state.seats.map((s) => s.stack)).toEqual([3980, 20]);
+    expect(started.state.winner).toBeNull();
+    expect(started.events.map((e) => e.type)).not.toContain('tournamentEnded');
+    const next = startHand(started.state, mulberry32(1));
+    expect(next.state.handNumber).toBe(2);
+  });
+
+  it('refuses to start a hand while one is in progress', () => {
+    const started = startHand(createTournament(['Mallorca', 'You']), mulberry32(1));
+    expect(() => startHand(started.state, mulberry32(1))).toThrow('A hand is still in progress');
+  });
+
+  it('raises the blinds on hand eleven', () => {
+    const rng = mulberry32(1);
+    let t = createTournament(['Mallorca', 'You']);
+    const bigBlinds: number[] = [];
+    for (let i = 0; i < 11; i++) {
+      const started = startHand(t, rng);
+      const handStarted = started.events[0] as Extract<EngineEvent, { type: 'handStarted' }>;
+      bigBlinds.push(handStarted.bigBlind);
+      t = apply(started.state, { kind: 'fold' }).state;
+    }
+    expect(bigBlinds.slice(9)).toEqual([20, 30]);
   });
 
   it('refuses to start a hand once the tournament is over', () => {

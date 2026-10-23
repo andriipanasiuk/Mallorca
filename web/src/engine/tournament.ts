@@ -2,7 +2,7 @@ import { fullDeck, shuffle } from '../cards/index.ts';
 import type { Rng } from '../cards/index.ts';
 import { applyAction, startHandWith } from './hand.ts';
 import { legalActions, otherSeat } from './legal.ts';
-import type { Action, EngineEvent, Hand, LegalActions, Seat, SeatIndex } from './types.ts';
+import type { Action, EngineEvent, Hand, LegalActions, Seat, SeatIndex, Step } from './types.ts';
 
 export interface Tournament {
   seats: [Seat, Seat];
@@ -61,10 +61,20 @@ export function startHand(t: Tournament, rng: Rng): { state: Tournament; events:
     shuffle(fullDeck(), rng),
     handNumber,
   );
-  return {
-    state: { ...t, seats: step.seats, button, handNumber, hand: step.hand },
-    events: step.events,
-  };
+  return conclude({ ...t, button, handNumber }, step);
+}
+
+function conclude(t: Tournament, step: Step): { state: Tournament; events: EngineEvent[] } {
+  const events = [...step.events];
+  let winner: SeatIndex | null = null;
+  if (step.hand.street === 'complete') {
+    const broke = step.seats[0].stack === 0 ? 0 : step.seats[1].stack === 0 ? 1 : null;
+    if (broke !== null) {
+      winner = otherSeat(broke);
+      events.push({ type: 'tournamentEnded', winner });
+    }
+  }
+  return { state: { ...t, seats: step.seats, hand: step.hand, winner }, events };
 }
 
 export function legalActionsOf(t: Tournament): LegalActions {
@@ -82,15 +92,5 @@ export function apply(t: Tournament, action: Action): { state: Tournament; event
   if (t.hand === null) {
     throw new Error('No hand in progress');
   }
-  const step = applyAction(t.hand, t.seats, action);
-  const events = [...step.events];
-  let winner: SeatIndex | null = null;
-  if (step.hand.street === 'complete') {
-    const broke = step.seats[0].stack === 0 ? 0 : step.seats[1].stack === 0 ? 1 : null;
-    if (broke !== null) {
-      winner = otherSeat(broke);
-      events.push({ type: 'tournamentEnded', winner });
-    }
-  }
-  return { state: { ...t, seats: step.seats, hand: step.hand, winner }, events };
+  return conclude(t, applyAction(t.hand, t.seats, action));
 }
