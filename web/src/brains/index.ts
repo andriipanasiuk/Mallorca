@@ -36,4 +36,5 @@ export type {
   SolverActionType,
 } from './profit.ts';
 export { createRaiseAction, profitMap, RandomVariable } from './profit.ts';
-export { NLGameSolver, ShowdownGameSolver, SpectrumEquilator } from './solver.ts';
+export { NLGameSolver, ShowdownGameSolver } from './solver.ts';
+export { SpectrumEquilator } from './spectrumEquilator.ts';
