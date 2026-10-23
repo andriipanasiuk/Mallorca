@@ -1,0 +1,156 @@
+import { spawn } from 'node:child_process';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { chromium } from '@playwright/test';
+import type { Browser, Page } from '@playwright/test';
+
+const PORT = 4174;
+const BASE = `http://localhost:${PORT}/`;
+const OUT_DIR = 'e2e/contact';
+const SHEET_COLUMNS = 3;
+const THINKING_DELAY_MS = 600_000;
+const SETTLE_MS = 400;
+
+const DEVICES = [
+  { name: 'phone', viewport: { width: 390, height: 844 }, isMobile: true },
+  { name: 'desktop', viewport: { width: 1440, height: 900 }, isMobile: false },
+];
+
+interface Shot {
+  label: string;
+  png: Buffer;
+}
+
+async function waitForServer(): Promise<void> {
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    try {
+      const response = await fetch(BASE);
+      if (response.ok) {
+        return;
+      }
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  }
+  throw new Error('preview server did not start');
+}
+
+async function snap(page: Page, label: string, shots: Shot[]): Promise<void> {
+  await page.waitForTimeout(SETTLE_MS);
+  shots.push({ label, png: await page.screenshot() });
+}
+
+function id(page: Page, testId: string) {
+  return page.getByTestId(testId);
+}
+
+async function nextWaypoint(page: Page): Promise<'act' | 'next-hand' | 'tournament-over'> {
+  const act = id(page, 'passive').and(page.locator(':enabled'));
+  await act.or(id(page, 'next-hand')).or(id(page, 'tournament-over')).first().waitFor();
+  if (await id(page, 'tournament-over').isVisible()) {
+    return 'tournament-over';
+  }
+  return (await id(page, 'next-hand').isVisible()) ? 'next-hand' : 'act';
+}
+
+async function boardCards(page: Page): Promise<number> {
+  return id(page, 'board').getByTestId('card').count();
+}
+
+async function capture(browser: Browser, device: (typeof DEVICES)[number]): Promise<Shot[]> {
+  const shots: Shot[] = [];
+  const open = async (query: string) => {
+    const context = await browser.newContext({
+      viewport: device.viewport,
+      isMobile: device.isMobile,
+      hasTouch: device.isMobile,
+    });
+    const page = await context.newPage();
+    await page.goto(`${BASE}?${query}`);
+    return page;
+  };
+
+  const page = await open('seed=42&botDelay=0');
+  await snap(page, 'start', shots);
+  await id(page, 'start').click();
+  await nextWaypoint(page);
+  await snap(page, 'human to act', shots);
+
+  for (;;) {
+    if ((await nextWaypoint(page)) !== 'act' || (await boardCards(page)) >= 3) {
+      break;
+    }
+    await id(page, 'passive').click();
+  }
+  await nextWaypoint(page);
+  await snap(page, 'after flop', shots);
+
+  for (;;) {
+    const waypoint = await nextWaypoint(page);
+    if (waypoint !== 'act') {
+      break;
+    }
+    await id(page, 'passive').click();
+  }
+  await snap(page, 'showdown', shots);
+
+  const slow = await open(`seed=42&botDelay=${THINKING_DELAY_MS}`);
+  await id(slow, 'start').click();
+  await id(slow, 'passive').and(slow.locator(':enabled')).waitFor();
+  await id(slow, 'passive').click();
+  await id(slow, 'thinking-1').waitFor();
+  await snap(slow, 'bot thinking', shots);
+
+  for (;;) {
+    const waypoint = await nextWaypoint(page);
+    if (waypoint === 'tournament-over') {
+      break;
+    }
+    if (waypoint === 'next-hand') {
+      await id(page, 'next-hand').click();
+    } else if (await id(page, 'raise').isEnabled()) {
+      await id(page, 'preset-allin').click();
+      await id(page, 'raise').click();
+    } else {
+      await id(page, 'passive').click();
+    }
+  }
+  await snap(page, 'tournament over', shots);
+  return shots;
+}
+
+async function compose(browser: Browser, shots: Shot[], out: string): Promise<void> {
+  const cells = shots
+    .map(
+      ({ label, png }) =>
+        `<figure><img src="data:image/png;base64,${png.toString('base64')}"><figcaption>${label}</figcaption></figure>`,
+    )
+    .join('');
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+body { margin: 0; background: #111; color: #ddd; font: 14px system-ui }
+main { display: grid; grid-template-columns: repeat(${SHEET_COLUMNS}, 1fr); gap: 8px; padding: 8px; align-items: start }
+figure { margin: 0 }
+img { width: 100%; display: block; border: 1px solid #333 }
+figcaption { padding: 4px 0 }
+</style></head><body><main>${cells}</main></body></html>`;
+  const page = await browser.newPage({ viewport: { width: 1800, height: 1000 } });
+  await page.setContent(html, { waitUntil: 'load' });
+  writeFileSync(out, await page.screenshot({ fullPage: true }));
+  await page.close();
+}
+
+mkdirSync(OUT_DIR, { recursive: true });
+const server = spawn('npm', ['run', 'preview', '--', '--port', String(PORT), '--strictPort'], {
+  stdio: 'ignore',
+});
+const browser = await chromium.launch();
+try {
+  await waitForServer();
+  for (const device of DEVICES) {
+    const shots = await capture(browser, device);
+    await compose(browser, shots, `${OUT_DIR}/${device.name}.png`);
+    console.log(`saved ${OUT_DIR}/${device.name}.png with ${shots.length} screenshots`);
+  }
+} finally {
+  await browser.close();
+  server.kill();
+}

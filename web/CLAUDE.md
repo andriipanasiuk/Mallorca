@@ -9,5 +9,6 @@
 - Chips are integers. Cards in fixtures and text are two-character strings: rank `23456789TJQKA`, suit `cdhs`.
 - No comments in code or config, in any language.
 - UI copy: no all-caps words, no em or en dashes as sentence punctuation.
+- `npm run contact` builds, plays a seeded game and writes `e2e/contact/phone.png` and `e2e/contact/desktop.png` (gitignored); it is not part of `test:e2e`.
 - Review screenshots as one contact sheet per device, not one file at a time.
 - Git: feature branches, atomic conventional commits with the layer as scope (`feat(engine): ...`), never push to `main`, PRs are squash-merged. Run `git branch --show-current` before committing.
