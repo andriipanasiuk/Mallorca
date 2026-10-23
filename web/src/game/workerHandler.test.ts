@@ -27,7 +27,10 @@ function fakeBrain(decide: Brain['decide'] = () => decision) {
 describe('createWorkerHandler', () => {
   it('feeds every observation to the brain', () => {
     const { brain, observed } = fakeBrain();
-    const handle = createWorkerHandler(() => brain, () => undefined);
+    const handle = createWorkerHandler(
+      () => brain,
+      () => undefined,
+    );
     handle({ kind: 'observe', observations: [observation, observation] });
     expect(observed).toHaveLength(2);
   });
@@ -35,7 +38,10 @@ describe('createWorkerHandler', () => {
   it('replies to decide with the decision and the request id', () => {
     const { brain } = fakeBrain();
     const replies: WorkerReply[] = [];
-    const handle = createWorkerHandler(() => brain, (reply) => replies.push(reply));
+    const handle = createWorkerHandler(
+      () => brain,
+      (reply) => replies.push(reply),
+    );
     handle({ kind: 'decide', id: 7, legal });
     expect(replies).toEqual([{ id: 7, decision }]);
   });
@@ -45,7 +51,10 @@ describe('createWorkerHandler', () => {
       throw new Error('no cards');
     });
     const replies: WorkerReply[] = [];
-    const handle = createWorkerHandler(() => brain, (reply) => replies.push(reply));
+    const handle = createWorkerHandler(
+      () => brain,
+      (reply) => replies.push(reply),
+    );
     handle({ kind: 'decide', id: 3, legal });
     expect(replies).toEqual([{ id: 3, error: 'no cards' }]);
   });
@@ -55,7 +64,10 @@ describe('createWorkerHandler', () => {
       throw 'boom';
     });
     const replies: WorkerReply[] = [];
-    const handle = createWorkerHandler(() => brain, (reply) => replies.push(reply));
+    const handle = createWorkerHandler(
+      () => brain,
+      (reply) => replies.push(reply),
+    );
     handle({ kind: 'decide', id: 4, legal });
     expect(replies).toEqual([{ id: 4, error: 'boom' }]);
   });
