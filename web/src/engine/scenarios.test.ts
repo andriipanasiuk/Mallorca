@@ -92,9 +92,9 @@ describe('scenario table', () => {
   it('a raise to the opponent stack and beyond returns the excess', () => {
     const step = playEvents(startHand([2000, 100], aaWins), raiseTo(300), call);
     expect(step.hand.street).toBe('complete');
-    const awards = step.events.filter((e) => e.type === 'potAwarded');
+    const awards = step.events.filter((e) => e.type === 'potAwarded' || e.type === 'betReturned');
     expect(awards).toEqual([
-      { type: 'potAwarded', seat: 0, amount: 200 },
+      { type: 'betReturned', seat: 0, amount: 200 },
       { type: 'potAwarded', seat: 1, amount: 200 },
     ]);
     expect(stacksOf(step)).toEqual([1900, 200]);
@@ -104,8 +104,11 @@ describe('scenario table', () => {
   it('the excess goes back when the big stack wins too', () => {
     const step = playEvents(startHand([2000, 100], buttonWins), raiseTo(300), call);
     expect(stacksOf(step)).toEqual([2100, 0]);
-    const awards = step.events.filter((e) => e.type === 'potAwarded');
-    expect(awards).toEqual([{ type: 'potAwarded', seat: 0, amount: 400 }]);
+    const awards = step.events.filter((e) => e.type === 'potAwarded' || e.type === 'betReturned');
+    expect(awards).toEqual([
+      { type: 'betReturned', seat: 0, amount: 200 },
+      { type: 'potAwarded', seat: 0, amount: 200 },
+    ]);
   });
 
   it('a postflop bet bigger than the opponent stack is refunded in part', () => {
@@ -113,8 +116,11 @@ describe('scenario table', () => {
     const step = playEvents(flop, raiseTo(500), call);
     expect(step.hand.street).toBe('complete');
     expect(stacksOf(step)).toEqual([0, 2200]);
-    const awards = step.events.filter((e) => e.type === 'potAwarded');
-    expect(awards).toEqual([{ type: 'potAwarded', seat: 1, amount: 720 }]);
+    const awards = step.events.filter((e) => e.type === 'potAwarded' || e.type === 'betReturned');
+    expect(awards).toEqual([
+      { type: 'betReturned', seat: 1, amount: 320 },
+      { type: 'potAwarded', seat: 1, amount: 400 },
+    ]);
   });
 
   it('both all-in preflop runs out flop, turn and river then shows down', () => {
@@ -170,7 +176,16 @@ describe('scenario table', () => {
 
   it('a fold awards the pot without a showdown', () => {
     const step = playEvents(startHand([2000, 2000], aaWins), fold);
-    expect(types(step.events).slice(-3)).toEqual(['acted', 'potAwarded', 'handEnded']);
+    expect(types(step.events).slice(-4)).toEqual([
+      'acted',
+      'betReturned',
+      'potAwarded',
+      'handEnded',
+    ]);
+    expect(step.events.filter((e) => e.type === 'betReturned' || e.type === 'potAwarded')).toEqual([
+      { type: 'betReturned', seat: 1, amount: 10 },
+      { type: 'potAwarded', seat: 1, amount: 20 },
+    ]);
     expect(types(step.events)).not.toContain('showdown');
     expect(stacksOf(step)).toEqual([1990, 2010]);
     expect(step.hand.street).toBe('complete');
@@ -182,6 +197,26 @@ describe('scenario table', () => {
     const flop = play(startHand([2000, 2000], aaWins), call, check);
     const step = play(flop, raiseTo(100), fold);
     expect(stacksOf(step)).toEqual([1980, 2020]);
+    expect(step.events.slice(-3)).toEqual([
+      { type: 'betReturned', seat: 1, amount: 100 },
+      { type: 'potAwarded', seat: 1, amount: 40 },
+      { type: 'handEnded', stacks: [1980, 2020] },
+    ]);
+  });
+
+  it('a fold to a raise returns the uncalled part and awards the matched pot', () => {
+    const step = playEvents(startHand([2000, 2000], aaWins), raiseTo(60), fold);
+    expect(stacksOf(step)).toEqual([2020, 1980]);
+    expect(types(step.events).slice(-4)).toEqual([
+      'acted',
+      'betReturned',
+      'potAwarded',
+      'handEnded',
+    ]);
+    expect(step.events.filter((e) => e.type === 'betReturned' || e.type === 'potAwarded')).toEqual([
+      { type: 'betReturned', seat: 0, amount: 40 },
+      { type: 'potAwarded', seat: 0, amount: 40 },
+    ]);
   });
 
   it('a big blind with 15 chips posts all-in and the hand runs out', () => {
@@ -222,14 +257,20 @@ describe('scenario table', () => {
         .map((e) => (e as { amount: number }).amount),
     ).toEqual([5, 20]);
     expect(allIn.hand.street).toBe('complete');
-    expect(types(allIn.events).slice(-6)).toEqual([
+    expect(types(allIn.events).slice(-7)).toEqual([
       'streetDealt',
       'streetDealt',
       'streetDealt',
       'showdown',
+      'betReturned',
       'potAwarded',
       'handEnded',
     ]);
+    expect(allIn.events.find((e) => e.type === 'betReturned')).toEqual({
+      type: 'betReturned',
+      seat: 1,
+      amount: 15,
+    });
     expect(stacksOf(allIn)[0]! + stacksOf(allIn)[1]!).toBe(2005);
   });
 });

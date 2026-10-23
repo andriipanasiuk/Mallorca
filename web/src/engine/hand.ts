@@ -182,7 +182,7 @@ function showdown(
   events.push({ type: 'showdown', hands });
   const pot = committed[0] + committed[1];
   const shares = awardShowdown(pot, [hands[0].rank, hands[1].rank], otherSeat(hand.button));
-  return finish(current, stacks, seats, events, [shares[0] + refund[0], shares[1] + refund[1]]);
+  return finish(current, stacks, seats, events, shares, refund);
 }
 
 function finish(
@@ -191,8 +191,14 @@ function finish(
   seats: readonly [Seat, Seat],
   events: EngineEvent[],
   awards: Stacks,
+  refund: Stacks,
 ): Step {
-  const final: Stacks = [stacks[0] + awards[0], stacks[1] + awards[1]];
+  const final: Stacks = [stacks[0] + awards[0] + refund[0], stacks[1] + awards[1] + refund[1]];
+  for (const seat of [0, 1] as const) {
+    if (refund[seat] > 0) {
+      events.push({ type: 'betReturned', seat, amount: refund[seat] });
+    }
+  }
   for (const seat of [0, 1] as const) {
     if (awards[seat] > 0) {
       events.push({ type: 'potAwarded', seat, amount: awards[seat] });
@@ -243,9 +249,12 @@ export function applyAction(hand: Hand, seats: [Seat, Seat], action: Action): St
   if (action.kind === 'fold') {
     events.push({ type: 'acted', seat: me, action, amount: 0, allIn: false });
     const winner = otherSeat(me);
+    const excess = Math.max(hand.committed[winner] - hand.committed[me], 0);
     const awards: Stacks = [0, 0];
-    awards[winner] = hand.pot;
-    return finish(current, stacks, seats, events, awards);
+    const refund: Stacks = [0, 0];
+    awards[winner] = hand.pot - excess;
+    refund[winner] = excess;
+    return finish(current, stacks, seats, events, awards, refund);
   }
   const currentBet = Math.max(hand.bets[0], hand.bets[1]);
   let amount = 0;

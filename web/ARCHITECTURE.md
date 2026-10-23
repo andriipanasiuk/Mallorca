@@ -60,7 +60,8 @@ argument.
 - `Hand.bets` is the street bet per seat, `committed` the total per seat for the hand, `pot` is the sum of
   `committed`. `canRaise` is false for a seat that faces a short all-in raise.
 - `seats` stacks are the chips behind. `legalActions` raise amounts are "raise to" the street total and `max` is
-  all-in; an uncalled excess returns to its owner in `potAwarded`.
+  all-in. An uncalled excess returns to its owner as `betReturned`, before `potAwarded`; `potAwarded` holds only
+  the matched pot, twice the smaller contribution.
 - `acted.amount` is the chips added to the pot by that action. When a hand ends, `street` is `complete`, `toAct`
   is null, `pot` is 0 and the stacks include the awarded pot.
 - `showdown.hands` is indexed by seat; `cards` are the hole cards.

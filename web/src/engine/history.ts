@@ -44,6 +44,10 @@ function describeEvent(event: EngineEvent, names: [string, string]): string[] {
         const category = hand.category.replace('-', ' ');
         return `Showdown: ${say(names[seat as 0 | 1], 'show')} ${cards}, ${category}`;
       });
+    case 'betReturned':
+      return [
+        `Uncalled bet of ${event.amount} returned to ${names[event.seat] === YOU ? 'you' : names[event.seat]}`,
+      ];
     case 'potAwarded':
       return [`${say(names[event.seat], 'win')} ${event.amount}`];
     case 'tournamentEnded':

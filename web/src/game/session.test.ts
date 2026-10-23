@@ -193,6 +193,20 @@ describe('session', () => {
     }
   });
 
+  it('reports the same pot in the result and the log when a raise is folded to', async () => {
+    const session = open(
+      scriptedBot((legal) => (legal.raise ? { kind: 'raise', to: 60 } : { kind: 'call' })),
+    );
+    await session.getState().start();
+    await session.getState().act({ kind: 'fold' });
+    const state = session.getState();
+    expect(state.result).toMatchObject({ winner: 0, showdown: false, amount: 40 });
+    expect(state.log.slice(-2)).toEqual([
+      'Uncalled bet of 40 returned to Mallorca',
+      `Mallorca wins ${state.result?.amount}`,
+    ]);
+  });
+
   it('ends the tournament when the deal busts the short stack', async () => {
     const bot = callingBot();
     const session = open(bot, { seed: 1, startingStacks: [3990, 10] });

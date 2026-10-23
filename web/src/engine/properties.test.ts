@@ -133,12 +133,22 @@ describe('hand properties', () => {
           events.push(...step.events);
         }
         const awarded = events
-          .filter((e) => e.type === 'potAwarded')
+          .filter((e) => e.type === 'potAwarded' || e.type === 'betReturned')
           .reduce((sum, e) => sum + (e as { amount: number }).amount, 0);
         const posted = events
           .filter((e) => e.type === 'blindPosted' || e.type === 'acted')
           .reduce((sum, e) => sum + (e as { amount: number }).amount, 0);
         expect(awarded).toBe(posted);
+        const paid: [number, number] = [0, 0];
+        for (const e of events) {
+          if (e.type === 'blindPosted' || e.type === 'acted') {
+            paid[e.seat] += e.amount;
+          }
+        }
+        const pot = events
+          .filter((e) => e.type === 'potAwarded')
+          .reduce((sum, e) => sum + (e as { amount: number }).amount, 0);
+        expect(pot).toBe(2 * Math.min(paid[0], paid[1]));
       }),
       { numRuns: 300 },
     );

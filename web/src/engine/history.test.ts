@@ -45,7 +45,8 @@ describe('handHistory', () => {
       'You post 10',
       'Mallorca posts 20',
       'You fold',
-      'Mallorca wins 30',
+      'Uncalled bet of 10 returned to Mallorca',
+      'Mallorca wins 20',
     ]);
     const shove = playEvents(
       startHandWith(seats, 0, { small: 10, big: 20 }, deck, 1),
