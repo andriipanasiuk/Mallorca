@@ -57,7 +57,8 @@ export type EngineEvent =
   | { type: 'streetDealt'; street: 'flop' | 'turn' | 'river'; cards: Card[]; board: Card[] }
   | { type: 'showdown'; hands: [ShowdownHand, ShowdownHand] }
   | { type: 'potAwarded'; seat: SeatIndex; amount: number }
-  | { type: 'handEnded'; stacks: [number, number] };
+  | { type: 'handEnded'; stacks: [number, number] }
+  | { type: 'tournamentEnded'; winner: SeatIndex };
 
 export interface Step {
   hand: Hand;
