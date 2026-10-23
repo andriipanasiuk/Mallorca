@@ -38,6 +38,34 @@ describe('Table result and announcements', () => {
     expect(region.textContent).toBe('Mallorca wins 120 with Two pair');
   });
 
+  it('keeps both seats and the felt layer in order', () => {
+    const { container } = table();
+    const felt = container.querySelector('.table-felt');
+    expect(felt).not.toBeNull();
+    expect(felt?.querySelector('[data-testid="board"]')).not.toBeNull();
+    expect(felt?.querySelector('[data-testid="pot"]')).not.toBeNull();
+    expect(screen.getByTestId('seat-1').querySelectorAll('[data-testid="card-back"]').length).toBe(
+      2,
+    );
+  });
+
+  it('marks the player seat active on their turn', () => {
+    table();
+    expect(screen.getByTestId('seat-0').classList.contains('seat-active')).toBe(true);
+  });
+
+  it('sends the pot chips toward the winner', () => {
+    const { container } = table(fixtureResult(), 'handOver');
+    const chips = container.querySelector('.result-chips');
+    expect(chips?.classList.contains('result-chips-to-top')).toBe(true);
+    expect(chips?.getAttribute('aria-hidden')).toBe('true');
+    cleanup();
+    const split = fixtureResult();
+    split.result = { winner: null, category: null, amount: 60 };
+    const view = table(split, 'handOver');
+    expect(view.container.querySelector('.result-chips-split')).not.toBeNull();
+  });
+
   it('announces the bot thinking state', () => {
     const vm = viewModel({ enabled: false });
     vm.seats[1].isToAct = true;

@@ -22,3 +22,22 @@ test('the start screen and the table fit the viewport without horizontal scroll'
     await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
   }
 });
+
+for (const viewport of [
+  { width: 844, height: 390 },
+  { width: 1280, height: 600 },
+]) {
+  test(`a short landscape screen keeps every control visible at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const scrollWidth = () => page.evaluate(() => document.documentElement.scrollWidth);
+    await page.goto(FAST_URL);
+    await byId(page, 'start').click();
+    await expect(byId(page, 'passive')).toBeEnabled();
+    expect(await scrollWidth()).toBeLessThanOrEqual(viewport.width);
+    for (const id of [...CONTROLS, 'preset-half', 'preset-pot', 'preset-allin', 'raise-amount']) {
+      await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
+    }
+  });
+}
