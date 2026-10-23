@@ -50,3 +50,18 @@ argument.
 - Chips are integers.
 - Cards in fixtures and text are two-character strings.
 - Tests sit next to the code as `*.test.ts`.
+
+## engine
+
+- `startHandWith(seats, button, blinds, deck, handNumber)` takes an already shuffled deck and deals from its front.
+  Hole cards alternate starting with the seat after the button: `deck[0]` and `deck[2]` go to the big blind seat,
+  `deck[1]` and `deck[3]` to the button. The board follows in order with no burn cards: flop `deck[4..6]`, turn
+  `deck[7]`, river `deck[8]`. `Hand.deck` holds the undealt cards.
+- `Hand.bets` is the street bet per seat, `committed` the total per seat for the hand, `pot` is the sum of
+  `committed`. `canRaise` is false for a seat that faces a short all-in raise.
+- `seats` stacks are the chips behind. `legalActions` raise amounts are "raise to" the street total and `max` is
+  all-in; an uncalled excess returns to its owner in `potAwarded`.
+- `acted.amount` is the chips added to the pot by that action. When a hand ends, `street` is `complete`, `toAct`
+  is null, `pot` is 0 and the stacks include the awarded pot.
+- `showdown.hands` is indexed by seat; `cards` are the hole cards.
+- `legalActions` returns no action when nobody is to act.
