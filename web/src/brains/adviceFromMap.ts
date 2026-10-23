@@ -44,10 +44,7 @@ const PROFITABLE_EV_VAR_ABOVE_VAR_BB_BELOW: readonly (readonly [number, number])
   [0.75, 100],
 ];
 
-function profitabilityIsGood(actionProfit: ActionProfit | null, lowEV: number): boolean {
-  if (actionProfit === null) {
-    return false;
-  }
+function profitabilityIsGood(actionProfit: ActionProfit, lowEV: number): boolean {
   if (actionProfit.evBBKoeff < lowEV) {
     return false;
   }
@@ -82,21 +79,68 @@ function correctionOf(
   return toCall === 0 ? corrections.postflopCheck : corrections.postflopCall;
 }
 
+interface ScoredAction {
+  readonly entry: ActionProfitEntry;
+  readonly profit: ActionProfit;
+}
+
+interface ScoredDistribution {
+  fold: ScoredAction | null;
+  passive: ScoredAction | null;
+  raise: ScoredAction | null;
+  toCall: number;
+}
+
+interface CompleteDistribution {
+  readonly fold: ScoredAction;
+  readonly passive: ScoredAction;
+  readonly raise: ScoredAction | null;
+  readonly toCall: number;
+}
+
+function scoreDistribution(distribution: ActionDistribution, bb: number): ScoredDistribution {
+  const scored: ScoredDistribution = { fold: null, passive: null, raise: null, toCall: -1 };
+  for (const entry of distribution) {
+    const profit = new ActionProfit();
+    if (entry.action.type === 'fold') {
+      scored.fold = { entry, profit };
+    } else if (entry.action.type === 'passive') {
+      scored.toCall = entry.action.toCall;
+      scored.passive = { entry, profit };
+    } else {
+      scored.raise = { entry, profit };
+    }
+    profit.variance = entry.profit.getVariance();
+    profit.ev = entry.profit.getEV();
+    profit.calculate(bb);
+  }
+  return scored;
+}
+
+function completed(scored: ScoredDistribution): CompleteDistribution {
+  const { fold, passive, raise, toCall } = scored;
+  if (toCall === -1 || passive === null) {
+    throw new Error('toCall cannot be -1 in this state');
+  }
+  if (fold === null) {
+    throw new Error('The profit map has no fold');
+  }
+  return { fold, passive, raise, toCall };
+}
+
 function correctProfits(
   game: GameContext,
   corrections: ProfitCorrections | null,
-  toCall: number,
-  raiseProfit: ActionProfit | null,
-  passiveProfit: ActionProfit,
+  scored: CompleteDistribution,
 ): void {
   const bb = game.bigBlind;
   const preflop = game.street === PREFLOP;
-  if (raiseProfit !== null) {
-    raiseProfit.evVarKoeff += correctionOf(corrections, true, toCall, preflop);
-    raiseProfit.calculateEVVarChanged(bb);
+  if (scored.raise !== null) {
+    scored.raise.profit.evVarKoeff += correctionOf(corrections, true, scored.toCall, preflop);
+    scored.raise.profit.calculateEVVarChanged(bb);
   }
-  passiveProfit.evVarKoeff += correctionOf(corrections, false, toCall, preflop);
-  passiveProfit.calculateEVVarChanged(bb);
+  scored.passive.profit.evVarKoeff += correctionOf(corrections, false, scored.toCall, preflop);
+  scored.passive.profit.calculateEVVarChanged(bb);
 }
 
 function bestAction(
@@ -105,46 +149,18 @@ function bestAction(
   fromTop: boolean,
   corrections: ProfitCorrections | null,
 ): ActionProfitEntry {
-  let foldAction: ActionProfitEntry | null = null;
-  let passiveAction: ActionProfitEntry | null = null;
-  let raiseAction: ActionProfitEntry | null = null;
-  let foldProfit: ActionProfit | null = null;
-  let passiveProfit: ActionProfit | null = null;
-  let raiseProfit: ActionProfit | null = null;
-  let toCall = -1;
-  for (const entry of distribution) {
-    const actionProfit = new ActionProfit();
-    if (entry.action.type === 'fold') {
-      foldAction = entry;
-      foldProfit = actionProfit;
-    } else if (entry.action.type === 'passive') {
-      toCall = entry.action.toCall;
-      passiveAction = entry;
-      passiveProfit = actionProfit;
-    } else {
-      raiseProfit = actionProfit;
-      raiseAction = entry;
-    }
-    actionProfit.variance = entry.profit.getVariance();
-    actionProfit.ev = entry.profit.getEV();
-    actionProfit.calculate(game.bigBlind);
-  }
-  if (toCall === -1 || passiveAction === null || passiveProfit === null) {
-    throw new Error('toCall cannot be -1 in this state');
-  }
-  if (foldAction === null || foldProfit === null) {
-    throw new Error('The profit map has no fold');
-  }
+  const scored = completed(scoreDistribution(distribution, game.bigBlind));
   if (fromTop) {
-    correctProfits(game, corrections, toCall, raiseProfit, passiveProfit);
+    correctProfits(game, corrections, scored);
   }
-  if (raiseAction !== null && profitabilityIsGood(raiseProfit, foldProfit.evBBKoeff)) {
-    return raiseAction;
+  const lowEV = scored.fold.profit.evBBKoeff;
+  if (scored.raise !== null && profitabilityIsGood(scored.raise.profit, lowEV)) {
+    return scored.raise.entry;
   }
-  if (profitabilityIsGood(passiveProfit, foldProfit.evBBKoeff) || toCall === 0) {
-    return passiveAction;
+  if (profitabilityIsGood(scored.passive.profit, lowEV) || scored.toCall === 0) {
+    return scored.passive.entry;
   }
-  return foldAction;
+  return scored.fold.entry;
 }
 
 export function getOptimal(
