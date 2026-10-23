@@ -49,7 +49,7 @@ argument.
 
 ## engine
 
-- `startHandWith(seats, button, blinds, deck, handNumber)` takes an already shuffled deck and deals from its front.
+- `startHandWith(seats, { button, blinds, handNumber }, deck)` takes an already shuffled deck and deals from its front.
   Hole cards alternate starting with the seat after the button: `deck[0]` and `deck[2]` go to the big blind seat,
   `deck[1]` and `deck[3]` to the button. The board follows in order with no burn cards: flop `deck[4..6]`, turn
   `deck[7]`, river `deck[8]`. `Hand.deck` holds the undealt cards.
