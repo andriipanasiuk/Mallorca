@@ -95,6 +95,26 @@ describe('runArena', () => {
     ).rejects.toThrow();
   });
 
+  it('saves hands with distinct playedAt so hand numbers do not collide', async () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'arena-')), 'hands.jsonl');
+    await runArena({
+      a: 'always-raise',
+      b: 'always-call',
+      pairs: 4,
+      seed: 1,
+      workers: 1,
+      saveHands: file,
+    });
+    const records = readFileSync(file, 'utf8')
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line) as { playedAt: string });
+    expect(records).toHaveLength(8);
+    expect(new Set(records.map((r) => r.playedAt)).size).toBe(8);
+    const times = records.map((r) => Date.parse(r.playedAt));
+    expect(times.map((t) => t - times[0]!)).toEqual([0, 1, 2, 3, 4, 5, 6, 7].map((n) => n * 1000));
+  });
+
   it('runs in process', async () => {
     const report = await runArena({ a: 'math', b: 'always-call', pairs: 20, seed: 1, workers: 1 });
     expect(report.hands).toBe(40);

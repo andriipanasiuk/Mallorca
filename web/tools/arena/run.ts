@@ -78,7 +78,6 @@ export async function runArena(options: ArenaOptions): Promise<Report> {
     }
   }
   const started = Date.now();
-  const playedAt = new Date(started).toISOString();
   const a = options.a as BotName;
   const b = options.b as BotName;
   const withHands = options.saveHands !== undefined;
@@ -97,6 +96,7 @@ export async function runArena(options: ArenaOptions): Promise<Report> {
     for (const result of results) {
       (result.hands ?? []).forEach((events, k) => {
         const names: [string, string] = k === 0 ? [a, b] : [b, a];
+        const playedAt = new Date(started + (result.index * 2 + k) * 1000).toISOString();
         const record = handRecord(events, [], {
           sessionId: `arena-${options.seed}`,
           mode: CASH,
