@@ -1,0 +1,47 @@
+export interface PlateGeometry {
+  focusX: string;
+  focusY: string;
+  feltTilt: string;
+  opponentY: string;
+  boardY: string;
+  heroBottom: string;
+  cardScale: string;
+}
+
+export const LANDSCAPE: PlateGeometry = {
+  focusX: '50%',
+  focusY: '60%',
+  feltTilt: '56deg',
+  opponentY: '45%',
+  boardY: '70%',
+  heroBottom: '16px',
+  cardScale: 'clamp(48px, 4.6vw, 72px)',
+};
+
+export const PORTRAIT: PlateGeometry = {
+  focusX: '50%',
+  focusY: '55%',
+  feltTilt: '50deg',
+  opponentY: '39%',
+  boardY: '58%',
+  heroBottom: '118px',
+  cardScale: 'clamp(44px, 12vw, 56px)',
+};
+
+const NAMES: Record<keyof PlateGeometry, string> = {
+  focusX: 'focus-x',
+  focusY: 'focus-y',
+  feltTilt: 'felt-tilt',
+  opponentY: 'opponent-y',
+  boardY: 'board-y',
+  heroBottom: 'hero-bottom',
+  cardScale: 'card-scale',
+};
+
+export function geometryStyle(geometry: PlateGeometry, prefix: 'l' | 'p'): Record<string, string> {
+  const style: Record<string, string> = {};
+  for (const key of Object.keys(NAMES) as (keyof PlateGeometry)[]) {
+    style[`--${prefix}-${NAMES[key]}`] = geometry[key];
+  }
+  return style;
+}
