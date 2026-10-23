@@ -44,6 +44,16 @@ pub struct Preset {
     pub cfr: CfrParams,
 }
 
+#[derive(Serialize)]
+struct AbstractionIdentity<'a> {
+    small_blind: u32,
+    big_blind: u32,
+    stack: u32,
+    buckets: [u16; 3],
+    preflop: &'a PreflopSizes,
+    postflop: &'a PostflopSizes,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum PresetError {
     Parse(String),
@@ -70,6 +80,18 @@ impl Preset {
 
     pub fn canonical_toml(&self) -> String {
         toml::to_string(self).expect("preset serializes to toml")
+    }
+
+    pub fn abstraction_toml(&self) -> String {
+        let identity = AbstractionIdentity {
+            small_blind: self.small_blind,
+            big_blind: self.big_blind,
+            stack: self.stack,
+            buckets: self.buckets,
+            preflop: &self.preflop,
+            postflop: &self.postflop,
+        };
+        toml::to_string(&identity).expect("abstraction identity serializes to toml")
     }
 
     pub fn tree_buckets(&self) -> [u16; 4] {

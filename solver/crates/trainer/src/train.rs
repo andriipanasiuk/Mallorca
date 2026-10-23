@@ -22,6 +22,7 @@ const TABLES: [(&str, Street); 3] = [
     ("river.bkt", Street::River),
 ];
 const POLL: Duration = Duration::from_millis(50);
+const PAUSE_POLL: Duration = Duration::from_millis(1);
 const NIGHTS: [u64; 2] = [8, 10];
 
 #[derive(Args)]
@@ -196,14 +197,25 @@ struct Shared<'a, G: Game> {
     game: &'a G,
     storage: &'a Storage,
     cfr: &'a CfrParams,
-    counter: &'a AtomicU64,
+    claimed: &'a AtomicU64,
+    completed: &'a AtomicU64,
     end: u64,
     halt: &'a AtomicBool,
+    pause: &'a AtomicBool,
+    idle: &'a AtomicUsize,
 }
 
 fn work<G: Game>(s: &Shared<'_, G>, rng: &mut Rng) {
     while !s.halt.load(Ordering::Relaxed) {
-        let i = s.counter.fetch_add(1, Ordering::Relaxed);
+        if s.pause.load(Ordering::Acquire) {
+            s.idle.fetch_add(1, Ordering::AcqRel);
+            while s.pause.load(Ordering::Acquire) && !s.halt.load(Ordering::Relaxed) {
+                std::thread::sleep(PAUSE_POLL);
+            }
+            s.idle.fetch_sub(1, Ordering::AcqRel);
+            continue;
+        }
+        let i = s.claimed.fetch_add(1, Ordering::Relaxed);
         if i >= s.end {
             break;
         }
@@ -212,6 +224,21 @@ fn work<G: Game>(s: &Shared<'_, G>, rng: &mut Rng) {
         if done.is_multiple_of(s.cfr.discount_interval) {
             s.storage.discount(done / s.cfr.discount_interval, s.cfr);
         }
+        s.completed.fetch_add(1, Ordering::Release);
+    }
+}
+
+struct Finished<'a> {
+    count: &'a AtomicUsize,
+    halt: &'a AtomicBool,
+}
+
+impl Drop for Finished<'_> {
+    fn drop(&mut self) {
+        if std::thread::panicking() {
+            self.halt.store(true, Ordering::Relaxed);
+        }
+        self.count.fetch_add(1, Ordering::AcqRel);
     }
 }
 
@@ -306,11 +333,14 @@ pub fn train(
         start_elapsed,
         next,
     };
-    let counter = AtomicU64::new(start);
+    let claimed = AtomicU64::new(start);
+    let completed = AtomicU64::new(start);
     let end = session
         .iterations
         .map_or(u64::MAX, |n| start.saturating_add(n));
     let halt = AtomicBool::new(false);
+    let pause = AtomicBool::new(false);
+    let idle = AtomicUsize::new(0);
     let finished = AtomicUsize::new(0);
     let deadline = session.minutes.map(|m| Duration::from_secs(m * 60));
     let interval = Duration::from_secs(preset.checkpoint_minutes * 60);
@@ -318,32 +348,51 @@ pub fn train(
         game: &game,
         storage: &storage,
         cfr: &preset.cfr,
-        counter: &counter,
+        claimed: &claimed,
+        completed: &completed,
         end,
         halt: &halt,
+        pause: &pause,
+        idle: &idle,
     };
     println!("training with {threads} threads");
     let began = clock();
     let since = || clock().saturating_sub(began);
-    let current = || counter.load(Ordering::Relaxed).min(end);
+    let all_done = || finished.load(Ordering::Acquire) >= threads;
+    let quiescent = || idle.load(Ordering::Acquire) + finished.load(Ordering::Acquire) >= threads;
     let run: Result<(), String> = std::thread::scope(|scope| {
         for w in 0..threads {
             let shared = &shared;
-            let finished = &finished;
+            let guard = Finished {
+                count: &finished,
+                halt: &halt,
+            };
             let seed = session.seed ^ w as u64 ^ start.rotate_left(32);
             scope.spawn(move || {
+                let _guard = guard;
                 work(shared, &mut Rng::new(seed));
-                finished.fetch_add(1, Ordering::Relaxed);
             });
         }
         let mut last = Duration::ZERO;
-        while finished.load(Ordering::Relaxed) < threads {
+        while !all_done() {
             let elapsed = since();
             if stop.load(Ordering::Relaxed) || deadline.is_some_and(|d| elapsed >= d) {
                 break;
             }
-            if elapsed - last >= interval {
-                if let Err(e) = progress.checkpoint(&storage, current(), elapsed) {
+            if elapsed.saturating_sub(last) >= interval {
+                pause.store(true, Ordering::Release);
+                while !quiescent() {
+                    std::thread::sleep(PAUSE_POLL);
+                }
+                let saved = if halt.load(Ordering::Relaxed) {
+                    Ok(())
+                } else {
+                    progress
+                        .checkpoint(&storage, completed.load(Ordering::Acquire), elapsed)
+                        .map(|_| ())
+                };
+                pause.store(false, Ordering::Release);
+                if let Err(e) = saved {
                     halt.store(true, Ordering::Relaxed);
                     return Err(e);
                 }
@@ -356,7 +405,7 @@ pub fn train(
     });
     run?;
     let trained_for = since();
-    let iterations = current();
+    let iterations = completed.load(Ordering::Acquire);
     let path = progress.checkpoint(&storage, iterations, trained_for)?;
     Ok(Outcome {
         iterations,
@@ -614,6 +663,68 @@ mod tests {
         let resumed = go(&session(&dir, Some(10), 0, None)).unwrap();
         assert_eq!(resumed.iterations, stopped.iterations + 10);
         std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn periodic_snapshot_matches_a_run_of_its_iteration_count() {
+        let dir = data_dir("snapshot");
+        let calls = AtomicU64::new(0);
+        let stop = AtomicBool::new(false);
+        let stepping = || {
+            let n = calls.fetch_add(1, Ordering::Relaxed);
+            if n >= 12 {
+                stop.store(true, Ordering::Relaxed);
+            }
+            Duration::from_secs(60 * n)
+        };
+        train(&session(&dir, None, 7, Some(1)), &stepping, &stop).unwrap();
+        let ckpts = dir.join("checkpoints");
+        let periodic = (1..)
+            .map(|n| ckpts.join(format!("{n}.ckpt")))
+            .take_while(|p| p.exists())
+            .collect::<Vec<_>>();
+        assert!(periodic.len() >= 3, "{periodic:?}");
+        let snapshot = &periodic[periodic.len() - 2];
+        let count = header(snapshot).iterations;
+        assert!(count > 0);
+        let fresh = data_dir("snapshot-fresh");
+        go(&session(&fresh, Some(count), 7, Some(1))).unwrap();
+        let a = std::fs::read(snapshot).unwrap();
+        let b = std::fs::read(fresh.join("checkpoints/1.ckpt")).unwrap();
+        assert!(
+            a[66..] == b[66..],
+            "snapshot at {count} differs from a fresh run"
+        );
+        std::fs::remove_dir_all(dir).unwrap();
+        std::fs::remove_dir_all(fresh).unwrap();
+    }
+
+    #[test]
+    fn panicking_worker_counts_as_finished_and_halts_the_others() {
+        let count = AtomicUsize::new(0);
+        let halt = AtomicBool::new(false);
+        let joined = std::thread::scope(|scope| {
+            let clean = scope.spawn(|| {
+                let _guard = Finished {
+                    count: &count,
+                    halt: &halt,
+                };
+            });
+            clean.join().unwrap();
+            assert!(!halt.load(Ordering::Relaxed));
+            scope
+                .spawn(|| {
+                    let _guard = Finished {
+                        count: &count,
+                        halt: &halt,
+                    };
+                    std::panic::resume_unwind(Box::new("worker failed"));
+                })
+                .join()
+        });
+        assert!(joined.is_err());
+        assert_eq!(count.load(Ordering::Relaxed), 2);
+        assert!(halt.load(Ordering::Relaxed));
     }
 
     #[test]
