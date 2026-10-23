@@ -34,6 +34,41 @@ async function playToTheFlop(page: Page) {
   return boardCard;
 }
 
+test('the showdown result leaves both shown hands and the board visible', async ({ page }) => {
+  await page.goto(FAST_URL);
+  await byId(page, 'start').click();
+  for (;;) {
+    const waypoint = await waitForWaypoint(page);
+    if (waypoint === 'next-hand') {
+      break;
+    }
+    await byId(page, 'passive').click();
+  }
+  const opponentCards = byId(page, 'seat-1').getByTestId('card');
+  await expect(opponentCards).toHaveCount(2);
+  const result = await byId(page, 'result').boundingBox();
+  const covered = [];
+  for (const locator of [
+    opponentCards.first(),
+    opponentCards.last(),
+    byId(page, 'board'),
+    byId(page, 'seat-0').getByTestId('card').first(),
+  ]) {
+    const box = await locator.boundingBox();
+    if (
+      result !== null &&
+      box !== null &&
+      result.x < box.x + box.width &&
+      box.x < result.x + result.width &&
+      result.y < box.y + box.height &&
+      box.y < result.y + result.height
+    ) {
+      covered.push(await locator.getAttribute('data-testid'));
+    }
+  }
+  expect(covered).toEqual([]);
+});
+
 test('reduced motion turns off the deal animation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(FAST_URL);

@@ -72,7 +72,7 @@ export function Table({ vm, phase, humanSeat, log, onAct, onNextHand }: TablePro
         )}
       </div>
       {text !== null && (
-        <div class="result glass pill" data-testid="result">
+        <div class="result glass" data-testid="result">
           <span class="result-text">{text}</span>
           {phase === 'handOver' && (
             <button
