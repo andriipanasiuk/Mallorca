@@ -1,6 +1,7 @@
 use crate::cards::Card;
 use crate::eval::rank;
 use crate::iso::{street_indexers, HandIndexer};
+use crate::strategy::{StrategyError, StrategyFile};
 use crate::tree::Street;
 use std::sync::OnceLock;
 
@@ -110,6 +111,37 @@ impl Abstraction {
             indexers: street_indexers(),
             tables,
         }
+    }
+
+    pub fn from_strategy(file: &StrategyFile) -> Result<Abstraction, StrategyError> {
+        const POSTFLOP: [Street; 3] = [Street::Flop, Street::Turn, Street::River];
+        let mut tables: [Vec<u8>; 3] = Default::default();
+        let mut next = file.tables.iter();
+        for (slot, street) in tables.iter_mut().zip(POSTFLOP) {
+            if !file.includes(street) {
+                return Err(StrategyError::MissingStreet(street));
+            }
+            *slot = next
+                .next()
+                .ok_or(StrategyError::MissingStreet(street))?
+                .clone();
+        }
+        if next.next().is_some() {
+            return Err(StrategyError::Inconsistent);
+        }
+        let abstraction = Abstraction::new(tables);
+        let buckets = file.tree.buckets();
+        for street in POSTFLOP {
+            let table = abstraction.table_bytes(street);
+            if table.len() as u64 != abstraction.class_count(street) {
+                return Err(StrategyError::Inconsistent);
+            }
+            let limit = buckets[street.as_index()];
+            if table.iter().any(|&b| u16::from(b) >= limit) {
+                return Err(StrategyError::BucketOutOfRange(street));
+            }
+        }
+        Ok(abstraction)
     }
 
     pub fn bucket(&self, street: Street, hole: [Card; 2], board: &[Card]) -> u16 {

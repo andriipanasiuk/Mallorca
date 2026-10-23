@@ -11,6 +11,8 @@ pub enum StrategyError {
     UnknownVersion(u16),
     Truncated,
     Inconsistent,
+    MissingStreet(Street),
+    BucketOutOfRange(Street),
 }
 
 impl fmt::Display for StrategyError {
@@ -20,6 +22,15 @@ impl fmt::Display for StrategyError {
             StrategyError::UnknownVersion(v) => write!(f, "unknown strategy format version {v}"),
             StrategyError::Truncated => write!(f, "strategy file is truncated"),
             StrategyError::Inconsistent => write!(f, "strategy file is inconsistent"),
+            StrategyError::MissingStreet(street) => {
+                write!(f, "strategy file has no table for the {street:?}")
+            }
+            StrategyError::BucketOutOfRange(street) => {
+                write!(
+                    f,
+                    "strategy file has a {street:?} bucket beyond the tree's count"
+                )
+            }
         }
     }
 }

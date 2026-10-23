@@ -7,6 +7,7 @@ pub mod fingerprint;
 pub mod games;
 pub mod holdem;
 pub mod iso;
+pub mod measure;
 pub mod preset;
 pub mod rng;
 pub mod strategy;
