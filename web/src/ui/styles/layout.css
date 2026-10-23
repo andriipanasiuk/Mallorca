@@ -499,8 +499,22 @@ button {
 
 .action-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr 1.25fr;
+  grid-template-columns: 1fr 1fr 1.3fr;
   gap: var(--space-2);
+}
+
+.action-buttons .button {
+  min-height: 52px;
+  padding: var(--space-2) var(--space-2);
+  font-size: clamp(15px, 4.2vw, 20px);
+}
+
+.bet-slider .button-small {
+  padding: var(--space-1) var(--space-3);
+}
+
+.bet-range {
+  height: 6px;
 }
 
 .bet-slider {
@@ -590,6 +604,20 @@ button {
     right: var(--space-5);
     bottom: var(--space-5);
     width: 380px;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .action-buttons .button {
+    font-size: var(--font-size-large);
+  }
+
+  .action-buttons .button-raise {
+    grid-column: 1 / -1;
+    order: -1;
+    min-height: 56px;
   }
 
   .table-side {

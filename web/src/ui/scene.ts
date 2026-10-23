@@ -24,7 +24,7 @@ export const PORTRAIT: PlateGeometry = {
   feltTilt: '50deg',
   opponentY: '42%',
   boardY: '58%',
-  heroBottom: '118px',
+  heroBottom: '132px',
   cardScale: 'clamp(44px, 12vw, 56px)',
 };
 
