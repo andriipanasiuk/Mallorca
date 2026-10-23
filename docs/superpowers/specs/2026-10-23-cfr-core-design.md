@@ -22,7 +22,13 @@ This spec fixes the contracts later sub-projects depend on: the strategy file fo
 
 ## Goals
 
-- Game: heads-up NLHE cash, blinds 10/20, both stacks 2000 chips (100 bb) at the start of every hand.
+- Game: heads-up NLHE cash, blinds 10/20. Before every hand a seat with less than 2000 chips is topped up to
+  2000 and the other keeps its chips, so the effective stack is at least 100 bb and can be deeper (3500 against
+  2500 is 125 bb). The blueprint is trained at exactly 100 bb.
+- Deeper stacks in v1: preflop and flop play the 100 bb blueprint as if the chips beyond 100 bb were absent;
+  an all-in in the tree means the real remaining stack, and an opponent bet above 100 bb translates to the
+  tree's all-in. Turn and river are solved at the real depth by the subgame solver of sub-project 2.
+  Measurement reports how much this loses at 125 and 150 bb.
 - One full training run fits in one night (8 to 10 hours) on an M3 Pro with 12 cores and 18 GB of memory.
 - Every checkpoint gets a local best response figure in mbb/hand and a baseline match result in bb/100.
 - The spec documents how to improve the strategy and which number each change should move.
@@ -30,7 +36,9 @@ This spec fixes the contracts later sub-projects depend on: the strategy file fo
 ## Non-goals
 
 - WASM bindings, a server, the subgame solver, the TS `Brain`: sub-project 2.
-- Off-tree bet translation: sub-project 2. Evaluation opponents here use on-tree sizes only.
+- Off-tree bet translation and the play-time mapping of deeper stacks: sub-project 2. Evaluation opponents here
+  use on-tree sizes only.
+- Blueprints for depths other than 100 bb: a lever in section 8, not v1.
 - Difficulty levels: sub-project 3.
 - Cloud training: only if the measurements show the abstraction is the limit.
 - Code from b-inary/postflop-solver: reference reading only, its licence is likely AGPL.
@@ -200,6 +208,9 @@ probabilities    u8 per action per infoset, in tree order
   always call, always raise (the largest on-tree raise) and random (uniform over legal on-tree actions), and prints
   bb/100 with a 95% interval for each.
 - Every opponent here acts on the tree's sizes, so no bet translation is needed.
+- **Depth:** `lbr` and `match` take `--stack` (2000 by default). At a deeper stack both seats still act on the
+  100 bb tree, chip amounts of `RaiseTo` stay as in the tree, and an all-in commits the real remaining stack.
+  The runbook measures at 2000, 2500 and 3000 chips to show what the 100 bb blueprint loses at depth.
 
 ## 6. Testing
 
@@ -239,5 +250,9 @@ move. Change one lever at a time, record the preset, the figures and the run tim
    size multiplies the tree.
 6. **Vector CFR over public chance** (public chance sampling). Faster convergence per iteration; a larger rewrite
    of `cfr`.
-7. **Cloud.** Only when the levers above are spent and the memory or time limit of the local machine is the
+7. **Deeper blueprints.** Train presets with `stack` 3000 and 4000 and pick the nearest blueprint by effective
+   stack at the start of a hand. Worth it when the arena from #3 shows deep effective stacks are common and the
+   `--stack 2500` and `--stack 3000` figures are clearly worse than at 2000. Costs one night and one browser file
+   per depth.
+8. **Cloud.** Only when the levers above are spent and the memory or time limit of the local machine is the
    blocker.
