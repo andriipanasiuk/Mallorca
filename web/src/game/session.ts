@@ -24,6 +24,9 @@ import type {
 import type { HandCategory } from '../equity/index.ts';
 import { withFallback } from './botClient.ts';
 import type { BotClient } from './botClient.ts';
+import { handRecord, MATH_BOT, recordDecision } from './records/record.ts';
+import type { RecordedDecision } from './records/record.ts';
+import type { HandStore } from './records/store.ts';
 
 export type Phase =
   | 'idle'
@@ -52,6 +55,7 @@ export interface SessionState {
   seed: number;
   result: HandResult | null;
   session: { hands: number; net: number };
+  sessionId: string | null;
 }
 
 export interface SessionActions {
@@ -72,6 +76,7 @@ export interface SessionOptions {
   names: [string, string];
   startingStacks?: [number, number];
   mode: TableMode;
+  records?: { store: HandStore; sessionId: string; now: () => string };
 }
 
 function label(event: Extract<EngineEvent, { type: 'acted' }>): LogEntry {
@@ -167,6 +172,8 @@ export function createSession(options: SessionOptions): Session {
   let startStacks: [number, number] = [0, 0];
   let hands = 0;
   let topUps = 0;
+  let handEvents: EngineEvent[] = [];
+  let handDecisions: RecordedDecision[] = [];
   const timers = new Map<ReturnType<typeof setTimeout>, () => void>();
 
   const sleep = (ms: number): Promise<void> =>
@@ -208,6 +215,7 @@ export function createSession(options: SessionOptions): Session {
 
   return createStore<SessionState & SessionActions>((set, get) => {
     const record = (events: EngineEvent[]) => {
+      handEvents = [...handEvents, ...events];
       bot.observe(toObservations(events, botSeat));
       const lastActions: [LogEntry | null, LogEntry | null] = [...get().lastActions];
       for (const event of events) {
@@ -231,6 +239,18 @@ export function createSession(options: SessionOptions): Session {
       if (step.state.hand?.street === 'complete') {
         const { seats } = step.state;
         hands += 1;
+        if (options.records !== undefined) {
+          const { store, sessionId, now } = options.records;
+          const saved = handRecord(handEvents, handDecisions, {
+            sessionId,
+            mode: step.state.mode,
+            names,
+            humanSeat,
+            bot: MATH_BOT,
+            playedAt: now(),
+          });
+          store.add(saved).catch(() => {});
+        }
         const paid = (seat: SeatIndex) =>
           startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
         set({
@@ -244,8 +264,14 @@ export function createSession(options: SessionOptions): Session {
       }
     };
 
-    const play = (action: Action) => {
+    const play = (action: Action, decision: Decision | null = null) => {
       const step = apply(get().table, action);
+      if (decision !== null) {
+        const index = step.events.findIndex((event) => event.type === 'acted');
+        if (index >= 0) {
+          handDecisions = [...handDecisions, recordDecision(decision, handEvents.length + index)];
+        }
+      }
       set({ table: step.state });
       record(step.events);
       conclude(step);
@@ -283,7 +309,7 @@ export function createSession(options: SessionOptions): Session {
           }
         }
         const intent: Intent = decision === null ? { kind: 'passive' } : toIntent(decision.action);
-        play(resolveIntent(intent, legal));
+        play(resolveIntent(intent, legal), decision);
       }
     };
 
@@ -292,6 +318,8 @@ export function createSession(options: SessionOptions): Session {
       startStacks = [seats[0].stack, seats[1].stack];
       const step = startHand(get().table, rng);
       bot.reset();
+      handEvents = [];
+      handDecisions = [];
       set({ table: step.state, lastActions: [null, null], result: null });
       record(step.events);
       conclude(step);
@@ -308,6 +336,7 @@ export function createSession(options: SessionOptions): Session {
       seed,
       result: null,
       session: tally(initial),
+      sessionId: options.records?.sessionId ?? null,
       start(next) {
         epoch += 1;
         cancelTimers();

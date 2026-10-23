@@ -16,3 +16,5 @@ export { CASH, TOURNAMENT } from '../engine/index.ts';
 export type { HandCategory } from '../equity/index.ts';
 export type { RaiseControl, SeatView, ViewModel } from './viewModel.ts';
 export { toViewModel } from './viewModel.ts';
+export type { HandRecord, HandStore } from './records/index.ts';
+export { memoryStore, openHandStore, toPokerStars } from './records/index.ts';

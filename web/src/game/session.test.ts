@@ -4,6 +4,8 @@ import { CASH, legalActionsOf, toAct, TOURNAMENT } from '../engine/index.ts';
 import type { TableMode } from '../engine/index.ts';
 import type { BotClient } from './botClient.ts';
 import { inProcessBot } from './botClient.ts';
+import { memoryStore } from './records/store.ts';
+import type { HandStore } from './records/store.ts';
 import { createSession } from './session.ts';
 import type { Session } from './session.ts';
 import { callingBot, scriptedBot, shovingBot } from './testBot.ts';
@@ -426,5 +428,64 @@ describe('cash session', () => {
     expect(session.getState().table.mode).toEqual(CASH);
     await session.getState().start(TOURNAMENT);
     expect(session.getState().table.mode).toEqual(TOURNAMENT);
+  });
+});
+
+describe('session recording', () => {
+  const now = () => '2026-10-23T18:00:00.000Z';
+
+  function record(store: HandStore, bot: BotClient): Session {
+    return createSession({
+      bot,
+      seed: 7,
+      botDelayMs: 0,
+      humanSeat: 1,
+      names: ['Mallorca', 'You'],
+      mode: CASH,
+      records: { store, sessionId: 's1', now },
+    });
+  }
+
+  it('stores a record per hand with the bot decisions pointing at its acted events', async () => {
+    const store = memoryStore();
+    const session = record(store, shovingBot());
+    await session.getState().start();
+    expect(session.getState().sessionId).toBe('s1');
+    await session.getState().act({ kind: 'fold' });
+    await session.getState().nextHand();
+    await session.getState().act({ kind: 'fold' });
+    const records = await store.list();
+    expect(records.map((r) => r.id)).toEqual(['s1-1', 's1-2']);
+    expect(records[0]?.playedAt).toBe(now());
+    expect(records[0]?.humanSeat).toBe(1);
+    expect(records[0]?.bot).toEqual({ id: 'math', version: '1' });
+    expect(records[0]?.decisions.length).toBeGreaterThan(0);
+    for (const rec of records) {
+      for (const decision of rec.decisions) {
+        const event = rec.events[decision.eventIndex];
+        expect(event?.type).toBe('acted');
+        expect(event?.type === 'acted' && event.seat).toBe(0);
+      }
+    }
+  });
+
+  it('keeps dealing when the store rejects', async () => {
+    const store: HandStore = {
+      add: () => Promise.reject(new Error('quota')),
+      list: () => Promise.resolve([]),
+      clear: () => Promise.resolve(),
+    };
+    const session = record(store, shovingBot());
+    await session.getState().start();
+    await session.getState().act({ kind: 'fold' });
+    await session.getState().nextHand();
+    expect(session.getState().table.handNumber).toBe(2);
+    expect(session.getState().phase).toBe('humanToAct');
+  });
+
+  it('records nothing without records', async () => {
+    const session = open(shovingBot());
+    await session.getState().start();
+    expect(session.getState().sessionId).toBeNull();
   });
 });

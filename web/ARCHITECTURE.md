@@ -127,8 +127,21 @@ argument.
   blinds (from `rulesOf(mode).blinds`) and hand number; the `mode` (`cash` or `tournament`); `session` with
   `hands`, `netBb` and `bbPer100` (one decimal, null with no hands); the controls (`fold`, `passive` with its amount, `raise` with `min`, `max` and the
   presets `halfPot`, `pot` and `allIn`, and `enabled`); the result and the tournament winner.
+- `SessionOptions.records` is `{ store, sessionId, now }`; without it nothing is recorded and `sessionId` in the state is
+  null. The session collects the events of each hand from `beginHand` on and, when the hand completes, calls
+  `store.add(handRecord(...))` without awaiting it and ignores a rejection. A bot `Decision` is recorded with
+  `recordDecision`; its `eventIndex` is the index of the resulting `acted` event in the hand's events. The timeout
+  fallback plays without a decision and records none. `bot` is `MATH_BOT`, `playedAt` is `now()` at completion.
+- `game/records` holds `HandRecord` (version 1: id `<sessionId>-<handNumber>`, mode, names, human seat, bot, hole
+  cards, board, every engine event of the hand and the bot decisions with `evByAction` where a non-finite EV is
+  null) and `toPokerStars(records)`, which formats records as PokerStars hand history text.
+- `HandStore` has `add`, `list(sessionId?)` and `clear`. `list` returns records by `handNumber` ascending within one
+  session; across sessions it returns every record. `memoryStore()` is a map. `indexedDbStore()` uses database
+  `mallorca` version 1, object store `hands` keyed by `id` with index `sessionId`. `openHandStore()` returns the
+  IndexedDB store, or `memoryStore()` when `indexedDB` is undefined or fails to open.
 - For the ui, `game` re-exports `Card`, `formatCard`, `rankOf`, `suitOf`, `SeatIndex`, `LogEntry`, `HandCategory`,
-  `TableMode`, `CASH` and `TOURNAMENT`.
+  `TableMode`, `CASH` and `TOURNAMENT`, plus `HandRecord`, `HandStore`, `openHandStore`, `memoryStore` and
+  `toPokerStars`.
 
 ## ui
 
