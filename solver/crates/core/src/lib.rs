@@ -3,6 +3,7 @@ pub mod cards;
 pub mod cfr;
 pub mod eval;
 pub mod games;
+pub mod holdem;
 pub mod iso;
 pub mod preset;
 pub mod rng;

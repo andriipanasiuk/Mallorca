@@ -166,7 +166,10 @@ impl Tree {
             Node::Decision {
                 street, actions, ..
             } => {
-                debug_assert!(bucket < self.buckets[street.as_index()]);
+                assert!(
+                    bucket < self.buckets[street.as_index()],
+                    "bucket {bucket} out of range for {street:?}"
+                );
                 self.decision_offsets[node as usize] + u64::from(bucket) * actions.len() as u64
             }
             other => panic!("node {node} is not a decision: {other:?}"),
@@ -880,5 +883,16 @@ mod tests {
             assert_eq!(next, t.action_slot_count());
             assert_eq!(infosets, t.infoset_count());
         }
+    }
+
+    #[test]
+    #[should_panic(expected = "out of range")]
+    fn offset_rejects_out_of_range_bucket() {
+        let t = Tree::build(&tiny());
+        let street = match t.node(t.root()) {
+            Node::Decision { street, .. } => *street,
+            other => panic!("{other:?}"),
+        };
+        t.offset(t.root(), t.buckets()[street.as_index()]);
     }
 }
