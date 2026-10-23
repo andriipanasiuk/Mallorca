@@ -372,7 +372,7 @@ describe('cash session', () => {
     const next = session.getState();
     expect(next.table.seats[1].stack + (next.table.hand?.bets[1] ?? 0)).toBeGreaterThan(3400);
     expect(next.table.seats[0].stack + (next.table.hand?.bets[0] ?? 0)).toBe(2000);
-    expect(next.session.net + (next.table.hand?.bets[1] ?? 0)).toBe(state.session.net);
+    expect(next.session.net).toBe(state.session.net);
   });
 
   it('keeps playing after the human loses everything', async () => {
@@ -387,8 +387,24 @@ describe('cash session', () => {
     await over.nextHand();
     const state = session.getState();
     expect(state.table.seats[1].stack + (state.table.hand?.bets[1] ?? 0)).toBe(2000);
-    expect(state.session.net + (state.table.hand?.bets[1] ?? 0)).toBe(-2000);
+    expect(state.session.net).toBe(-2000);
     expect(state.session.hands).toBe(1);
+  });
+
+  it('keeps net constant during a hand and changes it only when the hand completes', async () => {
+    const session = open(callingBot(), { mode: CASH });
+    await session.getState().start();
+    const seen: number[] = [session.getState().session.net];
+    await session.getState().act({ kind: 'raise', to: 100 });
+    seen.push(session.getState().session.net);
+    expect(session.getState().phase).not.toBe('handOver');
+    expect(new Set(seen)).toEqual(new Set([0]));
+    while (session.getState().phase === 'humanToAct') {
+      await session.getState().act({ kind: 'passive' });
+    }
+    expect(session.getState().phase).toBe('handOver');
+    const { table, session: tallied } = session.getState();
+    expect(tallied.net).toBe(table.seats[1].stack - 2000);
   });
 
   it('leaves only between hands', async () => {
@@ -481,6 +497,33 @@ describe('session recording', () => {
     await session.getState().nextHand();
     expect(session.getState().table.handNumber).toBe(2);
     expect(session.getState().phase).toBe('humanToAct');
+  });
+
+  it('keeps dealing when the clock throws while recording', async () => {
+    const store = memoryStore();
+    const session = createSession({
+      bot: shovingBot(),
+      seed: 7,
+      botDelayMs: 0,
+      humanSeat: 1,
+      names: ['Mallorca', 'You'],
+      mode: CASH,
+      records: {
+        store,
+        sessionId: 's1',
+        now: () => {
+          throw new Error('clock');
+        },
+      },
+    });
+    await session.getState().start();
+    await session.getState().act({ kind: 'fold' });
+    expect(session.getState().phase).toBe('handOver');
+    expect(session.getState().result).not.toBeNull();
+    await session.getState().nextHand();
+    expect(session.getState().table.handNumber).toBe(2);
+    expect(session.getState().phase).toBe('humanToAct');
+    expect(await store.list()).toEqual([]);
   });
 
   it('records nothing without records', async () => {

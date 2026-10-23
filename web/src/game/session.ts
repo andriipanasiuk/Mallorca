@@ -210,7 +210,9 @@ export function createSession(options: SessionOptions): Session {
 
   const tally = (table: Table): SessionState['session'] => {
     const buyIn = table.mode.kind === 'cash' ? table.mode.buyIn : TOURNAMENT_STACK;
-    return { hands, net: table.seats[humanSeat].stack - buyIn - topUps };
+    const live = table.hand !== null && table.hand.street !== 'complete';
+    const stack = live ? startStacks[humanSeat] : table.seats[humanSeat].stack;
+    return { hands, net: stack - buyIn - topUps };
   };
 
   return createStore<SessionState & SessionActions>((set, get) => {
@@ -235,22 +237,31 @@ export function createSession(options: SessionOptions): Session {
       });
     };
 
+    const saveRecord = (tableMode: TableMode) => {
+      if (options.records === undefined) {
+        return;
+      }
+      const { store, sessionId, now } = options.records;
+      try {
+        const saved = handRecord(handEvents, handDecisions, {
+          sessionId,
+          mode: tableMode,
+          names,
+          humanSeat,
+          bot: MATH_BOT,
+          playedAt: now(),
+        });
+        store.add(saved).catch(() => {});
+      } catch {
+        return;
+      }
+    };
+
     const conclude = (step: { state: Table; events: EngineEvent[] }) => {
       if (step.state.hand?.street === 'complete') {
         const { seats } = step.state;
         hands += 1;
-        if (options.records !== undefined) {
-          const { store, sessionId, now } = options.records;
-          const saved = handRecord(handEvents, handDecisions, {
-            sessionId,
-            mode: step.state.mode,
-            names,
-            humanSeat,
-            bot: MATH_BOT,
-            playedAt: now(),
-          });
-          store.add(saved).catch(() => {});
-        }
+        saveRecord(step.state.mode);
         const paid = (seat: SeatIndex) =>
           startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
         set({
@@ -314,9 +325,12 @@ export function createSession(options: SessionOptions): Session {
     };
 
     const beginHand = (): Promise<void> => {
-      const { seats } = get().table;
-      startStacks = [seats[0].stack, seats[1].stack];
       const step = startHand(get().table, rng);
+      const { seats, hand } = step.state;
+      startStacks = [
+        seats[0].stack + (hand?.committed[0] ?? 0),
+        seats[1].stack + (hand?.committed[1] ?? 0),
+      ];
       bot.reset();
       handEvents = [];
       handDecisions = [];

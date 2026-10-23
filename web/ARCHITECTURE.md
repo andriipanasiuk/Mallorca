@@ -107,7 +107,7 @@ argument.
   from `handOver` to `sessionOver`, where `act` and `nextHand` do nothing; in any other mode or phase it is ignored.
 - `session` is `{ hands, net }` for the human seat: `hands` counts completed hands and
   `net = stack - buyIn - top-ups`, where `buyIn` is the mode's in cash and 2000 in a tournament. Mid-hand `net`
-  includes the blinds already posted; after a hand it is the result.
+  uses the stack at the start of the hand (after any top-up), so it changes only when a hand completes.
 - `Intent` is `fold`, `passive` (check or call) or `raise` with a target. `resolveIntent` turns it into a legal
   action: a raise is rounded and clamped into `legal.raise`, a fold becomes a check when checking is free.
 - `log` holds the `LogEntry` values of the tournament. `lastActions` holds one tag per seat for the current hand,
