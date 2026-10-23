@@ -57,4 +57,10 @@ describe('handHistory', () => {
     expect(entries).toContainEqual({ key: 'allIn', params: { seat: 1 } });
     expect(entries.at(-1)).toEqual({ key: 'winTournament', params: { seat: 1 } });
   });
+
+  it('describes a top-up', () => {
+    expect(handHistory([{ type: 'toppedUp', seat: 1, amount: 1400 }])).toEqual([
+      { key: 'toppedUp', params: { seat: 1, amount: 1400 } },
+    ]);
+  });
 });

@@ -2,7 +2,10 @@ import { fullDeck, shuffle } from '../cards/index.ts';
 import type { Rng } from '../cards/index.ts';
 import { applyAction, startHandWith } from './hand.ts';
 import { legalActions, otherSeat } from './legal.ts';
+import { rulesOf } from './rules.ts';
 import type { Action, EngineEvent, Hand, LegalActions, Seat, SeatIndex, Step } from './types.ts';
+
+export { BIG_BLINDS, blindsFor } from './rules.ts';
 
 export type TableMode = { kind: 'tournament' } | { kind: 'cash'; bigBlind: number; buyIn: number };
 
@@ -19,22 +22,6 @@ export interface Table {
   handNumber: number;
   hand: Hand | null;
   winner: SeatIndex | null;
-}
-
-export const BIG_BLINDS = [
-  20, 30, 40, 50, 60, 80, 100, 120, 160, 200, 240, 300, 400, 500, 600, 800, 1000, 1200, 1600, 2000,
-  2400,
-];
-
-const HANDS_PER_LEVEL = 10;
-
-export function blindsFor(handNumber: number): { small: number; big: number } {
-  const level = Math.min(
-    Math.max(Math.floor((handNumber - 1) / HANDS_PER_LEVEL), 0),
-    BIG_BLINDS.length - 1,
-  );
-  const big = BIG_BLINDS[level] as number;
-  return { small: Math.floor(big / 2), big };
 }
 
 export function createTable(
@@ -65,23 +52,25 @@ export function startHand(t: Table, rng: Rng): { state: Table; events: EngineEve
   }
   const handNumber = t.handNumber + 1;
   const button = t.handNumber === 0 ? t.button : otherSeat(t.button);
+  const rules = rulesOf(t.mode);
+  const prepared = rules.beforeHand(t.seats);
   const step = startHandWith(
-    t.seats,
+    prepared.seats,
     button,
-    blindsFor(handNumber),
+    rules.blinds(handNumber),
     shuffle(fullDeck(), rng),
     handNumber,
   );
-  return conclude({ ...t, button, handNumber }, step);
+  const concluded = conclude({ ...t, button, handNumber }, step);
+  return { state: concluded.state, events: [...prepared.events, ...concluded.events] };
 }
 
 function conclude(t: Table, step: Step): { state: Table; events: EngineEvent[] } {
   const events = [...step.events];
   let winner: SeatIndex | null = null;
   if (step.hand.street === 'complete') {
-    const broke = step.seats[0].stack === 0 ? 0 : step.seats[1].stack === 0 ? 1 : null;
-    if (broke !== null) {
-      winner = otherSeat(broke);
+    winner = rulesOf(t.mode).isOver(step.seats);
+    if (winner !== null) {
       events.push({ type: 'tournamentEnded', winner });
     }
   }

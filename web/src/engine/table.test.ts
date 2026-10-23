@@ -68,7 +68,13 @@ describe('table', () => {
       { name: 'Mallorca', stack: 2000 },
       { name: 'You', stack: 2000 },
     ]);
-    expect(t).toMatchObject({ button: 0, handNumber: 0, hand: null, winner: null });
+    expect(t).toMatchObject({
+      mode: TOURNAMENT,
+      button: 0,
+      handNumber: 0,
+      hand: null,
+      winner: null,
+    });
     expect(toAct(t)).toBeNull();
     expect(legalActionsOf(t)).toEqual({ fold: false, check: false, call: null, raise: null });
   });
@@ -154,5 +160,30 @@ describe('table', () => {
       t = shoveHand(startHand(t, rng).state).state;
     }
     expect(() => startHand(t, rng)).toThrow();
+  });
+
+  it('keeps a cash session going after a bust and tops the seat up on the next hand', () => {
+    const rng = mulberry32(3);
+    let t = createTable(['Mallorca', 'You'], CASH);
+    let events: EngineEvent[] = [];
+    for (let i = 0; i < 500 && !t.seats.some((s) => s.stack === 0); i++) {
+      const played = shoveHand(startHand(t, rng).state);
+      t = played.state;
+      events = played.events;
+    }
+    const busted = t.seats[0].stack === 0 ? 0 : 1;
+    expect(t.seats[busted].stack).toBe(0);
+    expect(t.winner).toBeNull();
+    expect(events.map((e) => e.type)).not.toContain('tournamentEnded');
+    const next = startHand(t, rng);
+    const types = next.events.map((e) => e.type);
+    expect(types[0]).toBe('toppedUp');
+    expect(types.indexOf('toppedUp')).toBeLessThan(types.indexOf('handStarted'));
+    expect(next.events[0]).toEqual({ type: 'toppedUp', seat: busted, amount: 2000 });
+    const handStarted = next.events.find((e) => e.type === 'handStarted') as Extract<
+      EngineEvent,
+      { type: 'handStarted' }
+    >;
+    expect(handStarted.stacks[busted]).toBe(2000);
   });
 });

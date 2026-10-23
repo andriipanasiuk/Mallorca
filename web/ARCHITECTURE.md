@@ -68,6 +68,10 @@ argument.
 - `startHand(t, rng)` and `apply(t, action)` both end the tournament when a hand completes with an empty stack:
   they set `winner` and append `tournamentEnded`. A hand can complete inside `startHand` when a short stack is
   all-in from the blinds.
+- `rulesOf(mode)` returns `Rules`: `blinds(handNumber)`, `beforeHand(seats)` and `isOver(seats)`. Tournament rules use
+  `blindsFor`, no top-up, and end when a seat is empty. Cash rules use fixed blinds of half and full `bigBlind`,
+  top every seat below `buyIn` up to it before the hand and emit `toppedUp { seat, amount }` ahead of `handStarted`,
+  and never end the table. `startHand` and `apply` take the blinds and the winner from the rules.
 - `blindsFor(handNumber)` raises the level every 10 hands and holds the last level.
 - `handHistory(events)` returns `LogEntry` values, `{ key, params }`, with seat indices in `params.seat` and no
   names or English text. `key` is a locale key under `log` (with `you` or `other` for entries that have a seat);

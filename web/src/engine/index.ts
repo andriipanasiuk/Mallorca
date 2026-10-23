@@ -23,5 +23,7 @@ export {
   toAct,
   TOURNAMENT,
 } from './table.ts';
+export type { Rules } from './rules.ts';
+export { rulesOf } from './rules.ts';
 export type { LogEntry } from './history.ts';
 export { handHistory } from './history.ts';

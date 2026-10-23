@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { fullDeck, mulberry32, shuffle } from '../cards/index.ts';
 import { applyAction, startHandWith } from './hand.ts';
 import { legalActions } from './legal.ts';
-import type { Action, LegalActions, SeatIndex, Step } from './types.ts';
+import { apply, CASH, createTable, legalActionsOf, startHand, toAct } from './table.ts';
+import type { Table } from './table.ts';
+import type { Action, EngineEvent, LegalActions, SeatIndex, Step } from './types.ts';
 
 const MAX_ACTIONS = 50;
 const MAX_ACTIONS_WITH_MIN_RAISES = 800;
@@ -151,6 +153,48 @@ describe('hand properties', () => {
         expect(pot).toBe(2 * Math.min(paid[0], paid[1]));
       }),
       { numRuns: 300 },
+    );
+  });
+});
+
+describe('cash table properties', () => {
+  it('starts every hand with at least the buy-in, topped-up seats exactly at it, and conserves chips', () => {
+    fc.assert(
+      fc.property(
+        fc.integer(),
+        fc.array(fc.nat(), { minLength: 1, maxLength: 60 }),
+        (seed, choices) => {
+          const rng = mulberry32(seed);
+          let t: Table = createTable(['A', 'B'], CASH);
+          let toppedUp = 0;
+          let picks = 0;
+          for (let hand = 0; hand < 30; hand++) {
+            const started = startHand(t, rng);
+            const events: EngineEvent[] = [...started.events];
+            let state = started.state;
+            const topped = started.events.filter((e) => e.type === 'toppedUp');
+            for (const e of topped) toppedUp += e.amount;
+            const handStarted = events.find((e) => e.type === 'handStarted') as Extract<
+              EngineEvent,
+              { type: 'handStarted' }
+            >;
+            expect(handStarted.stacks[0]).toBeGreaterThanOrEqual(2000);
+            expect(handStarted.stacks[1]).toBeGreaterThanOrEqual(2000);
+            for (const e of topped) expect(handStarted.stacks[e.seat]).toBe(2000);
+            while (toAct(state) !== null) {
+              const available = options(legalActionsOf(state));
+              const pick = available[
+                (choices[picks++ % choices.length] as number) % available.length
+              ] as Action;
+              state = apply(state, pick).state;
+            }
+            expect(state.winner).toBeNull();
+            expect(state.seats[0].stack + state.seats[1].stack).toBe(4000 + toppedUp);
+            t = state;
+          }
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 });

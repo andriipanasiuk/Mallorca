@@ -49,6 +49,8 @@ function describeEvent(event: EngineEvent): LogEntry[] {
       return [{ key: 'returned', params: { seat: event.seat, amount: event.amount } }];
     case 'potAwarded':
       return [{ key: 'win', params: { seat: event.seat, amount: event.amount } }];
+    case 'toppedUp':
+      return [{ key: 'toppedUp', params: { seat: event.seat, amount: event.amount } }];
     case 'tournamentEnded':
       return [{ key: 'winTournament', params: { seat: event.winner } }];
     case 'holeCards':
