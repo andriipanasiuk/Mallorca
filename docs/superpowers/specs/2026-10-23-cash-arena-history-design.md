@@ -29,8 +29,9 @@ Out of scope: the CFR brain, difficulty levels, server storage, the coach panel.
 | Arena            | Node CLI, duplicate pairs, worker threads, JSON report, optional saving of hands                |
 | Engine structure | `Tournament` generalises to `Table` with mode rules                                             |
 
-With the top-up rule the effective stack before every cash hand is exactly 100 bb, the depth the CFR strategy
-is trained for.
+With the top-up rule the effective stack before every cash hand is at least 100 bb. It is above 100 bb when
+the short seat wins without being topped up, for example 4000 against 2000 becoming 3500 against 2500. The CFR
+strategy (#4) has to cover effective stacks above 100 bb.
 
 ## Engine
 
@@ -80,8 +81,8 @@ The brain reads blinds and stacks from `handStarted`, so `brains` needs no chang
 
 Tests: the tournament tests move to `Table` with unchanged expectations. New tests cover the cash blinds, the
 top-up of one or both seats, a cash table never having a winner, and `toppedUp` in the log. A property test
-plays random cash hands and checks that both stacks before every hand are at least `buyIn` and the smaller
-one equals it.
+plays random cash hands and checks that both stacks before every hand are at least `buyIn` and a topped-up
+seat holds exactly `buyIn`.
 
 ## Session and UI
 
