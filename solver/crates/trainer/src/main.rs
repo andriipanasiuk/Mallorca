@@ -1,3 +1,4 @@
+mod buckets;
 mod tree;
 
 use clap::{Parser, Subcommand};
@@ -12,12 +13,14 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    Buckets(buckets::BucketsArgs),
     Tree(tree::TreeArgs),
 }
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let result = match cli.command {
+        Command::Buckets(args) => buckets::run(&args),
         Command::Tree(args) => tree::run(&args),
     };
     match result {
