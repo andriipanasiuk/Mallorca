@@ -3,6 +3,11 @@ import { createSession, workerBot } from './game/index.ts';
 import type { Session } from './game/index.ts';
 import { App } from './ui/App.tsx';
 import { t } from './ui/i18n.ts';
+import '@fontsource/cormorant-garamond/latin-500.css';
+import '@fontsource/cormorant-garamond/latin-600.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
 import './ui/styles/tokens.css';
 import './ui/styles/layout.css';
 

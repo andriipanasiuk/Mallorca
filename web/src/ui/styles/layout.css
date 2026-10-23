@@ -476,6 +476,7 @@ button {
   --board-y: var(--p-board-y);
   --hero-bottom: var(--p-hero-bottom);
   --card-scale: var(--p-card-scale);
+  --card-width: var(--card-scale);
 
   position: fixed;
   inset: 0;
@@ -526,7 +527,26 @@ button {
     --board-y: var(--l-board-y);
     --hero-bottom: var(--l-hero-bottom);
     --card-scale: var(--l-card-scale);
+    --card-width: var(--card-scale);
 
     background-image: var(--l-blur);
   }
+}
+
+.glass {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.1);
+  backdrop-filter: blur(var(--blur-glass)) saturate(1.1);
+  box-shadow: var(--shadow-panel);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass {
+    background: var(--color-surface);
+  }
+}
+
+.pill {
+  border-radius: var(--radius-pill);
 }

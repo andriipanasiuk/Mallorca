@@ -33,6 +33,9 @@
     "vitest": "^5.0.5"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
     "i18next": "^26.5.6",
     "phe": "^0.6.0",
     "preact": "^11.0.1",
