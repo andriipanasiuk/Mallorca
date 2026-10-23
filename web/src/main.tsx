@@ -45,10 +45,7 @@ function mount(): void {
     names: [t('seat.you'), t('seat.bot')],
     mode: TOURNAMENT,
   });
-  render(
-    <App session={session} humanSeat={HUMAN_SEAT} onNewTournament={mount} />,
-    root as HTMLElement,
-  );
+  render(<App session={session} humanSeat={HUMAN_SEAT} onNewGame={mount} />, root as HTMLElement);
 }
 
 mount();

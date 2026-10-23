@@ -137,14 +137,14 @@ argument.
 - Every string comes from `src/locales/en.json` through i18next (`ui/i18n.ts`). `ui/phrases.ts` words log
   entries, action tags and hand categories; an entry with the human seat uses the `log.you` keys, any other seat
   the `log.other` keys with `{{name}}`.
-- `main.tsx` reads two query parameters: `?seed=<n>` fixes the tournament seed and `?botDelay=<ms>` sets the bot
+- `signed` in `ui` formats a bb value as sign and one-decimal absolute value. `main.tsx` reads two query parameters: `?seed=<n>` fixes the tournament seed and `?botDelay=<ms>` sets the bot
   pause (700 ms by default). The human sits in seat 0.
 - Keyboard: `f` folds, `c` checks or calls, `r` raises, the arrow keys move the raise amount.
-- `data-testid` contract for e2e and contact sheets: `start`, `blinds`, `hand-number`, `new-tournament`,
+- `data-testid` contract for e2e and contact sheets: `start-cash`, `start-tournament`, `blinds`, `session-result`, `hand-number`, `leave`, `new-game`,
   `seat-<i>`, `stack-<i>` (with `data-stack`), `bet-<i>`, `action-<i>`, `thinking-<i>`, `card` (with
   `data-card`), `card-back`, `board`, `pot` (with `data-amount`), `result`, `next-hand`, `fold`, `passive`,
   `raise`, `raise-amount`, `preset-half`, `preset-pot`, `preset-allin`, `hand-log`, `coach`, `live-region`,
-  `tournament-over` and `play-again`.
+  `tournament-over`, `session-over`, `session-summary`, `session-rate` and `play-again`.
 
 ## Conventions
 

@@ -6,6 +6,7 @@ import { ActionBar } from './ActionBar.tsx';
 import { fixtureResult } from './fixtures.ts';
 import { StartScreen } from './StartScreen.tsx';
 import { Table } from './Table.tsx';
+import { SessionOver } from './SessionOver.tsx';
 import { TournamentOver } from './TournamentOver.tsx';
 import { viewModel } from './fixtures.ts';
 
@@ -146,6 +147,12 @@ describe('copy', () => {
     expectFromLocale(render(<TournamentOver won onPlayAgain={vi.fn()} />).container);
     cleanup();
     expectFromLocale(render(<TournamentOver won={false} onPlayAgain={vi.fn()} />).container);
+    cleanup();
+    expectFromLocale(
+      render(
+        <SessionOver session={{ hands: 3, netBb: 4.5, bbPer100: 150 }} onPlayAgain={vi.fn()} />,
+      ).container,
+    );
   });
 
   it('the hand log is checked and text outside en.json fails the check', () => {

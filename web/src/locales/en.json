@@ -4,15 +4,18 @@
   },
   "start": {
     "heading": "Heads-up against Mallorca",
-    "tagline": "No-limit hold'em, 2000 chips each, blinds rise every 10 hands. Last player with chips wins.",
-    "cta": "Start tournament"
+    "tagline": "Heads-up no-limit hold'em. A cash game with 100 big blinds, or a tournament with rising blinds.",
+    "cash": "Cash game, 100 big blinds",
+    "tournament": "Tournament"
   },
   "status": {
     "blinds": "Blinds {{small}}/{{big}}",
     "hand": "Hand {{number}}",
     "seed": "Seed {{seed}}",
     "menu": "Menu",
-    "newTournament": "New tournament"
+    "newGame": "New game",
+    "result": "{{sign}}{{bb}} bb",
+    "leave": "Leave table"
   },
   "seat": {
     "you": "You",
@@ -92,6 +95,12 @@
   "over": {
     "won": "You won the tournament",
     "lost": "You lost the tournament",
+    "again": "Play again"
+  },
+  "session": {
+    "title": "Session over",
+    "summary": "{{sign}}{{bb}} bb over {{hands}} hands",
+    "rate": "{{rate}} bb/100",
     "again": "Play again"
   },
   "hands": {
