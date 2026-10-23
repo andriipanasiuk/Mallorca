@@ -1,6 +1,8 @@
 pub mod abstraction;
 pub mod cards;
+pub mod cfr;
 pub mod eval;
+pub mod games;
 pub mod iso;
 pub mod preset;
 pub mod rng;
