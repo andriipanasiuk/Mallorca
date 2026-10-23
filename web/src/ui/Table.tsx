@@ -12,6 +12,7 @@ export interface TableProps {
   phase: Phase;
   humanSeat: SeatIndex;
   log: LogEntry[];
+  autoNextMs?: number | null;
   onAct: (intent: Intent) => void;
   onNextHand: () => void;
 }
@@ -42,7 +43,15 @@ function chipsDirection(winner: SeatIndex | null, humanSeat: SeatIndex): string 
   return winner === humanSeat ? 'to-bottom' : 'to-top';
 }
 
-export function Table({ vm, phase, humanSeat, log, onAct, onNextHand }: TableProps) {
+export function Table({
+  vm,
+  phase,
+  humanSeat,
+  log,
+  autoNextMs = null,
+  onAct,
+  onNextHand,
+}: TableProps) {
   const botSeat: SeatIndex = humanSeat === 0 ? 1 : 0;
   const botWaiting = phase === 'botThinking' || phase === 'animating';
   const text = resultText(vm, humanSeat);
@@ -77,7 +86,8 @@ export function Table({ vm, phase, humanSeat, log, onAct, onNextHand }: TablePro
           {phase === 'handOver' && (
             <button
               type="button"
-              class="button button-primary"
+              class={`button button-primary${autoNextMs === null ? '' : ' next-hand-auto'}`}
+              style={autoNextMs === null ? undefined : { '--auto-next-ms': `${autoNextMs}ms` }}
               data-testid="next-hand"
               onClick={onNextHand}
             >

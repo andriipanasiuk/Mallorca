@@ -1,6 +1,23 @@
 export type TableStyle = 'room' | 'simple';
 
 const KEY = 'mallorca.tableStyle';
+const AUTO_NEXT_KEY = 'mallorca.autoNext';
+
+export function readAutoNext(): boolean {
+  try {
+    return localStorage.getItem(AUTO_NEXT_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+export function writeAutoNext(on: boolean): void {
+  try {
+    localStorage.setItem(AUTO_NEXT_KEY, on ? 'on' : 'off');
+  } catch {
+    return;
+  }
+}
 
 export function readTableStyle(): TableStyle {
   try {

@@ -45,7 +45,7 @@ export const test = base.extend<{ problems: string[] }>({
 
 export { expect };
 
-export const FAST_URL = '/?seed=42&botDelay=0';
+export const FAST_URL = '/?seed=42&botDelay=0&autoNext=off';
 export const TOTAL_CHIPS = 4000;
 
 export function byId(page: Page, id: string): Locator {

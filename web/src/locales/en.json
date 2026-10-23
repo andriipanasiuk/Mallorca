@@ -14,7 +14,8 @@
     "seed": "Seed {{seed}}",
     "menu": "Menu",
     "newTournament": "New tournament",
-    "simpleTable": "Simple table"
+    "simpleTable": "Simple table",
+    "autoNext": "Auto next hand"
   },
   "seat": {
     "you": "You",

@@ -83,6 +83,16 @@ test('leaving for tonight returns to a farewell start screen', async ({ page }) 
   await expect(byId(page, 'farewell')).toHaveCount(0);
 });
 
+test('the next hand starts by itself after a fold', async ({ page }) => {
+  await page.goto('/?seed=42&botDelay=0');
+  await byId(page, 'start').click();
+  await expect(byId(page, 'fold')).toBeEnabled();
+  await byId(page, 'fold').click();
+  await expect(byId(page, 'next-hand')).toBeVisible();
+  await expect(byId(page, 'hand-number')).toHaveText('Hand 2', { timeout: 3000 });
+  await expect(byId(page, 'next-hand')).toHaveCount(0);
+});
+
 test('reloading in the middle of a hand shows the start screen', async ({ page }) => {
   await page.goto(FAST_URL);
   await byId(page, 'start').click();

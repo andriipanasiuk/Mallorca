@@ -30,6 +30,7 @@ function randomSeed(): number {
 }
 
 const botDelay = numberParam('botDelay') ?? DEFAULT_BOT_DELAY;
+const autoNext = params.get('autoNext') !== 'off';
 let nextSeed: number | null = numberParam('seed');
 let session: Session | null = null;
 
@@ -54,6 +55,7 @@ function mount(farewell = false): void {
       session={session}
       humanSeat={HUMAN_SEAT}
       farewell={farewell}
+      autoNext={autoNext}
       onNewTournament={() => mount()}
       onLeave={() => mount(true)}
     />,

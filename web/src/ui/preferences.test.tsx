@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { readTableStyle, writeTableStyle } from './preferences.ts';
+import { readAutoNext, readTableStyle, writeAutoNext, writeTableStyle } from './preferences.ts';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -30,5 +30,27 @@ describe('table style preference', () => {
     vi.stubGlobal('localStorage', { getItem: blocked, setItem: blocked });
     expect(() => writeTableStyle('simple')).not.toThrow();
     expect(readTableStyle()).toBe('room');
+  });
+});
+
+describe('auto next hand preference', () => {
+  it('is on by default', () => {
+    expect(readAutoNext()).toBe(true);
+  });
+
+  it('remembers turning it off and on', () => {
+    writeAutoNext(false);
+    expect(readAutoNext()).toBe(false);
+    writeAutoNext(true);
+    expect(readAutoNext()).toBe(true);
+  });
+
+  it('stays on when storage throws', () => {
+    const blocked = () => {
+      throw new Error('blocked');
+    };
+    vi.stubGlobal('localStorage', { getItem: blocked, setItem: blocked });
+    expect(() => writeAutoNext(false)).not.toThrow();
+    expect(readAutoNext()).toBe(true);
   });
 });

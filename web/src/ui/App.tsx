@@ -2,7 +2,8 @@ import { useEffect, useState } from 'preact/hooks';
 import { toViewModel } from '../game/index.ts';
 import type { Intent, Session, SeatIndex } from '../game/index.ts';
 import { HandLog } from './HandLog.tsx';
-import { readTableStyle, writeTableStyle } from './preferences.ts';
+import { nextHandDelay } from './autoNext.ts';
+import { readAutoNext, readTableStyle, writeAutoNext, writeTableStyle } from './preferences.ts';
 import type { TableStyle } from './preferences.ts';
 import { t } from './i18n.ts';
 import { Scene } from './Scene.tsx';
@@ -16,6 +17,7 @@ export interface AppProps {
   onNewTournament: () => void;
   onLeave: () => void;
   farewell?: boolean;
+  autoNext?: boolean;
 }
 
 function useSessionState(session: Session) {
@@ -27,7 +29,14 @@ function useSessionState(session: Session) {
   return state;
 }
 
-export function App({ session, humanSeat, onNewTournament, onLeave, farewell = false }: AppProps) {
+export function App({
+  session,
+  humanSeat,
+  onNewTournament,
+  onLeave,
+  farewell = false,
+  autoNext = true,
+}: AppProps) {
   const state = useSessionState(session);
   const [tableStyle, setTableStyle] = useState<TableStyle>(readTableStyle);
   const simple = tableStyle === 'simple';
@@ -36,6 +45,26 @@ export function App({ session, humanSeat, onNewTournament, onLeave, farewell = f
     writeTableStyle(next);
     setTableStyle(next);
   };
+  const [autoNextOn, setAutoNextOn] = useState(readAutoNext);
+  const toggleAutoNext = () => {
+    writeAutoNext(!autoNextOn);
+    setAutoNextOn(!autoNextOn);
+  };
+  const handOver = state.phase === 'handOver';
+  const autoNextMs =
+    autoNext && autoNextOn && handOver ? nextHandDelay(toViewModel(state, humanSeat)) : null;
+  const handNumber = handOver ? toViewModel(state, humanSeat).handNumber : null;
+  useEffect(() => {
+    if (autoNextMs === null) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      if (session.getState().phase === 'handOver') {
+        void session.getState().nextHand();
+      }
+    }, autoNextMs);
+    return () => clearTimeout(timer);
+  }, [session, autoNextMs, handNumber]);
   if (state.phase === 'idle') {
     return (
       <StartScreen
@@ -70,6 +99,15 @@ export function App({ session, humanSeat, onNewTournament, onLeave, farewell = f
                 />
                 <span>{t('status.simpleTable')}</span>
               </label>
+              <label class="menu-toggle">
+                <input
+                  type="checkbox"
+                  data-testid="auto-next"
+                  checked={autoNextOn}
+                  onChange={toggleAutoNext}
+                />
+                <span>{t('status.autoNext')}</span>
+              </label>
               <span>{t('status.seed', { seed: state.seed })}</span>
               <button
                 type="button"
@@ -94,6 +132,7 @@ export function App({ session, humanSeat, onNewTournament, onLeave, farewell = f
           humanSeat={humanSeat}
           log={state.log}
           onAct={act}
+          autoNextMs={autoNextMs}
           onNextHand={() => void session.getState().nextHand()}
         />
         {state.phase === 'tournamentOver' && (

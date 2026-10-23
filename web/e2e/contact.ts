@@ -69,7 +69,7 @@ async function capture(browser: Browser, device: (typeof DEVICES)[number]): Prom
     return page;
   };
 
-  const page = await open('seed=42&botDelay=0');
+  const page = await open('seed=42&botDelay=0&autoNext=off');
   await snap(page, 'start', shots);
   await id(page, 'start').click();
   await nextWaypoint(page);
@@ -93,7 +93,7 @@ async function capture(browser: Browser, device: (typeof DEVICES)[number]): Prom
   }
   await snap(page, 'showdown', shots);
 
-  const slow = await open(`seed=42&botDelay=${THINKING_DELAY_MS}`);
+  const slow = await open(`seed=42&botDelay=${THINKING_DELAY_MS}&autoNext=off`);
   await id(slow, 'start').click();
   await id(slow, 'passive').and(slow.locator(':enabled')).waitFor();
   await id(slow, 'passive').click();

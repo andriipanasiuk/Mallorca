@@ -66,6 +66,28 @@ describe('Table result and announcements', () => {
     expect(view.container.querySelector('.result-chips-split')).not.toBeNull();
   });
 
+  it('shows the countdown on Next hand while auto next hand is on', () => {
+    render(
+      <Table
+        vm={fixtureResult()}
+        phase="handOver"
+        humanSeat={0}
+        log={[]}
+        autoNextMs={2000}
+        onAct={vi.fn()}
+        onNextHand={vi.fn()}
+      />,
+    );
+    const button = screen.getByTestId('next-hand');
+    expect(button.classList.contains('next-hand-auto')).toBe(true);
+    expect(button.getAttribute('style')).toContain('--auto-next-ms: 2000ms');
+  });
+
+  it('shows a plain Next hand when auto next hand is off', () => {
+    table(fixtureResult(), 'handOver');
+    expect(screen.getByTestId('next-hand').classList.contains('next-hand-auto')).toBe(false);
+  });
+
   it('announces the bot thinking state', () => {
     const vm = viewModel({ enabled: false });
     vm.seats[1].isToAct = true;
