@@ -109,6 +109,15 @@ impl Preset {
         if post.max_aggressive == 0 {
             return invalid("max_aggressive must be positive");
         }
+        if self.threads == 0 {
+            return invalid("threads must be positive");
+        }
+        if self.checkpoint_minutes == 0 {
+            return invalid("checkpoint_minutes must be positive");
+        }
+        if self.cfr.discount_interval == 0 {
+            return invalid("discount_interval must be positive");
+        }
         Ok(())
     }
 }
@@ -194,6 +203,9 @@ mod tests {
             ("all_in_threshold = 0.6667", "all_in_threshold = 0.0"),
             ("first_raise_pot = [1.0]", "first_raise_pot = [-1.0]"),
             ("open_bb = 2.5", "open_bb = 0.5"),
+            ("threads = 12", "threads = 0"),
+            ("checkpoint_minutes = 60", "checkpoint_minutes = 0"),
+            ("discount_interval = 1000000", "discount_interval = 0"),
         ] {
             let s = V1.replace(from, to);
             assert!(

@@ -1,7 +1,9 @@
 pub mod abstraction;
 pub mod cards;
 pub mod cfr;
+pub mod checkpoint;
 pub mod eval;
+pub mod fingerprint;
 pub mod games;
 pub mod holdem;
 pub mod iso;

@@ -125,6 +125,10 @@ impl Abstraction {
         }
     }
 
+    pub fn class_count(&self, street: Street) -> u64 {
+        self.indexers[street.as_index()].size(1)
+    }
+
     pub fn table_bytes(&self, street: Street) -> &[u8] {
         &self.tables[street.as_index() - 1]
     }
@@ -287,6 +291,14 @@ mod tests {
                 assert_eq!(a, b);
             }
         }
+    }
+
+    #[test]
+    fn class_counts_match_table_sizes() {
+        let abstraction = Abstraction::new([vec![], vec![], vec![]]);
+        assert_eq!(abstraction.class_count(Street::Flop), 1_286_792);
+        assert_eq!(abstraction.class_count(Street::Turn), 13_960_050);
+        assert_eq!(abstraction.class_count(Street::River), 123_156_254);
     }
 
     #[test]
