@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { EngineEvent, SeatIndex } from '../../src/engine/index.ts';
 import { BOTS } from './bots.ts';
+import type { BotName } from './bots.ts';
 import { playPair } from './match.ts';
 
 const hole = (hand: EngineEvent[], seat: SeatIndex) =>
@@ -30,6 +31,26 @@ describe('playPair', () => {
     for (const hand of hands) {
       const ended = hand.find((e) => e.type === 'handEnded');
       expect(ended?.type === 'handEnded' ? ended.stacks[0] + ended.stacks[1] : null).toBe(4000);
+    }
+  });
+
+  it('net is the first bot gain over both hands, recomputed from the events', () => {
+    const finalStacks = (hand: EngineEvent[]) => {
+      const ended = hand.find((e) => e.type === 'handEnded');
+      if (ended?.type !== 'handEnded') throw new Error('no handEnded');
+      return ended.stacks;
+    };
+    const cases: [BotName, BotName, number, number, number][] = [
+      ['random', 'always-raise', 1, 0, -80],
+      ['random', 'always-raise', 1, 1, -160],
+      ['random', 'always-call', 7, 5, -70],
+      ['always-raise', 'always-call', 1, 0, 0],
+    ];
+    for (const [a, b, seed, index, expected] of cases) {
+      const { net, hands } = playPair(BOTS[a], BOTS[b], seed, index);
+      const recomputed = finalStacks(hands[0]!)[0] - 2000 + (finalStacks(hands[1]!)[1] - 2000);
+      expect(net).toBe(recomputed);
+      expect(net).toBe(expected);
     }
   });
 });
