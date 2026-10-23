@@ -20,7 +20,7 @@ web/
 | -------- | ------------------------------------- |
 | `cards`  | nothing                               |
 | `equity` | `cards`                               |
-| `engine` | `cards`                               |
+| `engine` | `cards`, `equity`                     |
 | `brains` | `cards`, `equity`, `engine`           |
 | `game`   | `cards`, `equity`, `engine`, `brains` |
 | `ui`     | `game`                                |

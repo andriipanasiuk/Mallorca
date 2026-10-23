@@ -37,7 +37,7 @@ export default tseslint.config(
   },
   layer('cards', []),
   layer('equity', ['cards']),
-  layer('engine', ['cards']),
+  layer('engine', ['cards', 'equity']),
   layer('brains', ['cards', 'equity', 'engine']),
   layer('game', ['cards', 'equity', 'engine', 'brains']),
   layer('ui', ['game']),
