@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CASH } from '../../engine/index.ts';
 import type { HandStore } from './store.ts';
 import { memoryStore, openHandStore } from './store.ts';
@@ -50,6 +50,23 @@ function describeStore(name: string, make: () => Promise<HandStore>) {
 describeStore('memoryStore', () => Promise.resolve(memoryStore()));
 
 describe('openHandStore', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('falls back to a memory store when the open request is blocked', async () => {
+    const request: { onblocked?: () => void } = {};
+    vi.stubGlobal('indexedDB', {
+      open: () => {
+        queueMicrotask(() => request.onblocked?.());
+        return request;
+      },
+    });
+    const store = await openHandStore();
+    await store.add(sample('s1', 1));
+    expect(await store.list()).toHaveLength(1);
+  });
+
   it('falls back to a memory store without indexedDB', async () => {
     const store = await openHandStore();
     await store.add(sample('s1', 1));

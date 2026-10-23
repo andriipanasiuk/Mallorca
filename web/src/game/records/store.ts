@@ -55,8 +55,10 @@ export function indexedDbStore(): Promise<HandStore> {
       store.createIndex('sessionId', 'sessionId');
     };
     opening.onerror = () => reject(opening.error ?? new Error('indexedDB open failed'));
+    opening.onblocked = () => reject(new Error('indexedDB open blocked'));
     opening.onsuccess = () => {
       const db = opening.result;
+      db.onversionchange = () => db.close();
       resolve({
         async add(record) {
           const tx = db.transaction(STORE, 'readwrite');
