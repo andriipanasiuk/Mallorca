@@ -102,7 +102,8 @@
     "exportText": "Export history as text",
     "exportAllJson": "Export all hands as data",
     "exportAllText": "Export all hands as text",
-    "clear": "Clear history"
+    "clear": "Clear history",
+    "clearConfirm": "Tap again to clear"
   },
   "session": {
     "title": "Session over",

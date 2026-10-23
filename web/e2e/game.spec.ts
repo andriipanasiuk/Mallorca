@@ -126,5 +126,8 @@ test('hand history is exported, persists across a reload and is cleared', async 
   await page.locator('summary.menu-summary').click();
   expect((await downloadJson(page, 'export-all-json')).length).toBeGreaterThanOrEqual(2);
   await byId(page, 'clear-history').click();
+  await expect(byId(page, 'clear-history')).toHaveText('Tap again to clear');
+  expect((await downloadJson(page, 'export-all-json')).length).toBeGreaterThanOrEqual(2);
+  await byId(page, 'clear-history').click();
   expect(await downloadJson(page, 'export-all-json')).toEqual([]);
 });

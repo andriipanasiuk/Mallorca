@@ -5,7 +5,7 @@ import { App } from './App.tsx';
 
 afterEach(cleanup);
 
-function setup(mode = TOURNAMENT) {
+function setup(mode = TOURNAMENT, store = memoryStore()) {
   const session = createSession({
     bot: inProcessBot(),
     seed: 42,
@@ -15,7 +15,7 @@ function setup(mode = TOURNAMENT) {
     mode,
   });
   const onNewGame = vi.fn();
-  render(<App session={session} store={memoryStore()} humanSeat={0} onNewGame={onNewGame} />);
+  render(<App session={session} store={store} humanSeat={0} onNewGame={onNewGame} />);
   return { session, onNewGame };
 }
 
@@ -74,6 +74,32 @@ describe('App', () => {
     await waitFor(() => expect(session.getState().phase).toBe('humanToAct'));
     expect(screen.queryByTestId('leave')).toBeNull();
     expect(screen.queryByTestId('session-result')).toBeNull();
+    session.getState().dispose();
+  });
+
+  it('clears the history only on the second tap and resets when the menu closes', async () => {
+    const store = memoryStore();
+    const clear = vi.spyOn(store, 'clear');
+    const { session } = setup(CASH, store);
+    fireEvent.click(screen.getByTestId('start-cash'));
+    await waitFor(() => expect(session.getState().phase).toBe('humanToAct'));
+    const button = screen.getByTestId('clear-history');
+    expect(button.textContent).toBe('Clear history');
+    fireEvent.click(button);
+    expect(clear).not.toHaveBeenCalled();
+    expect(screen.getByTestId('clear-history').textContent).toBe('Tap again to clear');
+    const menu = document.querySelector('details.menu') as HTMLDetailsElement;
+    menu.open = true;
+    menu.open = false;
+    fireEvent(menu, new Event('toggle'));
+    await waitFor(() =>
+      expect(screen.getByTestId('clear-history').textContent).toBe('Clear history'),
+    );
+    fireEvent.click(screen.getByTestId('clear-history'));
+    expect(clear).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId('clear-history'));
+    await waitFor(() => expect(clear).toHaveBeenCalledOnce());
+    expect(screen.getByTestId('clear-history').textContent).toBe('Clear history');
     session.getState().dispose();
   });
 });

@@ -27,6 +27,7 @@ function useSessionState(session: Session) {
 
 export function App({ session, store, humanSeat, onNewGame }: AppProps) {
   const state = useSessionState(session);
+  const [confirmClear, setConfirmClear] = useState(false);
   if (state.phase === 'idle') {
     return (
       <StartScreen seed={state.seed} onStart={(mode) => void session.getState().start(mode)} />
@@ -59,7 +60,14 @@ export function App({ session, store, humanSeat, onNewGame }: AppProps) {
             {t('status.leave')}
           </button>
         )}
-        <details class="menu">
+        <details
+          class="menu"
+          onToggle={(event) => {
+            if (!(event.currentTarget as HTMLDetailsElement).open) {
+              setConfirmClear(false);
+            }
+          }}
+        >
           <summary class="menu-summary">{t('status.menu')}</summary>
           <div class="menu-body">
             <span>{t('status.seed', { seed: state.seed })}</span>
@@ -91,9 +99,16 @@ export function App({ session, store, humanSeat, onNewGame }: AppProps) {
               type="button"
               class="button button-small"
               data-testid="clear-history"
-              onClick={() => void clearHistory(store)}
+              onClick={() => {
+                if (!confirmClear) {
+                  setConfirmClear(true);
+                  return;
+                }
+                setConfirmClear(false);
+                void clearHistory(store);
+              }}
             >
-              {t('history.clear')}
+              {t(confirmClear ? 'history.clearConfirm' : 'history.clear')}
             </button>
           </div>
         </details>
