@@ -9,3 +9,5 @@ advices_sng/
 .project
 logs
 .gradle/
+.superpowers/
+node_modules/
