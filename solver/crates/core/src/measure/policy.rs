@@ -22,7 +22,7 @@ fn kinds(tree: &Tree, node: NodeId) -> impl Iterator<Item = ActionKind> + '_ {
     actions.iter().map(|(kind, _)| *kind)
 }
 
-fn passive(tree: &Tree, node: NodeId) -> usize {
+pub(crate) fn passive(tree: &Tree, node: NodeId) -> usize {
     kinds(tree, node)
         .position(|k| matches!(k, ActionKind::Check | ActionKind::Call))
         .unwrap_or(0)

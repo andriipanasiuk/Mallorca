@@ -19,7 +19,7 @@ pub struct HandOutcome {
     pub chips: [i64; 2],
 }
 
-fn visible(street: Street) -> usize {
+pub(crate) fn visible(street: Street) -> usize {
     match street {
         Street::Preflop => 0,
         Street::Flop => 3,
@@ -28,11 +28,75 @@ fn visible(street: Street) -> usize {
     }
 }
 
-fn committed_at(tree: &Tree, node: NodeId) -> [u32; 2] {
+pub(crate) fn committed_at(tree: &Tree, node: NodeId) -> [u32; 2] {
     match tree.node(node) {
         Node::Decision { committed, .. }
         | Node::Fold { committed, .. }
         | Node::Showdown { committed } => *committed,
+    }
+}
+
+pub(crate) fn deal(rng: &mut Rng) -> [Card; 9] {
+    let mut deck: [Card; 52] = std::array::from_fn(|i| i as Card);
+    rng.shuffle(&mut deck);
+    deck[..9].try_into().expect("nine cards")
+}
+
+pub(crate) fn holes(deck: &[Card; 9]) -> [[Card; 2]; 2] {
+    [[deck[1], deck[3]], [deck[0], deck[2]]]
+}
+
+pub(crate) fn start(tree: &Tree, stack: u32) -> [u32; 2] {
+    committed_at(tree, tree.root()).map(|c| c.min(stack))
+}
+
+pub(crate) fn commit(
+    tree: &Tree,
+    kind: ActionKind,
+    next: NodeId,
+    committed: [u32; 2],
+    me: usize,
+    stack: u32,
+) -> u32 {
+    match kind {
+        ActionKind::Fold | ActionKind::Check => committed[me],
+        ActionKind::Call => committed[1 - me].min(stack),
+        ActionKind::RaiseTo(_) => committed_at(tree, next)[me].min(stack),
+        ActionKind::AllIn => stack,
+    }
+}
+
+pub(crate) fn settle(
+    tree: &Tree,
+    node: NodeId,
+    committed: [u32; 2],
+    hole: &[[Card; 2]; 2],
+    board: &[Card],
+) -> Option<[i64; 2]> {
+    match tree.node(node) {
+        Node::Decision { .. } => None,
+        Node::Fold { folder, .. } => {
+            let loser = usize::from(*folder);
+            let lost = i64::from(committed[loser]);
+            let mut chips = [0i64; 2];
+            chips[loser] = -lost;
+            chips[1 - loser] = lost;
+            Some(chips)
+        }
+        Node::Showdown { .. } => {
+            let at_risk = i64::from(committed[0].min(committed[1]));
+            let strength = |seat: usize| {
+                let mut cards = [0 as Card; 7];
+                cards[..2].copy_from_slice(&hole[seat]);
+                cards[2..].copy_from_slice(board);
+                rank(&cards)
+            };
+            Some(match strength(0).cmp(&strength(1)) {
+                std::cmp::Ordering::Greater => [at_risk, -at_risk],
+                std::cmp::Ordering::Less => [-at_risk, at_risk],
+                std::cmp::Ordering::Equal => [0, 0],
+            })
+        }
     }
 }
 
@@ -43,71 +107,42 @@ pub fn play_detailed(
     stack: u32,
     rng: &mut Rng,
 ) -> HandOutcome {
-    let hole = [[deck[1], deck[3]], [deck[0], deck[2]]];
+    let hole = holes(deck);
     let board = &deck[4..9];
     let mut node = tree.root();
-    let mut committed = committed_at(tree, node).map(|c| c.min(stack));
+    let mut committed = start(tree, stack);
     loop {
-        match tree.node(node) {
-            Node::Decision {
-                seat,
-                street,
-                actions,
-                ..
-            } => {
-                let me = usize::from(*seat);
-                let view = SeatView {
-                    hole: hole[me],
-                    board: board[..visible(*street)].to_vec(),
-                    street: *street,
-                };
-                let choice = policies[me].act(node, &view, rng);
-                assert!(
-                    choice < actions.len(),
-                    "policy chose action {choice} of {} at node {node}",
-                    actions.len()
-                );
-                let (kind, next) = actions[choice];
-                committed[me] = match kind {
-                    ActionKind::Fold | ActionKind::Check => committed[me],
-                    ActionKind::Call => committed[1 - me].min(stack),
-                    ActionKind::RaiseTo(_) => committed_at(tree, next)[me].min(stack),
-                    ActionKind::AllIn => stack,
-                };
-                node = next;
-            }
-            Node::Fold { folder, .. } => {
-                let loser = usize::from(*folder);
-                let lost = i64::from(committed[loser]);
-                let mut chips = [0i64; 2];
-                chips[loser] = -lost;
-                chips[1 - loser] = lost;
-                return HandOutcome {
-                    node,
-                    committed,
-                    chips,
-                };
-            }
-            Node::Showdown { .. } => {
-                let at_risk = i64::from(committed[0].min(committed[1]));
-                let strength = |seat: usize| {
-                    let mut cards = [0 as Card; 7];
-                    cards[..2].copy_from_slice(&hole[seat]);
-                    cards[2..].copy_from_slice(board);
-                    rank(&cards)
-                };
-                let chips = match strength(0).cmp(&strength(1)) {
-                    std::cmp::Ordering::Greater => [at_risk, -at_risk],
-                    std::cmp::Ordering::Less => [-at_risk, at_risk],
-                    std::cmp::Ordering::Equal => [0, 0],
-                };
-                return HandOutcome {
-                    node,
-                    committed,
-                    chips,
-                };
-            }
+        if let Some(chips) = settle(tree, node, committed, &hole, board) {
+            return HandOutcome {
+                node,
+                committed,
+                chips,
+            };
         }
+        let Node::Decision {
+            seat,
+            street,
+            actions,
+            ..
+        } = tree.node(node)
+        else {
+            unreachable!("settle returns None only for decisions");
+        };
+        let me = usize::from(*seat);
+        let view = SeatView {
+            hole: hole[me],
+            board: board[..visible(*street)].to_vec(),
+            street: *street,
+        };
+        let choice = policies[me].act(node, &view, rng);
+        assert!(
+            choice < actions.len(),
+            "policy chose action {choice} of {} at node {node}",
+            actions.len()
+        );
+        let (kind, next) = actions[choice];
+        committed[me] = commit(tree, kind, next, committed, me, stack);
+        node = next;
     }
 }
 
@@ -133,9 +168,7 @@ pub fn duplicate_match(
     let mut rng = Rng::new(seed);
     let mut stats = Stats::new();
     for _ in 0..deals {
-        let mut deck: [Card; 52] = std::array::from_fn(|i| i as Card);
-        rng.shuffle(&mut deck);
-        let nine: [Card; 9] = deck[..9].try_into().expect("nine cards");
+        let nine = deal(&mut rng);
         let first = play_hand(tree, &nine, [a, b], stack, &mut rng);
         let second = play_hand(tree, &nine, [b, a], stack, &mut rng);
         stats.push((first[0] + second[1]) as f64);

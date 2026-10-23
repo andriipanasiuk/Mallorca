@@ -1,5 +1,6 @@
 const HANDS_PER_DEAL: f64 = 2.0;
 const Z95: f64 = 1.96;
+const MILLI: f64 = 1000.0;
 
 #[derive(Debug, Clone, Default)]
 pub struct Stats {
@@ -49,6 +50,10 @@ pub fn bb_per_100(chips_per_deal: f64, big_blind: u32) -> f64 {
     chips_per_deal / HANDS_PER_DEAL / f64::from(big_blind) * 100.0
 }
 
+pub fn mbb_per_hand(chips_per_hand: f64, big_blind: u32) -> f64 {
+    chips_per_hand / f64::from(big_blind) * MILLI
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -90,5 +95,11 @@ mod tests {
     fn chips_per_deal_convert_to_bb_per_100() {
         assert!((bb_per_100(40.0, 20) - 100.0).abs() < 1e-12);
         assert!((bb_per_100(-8.0, 20) - -20.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn chips_per_hand_convert_to_mbb_per_hand() {
+        assert!((mbb_per_hand(20.0, 20) - 1000.0).abs() < 1e-12);
+        assert!((mbb_per_hand(-3.0, 20) - -150.0).abs() < 1e-12);
     }
 }

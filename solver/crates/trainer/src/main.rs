@@ -1,5 +1,6 @@
 mod buckets;
 mod export;
+mod lbr;
 mod measure;
 mod train;
 mod tree;
@@ -24,6 +25,7 @@ enum Command {
     Train(train::TrainArgs),
     Calibrate(train::CalibrateArgs),
     Export(export::ExportArgs),
+    Lbr(lbr::LbrArgs),
     Match(measure::MatchArgs),
 }
 
@@ -47,6 +49,7 @@ fn main() -> ExitCode {
         Command::Train(args) => catch_ctrl_c().and_then(|()| train::run(&args, &STOP)),
         Command::Calibrate(args) => catch_ctrl_c().and_then(|()| train::calibrate(&args, &STOP)),
         Command::Export(args) => export::run(&args),
+        Command::Lbr(args) => lbr::run(&args),
         Command::Match(args) => measure::run(&args),
     };
     match result {

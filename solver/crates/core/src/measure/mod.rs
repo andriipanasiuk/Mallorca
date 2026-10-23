@@ -1,3 +1,4 @@
+pub mod lbr;
 pub mod play;
 pub mod policy;
 pub mod stats;
