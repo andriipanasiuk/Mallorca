@@ -59,7 +59,7 @@ function runInProcess(input: WorkerInput): WorkerResult[] {
   });
 }
 
-function runInWorker(input: WorkerInput): Promise<WorkerResult[]> {
+export function runInWorker(input: WorkerInput): Promise<WorkerResult[]> {
   return new Promise((resolve, reject) => {
     const results: WorkerResult[] = [];
     const worker = new Worker(new URL('./worker.ts', import.meta.url), { workerData: input });
@@ -72,6 +72,11 @@ function runInWorker(input: WorkerInput): Promise<WorkerResult[]> {
 }
 
 export async function runArena(options: ArenaOptions): Promise<Report> {
+  for (const name of [options.a, options.b]) {
+    if (!Object.hasOwn(BOTS, name)) {
+      throw new Error(`unknown bot "${name}", choose from: ${Object.keys(BOTS).join(', ')}`);
+    }
+  }
   const started = Date.now();
   const playedAt = new Date(started).toISOString();
   const a = options.a as BotName;

@@ -29,12 +29,25 @@ for (const name of [values.a, values.b]) {
   }
 }
 
+function integerFlag(name: string, raw: string, min: number): number {
+  const value = Number(raw);
+  if (raw.trim() === '' || !Number.isInteger(value) || value < min) {
+    console.error(`--${name} must be an integer of at least ${min}, got "${raw}"`);
+    process.exit(1);
+  }
+  return value;
+}
+
+const pairs = integerFlag('pairs', values.pairs, 1);
+const seed = integerFlag('seed', values.seed, 0);
+const workers = integerFlag('workers', values.workers, 1);
+
 const report = await runArena({
   a: values.a,
   b: values.b,
-  pairs: Number(values.pairs),
-  seed: Number(values.seed),
-  workers: Number(values.workers),
+  pairs,
+  seed,
+  workers,
   saveHands: values['save-hands'],
 });
 

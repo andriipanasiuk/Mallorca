@@ -172,7 +172,7 @@ argument.
   chips of the first bot, `stats.ts` turns pair nets into bb/100 and a 95% interval.
 - `run.ts` splits pair indices into contiguous chunks, runs them in process (one worker) or in `worker_threads`
   (`worker.ts`), gathers results in index order and builds the `Report`; the result does not depend on the worker
-  count. `cli.ts` parses flags, writes `--out` and `--save-hands` and prints one line.
+  count. `run.ts` also writes `--save-hands`; `cli.ts` validates flags, writes `--out` and prints one line.
 
 ## Conventions
 

@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { runArena } from './run.ts';
+import { runArena, runInWorker } from './run.ts';
 
 const webDir = fileURLToPath(new URL('../../', import.meta.url));
 
@@ -64,7 +64,37 @@ describe('arena cli', () => {
   });
 });
 
+describe('numeric flags', () => {
+  it.each([
+    ['--pairs', 'abc'],
+    ['--pairs', '0'],
+    ['--pairs', '-5'],
+    ['--pairs', '2.5'],
+    ['--workers', 'abc'],
+    ['--workers', '0'],
+    ['--seed', '-1'],
+    ['--seed', '1.5'],
+  ])('%s %s exits with 1', (flag, value) => {
+    const r = cli([flag, value]);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain(flag);
+    expect(r.stdout).toBe('');
+  });
+});
+
 describe('runArena', () => {
+  it('rejects an unknown bot', async () => {
+    await expect(runArena({ a: 'nope', b: 'math', pairs: 2, seed: 1, workers: 1 })).rejects.toThrow(
+      /unknown bot "nope"/,
+    );
+  });
+
+  it('rejects when a worker throws', async () => {
+    await expect(
+      runInWorker({ a: 'nope' as 'math', b: 'math', seed: 1, indices: [0], withHands: false }),
+    ).rejects.toThrow();
+  });
+
   it('runs in process', async () => {
     const report = await runArena({ a: 'math', b: 'always-call', pairs: 20, seed: 1, workers: 1 });
     expect(report.hands).toBe(40);
