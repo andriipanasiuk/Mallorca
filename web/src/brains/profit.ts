@@ -125,40 +125,21 @@ export interface ProfitCorrections {
   readonly postflopBet: number;
 }
 
+export interface SolverRequest {
+  readonly game: GameContext;
+  readonly info: HandState;
+  readonly effectiveStack: number;
+  readonly pot: number;
+  readonly spectrum: Spectrum;
+  readonly hero: HoleCards;
+  readonly strength: StrengthManager;
+  readonly isHeroOnButton: boolean;
+}
+
 export interface GameSolver {
-  onFirstActionPreflop(
-    game: GameContext,
-    info: HandState,
-    effectiveStack: number,
-    pot: number,
-    spectrum: Spectrum,
-    hero: HoleCards,
-    strength: StrengthManager,
-    isHeroOnButton: boolean,
-    bigBlind: number,
-  ): ActionDistribution;
-  onFirstAction(
-    game: GameContext,
-    info: HandState,
-    effectiveStack: number,
-    pot: number,
-    spectrum: Spectrum,
-    hero: HoleCards,
-    strength: StrengthManager,
-    wasVillainPreviousAggressive: boolean,
-    isHeroOnButton: boolean,
-  ): ActionDistribution;
-  onSecondAction(
-    game: GameContext,
-    info: HandState,
-    effectiveStack: number,
-    pot: number,
-    toCall: number,
-    spectrum: Spectrum,
-    hero: HoleCards,
-    strength: StrengthManager,
-    isHeroOnButton: boolean,
-  ): ActionDistribution;
+  onFirstActionPreflop(request: SolverRequest, bigBlind: number): ActionDistribution;
+  onFirstAction(request: SolverRequest, wasVillainPreviousAggressive: boolean): ActionDistribution;
+  onSecondAction(request: SolverRequest, toCall: number): ActionDistribution;
 }
 
 export function profitMap(
@@ -171,54 +152,24 @@ export function profitMap(
 ): ActionDistribution {
   const onButton = situation.isHeroOnButton;
   const amountToCall = situation.amountToCall;
-  if (game.street === PREFLOP) {
-    if (onButton && situation.heroActionCount === 0) {
-      return solver.onFirstActionPreflop(
-        game,
-        situation,
-        game.bankRollAtRisk,
-        game.pot,
-        spectrum,
-        hero,
-        strength,
-        true,
-        game.bigBlind,
-      );
-    }
-    return solver.onSecondAction(
-      game,
-      situation,
-      game.bankRollAtRisk,
-      game.pot,
-      amountToCall,
-      spectrum,
-      hero,
-      strength,
-      onButton,
-    );
-  }
-  if (amountToCall === 0 && !onButton) {
-    return solver.onFirstAction(
-      game,
-      situation,
-      game.bankRollAtRisk,
-      game.pot,
-      spectrum,
-      hero,
-      strength,
-      situation.wasVillainPreviousAggressive,
-      onButton,
-    );
-  }
-  return solver.onSecondAction(
+  const request: SolverRequest = {
     game,
-    situation,
-    game.bankRollAtRisk,
-    game.pot,
-    amountToCall,
+    info: situation,
+    effectiveStack: game.bankRollAtRisk,
+    pot: game.pot,
     spectrum,
     hero,
     strength,
-    onButton,
-  );
+    isHeroOnButton: onButton,
+  };
+  if (game.street === PREFLOP) {
+    if (onButton && situation.heroActionCount === 0) {
+      return solver.onFirstActionPreflop(request, game.bigBlind);
+    }
+    return solver.onSecondAction(request, amountToCall);
+  }
+  if (amountToCall === 0 && !onButton) {
+    return solver.onFirstAction(request, situation.wasVillainPreviousAggressive);
+  }
+  return solver.onSecondAction(request, amountToCall);
 }

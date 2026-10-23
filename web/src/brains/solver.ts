@@ -3,12 +3,12 @@ import { getOptimal } from './adviceFromMap.ts';
 import type { AggressionInfo, GameContext } from './handState.ts';
 import { HandState, PREFLOP, RIVER } from './handState.ts';
 import { preflopStrengthVsSpectrum } from './preflopEquilator.ts';
-import type { ActionDistribution, GameSolver } from './profit.ts';
+import type { ActionDistribution, GameSolver, SolverRequest } from './profit.ts';
 import { call, check, createBetAction, createRaiseAction, fold, RandomVariable } from './profit.ts';
 import type { HoleCards } from './spectrum.ts';
 import { Spectrum } from './spectrum.ts';
 import { SpectrumEquilator } from './spectrumEquilator.ts';
-import type { StreetName, StrengthManager, StrengthMap } from './strength.ts';
+import type { StreetName, StrengthMap } from './strength.ts';
 import type { VillainModel } from './villainModel.ts';
 
 const STREET_NAMES: readonly StreetName[] = ['preflop', 'flop', 'turn', 'river'];
@@ -129,18 +129,9 @@ export class NLGameSolver implements GameSolver {
     this.villainModel = villainModel;
   }
 
-  onFirstActionPreflop(
-    game: GameContext,
-    info: AggressionInfo,
-    effectiveStack: number,
-    pot: number,
-    spectrum: Spectrum,
-    hero: HoleCards,
-    strength: StrengthManager,
-    isHeroOnButton: boolean,
-    bigBlind: number,
-  ): ActionDistribution {
-    const hand = this.hand(game, hero, isHeroOnButton, strength);
+  onFirstActionPreflop(request: SolverRequest, bigBlind: number): ActionDistribution {
+    const hand = this.hand(request);
+    const { info, effectiveStack, pot, spectrum } = request;
     const wasVillainPreviousAggressive = false;
     const result: ActionDistribution = [];
     result.push({ action: fold(), profit: RandomVariable.constant(0) });
@@ -168,18 +159,9 @@ export class NLGameSolver implements GameSolver {
     return result;
   }
 
-  onFirstAction(
-    game: GameContext,
-    info: AggressionInfo,
-    effectiveStack: number,
-    pot: number,
-    spectrum: Spectrum,
-    hero: HoleCards,
-    strength: StrengthManager,
-    wasVillainPreviousAggressive: boolean,
-    isHeroOnButton: boolean,
-  ): ActionDistribution {
-    const hand = this.hand(game, hero, isHeroOnButton, strength);
+  onFirstAction(request: SolverRequest, wasVillainPreviousAggressive: boolean): ActionDistribution {
+    const hand = this.hand(request);
+    const { info, effectiveStack, pot, spectrum } = request;
     const result: ActionDistribution = [];
     result.push({ action: fold(), profit: RandomVariable.constant(0) });
     const checkProfit = this.heroActionProfit(
@@ -205,18 +187,9 @@ export class NLGameSolver implements GameSolver {
     return result;
   }
 
-  onSecondAction(
-    game: GameContext,
-    info: AggressionInfo,
-    effectiveStack: number,
-    pot: number,
-    toCall: number,
-    spectrum: Spectrum,
-    hero: HoleCards,
-    strength: StrengthManager,
-    isHeroOnButton: boolean,
-  ): ActionDistribution {
-    const hand = this.hand(game, hero, isHeroOnButton, strength);
+  onSecondAction(request: SolverRequest, toCall: number): ActionDistribution {
+    const hand = this.hand(request);
+    const { info, effectiveStack, pot, spectrum } = request;
     return this.secondActionRecursive(
       hand,
       { info, effectiveStack, pot, heroInvestment: 0, spectrum },
@@ -250,12 +223,7 @@ export class NLGameSolver implements GameSolver {
     return result;
   }
 
-  private hand(
-    game: GameContext,
-    hero: HoleCards,
-    onButton: boolean,
-    strength: StrengthManager,
-  ): Hand {
+  private hand({ game, hero, isHeroOnButton: onButton, strength }: SolverRequest): Hand {
     const street = game.street;
     const strengthMap = this.villainModel.needsEquity
       ? strength.map(STREET_NAMES[street] ?? 'preflop')

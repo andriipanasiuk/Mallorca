@@ -34,6 +34,7 @@ export type {
   ProfitCorrections,
   SolverAction,
   SolverActionType,
+  SolverRequest,
 } from './profit.ts';
 export { createRaiseAction, profitMap, RandomVariable } from './profit.ts';
 export { NLGameSolver, ShowdownGameSolver } from './solver.ts';
