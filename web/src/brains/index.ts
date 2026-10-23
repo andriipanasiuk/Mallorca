@@ -28,6 +28,12 @@ export { getOptimal, LessVarianceActionFromMap } from './adviceFromMap.ts';
 export type { Brain, Decision, MathBrainOptions } from './brain.ts';
 export { createMathBrain } from './brain.ts';
 export { preprocessAction, toLegalAction } from './preprocess.ts';
-export type { ActionDistribution, GameSolver, ProfitCorrections, SolverAction } from './profit.ts';
+export type {
+  ActionDistribution,
+  GameSolver,
+  ProfitCorrections,
+  SolverAction,
+  SolverActionType,
+} from './profit.ts';
 export { createRaiseAction, profitMap, RandomVariable } from './profit.ts';
 export { NLGameSolver, ShowdownGameSolver, SpectrumEquilator } from './solver.ts';

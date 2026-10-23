@@ -2,7 +2,7 @@
 
 - Node: `source ~/.nvm/nvm.sh && nvm use` before any npm command; the version comes from `.nvmrc`. Run commands from `web/`.
 - Read `ARCHITECTURE.md` before adding a module or crossing a layer; it is the contract.
-- Before every commit: `npx prettier --write <paths>`, `npx eslint <paths>`, `npx tsc --noEmit`, `npx vitest run <paths>`. Before a PR: `npm run lint`, `npm test`, `npm run build`, `npm run test:e2e`.
+- Before every commit: `npx prettier --write <paths>`, `npx eslint <paths>`, `npx tsc --noEmit`, `npx vitest run <paths>`. Before a PR: `npm run lint`, `npm test`, `npm run test:golden`, `npm run build`, `npm run test:e2e`.
 - TDD: the failing test comes first. Fix the code, not the rule: never loosen a tolerance, add an ignore, a suppression or delete an assertion. A rule changes only in its own commit.
 - Layers import only downward: `ui` to `game` to `engine` and `brains` to `equity` to `cards`. ESLint enforces it per directory.
 - `cards`, `equity`, `engine` and `brains` use no DOM, no `Math.random`, no `Date` and no `performance`. Randomness enters as an `Rng` argument.

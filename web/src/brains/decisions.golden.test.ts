@@ -1,22 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { mulberry32 } from '../cards/index.ts';
-import type { Action, LegalActions } from '../engine/index.ts';
 import { createMathBrain } from './brain.ts';
-import fixtures from './fixtures/decisions.json' with { type: 'json' };
-import type { ObservationJson } from './observation.ts';
+import type { DecisionFixture } from './decisionFixtures.ts';
+import { decisionFixtures as decisions } from './decisionFixtures.ts';
 import { parseObservation } from './observation.ts';
 import { randomVillainModel } from './villainModel.ts';
 
-interface DecisionFixture {
-  id: string;
-  observations: ObservationJson[];
-  legal: LegalActions;
-  evByAction: { fold: number | null; passive: number | null; aggressive: number | null };
-  chosen: Action;
-  java: { street: string; pot: number };
-}
-
-const decisions = fixtures as DecisionFixture[];
 const CLASSES = ['fold', 'passive', 'aggressive'] as const;
 
 function expected(value: number | null): number {
@@ -24,7 +12,7 @@ function expected(value: number | null): number {
 }
 
 function decide(fixture: DecisionFixture) {
-  const brain = createMathBrain({ villainModel: randomVillainModel, rng: mulberry32(1) });
+  const brain = createMathBrain({ villainModel: randomVillainModel });
   for (const raw of fixture.observations) {
     brain.observe(parseObservation(raw));
   }

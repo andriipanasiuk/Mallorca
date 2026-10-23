@@ -1,4 +1,3 @@
-import type { Rng } from '../cards/index.ts';
 import type { Action, LegalActions } from '../engine/index.ts';
 import type { AdviceCreatorFromMap } from './adviceFromMap.ts';
 import { LessVarianceActionFromMap } from './adviceFromMap.ts';
@@ -14,6 +13,7 @@ import { VillainSpectrumTracker } from './villainModel.ts';
 
 export interface Decision {
   action: Action;
+  solverChoice: SolverActionType;
   evByAction: { fold: number; passive: number; aggressive: number };
 }
 
@@ -24,8 +24,6 @@ export interface Brain {
 
 export interface MathBrainOptions {
   villainModel: VillainModel;
-  rng: Rng;
-  samples?: number;
 }
 
 function evOf(distribution: ActionDistribution, type: SolverActionType): number {
@@ -71,6 +69,7 @@ class MathBrain implements Brain {
     const action = preprocessAction(advice, this.game, situation.amountToCall);
     return {
       action: toLegalAction(action, legal, this.game.bet('villain')),
+      solverChoice: advice.type,
       evByAction: {
         fold: evOf(distribution, 'fold'),
         passive: evOf(distribution, 'passive'),

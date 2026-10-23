@@ -65,3 +65,21 @@ argument.
   is null, `pot` is 0 and the stacks include the awarded pot.
 - `showdown.hands` is indexed by seat; `cards` are the hole cards.
 - `legalActions` returns no action when nobody is to act.
+
+## brains
+
+- `createMathBrain({ villainModel })` returns a `Brain` with `observe(o)` and `decide(legal)`. It enumerates
+  equities exactly and takes no `Rng`.
+- `decide` returns `{ action, solverChoice, evByAction }`. `action` is always legal under `legal`. `solverChoice`
+  is the class (`fold`, `passive`, `aggressive`) the advice creator picked, before preprocessing and clamping.
+- `evByAction` holds the expected profit of each class in chips, relative to folding now: `fold` is 0 at the
+  top of the tree.
+- `passive` counts as won only the chips in the pot from the current street, after the call: on the flop, turn and
+  river the pot at the end of the previous street is left out; preflop the whole pot counts. The loss is the
+  chips the call adds.
+- `aggressive` is the profit of the solver's own raise size (`Action.createRaiseAction` sizing), before the
+  preprocessor resizes it and before it is clamped into `legal.raise`. When the action ends up as a call or check
+  because no raise is legal, `aggressive` still refers to that unclamped raise.
+- A class the solver did not consider (no raise when the effective stack is 0) is `Number.NEGATIVE_INFINITY`.
+- `npm run test:golden` checks 674 decisions of the Java bot (`src/brains/decisions.golden.test.ts`); it is
+  not part of `npm test`.

@@ -1,26 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { mulberry32, parseCards } from '../cards/index.ts';
+import { parseCards } from '../cards/index.ts';
 import type { Card } from '../cards/index.ts';
 import type { Action, LegalActions } from '../engine/index.ts';
 import { createMathBrain } from './brain.ts';
-import fixtures from './fixtures/decisions.json' with { type: 'json' };
-import type { Observation, ObservationJson } from './observation.ts';
+import { decisionFixtures as decisions } from './decisionFixtures.ts';
+import type { Observation } from './observation.ts';
 import { parseObservation } from './observation.ts';
 import { aggressive, call, check, fold } from './profit.ts';
 import { toLegalAction } from './preprocess.ts';
 import { randomVillainModel } from './villainModel.ts';
 
-interface DecisionFixture {
-  id: string;
-  observations: ObservationJson[];
-  legal: LegalActions;
-  java: { street: string };
-}
-
-const decisions = fixtures as DecisionFixture[];
-
 function brainAfter(observations: readonly Observation[]) {
-  const brain = createMathBrain({ villainModel: randomVillainModel, rng: mulberry32(1) });
+  const brain = createMathBrain({ villainModel: randomVillainModel });
   for (const o of observations) {
     brain.observe(o);
   }
@@ -101,6 +92,19 @@ describe('createMathBrain', () => {
       }
     },
   );
+
+  it('reports the class the solver picked before the action was clamped', () => {
+    const fixture = decisions.find(({ chosen }) => chosen.kind === 'raise');
+    expect(fixture).toBeDefined();
+    const legal = fixture?.legal ?? CHECK_ONLY;
+    const brain = brainAfter((fixture?.observations ?? []).map(parseObservation));
+    const unclamped = brain.decide(legal);
+    expect(unclamped.action.kind).toBe('raise');
+    expect(unclamped.solverChoice).toBe('aggressive');
+    const clamped = brain.decide({ ...legal, raise: null });
+    expect(clamped.action.kind).not.toBe('raise');
+    expect(clamped.solverChoice).toBe('aggressive');
+  });
 
   it('never folds the nuts on the river', () => {
     const board = parseCards('Qs Js Ts 2c 3d');
