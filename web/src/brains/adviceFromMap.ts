@@ -32,6 +32,18 @@ class ActionProfit {
   }
 }
 
+const PROFITABLE_EV_VAR_ABOVE_VAR_BB_BELOW: readonly (readonly [number, number])[] = [
+  [0.1, 2],
+  [0.2, 5],
+  [0.25, 10],
+  [0.3, 25],
+  [0.4, 30],
+  [0.48, 38],
+  [0.5, 40],
+  [0.55, 50],
+  [0.75, 100],
+];
+
 function profitabilityIsGood(actionProfit: ActionProfit | null, lowEV: number): boolean {
   if (actionProfit === null) {
     return false;
@@ -41,17 +53,11 @@ function profitabilityIsGood(actionProfit: ActionProfit | null, lowEV: number): 
   }
   const evVar = actionProfit.evVarKoeff;
   const varBB = actionProfit.varBBKoeff;
-  return (
-    (evVar >= 0 && varBB <= 0) ||
-    (evVar > 0.1 && varBB < 2) ||
-    (evVar > 0.2 && varBB < 5) ||
-    (evVar > 0.25 && varBB < 10) ||
-    (evVar > 0.3 && varBB < 25) ||
-    (evVar > 0.4 && varBB < 30) ||
-    (evVar > 0.48 && varBB < 38) ||
-    (evVar > 0.5 && varBB < 40) ||
-    (evVar > 0.55 && varBB < 50) ||
-    (evVar > 0.75 && varBB < 100)
+  if (evVar >= 0 && varBB <= 0) {
+    return true;
+  }
+  return PROFITABLE_EV_VAR_ABOVE_VAR_BB_BELOW.some(
+    ([minEvVar, maxVarBB]) => evVar > minEvVar && varBB < maxVarBB,
   );
 }
 
