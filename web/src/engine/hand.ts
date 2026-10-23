@@ -1,7 +1,7 @@
 import type { Card } from '../cards/index.ts';
 import { legalActions, otherSeat } from './legal.ts';
 import { awardShowdown, evaluateShowdown } from './showdown.ts';
-import type { Action, EngineEvent, Hand, Seat, SeatIndex, Step } from './types.ts';
+import type { Action, EngineEvent, Hand, LegalActions, Seat, SeatIndex, Step } from './types.ts';
 
 export class IllegalActionError extends Error {
   constructor(message: string) {
@@ -11,6 +11,18 @@ export class IllegalActionError extends Error {
 }
 
 type Stacks = [number, number];
+
+interface Table {
+  hand: Hand;
+  stacks: Stacks;
+  seats: readonly [Seat, Seat];
+  events: EngineEvent[];
+}
+
+interface Payout {
+  awards: Stacks;
+  refund: Stacks;
+}
 
 const STREET_BY_BOARD_SIZE = { 0: 'flop', 3: 'turn', 4: 'river' } as const;
 const CARDS_BY_STREET = { flop: 3, turn: 1, river: 1 } as const;
@@ -46,11 +58,10 @@ function put(
 
 export function startHandWith(
   seats: [Seat, Seat],
-  button: SeatIndex,
-  blinds: { small: number; big: number },
+  deal: { button: SeatIndex; blinds: { small: number; big: number }; handNumber: number },
   deck: Card[],
-  handNumber: number,
 ): Step {
+  const { button, blinds, handNumber } = deal;
   const bigBlindSeat = otherSeat(button);
   const events: EngineEvent[] = [
     {
@@ -95,7 +106,7 @@ export function startHandWith(
   events.push({ type: 'blindPosted', seat: bigBlindSeat, amount: big });
   events.push({ type: 'holeCards', seat: bigBlindSeat, cards: holeCards[bigBlindSeat] });
   events.push({ type: 'holeCards', seat: button, cards: holeCards[button] });
-  return settle(state.hand, state.stacks, seats, events, bigBlindSeat);
+  return settle({ hand: state.hand, stacks: state.stacks, seats, events }, bigBlindSeat);
 }
 
 function needsAction(hand: Hand, stacks: Stacks, seat: SeatIndex): boolean {
@@ -109,13 +120,8 @@ function needsAction(hand: Hand, stacks: Stacks, seat: SeatIndex): boolean {
   return !hand.actedThisStreet[seat] && stacks[otherSeat(seat)] > 0;
 }
 
-function settle(
-  hand: Hand,
-  stacks: Stacks,
-  seats: readonly [Seat, Seat],
-  events: EngineEvent[],
-  last: SeatIndex,
-): Step {
+function settle(table: Table, last: SeatIndex): Step {
+  const { hand, stacks, seats, events } = table;
   const opponent = otherSeat(last);
   if (needsAction(hand, stacks, opponent)) {
     return { hand: { ...hand, toAct: opponent }, seats: withSeats(seats, stacks), events };
@@ -123,7 +129,7 @@ function settle(
   if (needsAction(hand, stacks, last)) {
     return { hand: { ...hand, toAct: last }, seats: withSeats(seats, stacks), events };
   }
-  return closeBetting(hand, stacks, seats, events);
+  return closeBetting(table);
 }
 
 function dealStreet(hand: Hand, events: EngineEvent[]): Hand {
@@ -135,12 +141,8 @@ function dealStreet(hand: Hand, events: EngineEvent[]): Hand {
   return { ...hand, street, deck: hand.deck.slice(count), board };
 }
 
-function closeBetting(
-  hand: Hand,
-  stacks: Stacks,
-  seats: readonly [Seat, Seat],
-  events: EngineEvent[],
-): Step {
+function closeBetting(table: Table): Step {
+  const { hand, stacks, seats, events } = table;
   const bothCanBet = stacks[0] > 0 && stacks[1] > 0;
   if (bothCanBet && hand.street !== 'river') {
     const next = dealStreet(hand, events);
@@ -157,15 +159,11 @@ function closeBetting(
       events,
     };
   }
-  return showdown(hand, stacks, seats, events);
+  return showdown(table);
 }
 
-function showdown(
-  hand: Hand,
-  stacks: Stacks,
-  seats: readonly [Seat, Seat],
-  events: EngineEvent[],
-): Step {
+function showdown(table: Table): Step {
+  const { hand, events } = table;
   const refund: Stacks = [0, 0];
   const committed = pair(hand.committed[0], hand.committed[1]);
   if (hand.bets[0] !== hand.bets[1]) {
@@ -181,18 +179,13 @@ function showdown(
   const hands = evaluateShowdown(current.holeCards, current.board);
   events.push({ type: 'showdown', hands });
   const pot = committed[0] + committed[1];
-  const shares = awardShowdown(pot, [hands[0].rank, hands[1].rank], otherSeat(hand.button));
-  return finish(current, stacks, seats, events, shares, refund);
+  const awards = awardShowdown(pot, [hands[0].rank, hands[1].rank], otherSeat(hand.button));
+  return finish({ ...table, hand: current }, { awards, refund });
 }
 
-function finish(
-  hand: Hand,
-  stacks: Stacks,
-  seats: readonly [Seat, Seat],
-  events: EngineEvent[],
-  awards: Stacks,
-  refund: Stacks,
-): Step {
+function finish(table: Table, payout: Payout): Step {
+  const { hand, stacks, seats, events } = table;
+  const { awards, refund } = payout;
   const final: Stacks = [stacks[0] + awards[0] + refund[0], stacks[1] + awards[1] + refund[1]];
   for (const seat of [0, 1] as const) {
     if (refund[seat] > 0) {
@@ -219,25 +212,33 @@ function finish(
   };
 }
 
+function isLegal(legal: LegalActions, action: Action): boolean {
+  switch (action.kind) {
+    case 'fold':
+      return legal.fold;
+    case 'check':
+      return legal.check;
+    case 'call':
+      return legal.call !== null;
+    case 'raise':
+      return (
+        legal.raise !== null &&
+        Number.isInteger(action.to) &&
+        action.to >= legal.raise.min &&
+        action.to <= legal.raise.max
+      );
+  }
+}
+
 function assertLegal(hand: Hand, seats: readonly [Seat, Seat], action: Action): void {
   const legal = legalActions(hand, seats);
   if (hand.toAct === null) {
     throw new IllegalActionError('Nobody is to act');
   }
-  const ok =
-    (action.kind === 'fold' && legal.fold) ||
-    (action.kind === 'check' && legal.check) ||
-    (action.kind === 'call' && legal.call !== null) ||
-    (action.kind === 'raise' &&
-      legal.raise !== null &&
-      Number.isInteger(action.to) &&
-      action.to >= legal.raise.min &&
-      action.to <= legal.raise.max);
-  if (!ok) {
+  if (!isLegal(legal, action)) {
     throw new IllegalActionError(`Illegal action: ${JSON.stringify(action)}`);
   }
 }
-
 export function applyAction(hand: Hand, seats: [Seat, Seat], action: Action): Step {
   assertLegal(hand, seats, action);
   const me = hand.toAct as SeatIndex;
@@ -254,7 +255,7 @@ export function applyAction(hand: Hand, seats: [Seat, Seat], action: Action): St
     const refund: Stacks = [0, 0];
     awards[winner] = hand.pot - excess;
     refund[winner] = excess;
-    return finish(current, stacks, seats, events, awards, refund);
+    return finish({ hand: current, stacks, seats, events }, { awards, refund });
   }
   const currentBet = Math.max(hand.bets[0], hand.bets[1]);
   let amount = 0;
@@ -277,5 +278,5 @@ export function applyAction(hand: Hand, seats: [Seat, Seat], action: Action): St
     current = { ...current, canRaise };
   }
   events.push({ type: 'acted', seat: me, action, amount, allIn: moved.stacks[me] === 0 });
-  return settle(current, moved.stacks, seats, events, me);
+  return settle({ hand: current, stacks: moved.stacks, seats, events }, me);
 }

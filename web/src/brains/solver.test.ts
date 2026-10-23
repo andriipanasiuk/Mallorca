@@ -47,15 +47,17 @@ function callProfit(solver: NLGameSolver): number {
     tracker.observe(o);
   }
   const distribution = solver.onSecondAction(
-    game,
-    state.situation(),
-    game.bankRollAtRisk,
-    game.pot,
+    {
+      game,
+      info: state.situation(),
+      effectiveStack: game.bankRollAtRisk,
+      pot: game.pot,
+      spectrum: tracker.spectrum,
+      hero,
+      strength,
+      isHeroOnButton: false,
+    },
     100,
-    tracker.spectrum,
-    hero,
-    strength,
-    false,
   );
   return distribution.find(({ action }) => action.type === 'passive')?.profit.getEV() ?? 0;
 }

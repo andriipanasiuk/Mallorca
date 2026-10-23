@@ -1,5 +1,9 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+import { importX } from 'eslint-plugin-import-x';
+
+const typescriptSettings = importX.flatConfigs.typescript.settings;
 
 const pure = ['src/cards', 'src/equity', 'src/engine', 'src/brains'];
 
@@ -38,6 +42,24 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    ignores: ['**/*.test.ts', '**/*.test.tsx'],
+    plugins: { 'import-x': importX },
+    settings: {
+      'import-x/extensions': typescriptSettings['import-x/extensions'],
+      'import-x/parsers': typescriptSettings['import-x/parsers'],
+      'import-x/resolver-next': [createTypeScriptImportResolver({ project: './tsconfig.json' })],
+    },
+    rules: {
+      'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', 60],
+      'max-depth': ['error', 3],
+      complexity: ['error', 12],
+      'max-params': ['error', 4],
+      'import-x/no-cycle': 'error',
     },
   },
   layer('cards', []),
