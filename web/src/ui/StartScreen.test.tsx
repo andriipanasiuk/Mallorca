@@ -11,9 +11,20 @@ describe('StartScreen', () => {
     const onStart = vi.fn();
     render(<StartScreen seed={42} onStart={onStart} />);
     fireEvent.click(screen.getByTestId('start-cash'));
-    expect(onStart).toHaveBeenLastCalledWith(CASH);
+    expect(onStart).toHaveBeenLastCalledWith(CASH, 'math');
     fireEvent.click(screen.getByTestId('start-tournament'));
-    expect(onStart).toHaveBeenLastCalledWith(TOURNAMENT);
+    expect(onStart).toHaveBeenLastCalledWith(TOURNAMENT, 'math');
+  });
+
+  it('starts against the chosen opponent', () => {
+    const onStart = vi.fn();
+    render(<StartScreen seed={42} onStart={onStart} />);
+    expect(screen.getByTestId('opponent-math').getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByTestId('opponent-cfr'));
+    expect(screen.getByTestId('opponent-cfr').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByTestId('opponent-math').getAttribute('aria-pressed')).toBe('false');
+    fireEvent.click(screen.getByTestId('start-cash'));
+    expect(onStart).toHaveBeenLastCalledWith(CASH, 'cfr');
   });
 
   it('shows the farewell line in place of the tagline', () => {

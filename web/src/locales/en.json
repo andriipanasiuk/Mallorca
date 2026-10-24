@@ -7,7 +7,13 @@
     "tagline": "Heads-up no-limit hold'em. A cash game with 100 big blinds, or a tournament with rising blinds.",
     "cash": "Cash game, 100 big blinds",
     "tournament": "Tournament",
-    "farewell": "Sleep well. The table will be here."
+    "farewell": "Sleep well. The table will be here.",
+    "opponent": "Opponent",
+    "opponents": {
+      "math": "Classic",
+      "cfr": "Solver"
+    },
+    "loading": "Bringing the solver to the table"
   },
   "status": {
     "blinds": "Blinds {{small}}/{{big}}",
