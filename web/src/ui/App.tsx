@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'preact/hooks';
 import { toViewModel } from '../game/index.ts';
-import type { Intent, Session, SeatIndex } from '../game/index.ts';
-import { t } from './i18n.ts';
+import type { HandStore, Intent, Session, SeatIndex } from '../game/index.ts';
+import { HistoryMenu } from './HistoryMenu.tsx';
 import { StartScreen } from './StartScreen.tsx';
 import { Table } from './Table.tsx';
+import { SessionOver } from './SessionOver.tsx';
+import { StatusBar } from './StatusBar.tsx';
 import { TournamentOver } from './TournamentOver.tsx';
 
 export interface AppProps {
   session: Session;
+  store: HandStore;
   humanSeat: SeatIndex;
-  onNewTournament: () => void;
+  onNewGame: () => void;
 }
 
 function useSessionState(session: Session) {
@@ -21,35 +24,24 @@ function useSessionState(session: Session) {
   return state;
 }
 
-export function App({ session, humanSeat, onNewTournament }: AppProps) {
+export function App({ session, store, humanSeat, onNewGame }: AppProps) {
   const state = useSessionState(session);
   if (state.phase === 'idle') {
-    return <StartScreen seed={state.seed} onStart={() => void session.getState().start()} />;
+    return (
+      <StartScreen seed={state.seed} onStart={(mode) => void session.getState().start(mode)} />
+    );
   }
   const vm = toViewModel(state, humanSeat);
   const act = (intent: Intent) => void session.getState().act(intent);
   return (
     <div class="app">
-      <header class="status-bar">
-        <span data-testid="blinds">
-          {t('status.blinds', { small: vm.blinds.small, big: vm.blinds.big })}
-        </span>
-        <span data-testid="hand-number">{t('status.hand', { number: vm.handNumber })}</span>
-        <details class="menu">
-          <summary class="menu-summary">{t('status.menu')}</summary>
-          <div class="menu-body">
-            <span>{t('status.seed', { seed: state.seed })}</span>
-            <button
-              type="button"
-              class="button button-small"
-              data-testid="new-tournament"
-              onClick={onNewTournament}
-            >
-              {t('status.newTournament')}
-            </button>
-          </div>
-        </details>
-      </header>
+      <StatusBar
+        vm={vm}
+        canLeave={state.phase === 'handOver'}
+        onLeave={() => session.getState().leave()}
+      >
+        <HistoryMenu seed={state.seed} store={store} onNewGame={onNewGame} />
+      </StatusBar>
       <Table
         vm={vm}
         phase={state.phase}
@@ -58,8 +50,16 @@ export function App({ session, humanSeat, onNewTournament }: AppProps) {
         onAct={act}
         onNextHand={() => void session.getState().nextHand()}
       />
+      {state.phase === 'sessionOver' && (
+        <SessionOver
+          session={vm.session}
+          store={store}
+          sessionId={state.sessionId}
+          onPlayAgain={onNewGame}
+        />
+      )}
       {state.phase === 'tournamentOver' && (
-        <TournamentOver won={vm.tournamentWinner === humanSeat} onPlayAgain={onNewTournament} />
+        <TournamentOver won={vm.tournamentWinner === humanSeat} onPlayAgain={onNewGame} />
       )}
     </div>
   );

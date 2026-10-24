@@ -19,3 +19,4 @@ web/tools/golden/build/
 web/e2e/contact/
 solver/target/
 solver/data/
+web/arena-out/

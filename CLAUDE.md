@@ -18,6 +18,8 @@
   and comments not counted), 60 lines per function, nesting depth 3, cyclomatic complexity 12, 4 parameters, and
   no import cycles (`import-x/no-cycle`). Over a limit, split the code: a helper, a module, an options object.
 - UI copy: no all-caps words, no em or en dashes as sentence punctuation.
+- Arena: `npm run arena -- --a math --b always-call --pairs 2000` plays duplicate pairs between two bots over worker
+  threads and prints bb/100 with a 95% interval (`web/tools/arena/README.md`).
 - Screenshots: `npm run contact` builds, plays a seeded game and writes one contact sheet per device,
   `web/e2e/contact/phone.png` and `web/e2e/contact/desktop.png` (gitignored). After a UI change, look at each
   sheet once, as one image, before committing.

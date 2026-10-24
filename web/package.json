@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:golden": "vitest run --config vitest.golden.config.ts",
     "test:e2e": "playwright test",
+    "arena": "node tools/arena/cli.ts",
     "contact": "npm run build && node e2e/contact.ts",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write . && eslint . --fix"
