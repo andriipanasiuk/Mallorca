@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Decision, Observation } from '../brains/index.ts';
 import type { BotClient } from './botClient.ts';
-import { inProcessBot, withFallback } from './botClient.ts';
+import { BOT_TIMEOUT_MS, inProcessBot, withFallback, workerBot } from './botClient.ts';
+import type { WorkerReply, WorkerRequest } from './workerProtocol.ts';
 
 const legal = { fold: true, check: false, call: 10, raise: { min: 40, max: 2000 } };
 
@@ -63,5 +64,187 @@ describe('withFallback', () => {
     await expect(staleOutcome).resolves.toBe('rejected');
     await expect(bot.decide(legal)).resolves.toBe(decision);
     expect(calls).toBe(3);
+  });
+});
+
+class FakeWorker {
+  static instances: FakeWorker[] = [];
+  onmessage: ((event: MessageEvent<WorkerReply>) => void) | null = null;
+  onerror: (() => void) | null = null;
+  sent: WorkerRequest[] = [];
+  terminated = false;
+
+  constructor() {
+    FakeWorker.instances.push(this);
+  }
+
+  postMessage(request: WorkerRequest) {
+    this.sent.push(request);
+  }
+
+  terminate() {
+    this.terminated = true;
+  }
+
+  reply(reply: WorkerReply) {
+    this.onmessage?.({ data: reply } as MessageEvent<WorkerReply>);
+  }
+
+  decideIds() {
+    return this.sent.flatMap((request) => (request.kind === 'decide' ? [request.id] : []));
+  }
+}
+
+function currentWorker() {
+  const worker = FakeWorker.instances.at(-1);
+  if (worker === undefined) {
+    throw new Error('no worker was created');
+  }
+  return worker;
+}
+
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+async function startDecide(bot: BotClient) {
+  const pending = bot.decide(legal);
+  await settle();
+  const worker = currentWorker();
+  return { pending, worker, id: worker.decideIds().at(-1) as number };
+}
+
+describe('workerBot', () => {
+  beforeEach(() => {
+    FakeWorker.instances = [];
+    vi.stubGlobal('Worker', FakeWorker);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('posts observe and reset requests to the worker', () => {
+    const bot = workerBot();
+    bot.observe(hand);
+    bot.reset();
+    expect(currentWorker().sent).toEqual([
+      { kind: 'observe', observations: hand },
+      { kind: 'reset' },
+    ]);
+  });
+
+  it('correlates each reply with its request by id', async () => {
+    const bot = workerBot();
+    const first = await startDecide(bot);
+    const second = await startDecide(bot);
+    const other: Decision = { ...decision, solverChoice: 'aggressive' };
+    first.worker.reply({ id: second.id, decision: other });
+    first.worker.reply({ id: first.id, decision });
+    await expect(first.pending).resolves.toBe(decision);
+    await expect(second.pending).resolves.toBe(other);
+  });
+
+  it('ignores replies for unknown ids', async () => {
+    const bot = workerBot();
+    const { pending, worker, id } = await startDecide(bot);
+    worker.reply({ id: 999, decision: { ...decision, solverChoice: 'aggressive' } });
+    worker.reply({ id, decision });
+    await expect(pending).resolves.toBe(decision);
+  });
+
+  it('ignores a second reply for an id that was already answered', async () => {
+    const bot = workerBot();
+    const { pending, worker, id } = await startDecide(bot);
+    worker.reply({ id, decision });
+    worker.reply({ id, error: 'late' });
+    await expect(pending).resolves.toBe(decision);
+  });
+
+  it('falls back to the in-process bot when the worker replies with an error', async () => {
+    const bot = workerBot();
+    bot.observe(hand);
+    const { pending, worker, id } = await startDecide(bot);
+    worker.reply({ id, error: 'worker exploded' });
+    await expect(pending).resolves.toMatchObject({ action: expect.any(Object) });
+    expect(worker.terminated).toBe(true);
+  });
+
+  it('rejects when the in-process fallback fails as well', async () => {
+    const bot = workerBot();
+    const { pending, worker, id } = await startDecide(bot);
+    worker.reply({ id, error: 'worker exploded' });
+    await expect(pending).rejects.toThrow('The brain has not seen its hole cards');
+    await expect(bot.decide(legal)).rejects.toThrow();
+  });
+
+  it('falls back when the worker reports an error event', async () => {
+    const bot = workerBot();
+    bot.observe(hand);
+    const { pending, worker } = await startDecide(bot);
+    worker.onerror?.();
+    await expect(pending).resolves.toMatchObject({ action: expect.any(Object) });
+    expect(worker.terminated).toBe(true);
+  });
+
+  it('falls back to the in-process bot after the timeout', async () => {
+    vi.useFakeTimers();
+    const bot = workerBot();
+    bot.observe(hand);
+    const pending = bot.decide(legal);
+    const settled = expect(pending).resolves.toMatchObject({ action: expect.any(Object) });
+    await vi.advanceTimersByTimeAsync(BOT_TIMEOUT_MS);
+    await settled;
+    expect(currentWorker().terminated).toBe(true);
+  });
+
+  it('rejects pending requests and terminates the worker on dispose', async () => {
+    const bot = workerBot();
+    const { pending, worker } = await startDecide(bot);
+    const outcome = pending.then(
+      () => 'resolved',
+      (error: Error) => error.message,
+    );
+    bot.dispose?.();
+    await expect(outcome).resolves.toBe('The bot worker was stopped');
+    expect(worker.terminated).toBe(true);
+  });
+});
+
+describe('withFallback guards', () => {
+  const failing = (reason: unknown): BotClient => ({
+    observe: () => undefined,
+    reset: () => undefined,
+    decide: () => Promise.reject(reason),
+  });
+
+  it('returns an already guarded client unchanged', () => {
+    const guardedBot = withFallback(inProcessBot());
+    expect(withFallback(guardedBot)).toBe(guardedBot);
+  });
+
+  it('forwards observations seen so far to the fallback', async () => {
+    const bot = withFallback(failing(new Error('primary failed')), 100);
+    bot.observe(hand);
+    await expect(bot.decide(legal)).resolves.toMatchObject({ action: expect.any(Object) });
+  });
+
+  it('wraps a non-Error rejection of a superseded request into an Error', async () => {
+    const bot = withFallback(failing('plain string'), 100);
+    const stale = bot.decide(legal);
+    bot.reset();
+    await expect(stale).rejects.toThrow('plain string');
+  });
+
+  it('disposes the primary and the active client on dispose', () => {
+    const disposed: string[] = [];
+    const primary: BotClient = {
+      observe: () => undefined,
+      reset: () => undefined,
+      decide: () => Promise.resolve(decision),
+      dispose: () => {
+        disposed.push('primary');
+      },
+    };
+    withFallback(primary).dispose?.();
+    expect(disposed).toEqual(['primary', 'primary']);
   });
 });

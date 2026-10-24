@@ -1,6 +1,7 @@
 import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
 import { mulberry32 } from '../cards/index.ts';
+import type { Rng } from '../cards/index.ts';
 import type { Decision } from '../brains/index.ts';
 import { toObservations } from '../brains/index.ts';
 import {
@@ -148,161 +149,211 @@ export function resolveIntent(intent: Intent, legal: LegalActions): Action {
   return { kind: 'fold' };
 }
 
+type Store = SessionState & SessionActions;
+type Step = { state: Tournament; events: EngineEvent[] };
+
+interface Timers {
+  sleep(ms: number): Promise<void>;
+  cancel(): void;
+}
+
+interface Runtime {
+  set: StoreApi<Store>['setState'];
+  get: StoreApi<Store>['getState'];
+  bot: BotClient;
+  rng: Rng;
+  timers: Timers;
+  humanSeat: SeatIndex;
+  botSeat: SeatIndex;
+  botDelayMs: number;
+  epoch: number;
+  startStacks: [number, number];
+}
+
+function createTimers(): Timers {
+  const pending = new Map<ReturnType<typeof setTimeout>, () => void>();
+  return {
+    sleep: (ms) =>
+      new Promise((resolve) => {
+        const timer = setTimeout(() => {
+          pending.delete(timer);
+          resolve();
+        }, ms);
+        pending.set(timer, resolve);
+      }),
+    cancel: () => {
+      for (const [timer, resolve] of pending) {
+        clearTimeout(timer);
+        resolve();
+      }
+      pending.clear();
+    },
+  };
+}
+
+function freshTournament(options: SessionOptions): Tournament {
+  const { names, startingStacks } = options;
+  const tournament = createTournament(names, STARTING_STACK, 0);
+  if (startingStacks === undefined) {
+    return tournament;
+  }
+  return {
+    ...tournament,
+    seats: [
+      { name: names[0], stack: startingStacks[0] },
+      { name: names[1], stack: startingStacks[1] },
+    ],
+  };
+}
+
+function record(rt: Runtime, events: EngineEvent[]): void {
+  rt.bot.observe(toObservations(events, rt.botSeat));
+  const lastActions: [LogEntry | null, LogEntry | null] = [...rt.get().lastActions];
+  for (const event of events) {
+    if (event.type === 'acted') {
+      lastActions[event.seat] = label(event);
+    }
+  }
+  rt.set({ log: [...rt.get().log, ...handHistory(events)], lastActions });
+}
+
+function conclude(rt: Runtime, step: Step): void {
+  if (step.state.hand?.street !== 'complete') {
+    return;
+  }
+  const { seats } = step.state;
+  const paid = (seat: SeatIndex) =>
+    rt.startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
+  rt.set({
+    result: {
+      ...resultOf(step.events),
+      amount: potCollected([paid(0), paid(1)], resultOf(step.events).winner),
+    },
+    phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
+  });
+}
+
+function play(rt: Runtime, action: Action): void {
+  const step = apply(rt.get().tournament, action);
+  rt.set({ tournament: step.state });
+  record(rt, step.events);
+  conclude(rt, step);
+}
+
+async function decide(rt: Runtime, legal: LegalActions): Promise<Decision | null> {
+  try {
+    return await rt.bot.decide(legal);
+  } catch {
+    return null;
+  }
+}
+
+async function botTurn(rt: Runtime, myEpoch: number): Promise<boolean> {
+  rt.set({ phase: 'botThinking' });
+  const legal = legalActionsOf(rt.get().tournament);
+  const decision = await decide(rt, legal);
+  if (myEpoch !== rt.epoch) {
+    return false;
+  }
+  if (decision !== null) {
+    rt.set({ lastDecision: decision });
+  }
+  if (rt.botDelayMs > 0) {
+    rt.set({ phase: 'animating' });
+    await rt.timers.sleep(rt.botDelayMs);
+    if (myEpoch !== rt.epoch) {
+      return false;
+    }
+  }
+  const intent: Intent = decision === null ? { kind: 'passive' } : toIntent(decision.action);
+  play(rt, resolveIntent(intent, legal));
+  return true;
+}
+
+async function drive(rt: Runtime, myEpoch: number): Promise<void> {
+  for (;;) {
+    const { tournament } = rt.get();
+    if (tournament.hand === null || tournament.hand.street === 'complete') {
+      return;
+    }
+    if (toAct(tournament) === rt.humanSeat) {
+      rt.set({ phase: 'humanToAct' });
+      return;
+    }
+    if (!(await botTurn(rt, myEpoch))) {
+      return;
+    }
+  }
+}
+
+function beginHand(rt: Runtime): Promise<void> {
+  const { seats } = rt.get().tournament;
+  rt.startStacks = [seats[0].stack, seats[1].stack];
+  const step = startHand(rt.get().tournament, rt.rng);
+  rt.bot.reset();
+  rt.set({ tournament: step.state, lastActions: [null, null], result: null });
+  record(rt, step.events);
+  conclude(rt, step);
+  return drive(rt, rt.epoch);
+}
+
+function sessionActions(rt: Runtime, options: SessionOptions): SessionActions {
+  return {
+    start() {
+      rt.epoch += 1;
+      rt.timers.cancel();
+      rt.set({ tournament: freshTournament(options), log: [], lastDecision: null, result: null });
+      return beginHand(rt);
+    },
+    dispose() {
+      rt.epoch += 1;
+      rt.timers.cancel();
+      rt.bot.dispose?.();
+    },
+    nextHand() {
+      if (rt.get().phase !== 'handOver') {
+        return Promise.resolve();
+      }
+      return beginHand(rt);
+    },
+    act(intent) {
+      const { phase, tournament } = rt.get();
+      if (phase !== 'humanToAct' || toAct(tournament) !== rt.humanSeat) {
+        return Promise.resolve();
+      }
+      play(rt, resolveIntent(intent, legalActionsOf(tournament)));
+      return drive(rt, rt.epoch);
+    },
+  };
+}
+
 export function createSession(options: SessionOptions): Session {
-  const { seed, botDelayMs, humanSeat, names } = options;
-  const botSeat: SeatIndex = humanSeat === 0 ? 1 : 0;
+  const { seed, botDelayMs, humanSeat } = options;
   const bot = withFallback(options.bot);
   const rng = mulberry32(seed);
-  let epoch = 0;
-  let startStacks: [number, number] = [0, 0];
-  const timers = new Map<ReturnType<typeof setTimeout>, () => void>();
-
-  const sleep = (ms: number): Promise<void> =>
-    new Promise((resolve) => {
-      const timer = setTimeout(() => {
-        timers.delete(timer);
-        resolve();
-      }, ms);
-      timers.set(timer, resolve);
-    });
-
-  const cancelTimers = () => {
-    for (const [timer, resolve] of timers) {
-      clearTimeout(timer);
-      resolve();
-    }
-    timers.clear();
-  };
-
-  const fresh = (): Tournament => {
-    const tournament = createTournament(names, STARTING_STACK, 0);
-    const stacks = options.startingStacks;
-    if (stacks === undefined) {
-      return tournament;
-    }
+  const timers = createTimers();
+  return createStore<Store>((set, get) => {
+    const rt: Runtime = {
+      set,
+      get,
+      bot,
+      rng,
+      timers,
+      humanSeat,
+      botSeat: humanSeat === 0 ? 1 : 0,
+      botDelayMs,
+      epoch: 0,
+      startStacks: [0, 0],
+    };
     return {
-      ...tournament,
-      seats: [
-        { name: names[0], stack: stacks[0] },
-        { name: names[1], stack: stacks[1] },
-      ],
-    };
-  };
-
-  return createStore<SessionState & SessionActions>((set, get) => {
-    const record = (events: EngineEvent[]) => {
-      bot.observe(toObservations(events, botSeat));
-      const lastActions: [LogEntry | null, LogEntry | null] = [...get().lastActions];
-      for (const event of events) {
-        if (event.type === 'acted') {
-          lastActions[event.seat] = label(event);
-        }
-      }
-      set({ log: [...get().log, ...handHistory(events)], lastActions });
-    };
-
-    const conclude = (step: { state: Tournament; events: EngineEvent[] }) => {
-      if (step.state.hand?.street === 'complete') {
-        const { seats } = step.state;
-        const paid = (seat: SeatIndex) =>
-          startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
-        set({
-          result: {
-            ...resultOf(step.events),
-            amount: potCollected([paid(0), paid(1)], resultOf(step.events).winner),
-          },
-          phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
-        });
-      }
-    };
-
-    const play = (action: Action) => {
-      const step = apply(get().tournament, action);
-      set({ tournament: step.state });
-      record(step.events);
-      conclude(step);
-    };
-
-    const drive = async (myEpoch: number): Promise<void> => {
-      for (;;) {
-        const { tournament } = get();
-        if (tournament.hand === null || tournament.hand.street === 'complete') {
-          return;
-        }
-        if (toAct(tournament) === humanSeat) {
-          set({ phase: 'humanToAct' });
-          return;
-        }
-        set({ phase: 'botThinking' });
-        const legal = legalActionsOf(tournament);
-        let decision: Decision | null;
-        try {
-          decision = await bot.decide(legal);
-        } catch {
-          decision = null;
-        }
-        if (myEpoch !== epoch) {
-          return;
-        }
-        if (decision !== null) {
-          set({ lastDecision: decision });
-        }
-        if (botDelayMs > 0) {
-          set({ phase: 'animating' });
-          await sleep(botDelayMs);
-          if (myEpoch !== epoch) {
-            return;
-          }
-        }
-        const intent: Intent = decision === null ? { kind: 'passive' } : toIntent(decision.action);
-        play(resolveIntent(intent, legal));
-      }
-    };
-
-    const beginHand = (): Promise<void> => {
-      const { seats } = get().tournament;
-      startStacks = [seats[0].stack, seats[1].stack];
-      const step = startHand(get().tournament, rng);
-      bot.reset();
-      set({ tournament: step.state, lastActions: [null, null], result: null });
-      record(step.events);
-      conclude(step);
-      return drive(epoch);
-    };
-
-    return {
-      tournament: fresh(),
+      tournament: freshTournament(options),
       phase: 'idle',
       log: [],
       lastActions: [null, null],
       lastDecision: null,
       seed,
       result: null,
-      start() {
-        epoch += 1;
-        cancelTimers();
-        set({ tournament: fresh(), log: [], lastDecision: null, result: null });
-        return beginHand();
-      },
-      dispose() {
-        epoch += 1;
-        cancelTimers();
-        bot.dispose?.();
-      },
-      nextHand() {
-        if (get().phase !== 'handOver') {
-          return Promise.resolve();
-        }
-        return beginHand();
-      },
-      act(intent) {
-        const { phase, tournament } = get();
-        if (phase !== 'humanToAct' || toAct(tournament) !== humanSeat) {
-          return Promise.resolve();
-        }
-        play(resolveIntent(intent, legalActionsOf(tournament)));
-        return drive(epoch);
-      },
+      ...sessionActions(rt, options),
     };
   });
 }

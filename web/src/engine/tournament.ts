@@ -56,10 +56,8 @@ export function startHand(t: Tournament, rng: Rng): { state: Tournament; events:
   const button = t.handNumber === 0 ? t.button : otherSeat(t.button);
   const step = startHandWith(
     t.seats,
-    button,
-    blindsFor(handNumber),
+    { button, blinds: blindsFor(handNumber), handNumber },
     shuffle(fullDeck(), rng),
-    handNumber,
   );
   return conclude({ ...t, button, handNumber }, step);
 }

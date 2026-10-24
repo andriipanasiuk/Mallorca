@@ -37,37 +37,62 @@ export function ActionBar({ controls, onAct }: ActionBarProps) {
       {raise !== null && (
         <BetSlider raise={raise} value={amount} disabled={!enabled} onChange={setChosen} />
       )}
-      <div class="action-buttons">
-        <button
-          type="button"
-          class="button button-fold"
-          data-testid="fold"
-          disabled={!enabled || !fold}
-          onClick={doFold}
-        >
-          {t('actions.fold')}
-        </button>
-        <button
-          type="button"
-          class="button button-passive"
-          data-testid="passive"
-          disabled={!enabled}
-          onClick={doPassive}
-        >
-          {passive.kind === 'check'
-            ? t('actions.check')
-            : t('actions.call', { amount: passive.amount })}
-        </button>
-        <button
-          type="button"
-          class="button button-raise"
-          data-testid="raise"
-          disabled={!canRaise}
-          onClick={doRaise}
-        >
-          {canRaise ? t('actions.raiseTo', { amount }) : t('actions.raise')}
-        </button>
-      </div>
+      <ActionButtons
+        state={{ enabled, fold, passive, canRaise, amount }}
+        onFold={doFold}
+        onPassive={doPassive}
+        onRaise={doRaise}
+      />
+    </div>
+  );
+}
+
+interface ActionButtonsProps {
+  state: {
+    enabled: boolean;
+    fold: boolean;
+    passive: ViewModel['controls']['passive'];
+    canRaise: boolean;
+    amount: number;
+  };
+  onFold: () => void;
+  onPassive: () => void;
+  onRaise: () => void;
+}
+
+function ActionButtons({ state, onFold, onPassive, onRaise }: ActionButtonsProps) {
+  const { enabled, fold, passive, canRaise, amount } = state;
+  return (
+    <div class="action-buttons">
+      <button
+        type="button"
+        class="button button-fold"
+        data-testid="fold"
+        disabled={!enabled || !fold}
+        onClick={onFold}
+      >
+        {t('actions.fold')}
+      </button>
+      <button
+        type="button"
+        class="button button-passive"
+        data-testid="passive"
+        disabled={!enabled}
+        onClick={onPassive}
+      >
+        {passive.kind === 'check'
+          ? t('actions.check')
+          : t('actions.call', { amount: passive.amount })}
+      </button>
+      <button
+        type="button"
+        class="button button-raise"
+        data-testid="raise"
+        disabled={!canRaise}
+        onClick={onRaise}
+      >
+        {canRaise ? t('actions.raiseTo', { amount }) : t('actions.raise')}
+      </button>
     </div>
   );
 }

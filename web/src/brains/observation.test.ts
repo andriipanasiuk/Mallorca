@@ -13,7 +13,11 @@ const seats: [Seat, Seat] = [
 describe('toObservations', () => {
   it('keeps what the hero sees and drops villain hole cards and the showdown', () => {
     const deck = deckOf('Ah Ad', '7c 2d', 'Qs Jh 7d 4c 9h');
-    const start = startHandWith(seats, 0, { small: 10, big: 20 }, deck, 3);
+    const start = startHandWith(
+      seats,
+      { button: 0, blinds: { small: 10, big: 20 }, handNumber: 3 },
+      deck,
+    );
     const end = playEvents(start, raiseTo(60), call, check, check, check, check, check, check);
     expect(toObservations(end.events, 0)).toEqual([
       {
@@ -42,7 +46,11 @@ describe('toObservations', () => {
 
   it('sees the hand from the other seat', () => {
     const deck = deckOf('Ah Ad', '7c 2d', 'Qs Jh 7d 4c 9h');
-    const start = startHandWith(seats, 0, { small: 10, big: 20 }, deck, 3);
+    const start = startHandWith(
+      seats,
+      { button: 0, blinds: { small: 10, big: 20 }, handNumber: 3 },
+      deck,
+    );
     const observations = toObservations(start.events, 1);
     expect(observations[0]).toMatchObject({ heroOnButton: false, heroStack: 2500 });
     expect(observations[1]).toEqual({ type: 'holeCards', cards: parseCards('Ah Ad') });

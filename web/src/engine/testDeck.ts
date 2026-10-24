@@ -24,7 +24,7 @@ export function startHand(
   button: SeatIndex = 0,
   blinds = { small: 10, big: 20 },
 ): Step {
-  return startHandWith(seatsOf(stacks[0], stacks[1]), button, blinds, deck, 1);
+  return startHandWith(seatsOf(stacks[0], stacks[1]), { button, blinds, handNumber: 1 }, deck);
 }
 
 export function play(step: Step, ...actions: Action[]): Step {
