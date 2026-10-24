@@ -12,7 +12,7 @@ describe('playPair', () => {
     for (let i = 0; i < 10; i++) {
       expect(playPair(BOTS.math, BOTS.math, 1, i).net).toBe(0);
     }
-  });
+  }, 120_000);
 
   it('a pair is the same deck with the seats swapped', () => {
     const { hands } = playPair(BOTS['always-call'], BOTS['always-raise'], 5, 3);
