@@ -16,3 +16,4 @@ web/test-results/
 web/playwright-report/
 web/tools/golden/build/
 web/e2e/contact/
+web/arena-out/

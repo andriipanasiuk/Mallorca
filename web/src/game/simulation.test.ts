@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../cards/index.ts';
 import type { Rng } from '../cards/index.ts';
-import { legalActionsOf, toAct } from '../engine/index.ts';
+import { legalActionsOf, toAct, TOURNAMENT } from '../engine/index.ts';
 import type { LegalActions } from '../engine/index.ts';
 import { inProcessBot } from './botClient.ts';
 import { createSession } from './session.ts';
@@ -26,21 +26,21 @@ function randomIntent(legal: LegalActions, rng: Rng): Intent {
 }
 
 function chipsOnTable(session: Session): number {
-  const { tournament } = session.getState();
-  const pot = tournament.hand === null ? 0 : tournament.hand.pot;
-  return tournament.seats[0].stack + tournament.seats[1].stack + pot;
+  const { table } = session.getState();
+  const pot = table.hand === null ? 0 : table.hand.pot;
+  return table.seats[0].stack + table.seats[1].stack + pot;
 }
 
 function expectSettled(session: Session): void {
-  const { phase, tournament } = session.getState();
+  const { phase, table } = session.getState();
   if (phase === 'humanToAct') {
-    expect(toAct(tournament)).toBe(HUMAN_SEAT);
-    expect(tournament.hand?.street).not.toBe('complete');
+    expect(toAct(table)).toBe(HUMAN_SEAT);
+    expect(table.hand?.street).not.toBe('complete');
     return;
   }
   expect(['handOver', 'tournamentOver']).toContain(phase);
-  expect(tournament.hand?.street).toBe('complete');
-  expect(tournament.winner !== null).toBe(phase === 'tournamentOver');
+  expect(table.hand?.street).toBe('complete');
+  expect(table.winner !== null).toBe(phase === 'tournamentOver');
 }
 
 function startingStacksFor(seed: number, rng: Rng): [number, number] | undefined {
@@ -67,6 +67,7 @@ async function playTournament(seed: number): Promise<number> {
     humanSeat: HUMAN_SEAT,
     names: ['Mallorca', 'Human'],
     startingStacks: startingStacksFor(seed, rng),
+    mode: TOURNAMENT,
   });
   const unsubscribe = session.subscribe(() => {
     expect(chipsOnTable(session)).toBe(TOTAL_CHIPS);
@@ -77,7 +78,7 @@ async function playTournament(seed: number): Promise<number> {
     let hands = 1;
     let moves = 0;
     while (session.getState().phase !== 'tournamentOver') {
-      const { phase, tournament } = session.getState();
+      const { phase, table } = session.getState();
       if (phase === 'handOver') {
         expect(hands).toBeLessThan(MAX_HANDS);
         hands += 1;
@@ -86,11 +87,11 @@ async function playTournament(seed: number): Promise<number> {
       } else {
         expect(moves).toBeLessThan(MAX_MOVES_PER_HAND);
         moves += 1;
-        await session.getState().act(randomIntent(legalActionsOf(tournament), rng));
+        await session.getState().act(randomIntent(legalActionsOf(table), rng));
       }
       expectSettled(session);
     }
-    const { seats, winner } = session.getState().tournament;
+    const { seats, winner } = session.getState().table;
     expect(winner).not.toBeNull();
     expect(seats[winner as number]?.stack).toBe(TOTAL_CHIPS);
     return hands;

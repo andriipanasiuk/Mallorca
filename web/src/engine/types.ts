@@ -59,6 +59,7 @@ export type EngineEvent =
   | { type: 'betReturned'; seat: SeatIndex; amount: number }
   | { type: 'potAwarded'; seat: SeatIndex; amount: number }
   | { type: 'handEnded'; stacks: [number, number] }
+  | { type: 'toppedUp'; seat: SeatIndex; amount: number }
   | { type: 'tournamentEnded'; winner: SeatIndex };
 
 export interface Step {
