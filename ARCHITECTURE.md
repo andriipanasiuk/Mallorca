@@ -268,8 +268,8 @@ push/fold, neural opponent models, hand history parsers, the robot and the Swing
 
 - Preact components render only the `ViewModel`, the session phase and the log; they call the session actions
   and hold no game rules.
-- Components: `App`, `StartScreen`, `Table`, `Seat`, `Card` (SVG), `Board`, `Pot`, `ActionBar`, `BetSlider`,
-  `HandLog`, `TournamentOver`, `SessionOver`.
+- Components: `App`, `StatusBar`, `HistoryMenu`, `StartScreen`, `Table`, `Seat`, `Card` (SVG), `Board`, `Pot`,
+  `ActionBar`, `BetSlider`, `HandLog`, `TournamentOver`, `SessionOver`.
 - The start screen offers a cash game (100 bb) and a tournament. In cash the status bar shows the blinds, the
   running result in bb and a leave button, enabled only between hands; the session-over dialog shows the result in
   bb, bb/100 and the hands, with play again and the export of the session. `signed` formats a bb value as sign

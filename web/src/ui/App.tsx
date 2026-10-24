@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'preact/hooks';
 import { toViewModel } from '../game/index.ts';
 import type { HandStore, Intent, Session, SeatIndex } from '../game/index.ts';
-import { clearHistory, exportHistory } from './history.ts';
-import { t } from './i18n.ts';
+import { HistoryMenu } from './HistoryMenu.tsx';
 import { StartScreen } from './StartScreen.tsx';
 import { Table } from './Table.tsx';
 import { SessionOver } from './SessionOver.tsx';
-import { signed } from './signed.ts';
+import { StatusBar } from './StatusBar.tsx';
 import { TournamentOver } from './TournamentOver.tsx';
 
 export interface AppProps {
@@ -27,92 +26,22 @@ function useSessionState(session: Session) {
 
 export function App({ session, store, humanSeat, onNewGame }: AppProps) {
   const state = useSessionState(session);
-  const [confirmClear, setConfirmClear] = useState(false);
   if (state.phase === 'idle') {
     return (
       <StartScreen seed={state.seed} onStart={(mode) => void session.getState().start(mode)} />
     );
   }
   const vm = toViewModel(state, humanSeat);
-  const cash = vm.mode === 'cash';
-  const net = signed(vm.session.netBb);
   const act = (intent: Intent) => void session.getState().act(intent);
   return (
     <div class="app">
-      <header class="status-bar">
-        <span data-testid="blinds">
-          {t('status.blinds', { small: vm.blinds.small, big: vm.blinds.big })}
-        </span>
-        {cash && (
-          <span data-testid="session-result">
-            {t('status.result', { sign: net.sign, bb: net.value })}
-          </span>
-        )}
-        <span data-testid="hand-number">{t('status.hand', { number: vm.handNumber })}</span>
-        {cash && (
-          <button
-            type="button"
-            class="button button-small leave"
-            data-testid="leave"
-            disabled={state.phase !== 'handOver'}
-            onClick={() => session.getState().leave()}
-          >
-            {t('status.leave')}
-          </button>
-        )}
-        <details
-          class="menu"
-          onToggle={(event) => {
-            if (!(event.currentTarget as HTMLDetailsElement).open) {
-              setConfirmClear(false);
-            }
-          }}
-        >
-          <summary class="menu-summary">{t('status.menu')}</summary>
-          <div class="menu-body">
-            <span>{t('status.seed', { seed: state.seed })}</span>
-            <button
-              type="button"
-              class="button button-small"
-              data-testid="new-game"
-              onClick={onNewGame}
-            >
-              {t('status.newGame')}
-            </button>
-            <button
-              type="button"
-              class="button button-small"
-              data-testid="export-all-json"
-              onClick={() => void exportHistory(store, null, 'json')}
-            >
-              {t('history.exportAllJson')}
-            </button>
-            <button
-              type="button"
-              class="button button-small"
-              data-testid="export-all-text"
-              onClick={() => void exportHistory(store, null, 'text')}
-            >
-              {t('history.exportAllText')}
-            </button>
-            <button
-              type="button"
-              class="button button-small"
-              data-testid="clear-history"
-              onClick={() => {
-                if (!confirmClear) {
-                  setConfirmClear(true);
-                  return;
-                }
-                setConfirmClear(false);
-                void clearHistory(store);
-              }}
-            >
-              {t(confirmClear ? 'history.clearConfirm' : 'history.clear')}
-            </button>
-          </div>
-        </details>
-      </header>
+      <StatusBar
+        vm={vm}
+        canLeave={state.phase === 'handOver'}
+        onLeave={() => session.getState().leave()}
+      >
+        <HistoryMenu seed={state.seed} store={store} onNewGame={onNewGame} />
+      </StatusBar>
       <Table
         vm={vm}
         phase={state.phase}
