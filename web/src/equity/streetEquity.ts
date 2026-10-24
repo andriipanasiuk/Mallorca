@@ -12,6 +12,58 @@ export interface StreetEquity {
 const FLOP_SIZE = 3;
 const RIVER_SIZE = 5;
 
+interface Tally {
+  count: number;
+  wins: number;
+  draws: number;
+  countPositive: number;
+  winsPositive: number;
+  countNegative: number;
+  winsNegative: number;
+}
+
+interface Matchup {
+  hero: readonly [Card, Card];
+  villain: readonly [Card, Card];
+  board: readonly Card[];
+  dead: readonly Card[];
+}
+
+function tallyPotential(tally: Tally, matchup: Matchup, weight: number, heroBehind: boolean): void {
+  const { hero, villain, board, dead } = matchup;
+  for (const next of remainingDeck([...dead, ...villain])) {
+    const heroAfter = pheEvaluator.rank([...hero, ...board, next]);
+    const villainAfter = pheEvaluator.rank([...villain, ...board, next]);
+    if (heroBehind) {
+      tally.countPositive += weight;
+      if (heroAfter > villainAfter) {
+        tally.winsPositive += weight;
+      }
+    } else {
+      tally.countNegative += weight;
+      if (heroAfter < villainAfter) {
+        tally.winsNegative += weight;
+      }
+    }
+  }
+}
+
+function tallyVillain(tally: Tally, matchup: Matchup, weight: number, heroRank: number): void {
+  const villainRank = pheEvaluator.rank([...matchup.villain, ...matchup.board]);
+  tally.count += weight;
+  if (heroRank === villainRank) {
+    tally.draws += weight;
+    return;
+  }
+  const heroBehind = heroRank < villainRank;
+  if (!heroBehind) {
+    tally.wins += weight;
+  }
+  if (matchup.board.length < RIVER_SIZE) {
+    tallyPotential(tally, matchup, weight, heroBehind);
+  }
+}
+
 export function streetEquity(
   hero: readonly [Card, Card],
   range: WeightedHands,
@@ -23,53 +75,30 @@ export function streetEquity(
   }
   const dead = [...hero, ...board];
   const heroRank = pheEvaluator.rank([...hero, ...board]);
-  const canImprove = board.length < RIVER_SIZE;
-  let count = 0;
-  let wins = 0;
-  let draws = 0;
-  let countPositive = 0;
-  let winsPositive = 0;
-  let countNegative = 0;
-  let winsNegative = 0;
+  const tally: Tally = {
+    count: 0,
+    wins: 0,
+    draws: 0,
+    countPositive: 0,
+    winsPositive: 0,
+    countNegative: 0,
+    winsNegative: 0,
+  };
   for (const { cards: villain, weight } of range) {
-    if (isBlocked(villain, dead)) {
-      continue;
-    }
-    const villainRank = pheEvaluator.rank([...villain, ...board]);
-    count += weight;
-    if (heroRank === villainRank) {
-      draws += weight;
-      continue;
-    }
-    const heroBehind = heroRank < villainRank;
-    if (!heroBehind) {
-      wins += weight;
-    }
-    if (!canImprove) {
-      continue;
-    }
-    for (const next of remainingDeck([...dead, ...villain])) {
-      const heroAfter = pheEvaluator.rank([...hero, ...board, next]);
-      const villainAfter = pheEvaluator.rank([...villain, ...board, next]);
-      if (heroBehind) {
-        countPositive += weight;
-        if (heroAfter > villainAfter) {
-          winsPositive += weight;
-        }
-      } else {
-        countNegative += weight;
-        if (heroAfter < villainAfter) {
-          winsNegative += weight;
-        }
-      }
+    if (!isBlocked(villain, dead)) {
+      tallyVillain(tally, { hero, villain, board, dead }, weight, heroRank);
     }
   }
-  const noPotential = canImprove ? 1 : 0;
+  const noPotential = board.length < RIVER_SIZE ? 1 : 0;
   return {
-    strength: (draws / 2 + wins) / count,
-    positivePotential: countPositive !== 0 ? winsPositive / countPositive : noPotential,
-    negativePotential: countNegative !== 0 ? winsNegative / countNegative : noPotential,
+    strength: (tally.draws / 2 + tally.wins) / tally.count,
+    positivePotential: potential(tally.winsPositive, tally.countPositive, noPotential),
+    negativePotential: potential(tally.winsNegative, tally.countNegative, noPotential),
   };
+}
+
+function potential(wins: number, count: number, fallback: number): number {
+  return count !== 0 ? wins / count : fallback;
 }
 
 export function realEquity(e: StreetEquity): number {

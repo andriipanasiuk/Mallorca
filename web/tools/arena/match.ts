@@ -29,7 +29,11 @@ function playHand(
       for (const o of toObservations(step.events, seat)) bots[seat].observe(o);
     }
   };
-  let step = startHandWith(seats, 0, BLINDS, deck, index * 2 + k + 1);
+  let step = startHandWith(
+    seats,
+    { button: 0, blinds: BLINDS, handNumber: index * 2 + k + 1 },
+    deck,
+  );
   feed(step);
   while (step.hand.street !== 'complete') {
     const seat = step.hand.toAct as SeatIndex;

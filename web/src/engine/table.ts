@@ -56,10 +56,8 @@ export function startHand(t: Table, rng: Rng): { state: Table; events: EngineEve
   const prepared = rules.beforeHand(t.seats);
   const step = startHandWith(
     prepared.seats,
-    button,
-    rules.blinds(handNumber),
+    { button, blinds: rules.blinds(handNumber), handNumber },
     shuffle(fullDeck(), rng),
-    handNumber,
   );
   const concluded = conclude({ ...t, button, handNumber }, step);
   return { state: concluded.state, events: [...prepared.events, ...concluded.events] };

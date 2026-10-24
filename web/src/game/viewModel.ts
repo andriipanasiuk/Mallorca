@@ -1,6 +1,6 @@
 import type { Card } from '../cards/index.ts';
 import { legalActionsOf, rulesOf, toAct } from '../engine/index.ts';
-import type { LogEntry, SeatIndex } from '../engine/index.ts';
+import type { Hand, LegalActions, LogEntry, SeatIndex } from '../engine/index.ts';
 import type { HandCategory } from '../equity/index.ts';
 import type { SessionState } from './session.ts';
 
@@ -64,30 +64,53 @@ function seatView(state: SessionState, seat: SeatIndex, humanSeat: SeatIndex): S
   };
 }
 
+function raiseControl(
+  hand: Hand,
+  raise: LegalActions['raise'],
+  call: number | null,
+): RaiseControl | null {
+  if (raise === null) {
+    return null;
+  }
+  const { min, max } = raise;
+  const currentBet = Math.max(hand.bets[0], hand.bets[1]);
+  const potAfterCall = hand.pot + (call ?? 0);
+  return {
+    min,
+    max,
+    presets: {
+      halfPot: clamp(currentBet + potAfterCall / 2, min, max),
+      pot: clamp(currentBet + potAfterCall, min, max),
+      allIn: max,
+    },
+  };
+}
+
+function resultView(result: SessionState['result']): ViewModel['result'] {
+  if (result === null) {
+    return null;
+  }
+  return { winner: result.winner, category: result.category, amount: result.amount };
+}
+
+function sessionView(session: SessionState['session'], bigBlind: number): ViewModel['session'] {
+  const { hands, net } = session;
+  const netBb = net / bigBlind;
+  return {
+    hands,
+    netBb: roundTenth(netBb),
+    bbPer100: hands === 0 ? null : roundTenth((netBb / hands) * 100),
+  };
+}
+
 export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewModel {
-  const { table, phase, result } = state;
+  const { table, phase } = state;
   const { hand } = table;
   const enabled = phase === 'humanToAct' && toAct(table) === humanSeat;
   const legal = legalActionsOf(table);
   const call = enabled ? legal.call : null;
-  let raise: RaiseControl | null = null;
-  if (enabled && legal.raise !== null && hand !== null) {
-    const { min, max } = legal.raise;
-    const currentBet = Math.max(hand.bets[0], hand.bets[1]);
-    const potAfterCall = hand.pot + (call ?? 0);
-    raise = {
-      min,
-      max,
-      presets: {
-        halfPot: clamp(currentBet + potAfterCall / 2, min, max),
-        pot: clamp(currentBet + potAfterCall, min, max),
-        allIn: max,
-      },
-    };
-  }
+  const raise = enabled && hand !== null ? raiseControl(hand, legal.raise, call) : null;
   const blinds = rulesOf(table.mode).blinds(Math.max(table.handNumber, 1));
-  const { hands, net } = state.session;
-  const netBb = net / blinds.big;
   return {
     seats: [seatView(state, 0, humanSeat), seatView(state, 1, humanSeat)],
     board: hand === null ? [] : [...hand.board],
@@ -99,17 +122,10 @@ export function toViewModel(state: SessionState, humanSeat: SeatIndex): ViewMode
       enabled,
     },
     mode: table.mode.kind,
-    session: {
-      hands,
-      netBb: roundTenth(netBb),
-      bbPer100: hands === 0 ? null : roundTenth((netBb / hands) * 100),
-    },
+    session: sessionView(state.session, blinds.big),
     blinds,
     handNumber: table.handNumber,
-    result:
-      result === null
-        ? null
-        : { winner: result.winner, category: result.category, amount: result.amount },
+    result: resultView(state.result),
     tournamentWinner: table.winner,
   };
 }

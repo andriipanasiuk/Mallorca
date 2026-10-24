@@ -57,14 +57,11 @@ class MathBrain implements Brain {
       throw new Error('The brain has not seen its hole cards');
     }
     const situation = this.heroState.situation();
-    const distribution = profitMap(
-      this.solver,
-      this.game,
-      situation,
+    const distribution = profitMap(this.solver, this.game, situation, {
       hero,
-      this.tracker.spectrum,
-      this.strength,
-    );
+      spectrum: this.tracker.spectrum,
+      strength: this.strength,
+    });
     const advice = this.adviceCreator.create(distribution, this.game);
     const action = preprocessAction(advice, this.game, situation.amountToCall);
     return {

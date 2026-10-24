@@ -47,10 +47,8 @@ describe('hand properties', () => {
             { name: 'A', stack: stackA },
             { name: 'B', stack: stackB },
           ],
-          button,
-          { small: Math.floor(bigBlind / 2), big: bigBlind },
+          { button, blinds: { small: Math.floor(bigBlind / 2), big: bigBlind }, handNumber: 1 },
           deck,
-          1,
         );
         const expectedTotal = stackA + stackB;
         expect(total(step)).toBe(expectedTotal);
@@ -87,10 +85,8 @@ describe('hand properties', () => {
             { name: 'A', stack: stackA },
             { name: 'B', stack: stackB },
           ],
-          button,
-          { small: Math.floor(bigBlind / 2), big: bigBlind },
+          { button, blinds: { small: Math.floor(bigBlind / 2), big: bigBlind }, handNumber: 1 },
           shuffle(fullDeck(), mulberry32(seed)),
-          1,
         );
         let actions = 0;
         while (step.hand.toAct !== null) {
@@ -118,10 +114,8 @@ describe('hand properties', () => {
             { name: 'A', stack: stackA },
             { name: 'B', stack: stackB },
           ],
-          button,
-          { small: Math.floor(bigBlind / 2), big: bigBlind },
+          { button, blinds: { small: Math.floor(bigBlind / 2), big: bigBlind }, handNumber: 1 },
           deck,
-          1,
         );
         const events = [...step.events];
         let i = 0;

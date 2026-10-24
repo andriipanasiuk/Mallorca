@@ -52,78 +52,120 @@ export function strengthVsRandom(hero: HoleCards, board: readonly Card[]): numbe
   return (draws / 2 + wins) / count;
 }
 
+type Standing = 'ahead' | 'tied' | 'behind';
+
+interface PotentialTally {
+  countPositive: number;
+  winsPositive: number;
+  countNegative: number;
+  winsNegative: number;
+}
+
+interface NextCardDeal {
+  readonly live: readonly Card[];
+  readonly heroNext: Card[];
+  readonly villainNext: Card[];
+  readonly last: number;
+  readonly tally: PotentialTally;
+}
+
+function tallyFromTie(tally: PotentialTally, heroAfter: number, villainAfter: number): void {
+  tally.countPositive += 0.5;
+  tally.countNegative += 0.5;
+  if (heroAfter > villainAfter) {
+    tally.winsPositive += 0.5;
+  }
+  if (heroAfter < villainAfter) {
+    tally.winsNegative += 0.5;
+  }
+}
+
+function tallyFromBehind(tally: PotentialTally, heroAfter: number, villainAfter: number): void {
+  tally.countPositive++;
+  if (heroAfter > villainAfter) {
+    tally.winsPositive++;
+  } else if (heroAfter === villainAfter) {
+    tally.winsPositive += 0.5;
+  }
+}
+
+function tallyFromAhead(tally: PotentialTally, heroAfter: number, villainAfter: number): void {
+  tally.countNegative++;
+  if (heroAfter < villainAfter) {
+    tally.winsNegative++;
+  } else if (heroAfter === villainAfter) {
+    tally.winsNegative += 0.5;
+  }
+}
+
+const TALLY_BY_STANDING: Record<
+  Standing,
+  (tally: PotentialTally, heroAfter: number, villainAfter: number) => void
+> = { tied: tallyFromTie, behind: tallyFromBehind, ahead: tallyFromAhead };
+
+function tallyNextCards(deal: NextCardDeal, first: Card, second: Card, standing: Standing): void {
+  const tallyNext = TALLY_BY_STANDING[standing];
+  for (const next of deal.live) {
+    if (next === first || next === second) {
+      continue;
+    }
+    deal.heroNext[deal.last] = next;
+    deal.villainNext[deal.last] = next;
+    tallyNext(deal.tally, pheEvaluator.rank(deal.heroNext), pheEvaluator.rank(deal.villainNext));
+  }
+}
+
+function standingOf(heroRank: number, villainRank: number): Standing {
+  if (heroRank === villainRank) {
+    return 'tied';
+  }
+  return heroRank < villainRank ? 'behind' : 'ahead';
+}
+
 export function equityVsRandom(hero: HoleCards, board: readonly Card[]): StreetEquity {
   const live = fullDeck().filter(
     (card) => card !== hero[0] && card !== hero[1] && !board.includes(card),
   );
   const heroCurrent = pheEvaluator.rank([hero[0], hero[1], ...board]);
-  const heroNext = [hero[0], hero[1], ...board, 0];
   const villainCurrent = [0, 0, ...board];
-  const villainNext = [0, 0, ...board, 0];
-  const last = board.length + 2;
+  const tally: PotentialTally = {
+    countPositive: 0,
+    winsPositive: 0,
+    countNegative: 0,
+    winsNegative: 0,
+  };
+  const deal: NextCardDeal = {
+    live,
+    heroNext: [hero[0], hero[1], ...board, 0],
+    villainNext: [0, 0, ...board, 0],
+    last: board.length + 2,
+    tally,
+  };
   let count = 0;
   let wins = 0;
   let draws = 0;
-  let countPositive = 0;
-  let winsPositive = 0;
-  let countNegative = 0;
-  let winsNegative = 0;
   for (let f = 0; f < live.length; f++) {
     const first = live[f] as Card;
     for (let s = f + 1; s < live.length; s++) {
       const second = live[s] as Card;
       villainCurrent[0] = first;
       villainCurrent[1] = second;
-      villainNext[0] = first;
-      villainNext[1] = second;
-      const villainRank = pheEvaluator.rank(villainCurrent);
-      const behind = heroCurrent < villainRank;
-      const tied = heroCurrent === villainRank;
-      if (tied) {
+      deal.villainNext[0] = first;
+      deal.villainNext[1] = second;
+      const standing = standingOf(heroCurrent, pheEvaluator.rank(villainCurrent));
+      if (standing === 'tied') {
         draws++;
-      } else if (!behind) {
+      } else if (standing === 'ahead') {
         wins++;
       }
       count++;
-      for (const next of live) {
-        if (next === first || next === second) {
-          continue;
-        }
-        heroNext[last] = next;
-        villainNext[last] = next;
-        const heroAfter = pheEvaluator.rank(heroNext);
-        const villainAfter = pheEvaluator.rank(villainNext);
-        if (tied) {
-          countPositive += 0.5;
-          countNegative += 0.5;
-          if (heroAfter > villainAfter) {
-            winsPositive += 0.5;
-          }
-          if (heroAfter < villainAfter) {
-            winsNegative += 0.5;
-          }
-        } else if (behind) {
-          countPositive++;
-          if (heroAfter > villainAfter) {
-            winsPositive++;
-          } else if (heroAfter === villainAfter) {
-            winsPositive += 0.5;
-          }
-        } else {
-          countNegative++;
-          if (heroAfter < villainAfter) {
-            winsNegative++;
-          } else if (heroAfter === villainAfter) {
-            winsNegative += 0.5;
-          }
-        }
-      }
+      tallyNextCards(deal, first, second, standing);
     }
   }
   return {
     strength: (draws / 2 + wins) / count,
-    positivePotential: countPositive !== 0 ? winsPositive / countPositive : 1,
-    negativePotential: countNegative !== 0 ? winsNegative / countNegative : 1,
+    positivePotential: tally.countPositive !== 0 ? tally.winsPositive / tally.countPositive : 1,
+    negativePotential: tally.countNegative !== 0 ? tally.winsNegative / tally.countNegative : 1,
   };
 }
 
