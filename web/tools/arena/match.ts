@@ -41,6 +41,7 @@ function playHand(
     step = applyAction(step.hand, step.seats, action);
     feed(step);
   }
+  for (const bot of bots) bot.dispose?.();
   return { events, stacks: [step.seats[0].stack, step.seats[1].stack] };
 }
 

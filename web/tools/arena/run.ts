@@ -3,7 +3,7 @@ import { writeFileSync } from 'node:fs';
 import { Worker } from 'node:worker_threads';
 import { CASH } from '../../src/engine/index.ts';
 import { handRecord } from '../../src/game/records/record.ts';
-import { BOTS } from './bots.ts';
+import { BOTS, prepareBots } from './bots.ts';
 import type { BotName } from './bots.ts';
 import { playPair } from './match.ts';
 import { summarize } from './stats.ts';
@@ -84,6 +84,9 @@ export async function runArena(options: ArenaOptions): Promise<Report> {
   const inputs: WorkerInput[] = chunks(options.pairs, Math.max(1, options.workers)).map(
     (indices) => ({ a, b, seed: options.seed, indices, withHands }),
   );
+  if (options.workers <= 1) {
+    await prepareBots([a, b]);
+  }
   const batches =
     options.workers <= 1 ? inputs.map(runInProcess) : await Promise.all(inputs.map(runInWorker));
   const results = batches.flat().sort((x, y) => x.index - y.index);
