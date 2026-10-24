@@ -1,7 +1,8 @@
 # Working in this repository
 
 - The Java modules at the root are an archive and the reference for the golden tests; they are not modified.
-  Development happens in `web/`.
+  Development happens in `web/`, a TypeScript browser game, and in `solver/`, a Rust CFR trainer with its own
+  rules in `solver/CLAUDE.md`. The npm rules below apply to `web/`.
 - Node: `source ~/.nvm/nvm.sh && nvm use` before any npm command; the version comes from `web/.nvmrc` (24).
   Run npm commands from `web/`.
 - Read `ARCHITECTURE.md` before adding a module, crossing a layer or changing a contract; it is the contract.
