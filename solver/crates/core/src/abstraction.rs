@@ -2,6 +2,7 @@ use crate::cards::Card;
 use crate::eval::rank;
 use crate::iso::{street_indexers, HandIndexer};
 use crate::strategy::{StrategyError, StrategyFile};
+use crate::strength::{bucket_of, percentile_thresholds, river_hs, turn_value};
 use crate::tree::Street;
 use std::fmt;
 use std::sync::OnceLock;
@@ -83,7 +84,7 @@ pub fn decode_table(mut bytes: Vec<u8>) -> Result<(TableHeader, Vec<u8>), TableE
 }
 
 const LIVE_HOLES: usize = 1081;
-const LIVE_OPPONENTS: f32 = 990.0;
+pub(crate) const LIVE_OPPONENTS: f32 = 990.0;
 
 fn river_indexer() -> &'static HandIndexer {
     static INDEXER: OnceLock<HandIndexer> = OnceLock::new();
@@ -136,17 +137,10 @@ pub fn river_strength(board: &[Card; 5]) -> Vec<(u64, f32)> {
 }
 
 pub fn percentile_buckets(values: &[f32], buckets: u16) -> Vec<u8> {
-    assert!((1..=256).contains(&buckets));
-    let mut sorted = values.to_vec();
-    sorted.sort_unstable_by(f32::total_cmp);
-    let n = sorted.len();
-    let thresholds: Vec<f32> = (1..buckets as usize)
-        .map(|b| sorted[(b * n / buckets as usize).min(n - 1)])
-        .collect();
-    drop(sorted);
+    let thresholds = percentile_thresholds(values, buckets);
     values
         .iter()
-        .map(|&v| thresholds.partition_point(|&t| t <= v) as u8)
+        .map(|&v| bucket_of(&thresholds, v) as u8)
         .collect()
 }
 
@@ -156,7 +150,14 @@ pub fn aggregate_hs2(indexers: &[HandIndexer; 4], street: Street, index: u64, ne
         Street::Flop => (1, 2),
         _ => panic!("aggregate_hs2 needs flop or turn"),
     };
-    let mut cards = indexers[round].unindex(1, index);
+    let cards = indexers[round].unindex(1, index);
+    aggregate_squares(cards, |c| next[indexers[target].index(c) as usize])
+}
+
+pub(crate) fn aggregate_squares(
+    mut cards: Vec<Card>,
+    mut value: impl FnMut(&[Card]) -> f32,
+) -> f32 {
     let mut dead = 0u64;
     for &c in &cards {
         dead |= 1 << c;
@@ -170,46 +171,64 @@ pub fn aggregate_hs2(indexers: &[HandIndexer; 4], street: Street, index: u64, ne
             continue;
         }
         cards[last] = c;
-        let v = next[indexers[target].index(&cards) as usize];
+        let v = value(&cards);
         sum += v * v;
         live += 1;
     }
     sum / live as f32
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum BucketSource {
+    Table(Vec<u8>),
+    Thresholds(Vec<f32>),
+}
+
 pub struct Abstraction {
     indexers: [HandIndexer; 4],
-    tables: [Vec<u8>; 3],
+    sources: [BucketSource; 3],
 }
+
+const POSTFLOP: [Street; 3] = [Street::Flop, Street::Turn, Street::River];
 
 impl Abstraction {
     pub fn new(tables: [Vec<u8>; 3]) -> Abstraction {
+        Abstraction::with_sources(tables.map(BucketSource::Table))
+    }
+
+    pub fn with_sources(sources: [BucketSource; 3]) -> Abstraction {
         Abstraction {
             indexers: street_indexers(),
-            tables,
+            sources,
         }
     }
 
     pub fn from_strategy(file: &StrategyFile) -> Result<Abstraction, StrategyError> {
-        const POSTFLOP: [Street; 3] = [Street::Flop, Street::Turn, Street::River];
-        let mut tables: [Vec<u8>; 3] = Default::default();
+        let mut sources: [BucketSource; 3] = Default::default();
         let mut next = file.tables.iter();
-        for (slot, street) in tables.iter_mut().zip(POSTFLOP) {
+        for (slot, street) in sources.iter_mut().zip(POSTFLOP) {
             if !file.includes(street) {
                 return Err(StrategyError::MissingStreet(street));
             }
-            *slot = next
-                .next()
-                .ok_or(StrategyError::MissingStreet(street))?
-                .clone();
+            *slot = match file.thresholds_of(street) {
+                Some(t) if street != Street::Flop => BucketSource::Thresholds(t.to_vec()),
+                Some(_) => return Err(StrategyError::MissingStreet(street)),
+                None => BucketSource::Table(
+                    next.next()
+                        .ok_or(StrategyError::MissingStreet(street))?
+                        .clone(),
+                ),
+            };
         }
         if next.next().is_some() {
             return Err(StrategyError::Inconsistent);
         }
-        let abstraction = Abstraction::new(tables);
+        let abstraction = Abstraction::with_sources(sources);
         let buckets = file.tree.buckets();
         for street in POSTFLOP {
-            let table = abstraction.table_bytes(street);
+            let BucketSource::Table(table) = &abstraction.sources[street.as_index() - 1] else {
+                continue;
+            };
             if table.len() as u64 != abstraction.class_count(street) {
                 return Err(StrategyError::Inconsistent);
             }
@@ -226,11 +245,15 @@ impl Abstraction {
         let mut cards = [0 as Card; 7];
         cards[..2].copy_from_slice(&hole);
         cards[2..2 + board.len()].copy_from_slice(board);
-        let index = self.indexers[s].index(&cards[..2 + board.len()]);
         if s == 0 {
-            index as u16
-        } else {
-            self.tables[s - 1][index as usize] as u16
+            return self.indexers[0].index(&cards[..2]) as u16;
+        }
+        match &self.sources[s - 1] {
+            BucketSource::Table(table) => {
+                let index = self.indexers[s].index(&cards[..2 + board.len()]);
+                u16::from(table[index as usize])
+            }
+            BucketSource::Thresholds(t) => bucket_of(t, live_value(street, hole, board)),
         }
     }
 
@@ -239,7 +262,24 @@ impl Abstraction {
     }
 
     pub fn table_bytes(&self, street: Street) -> &[u8] {
-        &self.tables[street.as_index() - 1]
+        match &self.sources[street.as_index() - 1] {
+            BucketSource::Table(table) => table,
+            BucketSource::Thresholds(_) => panic!("the {street:?} has thresholds, not a table"),
+        }
+    }
+}
+
+impl Default for BucketSource {
+    fn default() -> BucketSource {
+        BucketSource::Table(Vec::new())
+    }
+}
+
+fn live_value(street: Street, hole: [Card; 2], board: &[Card]) -> f32 {
+    match street {
+        Street::Turn => turn_value(hole, board.try_into().expect("four board cards")),
+        Street::River => river_hs(hole, board.try_into().expect("five board cards")),
+        _ => panic!("no live value for the {street:?}"),
     }
 }
 

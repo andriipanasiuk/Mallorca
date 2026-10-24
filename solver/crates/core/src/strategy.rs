@@ -4,6 +4,9 @@ use std::fmt;
 
 pub const MAGIC: &[u8; 4] = b"MLCS";
 pub const FORMAT_VERSION: u16 = 1;
+pub const PLAY_FORMAT_VERSION: u16 = 2;
+const KIND_TABLE: u8 = 0;
+const KIND_THRESHOLDS: u8 = 1;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StrategyError {
@@ -81,6 +84,7 @@ pub struct StrategyFile {
     pub checkpoint: u32,
     pub tree: Tree,
     pub tables: Vec<Vec<u8>>,
+    pub thresholds: Vec<(Street, Vec<f32>)>,
     pub probabilities: Vec<u8>,
     offsets: Vec<u64>,
 }
@@ -154,6 +158,70 @@ impl<'a> Cursor<'a> {
     }
 }
 
+type Buckets = (Vec<Vec<u8>>, Vec<(Street, Vec<f32>)>);
+
+fn read_table(t: &mut Cursor<'_>, street: Street) -> Result<Vec<u8>, StrategyError> {
+    let table = t.prefixed().map_err(|_| StrategyError::Inconsistent)?;
+    if table.len() as u64 != street_indexers()[street.as_index()].size(1) {
+        return Err(StrategyError::Inconsistent);
+    }
+    Ok(table.to_vec())
+}
+
+fn read_thresholds(t: &mut Cursor<'_>, expected: u16) -> Result<Vec<f32>, StrategyError> {
+    let count = t.u16().map_err(|_| StrategyError::Inconsistent)?;
+    if count != expected.saturating_sub(1) {
+        return Err(StrategyError::Inconsistent);
+    }
+    let bytes = t
+        .take(usize::from(count) * 4)
+        .map_err(|_| StrategyError::Inconsistent)?;
+    let values: Vec<f32> = bytes
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .map(|&c| f32::from_le_bytes(c))
+        .collect();
+    let ordered = values.windows(2).all(|w| w[0] <= w[1]);
+    if !ordered || values.iter().any(|v| !v.is_finite()) {
+        return Err(StrategyError::Inconsistent);
+    }
+    Ok(values)
+}
+
+fn read_buckets(
+    section: &[u8],
+    tree: &Tree,
+    streets: u8,
+    tagged: bool,
+) -> Result<Buckets, StrategyError> {
+    let mut tables = Vec::new();
+    let mut thresholds = Vec::new();
+    let mut t = Cursor {
+        bytes: section,
+        pos: 0,
+    };
+    for street in POSTFLOP.into_iter().filter(|&s| included(streets, s)) {
+        let kind = if tagged {
+            t.u8().map_err(|_| StrategyError::Inconsistent)?
+        } else {
+            KIND_TABLE
+        };
+        match kind {
+            KIND_TABLE => tables.push(read_table(&mut t, street)?),
+            KIND_THRESHOLDS => {
+                let expected = tree.buckets()[street.as_index()];
+                thresholds.push((street, read_thresholds(&mut t, expected)?));
+            }
+            _ => return Err(StrategyError::Inconsistent),
+        }
+    }
+    if t.pos != section.len() {
+        return Err(StrategyError::Inconsistent);
+    }
+    Ok((tables, thresholds))
+}
+
 impl StrategyFile {
     pub fn new(
         header: StrategyHeader,
@@ -172,9 +240,48 @@ impl StrategyFile {
             checkpoint: header.checkpoint,
             tree,
             tables,
+            thresholds: Vec::new(),
             probabilities,
             offsets,
         }
+    }
+
+    pub fn with_thresholds(mut self, thresholds: Vec<(Street, Vec<f32>)>) -> StrategyFile {
+        self.thresholds = thresholds;
+        self
+    }
+
+    pub fn thresholds_of(&self, street: Street) -> Option<&[f32]> {
+        self.thresholds
+            .iter()
+            .find(|(s, _)| *s == street)
+            .map(|(_, t)| &t[..])
+    }
+
+    fn bucket_section(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        if self.thresholds.is_empty() {
+            for table in &self.tables {
+                out.extend_from_slice(&(table.len() as u32).to_le_bytes());
+                out.extend_from_slice(table);
+            }
+            return out;
+        }
+        let mut tables = self.tables.iter();
+        for street in POSTFLOP.into_iter().filter(|&s| self.includes(s)) {
+            if let Some(t) = self.thresholds_of(street) {
+                out.push(KIND_THRESHOLDS);
+                out.extend_from_slice(&(t.len() as u16).to_le_bytes());
+                for v in t {
+                    out.extend_from_slice(&v.to_le_bytes());
+                }
+            } else if let Some(table) = tables.next() {
+                out.push(KIND_TABLE);
+                out.extend_from_slice(&(table.len() as u32).to_le_bytes());
+                out.extend_from_slice(table);
+            }
+        }
+        out
     }
 
     pub fn includes(&self, street: Street) -> bool {
@@ -188,8 +295,13 @@ impl StrategyFile {
                 + self.tables.iter().map(Vec::len).sum::<usize>()
                 + self.probabilities.len(),
         );
+        let version = if self.thresholds.is_empty() {
+            FORMAT_VERSION
+        } else {
+            PLAY_FORMAT_VERSION
+        };
         out.extend_from_slice(MAGIC);
-        out.extend_from_slice(&FORMAT_VERSION.to_le_bytes());
+        out.extend_from_slice(&version.to_le_bytes());
         out.extend_from_slice(&self.fingerprint);
         out.extend_from_slice(&self.small_blind.to_le_bytes());
         out.extend_from_slice(&self.big_blind.to_le_bytes());
@@ -199,12 +311,9 @@ impl StrategyFile {
         out.extend_from_slice(&self.checkpoint.to_le_bytes());
         out.extend_from_slice(&(tree.len() as u32).to_le_bytes());
         out.extend_from_slice(&tree);
-        let section: usize = self.tables.iter().map(|t| 4 + t.len()).sum();
-        out.extend_from_slice(&(section as u32).to_le_bytes());
-        for table in &self.tables {
-            out.extend_from_slice(&(table.len() as u32).to_le_bytes());
-            out.extend_from_slice(table);
-        }
+        let section = self.bucket_section();
+        out.extend_from_slice(&(section.len() as u32).to_le_bytes());
+        out.extend_from_slice(&section);
         out.extend_from_slice(&self.probabilities);
         out
     }
@@ -215,7 +324,7 @@ impl StrategyFile {
             return Err(StrategyError::BadMagic);
         }
         let version = c.u16()?;
-        if version != FORMAT_VERSION {
+        if version != FORMAT_VERSION && version != PLAY_FORMAT_VERSION {
             return Err(StrategyError::UnknownVersion(version));
         }
         let fingerprint: [u8; 32] = c.take(32)?.try_into().expect("32 bytes");
@@ -232,25 +341,12 @@ impl StrategyFile {
             return Err(StrategyError::Inconsistent);
         }
         let tree = Tree::deserialize(tree_bytes).map_err(|_| StrategyError::Inconsistent)?;
-        let indexers = street_indexers();
-        let mut tables = Vec::new();
-        let mut t = Cursor {
-            bytes: table_section,
-            pos: 0,
-        };
-        for street in POSTFLOP {
-            if !included(streets, street) {
-                continue;
-            }
-            let table = t.prefixed().map_err(|_| StrategyError::Inconsistent)?;
-            if table.len() as u64 != indexers[street.as_index()].size(1) {
-                return Err(StrategyError::Inconsistent);
-            }
-            tables.push(table.to_vec());
-        }
-        if t.pos != table_section.len() {
-            return Err(StrategyError::Inconsistent);
-        }
+        let (tables, thresholds) = read_buckets(
+            table_section,
+            &tree,
+            streets,
+            version == PLAY_FORMAT_VERSION,
+        )?;
         let (offsets, expected) = offsets_for(&tree, streets);
         if probabilities.len() as u64 != expected {
             return Err(StrategyError::Inconsistent);
@@ -265,6 +361,7 @@ impl StrategyFile {
             checkpoint,
             tree,
             tables,
+            thresholds,
             probabilities: probabilities.to_vec(),
             offsets,
         })
@@ -427,12 +524,84 @@ mod tests {
     }
 
     #[test]
-    fn version_two() {
+    fn version_three() {
         let mut b = sample(0b0011).to_bytes();
-        b[4] = 2;
+        b[4] = 3;
         assert_eq!(
             StrategyFile::from_bytes(&b).err(),
-            Some(StrategyError::UnknownVersion(2))
+            Some(StrategyError::UnknownVersion(3))
+        );
+    }
+
+    fn thresholds() -> Vec<f32> {
+        (1..8).map(|i| i as f32 / 8.0).collect()
+    }
+
+    fn play_sample() -> StrategyFile {
+        sample(0b1111).with_thresholds(vec![
+            (Street::Turn, thresholds()),
+            (Street::River, thresholds()),
+        ])
+    }
+
+    #[test]
+    fn play_file_round_trips_as_version_two() {
+        let f = play_sample();
+        let b = f.to_bytes();
+        assert_eq!(&b[4..6], &2u16.to_le_bytes());
+        let g = StrategyFile::from_bytes(&b).unwrap();
+        assert_eq!(g, f);
+        assert_eq!(g.tables.len(), 1);
+        assert_eq!(g.thresholds_of(Street::Turn), Some(&thresholds()[..]));
+        assert_eq!(g.thresholds_of(Street::River), Some(&thresholds()[..]));
+        assert_eq!(g.thresholds_of(Street::Flop), None);
+        assert_eq!(g.probabilities.len() as u64, g.tree.action_slot_count());
+    }
+
+    #[test]
+    fn table_only_file_stays_version_one() {
+        let b = sample(0b0011).with_thresholds(Vec::new()).to_bytes();
+        assert_eq!(&b[4..6], &1u16.to_le_bytes());
+    }
+
+    #[test]
+    fn wrong_threshold_count() {
+        let f = sample(0b1111).with_thresholds(vec![
+            (Street::Turn, thresholds()),
+            (Street::River, thresholds()[1..].to_vec()),
+        ]);
+        assert_eq!(
+            StrategyFile::from_bytes(&f.to_bytes()).err(),
+            Some(StrategyError::Inconsistent)
+        );
+    }
+
+    #[test]
+    fn thresholds_out_of_order_or_not_finite() {
+        for bad in [f32::NAN, f32::INFINITY, 0.0] {
+            let mut t = thresholds();
+            t[3] = bad;
+            let f = sample(0b1111)
+                .with_thresholds(vec![(Street::Turn, thresholds()), (Street::River, t)]);
+            assert_eq!(
+                StrategyFile::from_bytes(&f.to_bytes()).err(),
+                Some(StrategyError::Inconsistent),
+                "{bad}"
+            );
+        }
+    }
+
+    #[test]
+    fn unknown_bucket_kind() {
+        let f = play_sample();
+        let mut b = f.to_bytes();
+        let tree_len = u32::from_le_bytes(b[63..67].try_into().unwrap()) as usize;
+        let kind = 67 + tree_len + 4;
+        assert_eq!(b[kind], 0);
+        b[kind] = 2;
+        assert_eq!(
+            StrategyFile::from_bytes(&b).err(),
+            Some(StrategyError::Inconsistent)
         );
     }
 

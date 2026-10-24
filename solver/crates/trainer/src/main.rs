@@ -2,6 +2,7 @@ mod buckets;
 mod export;
 mod lbr;
 mod measure;
+mod thresholds;
 mod train;
 mod tree;
 

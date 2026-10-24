@@ -2,7 +2,7 @@ use crate::tree::load_preset;
 use clap::Args;
 use mallorca_core::abstraction::{aggregate_hs2, encode_table, percentile_buckets, river_strength};
 use mallorca_core::cards::Card;
-use mallorca_core::iso::{board_indexer, street_indexers};
+use mallorca_core::iso::{board_indexer, street_indexers, HandIndexer};
 use mallorca_core::tree::Street;
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -84,6 +84,18 @@ fn write_floats(path: &Path, values: &[f32]) -> Result<(), String> {
         .map_err(|e| format!("cannot write {}: {e}", path.display()))
 }
 
+pub fn turn_values(indexers: &[HandIndexer; 4], river_hs: &[f32], threads: usize) -> Vec<f32> {
+    let turn_count = indexers[2].size(1) as usize;
+    let turn_cells = atomic_cells(turn_count, 0.0);
+    parallel_chunks("turn", turn_count, threads, |range| {
+        for i in range {
+            let v = aggregate_hs2(indexers, Street::Turn, i as u64, river_hs);
+            turn_cells[i].store(v.to_bits(), Ordering::Relaxed);
+        }
+    });
+    into_floats(turn_cells)
+}
+
 pub fn run(args: &BucketsArgs) -> Result<(), String> {
     let preset = load_preset(&args.preset)?;
     let threads = preset.threads;
@@ -114,14 +126,7 @@ pub fn run(args: &BucketsArgs) -> Result<(), String> {
     }
 
     println!("turn: {turn_count} classes");
-    let turn_cells = atomic_cells(turn_count, 0.0);
-    parallel_chunks("turn", turn_count, threads, |range| {
-        for i in range {
-            let v = aggregate_hs2(&indexers, Street::Turn, i as u64, &river_hs);
-            turn_cells[i].store(v.to_bits(), Ordering::Relaxed);
-        }
-    });
-    let turn_values = into_floats(turn_cells);
+    let turn_values = turn_values(&indexers, &river_hs, threads);
 
     println!("flop: {flop_count} classes");
     let flop_cells = atomic_cells(flop_count, 0.0);

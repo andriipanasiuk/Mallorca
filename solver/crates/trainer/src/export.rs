@@ -1,3 +1,4 @@
+use crate::thresholds::play_thresholds;
 use crate::train::{latest_checkpoint, load_abstraction, load_checkpoint};
 use crate::tree::load_preset;
 use clap::{Args, ValueEnum};
@@ -13,13 +14,14 @@ use std::path::{Path, PathBuf};
 pub enum StreetSet {
     Browser,
     All,
+    Play,
 }
 
 impl StreetSet {
     fn mask(self) -> u8 {
         match self {
             StreetSet::Browser => 0b0011,
-            StreetSet::All => 0b1111,
+            StreetSet::All | StreetSet::Play => 0b1111,
         }
     }
 }
@@ -74,11 +76,20 @@ pub fn build(
             probabilities.extend(quantize(&average));
         }
     }
-    let tables = [Street::Flop, Street::Turn, Street::River]
-        .into_iter()
-        .filter(|&street| included(street))
-        .map(|street| abstraction.table_bytes(street).to_vec())
-        .collect();
+    let (tables, thresholds) = match streets {
+        StreetSet::Play => (
+            vec![abstraction.table_bytes(Street::Flop).to_vec()],
+            play_thresholds(data, &preset, &abstraction)?,
+        ),
+        _ => (
+            [Street::Flop, Street::Turn, Street::River]
+                .into_iter()
+                .filter(|&street| included(street))
+                .map(|street| abstraction.table_bytes(street).to_vec())
+                .collect(),
+            Vec::new(),
+        ),
+    };
     let header = StrategyHeader {
         fingerprint: fp,
         small_blind: preset.small_blind,
@@ -88,7 +99,7 @@ pub fn build(
         iterations: loaded.iterations,
         checkpoint: loaded.checkpoint,
     };
-    Ok(StrategyFile::new(header, tree, tables, probabilities))
+    Ok(StrategyFile::new(header, tree, tables, probabilities).with_thresholds(thresholds))
 }
 
 fn gzip_size(bytes: &[u8]) -> Result<usize, String> {
@@ -223,6 +234,58 @@ mod tests {
             file.probabilities.len() as u64,
             file.tree.action_slot_count()
         );
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn play_export_needs_the_river_strengths() {
+        let dir = trained("export-play-missing", 100);
+        let err = export(&dir, StreetSet::Play).err().unwrap();
+        assert!(err.contains("river_hs.f32"), "{err}");
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    #[ignore]
+    fn play_export_on_real_tables_reproduces_every_bucket() {
+        let dir = data_dir("export-play-real");
+        let threads = std::thread::available_parallelism().map_or(2, |n| n.get());
+        let text = std::fs::read_to_string(dir.join("tiny.toml")).unwrap();
+        std::fs::write(
+            dir.join("tiny.toml"),
+            text.replace("threads = 2", &format!("threads = {threads}")),
+        )
+        .unwrap();
+        for table in ["flop.bkt", "turn.bkt", "river.bkt"] {
+            std::fs::remove_file(dir.join(table)).unwrap();
+        }
+        crate::buckets::run(&crate::buckets::BucketsArgs {
+            preset: dir.join("tiny.toml"),
+            out: dir.clone(),
+        })
+        .unwrap();
+        go(&session(&dir, Some(100), 3, Some(1))).unwrap();
+        let file = export(&dir, StreetSet::Play).unwrap();
+        assert_eq!(file.streets, 0b1111);
+        assert_eq!(file.tables.len(), 1);
+        let again = StrategyFile::from_bytes(&file.to_bytes()).unwrap();
+        assert_eq!(again, file);
+        let live = mallorca_core::abstraction::Abstraction::from_strategy(&again).unwrap();
+        let preset = load_preset(&dir.join("tiny.toml")).unwrap();
+        let tables = load_abstraction(&preset, &dir).unwrap();
+        let mut rng = mallorca_core::rng::Rng::new(11);
+        for _ in 0..300 {
+            let mut deck: Vec<u8> = (0..52).collect();
+            rng.shuffle(&mut deck);
+            let hole = [deck[0], deck[1]];
+            for (street, n) in [(Street::Flop, 5), (Street::Turn, 6), (Street::River, 7)] {
+                assert_eq!(
+                    live.bucket(street, hole, &deck[2..n]),
+                    tables.bucket(street, hole, &deck[2..n]),
+                    "{street:?} {deck:?}"
+                );
+            }
+        }
         std::fs::remove_dir_all(dir).unwrap();
     }
 

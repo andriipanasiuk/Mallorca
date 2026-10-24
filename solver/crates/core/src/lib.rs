@@ -1,4 +1,5 @@
 pub mod abstraction;
+pub mod bot;
 pub mod cards;
 pub mod cfr;
 pub mod checkpoint;
@@ -11,4 +12,5 @@ pub mod measure;
 pub mod preset;
 pub mod rng;
 pub mod strategy;
+pub mod strength;
 pub mod tree;
