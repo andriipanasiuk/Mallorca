@@ -4,8 +4,9 @@
   },
   "start": {
     "heading": "Heads-up against Mallorca",
-    "tagline": "No-limit hold'em, 2000 chips each, blinds rise every 10 hands. Last player with chips wins.",
-    "cta": "Take a seat",
+    "tagline": "Heads-up no-limit hold'em. A cash game with 100 big blinds, or a tournament with rising blinds.",
+    "cash": "Cash game, 100 big blinds",
+    "tournament": "Tournament",
     "farewell": "Sleep well. The table will be here."
   },
   "status": {
@@ -13,7 +14,9 @@
     "hand": "Hand {{number}}",
     "seed": "Seed {{seed}}",
     "menu": "Menu",
-    "newTournament": "New tournament",
+    "newGame": "New game",
+    "result": "{{sign}}{{bb}} bb",
+    "leave": "Leave table",
     "simpleTable": "Simple table",
     "autoNext": "Auto next hand"
   },
@@ -72,6 +75,7 @@
       "show": "You show {{cards}} ({{hand}})",
       "returned": "Uncalled bet of {{amount}} returned to you",
       "win": "You win {{amount}}",
+      "toppedUp": "You top up {{amount}}",
       "winTournament": "You win the tournament"
     },
     "other": {
@@ -84,6 +88,7 @@
       "show": "{{name}} shows {{cards}} ({{hand}})",
       "returned": "Uncalled bet of {{amount}} returned to {{name}}",
       "win": "{{name}} wins {{amount}}",
+      "toppedUp": "{{name}} tops up {{amount}}",
       "winTournament": "{{name}} wins the tournament"
     }
   },
@@ -96,6 +101,21 @@
     "lost": "You lost the tournament",
     "again": "Play again",
     "leave": "That's enough for tonight"
+  },
+  "history": {
+    "exportJson": "Export history as data",
+    "exportText": "Export history as text",
+    "exportAllJson": "Export all hands as data",
+    "exportAllText": "Export all hands as text",
+    "clear": "Clear history",
+    "clearConfirm": "Tap again to clear"
+  },
+  "session": {
+    "title": "Session over",
+    "summary_one": "{{sign}}{{bb}} bb over {{count}} hand",
+    "summary_other": "{{sign}}{{bb}} bb over {{count}} hands",
+    "rate": "{{rate}} bb/100",
+    "again": "Play again"
   },
   "hands": {
     "high-card": "High card",

@@ -4,15 +4,17 @@ import {
   apply,
   BIG_BLINDS,
   blindsFor,
-  createTournament,
+  CASH,
+  createTable,
   legalActionsOf,
   startHand,
   toAct,
-} from './tournament.ts';
-import type { Tournament } from './tournament.ts';
+  TOURNAMENT,
+} from './table.ts';
+import type { Table } from './table.ts';
 import type { EngineEvent } from './types.ts';
 
-function shoveHand(t: Tournament): { state: Tournament; events: EngineEvent[] } {
+function shoveHand(t: Table): { state: Table; events: EngineEvent[] } {
   let state = t;
   const events: EngineEvent[] = [];
   while (toAct(state) !== null) {
@@ -45,8 +47,9 @@ describe('blindsFor', () => {
   });
 });
 
-function shortStack(): Tournament {
+function shortStack(): Table {
   return {
+    mode: TOURNAMENT,
     seats: [
       { name: 'Mallorca', stack: 3990 },
       { name: 'You', stack: 10 },
@@ -58,21 +61,33 @@ function shortStack(): Tournament {
   };
 }
 
-describe('tournament', () => {
-  it('creates a tournament with equal stacks and no hand', () => {
-    const t = createTournament(['Mallorca', 'You']);
+describe('table', () => {
+  it('creates a tournament table with equal stacks and no hand', () => {
+    const t = createTable(['Mallorca', 'You'], TOURNAMENT);
     expect(t.seats).toEqual([
       { name: 'Mallorca', stack: 2000 },
       { name: 'You', stack: 2000 },
     ]);
-    expect(t).toMatchObject({ button: 0, handNumber: 0, hand: null, winner: null });
+    expect(t).toMatchObject({
+      mode: TOURNAMENT,
+      button: 0,
+      handNumber: 0,
+      hand: null,
+      winner: null,
+    });
     expect(toAct(t)).toBeNull();
     expect(legalActionsOf(t)).toEqual({ fold: false, check: false, call: null, raise: null });
   });
 
+  it('creates a cash table with the buy-in on both seats', () => {
+    const t = createTable(['A', 'B'], CASH);
+    expect(t.mode).toEqual({ kind: 'cash', bigBlind: 20, buyIn: 2000 });
+    expect(t.seats.map((s) => s.stack)).toEqual([2000, 2000]);
+  });
+
   it('uses the first button on hand one and alternates afterwards', () => {
     const rng = mulberry32(1);
-    let t = createTournament(['Mallorca', 'You'], 2000, 1);
+    let t = createTable(['Mallorca', 'You'], TOURNAMENT, 1);
     const buttons: number[] = [];
     for (let i = 0; i < 3; i++) {
       const started = startHand(t, rng);
@@ -86,7 +101,7 @@ describe('tournament', () => {
 
   it('plays all-in hands until one stack is empty and keeps the chip total', () => {
     const rng = mulberry32(3);
-    let t = createTournament(['Mallorca', 'You']);
+    let t = createTable(['Mallorca', 'You'], TOURNAMENT);
     let ended: EngineEvent[] = [];
     for (let i = 0; i < 500 && t.winner === null; i++) {
       const started = startHand(t, rng);
@@ -121,13 +136,13 @@ describe('tournament', () => {
   });
 
   it('refuses to start a hand while one is in progress', () => {
-    const started = startHand(createTournament(['Mallorca', 'You']), mulberry32(1));
+    const started = startHand(createTable(['Mallorca', 'You'], TOURNAMENT), mulberry32(1));
     expect(() => startHand(started.state, mulberry32(1))).toThrow('A hand is still in progress');
   });
 
   it('raises the blinds on hand eleven', () => {
     const rng = mulberry32(1);
-    let t = createTournament(['Mallorca', 'You']);
+    let t = createTable(['Mallorca', 'You'], TOURNAMENT);
     const bigBlinds: number[] = [];
     for (let i = 0; i < 11; i++) {
       const started = startHand(t, rng);
@@ -140,10 +155,35 @@ describe('tournament', () => {
 
   it('refuses to start a hand once the tournament is over', () => {
     const rng = mulberry32(3);
-    let t = createTournament(['Mallorca', 'You']);
+    let t = createTable(['Mallorca', 'You'], TOURNAMENT);
     while (t.winner === null) {
       t = shoveHand(startHand(t, rng).state).state;
     }
     expect(() => startHand(t, rng)).toThrow();
+  });
+
+  it('keeps a cash session going after a bust and tops the seat up on the next hand', () => {
+    const rng = mulberry32(3);
+    let t = createTable(['Mallorca', 'You'], CASH);
+    let events: EngineEvent[] = [];
+    for (let i = 0; i < 500 && !t.seats.some((s) => s.stack === 0); i++) {
+      const played = shoveHand(startHand(t, rng).state);
+      t = played.state;
+      events = played.events;
+    }
+    const busted = t.seats[0].stack === 0 ? 0 : 1;
+    expect(t.seats[busted].stack).toBe(0);
+    expect(t.winner).toBeNull();
+    expect(events.map((e) => e.type)).not.toContain('tournamentEnded');
+    const next = startHand(t, rng);
+    const types = next.events.map((e) => e.type);
+    expect(types[0]).toBe('toppedUp');
+    expect(types.indexOf('toppedUp')).toBeLessThan(types.indexOf('handStarted'));
+    expect(next.events[0]).toEqual({ type: 'toppedUp', seat: busted, amount: 2000 });
+    const handStarted = next.events.find((e) => e.type === 'handStarted') as Extract<
+      EngineEvent,
+      { type: 'handStarted' }
+    >;
+    expect(handStarted.stacks[busted]).toBe(2000);
   });
 });

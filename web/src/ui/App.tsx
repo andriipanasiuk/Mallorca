@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'preact/hooks';
 import { toViewModel } from '../game/index.ts';
-import type { Intent, Session, SeatIndex } from '../game/index.ts';
+import type { HandStore, Intent, Phase, Session, SeatIndex, ViewModel } from '../game/index.ts';
 import { HandLog } from './HandLog.tsx';
-import { nextHandDelay } from './autoNext.ts';
-import { readAutoNext, readTableStyle, writeAutoNext, writeTableStyle } from './preferences.ts';
-import type { TableStyle } from './preferences.ts';
-import { t } from './i18n.ts';
+import { HistoryMenu } from './HistoryMenu.tsx';
 import { Scene } from './Scene.tsx';
+import { SessionOver } from './SessionOver.tsx';
+import { Settings } from './Settings.tsx';
 import { StartScreen } from './StartScreen.tsx';
+import { StatusBar } from './StatusBar.tsx';
 import { Table } from './Table.tsx';
 import { TournamentOver } from './TournamentOver.tsx';
+import { useAutoNext } from './useAutoNext.ts';
+import { usePreferences } from './usePreferences.ts';
 
 export interface AppProps {
   session: Session;
+  store: HandStore;
   humanSeat: SeatIndex;
-  onNewTournament: () => void;
-  onLeave: () => void;
+  onNewGame: () => void;
+  onLeaveTonight: () => void;
   farewell?: boolean;
   autoNext?: boolean;
 }
@@ -29,120 +32,88 @@ function useSessionState(session: Session) {
   return state;
 }
 
-export function App({
-  session,
-  humanSeat,
-  onNewTournament,
-  onLeave,
-  farewell = false,
-  autoNext = true,
-}: AppProps) {
+export function App(props: AppProps) {
+  const { session, store, humanSeat, onNewGame } = props;
   const state = useSessionState(session);
-  const [tableStyle, setTableStyle] = useState<TableStyle>(readTableStyle);
-  const simple = tableStyle === 'simple';
-  const toggleSimple = () => {
-    const next: TableStyle = simple ? 'room' : 'simple';
-    writeTableStyle(next);
-    setTableStyle(next);
-  };
-  const [autoNextOn, setAutoNextOn] = useState(readAutoNext);
-  const toggleAutoNext = () => {
-    writeAutoNext(!autoNextOn);
-    setAutoNextOn(!autoNextOn);
-  };
-  const handOver = state.phase === 'handOver';
-  const autoNextMs =
-    autoNext && autoNextOn && handOver ? nextHandDelay(toViewModel(state, humanSeat)) : null;
-  const handNumber = handOver ? toViewModel(state, humanSeat).handNumber : null;
-  useEffect(() => {
-    if (autoNextMs === null) {
-      return;
-    }
-    const timer = setTimeout(() => {
-      if (session.getState().phase === 'handOver') {
-        void session.getState().nextHand();
-      }
-    }, autoNextMs);
-    return () => clearTimeout(timer);
-  }, [session, autoNextMs, handNumber]);
-  if (state.phase === 'idle') {
+  const preferences = usePreferences();
+  const vm = state.phase === 'idle' ? null : toViewModel(state, humanSeat);
+  const handOver = state.phase === 'handOver' ? vm : null;
+  const autoNextMs = useAutoNext(
+    session,
+    handOver,
+    (props.autoNext ?? true) && preferences.autoNext,
+  );
+  if (vm === null) {
     return (
       <StartScreen
         seed={state.seed}
-        simple={simple}
-        farewell={farewell}
-        onStart={() => void session.getState().start()}
+        simple={preferences.simple}
+        farewell={props.farewell ?? false}
+        onStart={(mode) => void session.getState().start(mode)}
       />
     );
   }
-  const vm = toViewModel(state, humanSeat);
   const act = (intent: Intent) => void session.getState().act(intent);
+  const names: [string, string] = [vm.seats[0].name, vm.seats[1].name];
   return (
-    <Scene simple={simple}>
+    <Scene simple={preferences.simple}>
       <div class="app">
-        <header class="scene-top">
-          <span class="status-pill glass pill" data-testid="blinds">
-            {t('status.blinds', { small: vm.blinds.small, big: vm.blinds.big })}
-          </span>
-          <span class="status-pill glass pill" data-testid="hand-number">
-            {t('status.hand', { number: vm.handNumber })}
-          </span>
-          <details class="menu">
-            <summary class="menu-summary glass pill">{t('status.menu')}</summary>
-            <div class="menu-body glass">
-              <label class="menu-toggle">
-                <input
-                  type="checkbox"
-                  data-testid="simple-table"
-                  checked={simple}
-                  onChange={toggleSimple}
-                />
-                <span>{t('status.simpleTable')}</span>
-              </label>
-              <label class="menu-toggle">
-                <input
-                  type="checkbox"
-                  data-testid="auto-next"
-                  checked={autoNextOn}
-                  onChange={toggleAutoNext}
-                />
-                <span>{t('status.autoNext')}</span>
-              </label>
-              <span>{t('status.seed', { seed: state.seed })}</span>
-              <button
-                type="button"
-                class="button button-small glass pill"
-                data-testid="new-tournament"
-                onClick={onNewTournament}
-              >
-                {t('status.newTournament')}
-              </button>
-              <HandLog
-                entries={state.log}
-                names={[vm.seats[0].name, vm.seats[1].name]}
-                humanSeat={humanSeat}
-                testId="hand-log-menu"
-              />
-            </div>
-          </details>
-        </header>
+        <StatusBar
+          vm={vm}
+          canLeave={state.phase === 'handOver'}
+          onLeave={() => session.getState().leave()}
+        >
+          <HistoryMenu seed={state.seed} store={store} onNewGame={onNewGame}>
+            <Settings preferences={preferences} />
+            <HandLog
+              entries={state.log}
+              names={names}
+              humanSeat={humanSeat}
+              testId="hand-log-menu"
+            />
+          </HistoryMenu>
+        </StatusBar>
         <Table
           vm={vm}
           phase={state.phase}
           humanSeat={humanSeat}
           log={state.log}
-          onAct={act}
           autoNextMs={autoNextMs}
+          onAct={act}
           onNextHand={() => void session.getState().nextHand()}
         />
-        {state.phase === 'tournamentOver' && (
-          <TournamentOver
-            won={vm.tournamentWinner === humanSeat}
-            onPlayAgain={onNewTournament}
-            onLeave={onLeave}
-          />
-        )}
+        <GameOver props={props} vm={vm} phase={state.phase} sessionId={state.sessionId} />
       </div>
     </Scene>
   );
+}
+
+interface GameOverProps {
+  props: AppProps;
+  vm: ViewModel;
+  phase: Phase;
+  sessionId: string | null;
+}
+
+function GameOver({ props, vm, phase, sessionId }: GameOverProps) {
+  if (phase === 'sessionOver') {
+    return (
+      <SessionOver
+        session={vm.session}
+        store={props.store}
+        sessionId={sessionId}
+        onPlayAgain={props.onNewGame}
+      />
+    );
+  }
+  if (phase === 'tournamentOver') {
+    return (
+      <TournamentOver
+        won={vm.tournamentWinner === props.humanSeat}
+        onPlayAgain={props.onNewGame}
+        onLeave={props.onLeaveTonight}
+      />
+    );
+  }
+  return null;
 }

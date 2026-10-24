@@ -12,7 +12,11 @@ const seats: [Seat, Seat] = [
 describe('handHistory', () => {
   it('describes a hand that goes to showdown with locale keys and seat indices', () => {
     const deck = deckOf('Ah Ad', '7c 2d', 'Qs Jh 7d 4c 9h');
-    const start = startHandWith(seats, 0, { small: 10, big: 20 }, deck, 1);
+    const start = startHandWith(
+      seats,
+      { button: 0, blinds: { small: 10, big: 20 }, handNumber: 1 },
+      deck,
+    );
     const end = playEvents(start, raiseTo(60), call, check, check, check, check, check, check);
     expect(handHistory(end.events)).toEqual([
       { key: 'handStarted', params: { number: 1, small: 10, big: 20 } },
@@ -37,7 +41,11 @@ describe('handHistory', () => {
 
   it('describes folds, uncalled bets, all-ins and the end of the tournament', () => {
     const deck = deckOf('Ah Ad', '7c 2d', 'Qs Jh 7d 4c 9h');
-    const start = startHandWith(seats, 1, { small: 10, big: 20 }, deck, 4);
+    const start = startHandWith(
+      seats,
+      { button: 1, blinds: { small: 10, big: 20 }, handNumber: 4 },
+      deck,
+    );
     const folded = playEvents(start, fold);
     expect(handHistory(folded.events)).toEqual([
       { key: 'handStarted', params: { number: 4, small: 10, big: 20 } },
@@ -48,7 +56,7 @@ describe('handHistory', () => {
       { key: 'win', params: { seat: 0, amount: 20 } },
     ]);
     const shove = playEvents(
-      startHandWith(seats, 0, { small: 10, big: 20 }, deck, 1),
+      startHandWith(seats, { button: 0, blinds: { small: 10, big: 20 }, handNumber: 1 }, deck),
       raiseTo(2000),
       call,
     );
@@ -56,5 +64,11 @@ describe('handHistory', () => {
     expect(entries).toContainEqual({ key: 'allIn', params: { seat: 0 } });
     expect(entries).toContainEqual({ key: 'allIn', params: { seat: 1 } });
     expect(entries.at(-1)).toEqual({ key: 'winTournament', params: { seat: 1 } });
+  });
+
+  it('describes a top-up', () => {
+    expect(handHistory([{ type: 'toppedUp', seat: 1, amount: 1400 }])).toEqual([
+      { key: 'toppedUp', params: { seat: 1, amount: 1400 } },
+    ]);
   });
 });

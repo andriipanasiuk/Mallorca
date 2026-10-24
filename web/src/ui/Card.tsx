@@ -24,43 +24,44 @@ function Index({ rank, suit }: { rank: string; suit: string }) {
   );
 }
 
-export function Card({ card, highlight = false }: CardProps) {
+function CardBack({ className }: { className: string }) {
   const id = useId();
-  const className = `card${highlight ? ' card-highlight' : ''}`;
-  if (card === 'back') {
-    return (
-      <svg
-        class={`${className} card-back`}
-        viewBox="0 0 250 350"
-        role="img"
-        aria-label={t('card.back')}
-        data-testid="card-back"
-      >
-        <defs>
-          <pattern
-            id={`weave-${id}`}
-            width="14"
-            height="14"
-            patternUnits="userSpaceOnUse"
-            patternTransform="rotate(45)"
-          >
-            <rect class="card-weave-ground" width="14" height="14" />
-            <path class="card-weave-line" d="M0 7h14M7 0v14" />
-          </pattern>
-        </defs>
-        <rect class="card-body" x="2" y="2" width="246" height="346" rx="18" />
-        <rect
-          class="card-weave"
-          x="16"
-          y="16"
-          width="218"
-          height="318"
-          rx="10"
-          fill={`url(#weave-${id})`}
-        />
-      </svg>
-    );
-  }
+  return (
+    <svg
+      class={`${className} card-back`}
+      viewBox="0 0 250 350"
+      role="img"
+      aria-label={t('card.back')}
+      data-testid="card-back"
+    >
+      <defs>
+        <pattern
+          id={`weave-${id}`}
+          width="14"
+          height="14"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <rect class="card-weave-ground" width="14" height="14" />
+          <path class="card-weave-line" d="M0 7h14M7 0v14" />
+        </pattern>
+      </defs>
+      <rect class="card-body" x="2" y="2" width="246" height="346" rx="18" />
+      <rect
+        class="card-weave"
+        x="16"
+        y="16"
+        width="218"
+        height="318"
+        rx="10"
+        fill={`url(#weave-${id})`}
+      />
+    </svg>
+  );
+}
+
+function CardFace({ card, className }: { card: CardValue; className: string }) {
+  const id = useId();
   const rank = RANKS[rankOf(card)] ?? String(rankOf(card));
   const suit = SUITS[suitOf(card)] ?? '';
   const red = suitOf(card) === 1 || suitOf(card) === 2;
@@ -96,5 +97,14 @@ export function Card({ card, highlight = false }: CardProps) {
         <Index rank={rank} suit={suit} />
       </g>
     </svg>
+  );
+}
+
+export function Card({ card, highlight = false }: CardProps) {
+  const className = `card${highlight ? ' card-highlight' : ''}`;
+  return card === 'back' ? (
+    <CardBack className={className} />
+  ) : (
+    <CardFace card={card} className={className} />
   );
 }

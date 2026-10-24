@@ -10,10 +10,10 @@ describe('TournamentOver', () => {
     const onLeave = vi.fn();
     render(<TournamentOver won onPlayAgain={onPlayAgain} onLeave={onLeave} />);
     fireEvent.click(screen.getByTestId('play-again'));
-    fireEvent.click(screen.getByTestId('leave'));
+    fireEvent.click(screen.getByTestId('leave-tonight'));
     expect(onPlayAgain).toHaveBeenCalledTimes(1);
     expect(onLeave).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('leave').textContent).toBe("That's enough for tonight");
+    expect(screen.getByTestId('leave-tonight').textContent).toBe("That's enough for tonight");
   });
 
   it('names the outcome under the title', () => {

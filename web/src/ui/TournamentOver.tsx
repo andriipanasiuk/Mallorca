@@ -21,7 +21,7 @@ export function TournamentOver({ won, onPlayAgain, onLeave }: TournamentOverProp
           >
             {t('over.again')}
           </button>
-          <button type="button" class="button" data-testid="leave" onClick={onLeave}>
+          <button type="button" class="button" data-testid="leave-tonight" onClick={onLeave}>
             {t('over.leave')}
           </button>
         </div>

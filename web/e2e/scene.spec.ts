@@ -10,7 +10,7 @@ test('the table stays playable when the plate fails to load', async ({ page, pro
     return route.abort();
   });
   await page.goto(FAST_URL);
-  await byId(page, 'start').click();
+  await byId(page, 'start-tournament').click();
   await expect(byId(page, 'passive')).toBeEnabled();
   await expect(byId(page, 'passive')).toBeInViewport({ ratio: 1 });
   const felt = await byId(page, 'scene').evaluate((node) => getComputedStyle(node).backgroundColor);
@@ -36,7 +36,7 @@ async function playToTheFlop(page: Page) {
 
 test('the showdown result leaves both shown hands and the board visible', async ({ page }) => {
   await page.goto(FAST_URL);
-  await byId(page, 'start').click();
+  await byId(page, 'start-tournament').click();
   for (;;) {
     const waypoint = await waitForWaypoint(page);
     if (waypoint === 'next-hand') {
@@ -77,14 +77,14 @@ test('the simple table is flat, skips the photo and is remembered', async ({ pag
     }
   });
   await page.goto(FAST_URL);
-  await byId(page, 'start').click();
+  await byId(page, 'start-tournament').click();
   await expect(byId(page, 'passive')).toBeEnabled();
   await page.locator('.menu-summary').click();
   await byId(page, 'simple-table').check();
   plates.length = 0;
   await page.reload();
   await expect(byId(page, 'scene')).toHaveClass(/scene-simple/);
-  await byId(page, 'start').click();
+  await byId(page, 'start-tournament').click();
   await expect(byId(page, 'passive')).toBeEnabled();
   const transforms = await page.evaluate(() =>
     ['.felt-plane', '.seat-top .card', '.seat-bottom .card'].map(
@@ -101,7 +101,7 @@ test('the simple table is flat, skips the photo and is remembered', async ({ pag
 test('reduced motion turns off the deal animation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(FAST_URL);
-  await byId(page, 'start').click();
+  await byId(page, 'start-tournament').click();
   const boardCard = await playToTheFlop(page);
   expect(await boardCard.evaluate((node) => node.getAnimations().length)).toBe(0);
 });
@@ -109,7 +109,7 @@ test('reduced motion turns off the deal animation', async ({ page }) => {
 test('without reduced motion a dealt card plays the deal animation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto(FAST_URL);
-  await byId(page, 'start').click();
+  await byId(page, 'start-tournament').click();
   const boardCard = await playToTheFlop(page);
   const names = await boardCard.evaluate((node) =>
     node.getAnimations().map((animation) => (animation as CSSAnimation).animationName),

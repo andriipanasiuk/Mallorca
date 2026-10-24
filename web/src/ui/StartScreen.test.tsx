@@ -1,11 +1,21 @@
-import { cleanup, render, screen } from '@testing-library/preact';
+import { cleanup, fireEvent, render, screen } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { CASH, TOURNAMENT } from '../game/index.ts';
 import en from '../locales/en.json';
 import { StartScreen } from './StartScreen.tsx';
 
 afterEach(cleanup);
 
 describe('StartScreen', () => {
+  it('starts a cash game or a tournament', () => {
+    const onStart = vi.fn();
+    render(<StartScreen seed={42} onStart={onStart} />);
+    fireEvent.click(screen.getByTestId('start-cash'));
+    expect(onStart).toHaveBeenLastCalledWith(CASH);
+    fireEvent.click(screen.getByTestId('start-tournament'));
+    expect(onStart).toHaveBeenLastCalledWith(TOURNAMENT);
+  });
+
   it('shows the farewell line in place of the tagline', () => {
     const { container } = render(<StartScreen seed={1} onStart={vi.fn()} farewell />);
     expect(screen.getByTestId('farewell').textContent).toBe('Sleep well. The table will be here.');
@@ -18,9 +28,8 @@ describe('StartScreen', () => {
     expect(container.textContent).toContain(en.start.tagline);
   });
 
-  it('invites the player to take a seat over the dimmed room', () => {
+  it('sits over the dimmed room', () => {
     render(<StartScreen seed={1} onStart={vi.fn()} />);
-    expect(screen.getByTestId('start').textContent).toBe('Take a seat');
     expect(screen.getByTestId('scene').classList.contains('scene-dimmed')).toBe(true);
   });
 });

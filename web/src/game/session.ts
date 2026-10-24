@@ -1,15 +1,17 @@
 import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
 import { mulberry32 } from '../cards/index.ts';
+import type { Rng } from '../cards/index.ts';
 import type { Decision } from '../brains/index.ts';
 import { toObservations } from '../brains/index.ts';
 import {
   apply,
-  createTournament,
+  createTable,
   handHistory,
   legalActionsOf,
   startHand,
   toAct,
+  TOURNAMENT_STACK,
 } from '../engine/index.ts';
 import type {
   Action,
@@ -17,36 +19,52 @@ import type {
   LegalActions,
   LogEntry,
   SeatIndex,
-  Tournament,
+  Table,
+  TableMode,
 } from '../engine/index.ts';
-import type { HandCategory } from '../equity/index.ts';
 import { withFallback } from './botClient.ts';
 import type { BotClient } from './botClient.ts';
+import { resolveIntent, toIntent } from './intent.ts';
+import type { Intent } from './intent.ts';
+import { actedLabel, awardedTo, potCollected, resultOf } from './outcome.ts';
+import type { HandResult } from './outcome.ts';
+import { handRecorder } from './records/recorder.ts';
+import type { HandRecorder, RecordsOptions } from './records/recorder.ts';
+
+export { resolveIntent, toIntent } from './intent.ts';
+export type { Intent } from './intent.ts';
+export { potCollected, resultOf } from './outcome.ts';
+export type { HandResult } from './outcome.ts';
 
 export type Phase =
-  'idle' | 'humanToAct' | 'botThinking' | 'animating' | 'handOver' | 'tournamentOver';
+  | 'idle'
+  | 'humanToAct'
+  | 'botThinking'
+  | 'animating'
+  | 'handOver'
+  | 'tournamentOver'
+  | 'sessionOver';
 
-export type Intent = { kind: 'fold' | 'passive' } | { kind: 'raise'; to: number };
-
-export interface HandResult {
-  winner: SeatIndex | null;
-  category: HandCategory | null;
-  showdown: boolean;
-  amount: number;
+export interface SessionResult {
+  hands: number;
+  net: number;
 }
 
 export interface SessionState {
-  tournament: Tournament;
+  table: Table;
   phase: Phase;
   log: LogEntry[];
   lastActions: [LogEntry | null, LogEntry | null];
   lastDecision: Decision | null;
   seed: number;
   result: HandResult | null;
+  session: SessionResult;
+  sessionId: string | null;
 }
 
 export interface SessionActions {
-  start(): Promise<void>;
+  start(mode?: TableMode): Promise<void>;
+  leave(): void;
   nextHand(): Promise<void>;
   act(intent: Intent): Promise<void>;
   dispose(): void;
@@ -61,248 +79,263 @@ export interface SessionOptions {
   humanSeat: SeatIndex;
   names: [string, string];
   startingStacks?: [number, number];
+  mode: TableMode;
+  records?: RecordsOptions;
 }
 
-const STARTING_STACK = 2000;
+type Store = SessionState & SessionActions;
+type Step = { state: Table; events: EngineEvent[] };
 
-function label(event: Extract<EngineEvent, { type: 'acted' }>): LogEntry {
-  if (event.allIn && event.action.kind !== 'fold') {
-    return { key: 'allIn', params: {} };
-  }
-  switch (event.action.kind) {
-    case 'fold':
-    case 'check':
-      return { key: event.action.kind, params: {} };
-    case 'call':
-      return { key: 'call', params: { amount: event.amount } };
-    case 'raise':
-      return { key: 'raiseTo', params: { amount: event.action.to } };
-  }
+interface Timers {
+  sleep(ms: number): Promise<void>;
+  cancel(): void;
 }
 
-export function resultOf(events: EngineEvent[]): Omit<HandResult, 'amount'> {
-  const awards: [number, number] = [0, 0];
-  let hands: Extract<EngineEvent, { type: 'showdown' }>['hands'] | null = null;
-  for (const event of events) {
-    if (event.type === 'potAwarded') {
-      awards[event.seat] += event.amount;
-    } else if (event.type === 'showdown') {
-      hands = event.hands;
-    }
-  }
-  let winner: SeatIndex | null;
-  if (hands !== null) {
-    winner = hands[0].rank === hands[1].rank ? null : hands[0].rank > hands[1].rank ? 0 : 1;
-  } else {
-    winner = awards[0] > 0 ? 0 : 1;
-  }
-  const shown = hands === null ? null : hands[winner ?? 0];
+interface Runtime {
+  set: StoreApi<Store>['setState'];
+  get: StoreApi<Store>['getState'];
+  bot: BotClient;
+  rng: Rng;
+  timers: Timers;
+  recorder: HandRecorder;
+  humanSeat: SeatIndex;
+  botSeat: SeatIndex;
+  botDelayMs: number;
+  epoch: number;
+  mode: TableMode;
+  startStacks: [number, number];
+  hands: number;
+  topUps: number;
+}
+
+function createTimers(): Timers {
+  const pending = new Map<ReturnType<typeof setTimeout>, () => void>();
   return {
-    winner,
-    category: shown === null ? null : shown.category,
-    showdown: hands !== null,
+    sleep: (ms) =>
+      new Promise((resolve) => {
+        const timer = setTimeout(() => {
+          pending.delete(timer);
+          resolve();
+        }, ms);
+        pending.set(timer, resolve);
+      }),
+    cancel: () => {
+      for (const [timer, resolve] of pending) {
+        clearTimeout(timer);
+        resolve();
+      }
+      pending.clear();
+    },
   };
 }
 
-export function potCollected(paid: [number, number], winner: SeatIndex | null): number {
-  const matched = Math.min(paid[0], paid[1]);
-  return winner === null ? matched : matched * 2;
+function freshTable(options: SessionOptions, mode: TableMode): Table {
+  const { names, startingStacks } = options;
+  const table = createTable(names, mode, 0);
+  if (startingStacks === undefined) {
+    return table;
+  }
+  return {
+    ...table,
+    seats: [
+      { name: names[0], stack: startingStacks[0] },
+      { name: names[1], stack: startingStacks[1] },
+    ],
+  };
 }
 
-function awardedTo(events: EngineEvent[], seat: SeatIndex): number {
-  let total = 0;
+function tally(rt: Runtime, table: Table): SessionResult {
+  const buyIn = table.mode.kind === 'cash' ? table.mode.buyIn : TOURNAMENT_STACK;
+  const live = table.hand !== null && table.hand.street !== 'complete';
+  const stack = live ? rt.startStacks[rt.humanSeat] : table.seats[rt.humanSeat].stack;
+  return { hands: rt.hands, net: stack - buyIn - rt.topUps };
+}
+
+function record(rt: Runtime, events: EngineEvent[]): void {
+  rt.recorder.observe(events);
+  rt.bot.observe(toObservations(events, rt.botSeat));
+  const lastActions: [LogEntry | null, LogEntry | null] = [...rt.get().lastActions];
   for (const event of events) {
-    if (event.type === 'potAwarded' && event.seat === seat) {
-      total += event.amount;
+    if (event.type === 'acted') {
+      lastActions[event.seat] = actedLabel(event);
+    } else if (event.type === 'toppedUp' && event.seat === rt.humanSeat) {
+      rt.topUps += event.amount;
     }
   }
-  return total;
+  rt.set({
+    log: [...rt.get().log, ...handHistory(events)],
+    lastActions,
+    session: tally(rt, rt.get().table),
+  });
 }
 
-export function toIntent(action: Action): Intent {
-  switch (action.kind) {
-    case 'fold':
-      return { kind: 'fold' };
-    case 'raise':
-      return { kind: 'raise', to: action.to };
-    default:
-      return { kind: 'passive' };
+function conclude(rt: Runtime, step: Step): void {
+  if (step.state.hand?.street !== 'complete') {
+    return;
+  }
+  const { seats } = step.state;
+  rt.hands += 1;
+  rt.recorder.save(step.state.mode);
+  const paid = (seat: SeatIndex) =>
+    rt.startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
+  rt.set({
+    result: {
+      ...resultOf(step.events),
+      amount: potCollected([paid(0), paid(1)], resultOf(step.events).winner),
+    },
+    phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
+    session: tally(rt, step.state),
+  });
+}
+
+function play(rt: Runtime, action: Action, decision: Decision | null = null): void {
+  const step = apply(rt.get().table, action);
+  if (decision !== null) {
+    rt.recorder.decided(decision, step.events);
+  }
+  rt.set({ table: step.state });
+  record(rt, step.events);
+  conclude(rt, step);
+}
+
+async function decide(rt: Runtime, legal: LegalActions): Promise<Decision | null> {
+  try {
+    return await rt.bot.decide(legal);
+  } catch {
+    return null;
   }
 }
 
-export function resolveIntent(intent: Intent, legal: LegalActions): Action {
-  if (intent.kind === 'raise' && legal.raise !== null) {
-    const { min, max } = legal.raise;
-    const to = Math.min(Math.max(Math.round(intent.to), min), max);
-    return { kind: 'raise', to };
+async function botTurn(rt: Runtime, myEpoch: number): Promise<boolean> {
+  rt.set({ phase: 'botThinking' });
+  const legal = legalActionsOf(rt.get().table);
+  const decision = await decide(rt, legal);
+  if (myEpoch !== rt.epoch) {
+    return false;
   }
-  if (intent.kind === 'fold' && legal.fold) {
-    return { kind: 'fold' };
+  if (decision !== null) {
+    rt.set({ lastDecision: decision });
   }
-  if (legal.check) {
-    return { kind: 'check' };
+  if (rt.botDelayMs > 0) {
+    rt.set({ phase: 'animating' });
+    await rt.timers.sleep(rt.botDelayMs);
+    if (myEpoch !== rt.epoch) {
+      return false;
+    }
   }
-  if (legal.call !== null) {
-    return { kind: 'call' };
+  const intent: Intent = decision === null ? { kind: 'passive' } : toIntent(decision.action);
+  play(rt, resolveIntent(intent, legal), decision);
+  return true;
+}
+
+async function drive(rt: Runtime, myEpoch: number): Promise<void> {
+  for (;;) {
+    const { table } = rt.get();
+    if (table.hand === null || table.hand.street === 'complete') {
+      return;
+    }
+    if (toAct(table) === rt.humanSeat) {
+      rt.set({ phase: 'humanToAct' });
+      return;
+    }
+    if (!(await botTurn(rt, myEpoch))) {
+      return;
+    }
   }
-  return { kind: 'fold' };
+}
+
+function beginHand(rt: Runtime): Promise<void> {
+  const step = startHand(rt.get().table, rt.rng);
+  const { seats, hand } = step.state;
+  rt.startStacks = [
+    seats[0].stack + (hand?.committed[0] ?? 0),
+    seats[1].stack + (hand?.committed[1] ?? 0),
+  ];
+  rt.bot.reset();
+  rt.recorder.begin();
+  rt.set({ table: step.state, lastActions: [null, null], result: null });
+  record(rt, step.events);
+  conclude(rt, step);
+  return drive(rt, rt.epoch);
+}
+
+function sessionActions(rt: Runtime, options: SessionOptions): SessionActions {
+  return {
+    start(next) {
+      rt.epoch += 1;
+      rt.timers.cancel();
+      if (next !== undefined) {
+        rt.mode = next;
+      }
+      rt.hands = 0;
+      rt.topUps = 0;
+      const table = freshTable(options, rt.mode);
+      rt.set({ table, log: [], lastDecision: null, result: null, session: tally(rt, table) });
+      return beginHand(rt);
+    },
+    leave() {
+      const { phase, table } = rt.get();
+      if (table.mode.kind === 'cash' && phase === 'handOver') {
+        rt.set({ phase: 'sessionOver' });
+      }
+    },
+    dispose() {
+      rt.epoch += 1;
+      rt.timers.cancel();
+      rt.bot.dispose?.();
+    },
+    nextHand() {
+      if (rt.get().phase !== 'handOver') {
+        return Promise.resolve();
+      }
+      return beginHand(rt);
+    },
+    act(intent) {
+      const { phase, table } = rt.get();
+      if (phase !== 'humanToAct' || toAct(table) !== rt.humanSeat) {
+        return Promise.resolve();
+      }
+      play(rt, resolveIntent(intent, legalActionsOf(table)));
+      return drive(rt, rt.epoch);
+    },
+  };
 }
 
 export function createSession(options: SessionOptions): Session {
   const { seed, botDelayMs, humanSeat, names } = options;
-  const botSeat: SeatIndex = humanSeat === 0 ? 1 : 0;
   const bot = withFallback(options.bot);
   const rng = mulberry32(seed);
-  let epoch = 0;
-  let startStacks: [number, number] = [0, 0];
-  const timers = new Map<ReturnType<typeof setTimeout>, () => void>();
-
-  const sleep = (ms: number): Promise<void> =>
-    new Promise((resolve) => {
-      const timer = setTimeout(() => {
-        timers.delete(timer);
-        resolve();
-      }, ms);
-      timers.set(timer, resolve);
-    });
-
-  const cancelTimers = () => {
-    for (const [timer, resolve] of timers) {
-      clearTimeout(timer);
-      resolve();
-    }
-    timers.clear();
-  };
-
-  const fresh = (): Tournament => {
-    const tournament = createTournament(names, STARTING_STACK, 0);
-    const stacks = options.startingStacks;
-    if (stacks === undefined) {
-      return tournament;
-    }
+  const timers = createTimers();
+  const recorder = handRecorder(options.records, { names, humanSeat });
+  return createStore<Store>((set, get) => {
+    const rt: Runtime = {
+      set,
+      get,
+      bot,
+      rng,
+      timers,
+      recorder,
+      humanSeat,
+      botSeat: humanSeat === 0 ? 1 : 0,
+      botDelayMs,
+      epoch: 0,
+      mode: options.mode,
+      startStacks: [0, 0],
+      hands: 0,
+      topUps: 0,
+    };
+    const initial = freshTable(options, rt.mode);
     return {
-      ...tournament,
-      seats: [
-        { name: names[0], stack: stacks[0] },
-        { name: names[1], stack: stacks[1] },
-      ],
-    };
-  };
-
-  return createStore<SessionState & SessionActions>((set, get) => {
-    const record = (events: EngineEvent[]) => {
-      bot.observe(toObservations(events, botSeat));
-      const lastActions: [LogEntry | null, LogEntry | null] = [...get().lastActions];
-      for (const event of events) {
-        if (event.type === 'acted') {
-          lastActions[event.seat] = label(event);
-        }
-      }
-      set({ log: [...get().log, ...handHistory(events)], lastActions });
-    };
-
-    const conclude = (step: { state: Tournament; events: EngineEvent[] }) => {
-      if (step.state.hand?.street === 'complete') {
-        const { seats } = step.state;
-        const paid = (seat: SeatIndex) =>
-          startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
-        set({
-          result: {
-            ...resultOf(step.events),
-            amount: potCollected([paid(0), paid(1)], resultOf(step.events).winner),
-          },
-          phase: step.state.winner === null ? 'handOver' : 'tournamentOver',
-        });
-      }
-    };
-
-    const play = (action: Action) => {
-      const step = apply(get().tournament, action);
-      set({ tournament: step.state });
-      record(step.events);
-      conclude(step);
-    };
-
-    const drive = async (myEpoch: number): Promise<void> => {
-      for (;;) {
-        const { tournament } = get();
-        if (tournament.hand === null || tournament.hand.street === 'complete') {
-          return;
-        }
-        if (toAct(tournament) === humanSeat) {
-          set({ phase: 'humanToAct' });
-          return;
-        }
-        set({ phase: 'botThinking' });
-        const legal = legalActionsOf(tournament);
-        let decision: Decision | null;
-        try {
-          decision = await bot.decide(legal);
-        } catch {
-          decision = null;
-        }
-        if (myEpoch !== epoch) {
-          return;
-        }
-        if (decision !== null) {
-          set({ lastDecision: decision });
-        }
-        if (botDelayMs > 0) {
-          set({ phase: 'animating' });
-          await sleep(botDelayMs);
-          if (myEpoch !== epoch) {
-            return;
-          }
-        }
-        const intent: Intent = decision === null ? { kind: 'passive' } : toIntent(decision.action);
-        play(resolveIntent(intent, legal));
-      }
-    };
-
-    const beginHand = (): Promise<void> => {
-      const { seats } = get().tournament;
-      startStacks = [seats[0].stack, seats[1].stack];
-      const step = startHand(get().tournament, rng);
-      bot.reset();
-      set({ tournament: step.state, lastActions: [null, null], result: null });
-      record(step.events);
-      conclude(step);
-      return drive(epoch);
-    };
-
-    return {
-      tournament: fresh(),
+      table: initial,
       phase: 'idle',
       log: [],
       lastActions: [null, null],
       lastDecision: null,
       seed,
       result: null,
-      start() {
-        epoch += 1;
-        cancelTimers();
-        set({ tournament: fresh(), log: [], lastDecision: null, result: null });
-        return beginHand();
-      },
-      dispose() {
-        epoch += 1;
-        cancelTimers();
-        bot.dispose?.();
-      },
-      nextHand() {
-        if (get().phase !== 'handOver') {
-          return Promise.resolve();
-        }
-        return beginHand();
-      },
-      act(intent) {
-        const { phase, tournament } = get();
-        if (phase !== 'humanToAct' || toAct(tournament) !== humanSeat) {
-          return Promise.resolve();
-        }
-        play(resolveIntent(intent, legalActionsOf(tournament)));
-        return drive(epoch);
-      },
+      session: tally(rt, initial),
+      sessionId: options.records?.sessionId ?? null,
+      ...sessionActions(rt, options),
     };
   });
 }

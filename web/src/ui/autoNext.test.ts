@@ -25,6 +25,12 @@ describe('nextHandDelay', () => {
     expect(nextHandDelay(vm)).toBeNull();
   });
 
+  it('leaves the cash table between hands for the player to decide', () => {
+    const vm = fixtureResult();
+    vm.mode = 'cash';
+    expect(nextHandDelay(vm)).toBeNull();
+  });
+
   it('has nothing to wait for while a hand is in progress', () => {
     const vm = fixtureResult();
     vm.result = null;

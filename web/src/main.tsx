@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { createSession, workerBot } from './game/index.ts';
+import { createSession, openHandStore, TOURNAMENT, workerBot } from './game/index.ts';
 import type { Session } from './game/index.ts';
 import { App } from './ui/App.tsx';
 import { t } from './ui/i18n.ts';
@@ -33,6 +33,7 @@ const botDelay = numberParam('botDelay') ?? DEFAULT_BOT_DELAY;
 const autoNext = params.get('autoNext') !== 'off';
 let nextSeed: number | null = numberParam('seed');
 let session: Session | null = null;
+const store = await openHandStore();
 
 const root = document.getElementById('app');
 if (root === null) {
@@ -49,15 +50,22 @@ function mount(farewell = false): void {
     botDelayMs: botDelay,
     humanSeat: HUMAN_SEAT,
     names: [t('seat.you'), t('seat.bot')],
+    mode: TOURNAMENT,
+    records: {
+      store,
+      sessionId: crypto.randomUUID(),
+      now: () => new Date().toISOString(),
+    },
   });
   render(
     <App
       session={session}
+      store={store}
       humanSeat={HUMAN_SEAT}
       farewell={farewell}
       autoNext={autoNext}
-      onNewTournament={() => mount()}
-      onLeave={() => mount(true)}
+      onNewGame={() => mount()}
+      onLeaveTonight={() => mount(true)}
     />,
     root as HTMLElement,
   );

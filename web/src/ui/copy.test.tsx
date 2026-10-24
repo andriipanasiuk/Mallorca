@@ -1,11 +1,13 @@
 import { cleanup, render } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { memoryStore } from '../game/index.ts';
 import type { LogEntry } from '../game/index.ts';
 import en from '../locales/en.json';
 import { ActionBar } from './ActionBar.tsx';
 import { fixtureResult } from './fixtures.ts';
 import { StartScreen } from './StartScreen.tsx';
 import { Table } from './Table.tsx';
+import { SessionOver } from './SessionOver.tsx';
 import { TournamentOver } from './TournamentOver.tsx';
 import { viewModel } from './fixtures.ts';
 
@@ -154,6 +156,17 @@ describe('copy', () => {
     cleanup();
     expectFromLocale(
       render(<TournamentOver won={false} onPlayAgain={vi.fn()} onLeave={vi.fn()} />).container,
+    );
+    cleanup();
+    expectFromLocale(
+      render(
+        <SessionOver
+          session={{ hands: 3, netBb: 4.5, bbPer100: 150 }}
+          store={memoryStore()}
+          sessionId="x"
+          onPlayAgain={vi.fn()}
+        />,
+      ).container,
     );
   });
 

@@ -31,6 +31,8 @@ export function viewModel(overrides: Partial<ViewModel['controls']> = {}): ViewM
       enabled: true,
       ...overrides,
     },
+    mode: 'tournament',
+    session: { hands: 0, netBb: 0, bbPer100: null },
     blinds: { small: 10, big: 20 },
     handNumber: 1,
     result: null,

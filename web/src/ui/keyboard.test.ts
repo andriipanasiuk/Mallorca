@@ -39,4 +39,23 @@ describe('handleKey', () => {
     expect(handleKey({ key: 'c', ctrlKey: true }, h)).toBe(false);
     expect(handleKey({ key: 'x' }, h)).toBe(false);
   });
+
+  it('accepts both letter cases and every arrow', () => {
+    const h = handlers(true);
+    for (const key of ['F', 'c', 'R', 'ArrowUp', 'ArrowLeft']) {
+      expect(handleKey({ key }, h)).toBe(true);
+    }
+    expect(h.fold).toHaveBeenCalledTimes(1);
+    expect(h.passive).toHaveBeenCalledTimes(1);
+    expect(h.raise).toHaveBeenCalledTimes(1);
+    expect(h.adjust.mock.calls).toEqual([[1], [-1]]);
+  });
+
+  it('ignores alt-modified keys and key names inherited from Object', () => {
+    const h = handlers(true);
+    expect(handleKey({ key: 'f', altKey: true }, h)).toBe(false);
+    expect(handleKey({ key: 'toString' }, h)).toBe(false);
+    expect(handleKey({ key: 'constructor' }, h)).toBe(false);
+    expect(h.fold).not.toHaveBeenCalled();
+  });
 });

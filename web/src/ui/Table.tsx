@@ -43,6 +43,61 @@ function chipsDirection(winner: SeatIndex | null, humanSeat: SeatIndex): string 
   return winner === humanSeat ? 'to-bottom' : 'to-top';
 }
 
+function Felt({
+  vm,
+  humanSeat,
+  showPot,
+}: {
+  vm: ViewModel;
+  humanSeat: SeatIndex;
+  showPot: boolean;
+}) {
+  return (
+    <div class="table-felt">
+      <div class="felt-plane">
+        {showPot && <Pot amount={vm.pot} />}
+        <Board cards={vm.board} />
+      </div>
+      {vm.result !== null && (
+        <span
+          class={`result-chips result-chips-${chipsDirection(vm.result.winner, humanSeat)}`}
+          aria-hidden="true"
+        >
+          <span class="chip chip-terracotta" />
+          <span class="chip chip-honey" />
+        </span>
+      )}
+    </div>
+  );
+}
+
+interface ResultProps {
+  text: string;
+  canContinue: boolean;
+  autoNextMs: number | null;
+  onNextHand: () => void;
+}
+
+function Result({ text, canContinue, autoNextMs, onNextHand }: ResultProps) {
+  const auto = autoNextMs !== null;
+  return (
+    <div class="result glass" data-testid="result">
+      <span class="result-text">{text}</span>
+      {canContinue && (
+        <button
+          type="button"
+          class={`button button-primary${auto ? ' next-hand-auto' : ''}`}
+          style={auto ? { '--auto-next-ms': `${autoNextMs}ms` } : undefined}
+          data-testid="next-hand"
+          onClick={onNextHand}
+        >
+          {t('result.next')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function Table({
   vm,
   phase,
@@ -65,36 +120,14 @@ export function Table({
       <div class="visually-hidden" role="status" aria-live="polite" data-testid="live-region">
         {announcement}
       </div>
-      <div class="table-felt">
-        <div class="felt-plane">
-          {text === null && <Pot amount={vm.pot} />}
-          <Board cards={vm.board} />
-        </div>
-        {vm.result !== null && (
-          <span
-            class={`result-chips result-chips-${chipsDirection(winner, humanSeat)}`}
-            aria-hidden="true"
-          >
-            <span class="chip chip-terracotta" />
-            <span class="chip chip-honey" />
-          </span>
-        )}
-      </div>
+      <Felt vm={vm} humanSeat={humanSeat} showPot={text === null} />
       {text !== null && (
-        <div class="result glass" data-testid="result">
-          <span class="result-text">{text}</span>
-          {phase === 'handOver' && (
-            <button
-              type="button"
-              class={`button button-primary${autoNextMs === null ? '' : ' next-hand-auto'}`}
-              style={autoNextMs === null ? undefined : { '--auto-next-ms': `${autoNextMs}ms` }}
-              data-testid="next-hand"
-              onClick={onNextHand}
-            >
-              {t('result.next')}
-            </button>
-          )}
-        </div>
+        <Result
+          text={text}
+          canContinue={phase === 'handOver'}
+          autoNextMs={autoNextMs}
+          onNextHand={onNextHand}
+        />
       )}
       <Seat
         index={botSeat}

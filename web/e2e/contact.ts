@@ -71,7 +71,7 @@ async function capture(browser: Browser, device: (typeof DEVICES)[number]): Prom
 
   const page = await open('seed=42&botDelay=0&autoNext=off');
   await snap(page, 'start', shots);
-  await id(page, 'start').click();
+  await id(page, 'start-tournament').click();
   await nextWaypoint(page);
   await snap(page, 'human to act', shots);
 
@@ -94,11 +94,24 @@ async function capture(browser: Browser, device: (typeof DEVICES)[number]): Prom
   await snap(page, 'showdown', shots);
 
   const slow = await open(`seed=42&botDelay=${THINKING_DELAY_MS}&autoNext=off`);
-  await id(slow, 'start').click();
+  await id(slow, 'start-tournament').click();
   await id(slow, 'passive').and(slow.locator(':enabled')).waitFor();
   await id(slow, 'passive').click();
   await id(slow, 'thinking-1').waitFor();
   await snap(slow, 'bot thinking', shots);
+
+  const cash = await open('seed=3&botDelay=0');
+  await id(cash, 'start-cash').click();
+  await id(cash, 'passive').and(cash.locator(':enabled')).waitFor();
+  await id(cash, 'fold').click();
+  await id(cash, 'next-hand').waitFor();
+  await snap(cash, 'cash hand over', shots);
+  await cash.locator('summary.menu-summary').click();
+  await snap(cash, 'menu open', shots);
+  await cash.locator('summary.menu-summary').click();
+  await id(cash, 'leave').click();
+  await id(cash, 'session-over').waitFor();
+  await snap(cash, 'session over', shots);
 
   for (;;) {
     const waypoint = await nextWaypoint(page);

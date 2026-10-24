@@ -15,39 +15,38 @@ export interface KeyLike {
   altKey?: boolean;
 }
 
+type Binding = (handlers: KeyHandlers) => void;
+
+const fold: Binding = (handlers) => handlers.fold();
+const passive: Binding = (handlers) => handlers.passive();
+const raise: Binding = (handlers) => handlers.raise();
+const up: Binding = (handlers) => handlers.adjust(1);
+const down: Binding = (handlers) => handlers.adjust(-1);
+
+const BINDINGS = new Map<string, Binding>([
+  ['f', fold],
+  ['F', fold],
+  ['c', passive],
+  ['C', passive],
+  ['r', raise],
+  ['R', raise],
+  ['ArrowRight', up],
+  ['ArrowUp', up],
+  ['ArrowLeft', down],
+  ['ArrowDown', down],
+]);
+
+function hasModifier(event: KeyLike): boolean {
+  return event.ctrlKey === true || event.metaKey === true || event.altKey === true;
+}
+
 export function handleKey(event: KeyLike, handlers: KeyHandlers): boolean {
-  if (
-    !handlers.enabled ||
-    event.ctrlKey === true ||
-    event.metaKey === true ||
-    event.altKey === true
-  ) {
+  const binding = BINDINGS.get(event.key);
+  if (!handlers.enabled || hasModifier(event) || binding === undefined) {
     return false;
   }
-  switch (event.key) {
-    case 'f':
-    case 'F':
-      handlers.fold();
-      return true;
-    case 'c':
-    case 'C':
-      handlers.passive();
-      return true;
-    case 'r':
-    case 'R':
-      handlers.raise();
-      return true;
-    case 'ArrowRight':
-    case 'ArrowUp':
-      handlers.adjust(1);
-      return true;
-    case 'ArrowLeft':
-    case 'ArrowDown':
-      handlers.adjust(-1);
-      return true;
-    default:
-      return false;
-  }
+  binding(handlers);
+  return true;
 }
 
 export function useKeyboard(handlers: KeyHandlers): void {
