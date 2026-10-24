@@ -23,7 +23,25 @@ function describeAction(seat: SeatIndex, action: Action, amount: number): LogEnt
   }
 }
 
+const SEAT_AMOUNT_KEYS = {
+  blindPosted: 'post',
+  betReturned: 'returned',
+  potAwarded: 'win',
+  toppedUp: 'toppedUp',
+} as const;
+
+type SeatAmountEvent = Extract<EngineEvent, { type: keyof typeof SEAT_AMOUNT_KEYS }>;
+
+function isSeatAmount(event: EngineEvent): event is SeatAmountEvent {
+  return event.type in SEAT_AMOUNT_KEYS;
+}
+
 function describeEvent(event: EngineEvent): LogEntry[] {
+  if (isSeatAmount(event)) {
+    return [
+      { key: SEAT_AMOUNT_KEYS[event.type], params: { seat: event.seat, amount: event.amount } },
+    ];
+  }
   switch (event.type) {
     case 'handStarted':
       return [
@@ -32,8 +50,6 @@ function describeEvent(event: EngineEvent): LogEntry[] {
           params: { number: event.handNumber, small: event.smallBlind, big: event.bigBlind },
         },
       ];
-    case 'blindPosted':
-      return [{ key: 'post', params: { seat: event.seat, amount: event.amount } }];
     case 'acted': {
       const line = describeAction(event.seat, event.action, event.amount);
       return event.allIn ? [line, { key: 'allIn', params: { seat: event.seat } }] : [line];
@@ -45,12 +61,6 @@ function describeEvent(event: EngineEvent): LogEntry[] {
         key: 'show',
         params: { seat, cards: cardsText(hand.cards), category: hand.category },
       }));
-    case 'betReturned':
-      return [{ key: 'returned', params: { seat: event.seat, amount: event.amount } }];
-    case 'potAwarded':
-      return [{ key: 'win', params: { seat: event.seat, amount: event.amount } }];
-    case 'toppedUp':
-      return [{ key: 'toppedUp', params: { seat: event.seat, amount: event.amount } }];
     case 'tournamentEnded':
       return [{ key: 'winTournament', params: { seat: event.winner } }];
     case 'holeCards':
