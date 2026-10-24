@@ -30,6 +30,10 @@ import { actedLabel, awardedTo, potCollected, resultOf } from './outcome.ts';
 import type { HandResult } from './outcome.ts';
 import { handRecorder } from './records/recorder.ts';
 import type { HandRecorder, RecordsOptions } from './records/recorder.ts';
+import { CFR_BOT, MATH_BOT } from './records/record.ts';
+import type { Opponent } from './opponent.ts';
+
+const BOT_RECORDS = { math: MATH_BOT, cfr: CFR_BOT } as const;
 
 export { resolveIntent, toIntent } from './intent.ts';
 export type { Intent } from './intent.ts';
@@ -60,10 +64,11 @@ export interface SessionState {
   result: HandResult | null;
   session: SessionResult;
   sessionId: string | null;
+  opponent: Opponent;
 }
 
 export interface SessionActions {
-  start(mode?: TableMode): Promise<void>;
+  start(mode?: TableMode, opponent?: Opponent): Promise<void>;
   leave(): void;
   nextHand(): Promise<void>;
   act(intent: Intent): Promise<void>;
@@ -106,6 +111,8 @@ interface Runtime {
   startStacks: [number, number];
   hands: number;
   topUps: number;
+  opponent: Opponent;
+  seed: number;
 }
 
 function createTimers(): Timers {
@@ -175,7 +182,7 @@ function conclude(rt: Runtime, step: Step): void {
   }
   const { seats } = step.state;
   rt.hands += 1;
-  rt.recorder.save(step.state.mode);
+  rt.recorder.save(step.state.mode, BOT_RECORDS[rt.opponent]);
   const paid = (seat: SeatIndex) =>
     rt.startStacks[seat] - seats[seat].stack + awardedTo(step.events, seat);
   rt.set({
@@ -259,19 +266,39 @@ function beginHand(rt: Runtime): Promise<void> {
   return drive(rt, rt.epoch);
 }
 
+async function choose(rt: Runtime, target: Opponent): Promise<void> {
+  rt.opponent = (await rt.bot.select?.(target, rt.seed)) ?? 'math';
+}
+
+function restart(rt: Runtime, options: SessionOptions): Promise<void> {
+  rt.hands = 0;
+  rt.topUps = 0;
+  const table = freshTable(options, rt.mode);
+  rt.set({
+    table,
+    log: [],
+    lastDecision: null,
+    result: null,
+    opponent: rt.opponent,
+    session: tally(rt, table),
+  });
+  return beginHand(rt);
+}
+
 function sessionActions(rt: Runtime, options: SessionOptions): SessionActions {
   return {
-    start(next) {
+    start(next, opponent) {
       rt.epoch += 1;
+      const mine = rt.epoch;
       rt.timers.cancel();
       if (next !== undefined) {
         rt.mode = next;
       }
-      rt.hands = 0;
-      rt.topUps = 0;
-      const table = freshTable(options, rt.mode);
-      rt.set({ table, log: [], lastDecision: null, result: null, session: tally(rt, table) });
-      return beginHand(rt);
+      const target = opponent ?? rt.opponent;
+      if (target === rt.opponent) {
+        return restart(rt, options);
+      }
+      return choose(rt, target).then(() => (mine === rt.epoch ? restart(rt, options) : undefined));
     },
     leave() {
       const { phase, table } = rt.get();
@@ -323,6 +350,8 @@ export function createSession(options: SessionOptions): Session {
       startStacks: [0, 0],
       hands: 0,
       topUps: 0,
+      seed,
+      opponent: 'math',
     };
     const initial = freshTable(options, rt.mode);
     return {
@@ -335,6 +364,7 @@ export function createSession(options: SessionOptions): Session {
       result: null,
       session: tally(rt, initial),
       sessionId: options.records?.sessionId ?? null,
+      opponent: rt.opponent,
       ...sessionActions(rt, options),
     };
   });

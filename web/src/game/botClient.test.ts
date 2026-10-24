@@ -248,3 +248,61 @@ describe('withFallback guards', () => {
     expect(disposed).toEqual(['primary', 'primary']);
   });
 });
+
+describe('select', () => {
+  it('the in-process bot plays the math bot only', async () => {
+    const bot = inProcessBot();
+    await expect(bot.select?.('math', 1)).resolves.toBe('math');
+    await expect(bot.select?.('cfr', 1)).rejects.toThrow(/math/);
+  });
+
+  it('falls back to the in-process math bot when the opponent cannot load', async () => {
+    let disposed = false;
+    const primary: BotClient = {
+      observe: () => undefined,
+      reset: () => undefined,
+      decide: () => Promise.reject(new Error('never asked')),
+      select: () => Promise.reject(new Error('no wasm')),
+      dispose: () => {
+        disposed = true;
+      },
+    };
+    const bot = withFallback(primary);
+    await expect(bot.select?.('cfr', 3)).resolves.toBe('math');
+    expect(disposed).toBe(true);
+    bot.observe(hand);
+    await expect(bot.decide(legal)).resolves.toMatchObject({ action: expect.any(Object) });
+  });
+
+  it('a client without select plays the math bot', async () => {
+    const primary: BotClient = {
+      observe: () => undefined,
+      reset: () => undefined,
+      decide: () => Promise.resolve(decision),
+    };
+    await expect(withFallback(primary).select?.('cfr', 3)).resolves.toBe('math');
+    await expect(withFallback(primary).select?.('math', 3)).resolves.toBe('math');
+  });
+});
+
+describe('workerBot select', () => {
+  beforeEach(() => {
+    FakeWorker.instances = [];
+    vi.stubGlobal('Worker', FakeWorker);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('asks the worker for the opponent and resolves with its answer', async () => {
+    const bot = workerBot();
+    const pending = bot.select?.('cfr', 9);
+    await settle();
+    const worker = currentWorker();
+    const request = worker.sent.at(-1);
+    expect(request).toMatchObject({ kind: 'select', opponent: 'cfr', seed: 9 });
+    worker.reply({ id: (request as { id: number }).id, opponent: 'cfr' });
+    await expect(pending).resolves.toBe('cfr');
+  });
+});

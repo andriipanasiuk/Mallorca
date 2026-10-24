@@ -34,6 +34,7 @@ export interface HandRecord {
 }
 
 export const MATH_BOT = { id: 'math', version: '1' };
+export const CFR_BOT = { id: 'cfr', version: 'v1-18' };
 
 function finiteOrNull(value: number): number | null {
   return Number.isFinite(value) ? value : null;
