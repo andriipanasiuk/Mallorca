@@ -45,7 +45,7 @@ export const test = base.extend<{ problems: string[] }>({
 
 export { expect };
 
-export const FAST_URL = '/?seed=42&botDelay=0';
+export const FAST_URL = '/?seed=42&botDelay=0&autoNext=off';
 export const TOTAL_CHIPS = 4000;
 
 export function byId(page: Page, id: string): Locator {
@@ -72,4 +72,23 @@ export async function waitForWaypoint(page: Page): Promise<Waypoint> {
     return 'next-hand';
   }
   return 'act';
+}
+
+export async function playToTheEnd(page: Page): Promise<void> {
+  for (;;) {
+    const waypoint = await waitForWaypoint(page);
+    if (waypoint === 'tournament-over') {
+      return;
+    }
+    if (waypoint === 'next-hand') {
+      await byId(page, 'next-hand').click();
+      continue;
+    }
+    if (await byId(page, 'raise').isEnabled()) {
+      await byId(page, 'preset-allin').click();
+      await byId(page, 'raise').click();
+    } else {
+      await byId(page, 'passive').click();
+    }
+  }
 }

@@ -27,6 +27,11 @@ describe('Card', () => {
     expect(spade?.classList.contains('card-black')).toBe(true);
   });
 
+  it('draws the corner index twice on a face card', () => {
+    const { container } = render(<Card card={51} />);
+    expect(container.querySelectorAll('.card-rank').length).toBe(2);
+  });
+
   it('renders the back without rank text', () => {
     const { container } = render(<Card card="back" />);
     expect(container.querySelector('svg')).not.toBeNull();

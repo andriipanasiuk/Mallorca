@@ -75,6 +75,27 @@ test('the cash status bar keeps long values inside the viewport', async ({ page 
   await expect(byId(page, 'clear-history')).toBeInViewport({ ratio: 1 });
 });
 
+for (const viewport of [
+  { width: 360, height: 740 },
+  { width: 390, height: 844 },
+]) {
+  test(`the cash status values are readable in full at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto(FAST_URL);
+    await byId(page, 'start-cash').click();
+    await expect(byId(page, 'passive')).toBeEnabled();
+    const clipped = await page.evaluate(() =>
+      ['blinds', 'session-result', 'hand-number'].filter((id) => {
+        const node = document.querySelector(`[data-testid="${id}"]`);
+        return node === null || node.scrollWidth > node.clientWidth;
+      }),
+    );
+    expect(clipped).toEqual([]);
+  });
+}
+
 test('the cash status bar stays on one line when the text runs wider', async ({ page }) => {
   await page.goto(FAST_URL);
   await byId(page, 'start-cash').click();
@@ -90,3 +111,69 @@ test('the cash status bar stays on one line when the text runs wider', async ({ 
     await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
   }
 });
+
+test('long amounts stay inside the small phone', async ({ page }) => {
+  const viewport = page.viewportSize();
+  if (viewport === null) {
+    throw new Error('viewport is not set');
+  }
+  await page.goto(FAST_URL);
+  await byId(page, 'start-tournament').click();
+  await expect(byId(page, 'passive')).toBeEnabled();
+  await byId(page, 'preset-allin').click();
+  await expect(byId(page, 'raise')).toContainText('2000');
+  for (const id of CONTROLS) {
+    await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+    viewport.width,
+  );
+  const overflowing = await page.evaluate(() =>
+    ['fold', 'passive', 'raise'].filter((id) => {
+      const node = document.querySelector(`[data-testid="${id}"]`);
+      return node !== null && node.scrollWidth > node.clientWidth;
+    }),
+  );
+  expect(overflowing).toEqual([]);
+});
+
+for (const viewport of [
+  { width: 360, height: 740 },
+  { width: 1440, height: 900 },
+]) {
+  test(`the simple table keeps every control visible at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem('mallorca.tableStyle', 'simple'));
+    await page.setViewportSize(viewport);
+    await page.goto(FAST_URL);
+    await expect(byId(page, 'scene')).toHaveClass(/scene-simple/);
+    await byId(page, 'start-tournament').click();
+    await expect(byId(page, 'passive')).toBeEnabled();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      viewport.width,
+    );
+    for (const id of [...CONTROLS, 'preset-half', 'preset-pot', 'preset-allin', 'raise-amount']) {
+      await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
+    }
+  });
+}
+
+for (const viewport of [
+  { width: 844, height: 390 },
+  { width: 1280, height: 600 },
+]) {
+  test(`a short landscape screen keeps every control visible at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const scrollWidth = () => page.evaluate(() => document.documentElement.scrollWidth);
+    await page.goto(FAST_URL);
+    await byId(page, 'start-tournament').click();
+    await expect(byId(page, 'passive')).toBeEnabled();
+    expect(await scrollWidth()).toBeLessThanOrEqual(viewport.width);
+    for (const id of [...CONTROLS, 'preset-half', 'preset-pot', 'preset-allin', 'raise-amount']) {
+      await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
+    }
+  });
+}

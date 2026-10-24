@@ -3,6 +3,11 @@ import { createSession, openHandStore, TOURNAMENT, workerBot } from './game/inde
 import type { Session } from './game/index.ts';
 import { App } from './ui/App.tsx';
 import { t } from './ui/i18n.ts';
+import '@fontsource/cormorant-garamond/latin-500.css';
+import '@fontsource/cormorant-garamond/latin-600.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
 import './ui/styles/tokens.css';
 import './ui/styles/layout.css';
 
@@ -25,6 +30,7 @@ function randomSeed(): number {
 }
 
 const botDelay = numberParam('botDelay') ?? DEFAULT_BOT_DELAY;
+const autoNext = params.get('autoNext') !== 'off';
 let nextSeed: number | null = numberParam('seed');
 let session: Session | null = null;
 const store = await openHandStore();
@@ -34,7 +40,7 @@ if (root === null) {
   throw new Error('Missing #app element');
 }
 
-function mount(): void {
+function mount(farewell = false): void {
   session?.getState().dispose();
   const seed = nextSeed ?? randomSeed();
   nextSeed = null;
@@ -52,7 +58,15 @@ function mount(): void {
     },
   });
   render(
-    <App session={session} store={store} humanSeat={HUMAN_SEAT} onNewGame={mount} />,
+    <App
+      session={session}
+      store={store}
+      humanSeat={HUMAN_SEAT}
+      farewell={farewell}
+      autoNext={autoNext}
+      onNewGame={() => mount()}
+      onLeaveTonight={() => mount(true)}
+    />,
     root as HTMLElement,
   );
 }

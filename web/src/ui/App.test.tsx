@@ -5,7 +5,7 @@ import { App } from './App.tsx';
 
 afterEach(cleanup);
 
-function setup(mode = TOURNAMENT, store = memoryStore()) {
+function setup(mode = TOURNAMENT, store = memoryStore(), autoNext?: boolean) {
   const session = createSession({
     bot: inProcessBot(),
     seed: 42,
@@ -15,11 +15,109 @@ function setup(mode = TOURNAMENT, store = memoryStore()) {
     mode,
   });
   const onNewGame = vi.fn();
-  render(<App session={session} store={store} humanSeat={0} onNewGame={onNewGame} />);
+  render(
+    <App
+      session={session}
+      store={store}
+      humanSeat={0}
+      onNewGame={onNewGame}
+      onLeaveTonight={vi.fn()}
+      autoNext={autoNext}
+    />,
+  );
   return { session, onNewGame };
 }
 
+const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function foldFirstHand(session: ReturnType<typeof setup>['session']) {
+  fireEvent.click(screen.getByTestId('start-tournament'));
+  await waitFor(() => expect(session.getState().phase).toBe('humanToAct'));
+  fireEvent.click(screen.getByTestId('fold'));
+  await waitFor(() => expect(screen.queryByTestId('next-hand')).not.toBeNull());
+}
+
+describe('App auto next hand', () => {
+  it('moves to the next hand by itself a second after a fold', async () => {
+    localStorage.clear();
+    const { session } = setup();
+    await foldFirstHand(session);
+    expect(screen.getByTestId('hand-number').textContent).toBe('Hand 1');
+    await waitFor(() => expect(screen.getByTestId('hand-number').textContent).toBe('Hand 2'), {
+      timeout: 2500,
+    });
+    session.getState().dispose();
+  });
+
+  it('waits for the player when auto next hand is switched off in the menu', async () => {
+    localStorage.clear();
+    const { session } = setup();
+    fireEvent.click(screen.getByTestId('start-tournament'));
+    await waitFor(() => expect(session.getState().phase).toBe('humanToAct'));
+    const toggle = screen.getByTestId('auto-next') as HTMLInputElement;
+    expect(toggle.checked).toBe(true);
+    fireEvent.click(toggle);
+    expect(localStorage.getItem('mallorca.autoNext')).toBe('off');
+    fireEvent.click(screen.getByTestId('fold'));
+    await waitFor(() => expect(screen.queryByTestId('next-hand')).not.toBeNull());
+    await pause(1300);
+    expect(screen.queryByTestId('next-hand')).not.toBeNull();
+    expect(screen.getByTestId('hand-number').textContent).toBe('Hand 1');
+    session.getState().dispose();
+    localStorage.clear();
+  });
+
+  it('does not skip a hand when Next hand is clicked before the timer', async () => {
+    localStorage.clear();
+    const { session } = setup();
+    await foldFirstHand(session);
+    fireEvent.click(screen.getByTestId('next-hand'));
+    await waitFor(() => expect(screen.getByTestId('hand-number').textContent).toBe('Hand 2'));
+    await pause(1300);
+    expect(screen.getByTestId('hand-number').textContent).toBe('Hand 2');
+    session.getState().dispose();
+  });
+
+  it('stays put when the page turns auto next hand off', async () => {
+    localStorage.clear();
+    const { session } = setup(TOURNAMENT, memoryStore(), false);
+    await foldFirstHand(session);
+    await pause(1300);
+    expect(screen.getByTestId('hand-number').textContent).toBe('Hand 1');
+    session.getState().dispose();
+  });
+});
+
 describe('App', () => {
+  it('switches to the simple table from the menu and remembers it', async () => {
+    localStorage.clear();
+    const { session } = setup();
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(false);
+    fireEvent.click(screen.getByTestId('start-tournament'));
+    await waitFor(() => expect(session.getState().phase).toBe('humanToAct'));
+    const handBefore = screen.getByTestId('hand-number').textContent;
+    const toggle = screen.getByTestId('simple-table') as HTMLInputElement;
+    expect(toggle.checked).toBe(false);
+    fireEvent.click(toggle);
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(true);
+    expect(localStorage.getItem('mallorca.tableStyle')).toBe('simple');
+    expect(screen.getByTestId('hand-number').textContent).toBe(handBefore);
+    expect(session.getState().phase).toBe('humanToAct');
+    fireEvent.click(screen.getByTestId('simple-table'));
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(false);
+    expect(localStorage.getItem('mallorca.tableStyle')).toBe('room');
+    session.getState().dispose();
+    localStorage.clear();
+  });
+
+  it('opens on the simple table when it was chosen before', () => {
+    localStorage.setItem('mallorca.tableStyle', 'simple');
+    const { session } = setup();
+    expect(screen.getByTestId('scene').classList.contains('scene-simple')).toBe(true);
+    session.getState().dispose();
+    localStorage.clear();
+  });
+
   it('starts on the start screen and deals after Start', async () => {
     const { session } = setup();
     expect(screen.getByTestId('start-tournament')).not.toBeNull();

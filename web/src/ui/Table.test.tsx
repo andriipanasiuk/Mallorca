@@ -38,6 +38,56 @@ describe('Table result and announcements', () => {
     expect(region.textContent).toBe('Mallorca wins 120 with Two pair');
   });
 
+  it('keeps both seats and the felt layer in order', () => {
+    const { container } = table();
+    const felt = container.querySelector('.table-felt');
+    expect(felt).not.toBeNull();
+    expect(felt?.querySelector('[data-testid="board"]')).not.toBeNull();
+    expect(felt?.querySelector('[data-testid="pot"]')).not.toBeNull();
+    expect(screen.getByTestId('seat-1').querySelectorAll('[data-testid="card-back"]').length).toBe(
+      2,
+    );
+  });
+
+  it('marks the player seat active on their turn', () => {
+    table();
+    expect(screen.getByTestId('seat-0').classList.contains('seat-active')).toBe(true);
+  });
+
+  it('sends the pot chips toward the winner', () => {
+    const { container } = table(fixtureResult(), 'handOver');
+    const chips = container.querySelector('.result-chips');
+    expect(chips?.classList.contains('result-chips-to-top')).toBe(true);
+    expect(chips?.getAttribute('aria-hidden')).toBe('true');
+    cleanup();
+    const split = fixtureResult();
+    split.result = { winner: null, category: null, amount: 60 };
+    const view = table(split, 'handOver');
+    expect(view.container.querySelector('.result-chips-split')).not.toBeNull();
+  });
+
+  it('shows the countdown on Next hand while auto next hand is on', () => {
+    render(
+      <Table
+        vm={fixtureResult()}
+        phase="handOver"
+        humanSeat={0}
+        log={[]}
+        autoNextMs={2000}
+        onAct={vi.fn()}
+        onNextHand={vi.fn()}
+      />,
+    );
+    const button = screen.getByTestId('next-hand');
+    expect(button.classList.contains('next-hand-auto')).toBe(true);
+    expect(button.getAttribute('style')).toContain('--auto-next-ms: 2000ms');
+  });
+
+  it('shows a plain Next hand when auto next hand is off', () => {
+    table(fixtureResult(), 'handOver');
+    expect(screen.getByTestId('next-hand').classList.contains('next-hand-auto')).toBe(false);
+  });
+
   it('announces the bot thinking state', () => {
     const vm = viewModel({ enabled: false });
     vm.seats[1].isToAct = true;

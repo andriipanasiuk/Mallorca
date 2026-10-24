@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
 import type { HandStore } from '../game/index.ts';
 import { clearHistory, exportHistory } from './history.ts';
@@ -7,9 +8,10 @@ export interface HistoryMenuProps {
   seed: number;
   store: HandStore;
   onNewGame: () => void;
+  children?: ComponentChildren;
 }
 
-export function HistoryMenu({ seed, store, onNewGame }: HistoryMenuProps) {
+export function HistoryMenu({ seed, store, onNewGame, children }: HistoryMenuProps) {
   const [confirmClear, setConfirmClear] = useState(false);
   const clear = () => {
     if (!confirmClear) {
@@ -28,8 +30,9 @@ export function HistoryMenu({ seed, store, onNewGame }: HistoryMenuProps) {
         }
       }}
     >
-      <summary class="menu-summary">{t('status.menu')}</summary>
-      <div class="menu-body">
+      <summary class="menu-summary glass pill">{t('status.menu')}</summary>
+      <div class="menu-body glass">
+        {children}
         <span>{t('status.seed', { seed })}</span>
         <button
           type="button"

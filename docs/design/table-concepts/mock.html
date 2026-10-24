@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Table mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --plate: none;
+  --ink: #f1e9d8;
+  --ink-dim: rgba(241, 233, 216, 0.62);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Inter', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --card-w: 64px;
+  --hole-w: 104px;
+  --board-x: 50%;
+  --board-y: 47%;
+  --board-tilt: 50deg;
+  --bot-y: 22%;
+  --vignette: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 40%, rgba(0,0,0,0.55) 100%);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #070605; color: var(--ink); font-family: var(--sans); overflow: hidden; }
+.scene { position: relative; width: 100vw; height: 100vh; background: var(--plate) var(--plate-x, 50%) var(--plate-y, 50%) / cover no-repeat; }
+.scene::after { content: ''; position: absolute; inset: 0; background: var(--vignette); pointer-events: none; }
+.layer { position: absolute; inset: 0; z-index: 1; }
+
+.status { position: absolute; top: 14px; left: 18px; right: 18px; display: flex; gap: 18px; align-items: center; font-size: 12px; letter-spacing: 0.04em; color: var(--ink-dim); z-index: 3; }
+.status b { color: var(--ink); font-weight: 500; }
+.status .menu { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.12); color: var(--ink); }
+
+.felt { position: absolute; left: var(--board-x); top: var(--board-y); transform: translate(-50%, -50%); perspective: 900px; z-index: 2; }
+.felt-plane { transform: rotateX(var(--board-tilt)); transform-style: preserve-3d; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.board { display: flex; gap: 10px; }
+.board .card { width: var(--card-w); box-shadow: 0 10px 14px -6px rgba(0,0,0,0.75), 0 2px 3px rgba(0,0,0,0.5); }
+.board .slot { width: var(--card-w); aspect-ratio: 5 / 7; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.14); }
+
+.pot { display: flex; align-items: center; gap: 14px; }
+.pot-label { font-family: var(--serif); font-size: 22px; font-weight: 600; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+.pot-label small { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim); font-weight: 500; }
+
+.stack { position: relative; width: 44px; height: 44px; }
+.chip { position: absolute; left: 0; width: 44px; height: 44px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, var(--chip-c) 0 34%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0 37%, transparent 38%),
+    repeating-conic-gradient(from 0deg, var(--chip-c) 0 22deg, #f3ece0 22deg 30deg);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.5), inset 0 0 0 2px rgba(0,0,0,0.25), 0 6px 10px -4px rgba(0,0,0,0.7); }
+.chip.red { --chip-c: #8e1f22; }
+.chip.blk { --chip-c: #1b1b1d; }
+.chip.grn { --chip-c: #1f5a3c; }
+.chip.blu { --chip-c: #1f3b6e; }
+
+.bot { position: absolute; left: 50%; top: var(--bot-y); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; }
+.bot-row { display: flex; gap: 8px; align-items: center; }
+.bot-cards { display: flex; gap: 4px; perspective: 600px; margin-top: 6px; }
+.bot-cards .card { width: 50px; transform: rotateX(58deg) rotateZ(var(--bz, 0deg)); box-shadow: 0 6px 8px -4px rgba(0,0,0,0.8); }
+.plaque { white-space: nowrap; display: flex; align-items: baseline; gap: 10px; padding: 6px 14px; border-radius: 999px; background: rgba(8,7,6,0.55); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+.plaque .name { font-family: var(--serif); font-size: 18px; font-weight: 600; }
+.plaque .stack-n { font-family: var(--mono); font-size: 13px; color: var(--ink-dim); }
+.tag { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,0.5); color: var(--ink); border: 1px solid rgba(255,255,255,0.14); }
+.dealer { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff, #d9d2c3); color: #222; font: 700 12px var(--sans); display: grid; place-items: center; box-shadow: 0 3px 5px rgba(0,0,0,0.6); }
+
+.hero { position: absolute; left: var(--hero-x, 50%); bottom: var(--hero-bottom, 126px); transform: translateX(-50%); display: flex; align-items: flex-end; gap: 14px; z-index: 3; }
+.hero-plaque { position: absolute; left: calc(100% + 6px); bottom: 10px; white-space: nowrap; }
+.hole { display: flex; perspective: 900px; }
+.hole .card { width: var(--hole-w); box-shadow: 0 18px 24px -10px rgba(0,0,0,0.85), 0 3px 6px rgba(0,0,0,0.45); }
+.hole .card:first-child { transform: rotateX(18deg) rotateZ(-7deg) translateX(14px); }
+.hole .card:last-child { transform: rotateX(18deg) rotateZ(6deg) translate(-14px, 4px); }
+
+.actions { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px; align-items: stretch; z-index: 4; width: min(620px, calc(100vw - 32px)); }
+.btns { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 10px; }
+.btn { min-height: 52px; font: 600 15px var(--sans); letter-spacing: 0.02em; color: var(--ink); cursor: pointer; }
+.btn .amt { font-family: var(--mono); font-weight: 500; margin-left: 6px; }
+.sizes { display: flex; gap: 8px; align-items: center; }
+.sizes .pill { font: 500 12px var(--sans); padding: 6px 12px; border-radius: 999px; color: var(--ink); }
+.slider { flex: 1; height: 4px; border-radius: 2px; position: relative; }
+.slider::after { content: ''; position: absolute; left: 34%; top: 50%; width: 20px; height: 20px; border-radius: 50%; transform: translate(-50%, -50%); }
+
+.log { position: absolute; right: 18px; top: 64px; width: 230px; font-size: 12px; line-height: 1.7; color: var(--ink-dim); z-index: 3; padding: 12px 14px; border-radius: 10px; }
+.log b { color: var(--ink); font-weight: 500; }
+
+/* ---------- variant A: back room ---------- */
+.v-a { --vignette: radial-gradient(ellipse 60% 55% at 50% 42%, transparent 35%, rgba(0,0,0,0.7) 100%); }
+.v-a .btn { border-radius: 4px; border: 1px solid rgba(201,162,92,0.55); background: linear-gradient(180deg, #2a1d14, #1a120c); box-shadow: inset 0 1px 0 rgba(255,220,160,0.15), 0 6px 14px rgba(0,0,0,0.6); font-family: var(--serif); font-size: 19px; letter-spacing: 0.04em; }
+.v-a .btn.fold { color: #d8a49a; border-color: rgba(160,70,60,0.6); }
+.v-a .btn.raise { color: #1b130b; border-color: #e3c27f; background: linear-gradient(180deg, #e7c886, #b48b45); text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
+.v-a .sizes .pill { background: rgba(26,18,12,0.85); border: 1px solid rgba(201,162,92,0.4); }
+.v-a .slider { background: linear-gradient(90deg, #c9a25c 34%, rgba(201,162,92,0.25) 34%); }
+.v-a .slider::after { background: radial-gradient(circle at 40% 35%, #f3dca6, #a87c35); box-shadow: 0 2px 6px rgba(0,0,0,0.7); }
+.v-a .actions { padding: 12px; border-radius: 6px; background: linear-gradient(180deg, rgba(20,13,8,0.0), rgba(20,13,8,0.75) 30%); }
+.v-a .log { background: rgba(10,7,5,0.55); border: 1px solid rgba(201,162,92,0.2); font-family: var(--serif); font-size: 14px; }
+
+/* ---------- variant B: club ---------- */
+.v-b { --ink: #eef1ee; --vignette: radial-gradient(ellipse 75% 60% at 50% 45%, transparent 45%, rgba(0,6,8,0.6) 100%); }
+.v-b .btn { border-radius: 14px; border: 1px solid rgba(255,255,255,0.14); background: rgba(10,22,24,0.55); backdrop-filter: blur(14px) saturate(1.2); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 10px 24px rgba(0,0,0,0.45); }
+.v-b .btn.fold { color: #f0b3a8; }
+.v-b .btn.raise { background: linear-gradient(180deg, rgba(214,165,84,0.95), rgba(170,120,50,0.95)); color: #14100a; border-color: rgba(255,220,150,0.6); }
+.v-b .sizes .pill { background: rgba(10,22,24,0.55); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.12); }
+.v-b .slider { background: linear-gradient(90deg, #d6a554 34%, rgba(255,255,255,0.18) 34%); }
+.v-b .slider::after { background: #f4efe4; box-shadow: 0 0 0 4px rgba(214,165,84,0.35), 0 2px 6px rgba(0,0,0,0.6); }
+.v-b .plaque { background: rgba(10,22,24,0.5); backdrop-filter: blur(12px); }
+.v-b .plaque .name { font-family: var(--sans); font-size: 15px; font-weight: 600; }
+.v-b .pot-label { font-family: var(--sans); font-size: 20px; }
+.v-b .log { background: rgba(10,22,24,0.5); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.1); }
+
+/* ---------- variant C: finca ---------- */
+.v-c { --ink: #f6eedf; --vignette: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 45%, rgba(5,8,16,0.55) 100%); }
+.v-c .btn { border-radius: 10px; border: none; background: #efe5d2; color: #3a2a1c; box-shadow: 0 1px 0 #fff8 inset, 0 4px 0 #b9a888, 0 10px 18px rgba(0,0,0,0.5); font-family: var(--serif); font-size: 20px; }
+.v-c .btn.fold { color: #8a3324; }
+.v-c .btn.raise { background: #c0623b; color: #fff4e6; box-shadow: 0 1px 0 #fff5 inset, 0 4px 0 #8a3f22, 0 10px 18px rgba(0,0,0,0.5); }
+.v-c .sizes .pill { background: #efe5d2; color: #3a2a1c; box-shadow: 0 2px 0 #b9a888; }
+.v-c .slider { background: linear-gradient(90deg, #c0623b 34%, rgba(239,229,210,0.35) 34%); height: 6px; border-radius: 3px; }
+.v-c .slider::after { background: #efe5d2; box-shadow: 0 3px 0 #b9a888, 0 4px 10px rgba(0,0,0,0.5); }
+.v-c .plaque { background: rgba(239,229,210,0.92); color: #3a2a1c; border: none; }
+.v-c .plaque .stack-n { color: #6d5a45; }
+.v-c .log { background: rgba(239,229,210,0.9); color: #5a4836; font-family: var(--serif); font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); transform: rotate(1.2deg); }
+.v-c .log b { color: #2c1f13; }
+
+
+/* ---------- variant D: cozy attic ---------- */
+.v-d { --ink: #f6ecda; --ink-dim: rgba(246,236,218,0.62); --vignette: radial-gradient(ellipse 72% 62% at 50% 52%, transparent 42%, rgba(12,8,4,0.55) 100%); }
+.v-d .btn { border-radius: 999px; border: 1px solid rgba(255,226,180,0.22); background: rgba(34,24,16,0.5); backdrop-filter: blur(14px) saturate(1.1); box-shadow: inset 0 1px 0 rgba(255,236,200,0.14), 0 8px 22px rgba(0,0,0,0.35); font-family: var(--serif); font-size: 20px; font-weight: 600; letter-spacing: 0.02em; }
+.v-d .btn.fold { color: #e9cdbb; }
+.v-d .btn.raise { background: radial-gradient(120% 140% at 50% 0%, #f6d39a, #d79a52 70%); color: #2a1a0c; border-color: rgba(255,226,170,0.7); box-shadow: 0 0 24px rgba(240,180,100,0.35), 0 8px 22px rgba(0,0,0,0.35); }
+.v-d .sizes .pill { background: rgba(34,24,16,0.45); backdrop-filter: blur(10px); border: 1px solid rgba(255,226,180,0.2); }
+.v-d .slider { background: linear-gradient(90deg, #e3b06e 34%, rgba(255,236,210,0.2) 34%); }
+.v-d .slider::after { background: #fbefd9; box-shadow: 0 0 0 5px rgba(227,176,110,0.3), 0 2px 6px rgba(0,0,0,0.5); }
+.v-d .plaque { background: rgba(34,24,16,0.45); backdrop-filter: blur(12px); border-color: rgba(255,226,180,0.18); }
+.v-d .log { background: rgba(34,24,16,0.42); backdrop-filter: blur(14px); border: 1px solid rgba(255,226,180,0.16); font-family: var(--serif); font-size: 14px; }
+.v-d .chip.red { --chip-c: #b0583c; }
+.v-d .chip.blk { --chip-c: #2f4f57; }
+.v-d .chip.grn { --chip-c: #c99a4a; }
+.v-d .chip.blu { --chip-c: #e9dcc4; }
+.v-d .tag { background: rgba(34,24,16,0.5); border-color: rgba(255,226,180,0.2); }
+
+.side-actions .actions { left: auto; right: 24px; transform: none; width: 380px; bottom: 24px; }
+.side-actions .btns { grid-template-columns: 1fr 1fr; }
+.side-actions .btn.raise { grid-column: 1 / -1; order: -1; min-height: 58px; }
+.side-actions .sizes { flex-wrap: wrap; }
+
+/* phone */
+.phone { --card-w: 46px; --hole-w: 84px; --board-y: 45%; --bot-y: 13%; --hero-bottom: 170px; }
+.phone .log { display: none; }
+.phone .hero { flex-direction: column; align-items: center; gap: 6px; }
+.phone .hero-plaque { position: static; }
+.phone .tag { white-space: nowrap; }
+.phone .btns { grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
+.phone .btn { min-height: 54px; font-size: 15px; }
+.phone.v-a .btn, .phone.v-c .btn { font-size: 18px; }
+.phone .board { gap: 6px; }
+.phone .pot-label { font-size: 18px; }
+.phone .stack, .phone .chip { width: 34px; height: 34px; }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="status"><span>Blinds <b>20 / 40</b></span><span>Hand <b>#14</b></span><span class="menu">≡</span></div>
+
+  <div class="bot">
+    <div class="bot-row"><div class="plaque"><span class="name">Mallorca</span><span class="stack-n">1 760</span></div><span class="tag">Raise 120</span></div>
+    <div class="bot-cards"><svg class="card" viewBox="0 0 250 350"><use href="#back"/></svg><svg class="card" viewBox="0 0 250 350"><use href="#back"/></svg></div>
+  </div>
+
+  <div class="felt"><div class="felt-plane">
+    <div class="pot">
+      <div class="stack"><div class="chip red" style="top:0"></div><div class="chip red" style="top:-4px"></div><div class="chip blk" style="top:-8px"></div></div>
+      <div class="pot-label"><small>Pot</small>320</div>
+      <div class="stack"><div class="chip grn" style="top:0"></div><div class="chip blu" style="top:-4px"></div></div>
+    </div>
+    <div class="board" id="board"></div>
+  </div></div>
+
+  <div class="hero">
+    <div class="hole" id="hole"></div>
+    <div class="plaque hero-plaque"><span class="dealer">D</span><span class="name">You</span><span class="stack-n">2 240</span></div>
+  </div>
+
+  <div class="actions">
+    <div class="sizes"><span class="pill">½ pot</span><span class="pill">Pot</span><div class="slider"></div><span class="pill">All-in</span></div>
+    <div class="btns">
+      <button class="btn fold">Fold</button>
+      <button class="btn call">Call<span class="amt">80</span></button>
+      <button class="btn raise">Raise to<span class="amt">360</span></button>
+    </div>
+  </div>
+
+  <div class="log"><div><b>Flop</b> Q♠ J♥ 7♦</div><div>You bet 80</div><div>Mallorca raises to 120</div><div><b>Turn</b> 2♣</div><div>Mallorca bets 120</div></div>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdf6"/><stop offset="1" stop-color="#ece5d4"/></linearGradient>
+    <pattern id="weave-d" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#1f4a52"/><path d="M0 7h14M7 0v14" stroke="#2c6370" stroke-width="3"/></pattern>
+    <pattern id="weave" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#6e1d1f"/><path d="M0 7h14M7 0v14" stroke="#8d2b2c" stroke-width="3"/></pattern>
+    <symbol id="back" viewBox="0 0 250 350"><rect x="2" y="2" width="246" height="346" rx="18" fill="#f5efe2"/><rect x="16" y="16" width="218" height="318" rx="10" fill="url(#weave)"/><rect x="16" y="16" width="218" height="318" rx="10" fill="none" stroke="#f5efe2" stroke-width="3"/></symbol>
+  </defs>
+</svg>
+
+<script>
+const q = new URLSearchParams(location.search);
+const v = q.get('v') || 'a';
+const phone = q.get('d') === 'phone';
+const scene = document.getElementById('scene');
+document.body.classList.add('v-' + v);
+if (phone) document.body.classList.add('phone');
+if (q.get('side')) document.body.classList.add('side-actions');
+scene.style.setProperty('--plate', `url(plates/${q.get('p') || v}.jpg)`);
+for (const [k, val] of q) if (k.startsWith('--')) document.body.style.setProperty(k, val);
+
+const suit = { s: ['♠', '#1c1c1e'], h: ['♥', '#b3202a'], d: ['♦', '#b3202a'], c: ['♣', '#1c1c1e'] };
+function card(c) {
+  const [r, s] = [c[0] === 'T' ? '10' : c[0], c[1]];
+  const [sym, col] = suit[s];
+  const face = 'JQK'.includes(r);
+  return `<svg class="card" viewBox="0 0 250 350"><rect x="2" y="2" width="246" height="346" rx="18" fill="url(#paper)" stroke="#d8cfbb" stroke-width="2"/>
+  <text x="24" y="70" font-family="Cormorant Garamond, Georgia, serif" font-weight="700" font-size="68" fill="${col}">${r}</text>
+  <text x="24" y="120" font-size="44" fill="${col}">${sym}</text>
+  <text x="125" y="${face ? 225 : 235}" text-anchor="middle" font-size="${face ? 120 : 140}" fill="${col}" opacity="${face ? 0.9 : 1}">${sym}</text>
+  ${face ? `<text x="125" y="300" text-anchor="middle" font-family="Cormorant Garamond, serif" font-weight="600" font-size="40" fill="${col}" opacity="0.55">${r === 'K' ? 'Rey' : r === 'Q' ? 'Reina' : 'Sota'}</text>` : ''}
+  <g transform="rotate(180 125 175)"><text x="24" y="70" font-family="Cormorant Garamond, Georgia, serif" font-weight="700" font-size="68" fill="${col}">${r}</text><text x="24" y="120" font-size="44" fill="${col}">${sym}</text></g></svg>`;
+}
+document.getElementById('board').innerHTML = ['Qs', 'Jh', '7d', '2c'].map(card).join('') + '<div class="slot"></div>';
+if (v === 'd') document.querySelectorAll('#back rect')[1].setAttribute('fill', 'url(#weave-d)');
+document.getElementById('hole').innerHTML = ['Ah', 'Qh'].map(card).join('');
+</script>
+</body>
+</html>

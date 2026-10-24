@@ -6,7 +6,8 @@
     "heading": "Heads-up against Mallorca",
     "tagline": "Heads-up no-limit hold'em. A cash game with 100 big blinds, or a tournament with rising blinds.",
     "cash": "Cash game, 100 big blinds",
-    "tournament": "Tournament"
+    "tournament": "Tournament",
+    "farewell": "Sleep well. The table will be here."
   },
   "status": {
     "blinds": "Blinds {{small}}/{{big}}",
@@ -15,7 +16,9 @@
     "menu": "Menu",
     "newGame": "New game",
     "result": "{{sign}}{{bb}} bb",
-    "leave": "Leave table"
+    "leave": "Leave table",
+    "simpleTable": "Simple table",
+    "autoNext": "Auto next hand"
   },
   "seat": {
     "you": "You",
@@ -93,9 +96,11 @@
     "label": "Coach"
   },
   "over": {
+    "title": "Good game",
     "won": "You won the tournament",
     "lost": "You lost the tournament",
-    "again": "Play again"
+    "again": "Play again",
+    "leave": "That's enough for tonight"
   },
   "history": {
     "exportJson": "Export history as data",
