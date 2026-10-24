@@ -8,7 +8,7 @@
 - `mallorca-core` is pure: no `std::time`, no `std::fs`, no `std::env`, no thread-local or global RNG, and it builds for `wasm32-unknown-unknown`. Randomness enters as a `&mut Rng` argument. Threads, files and clocks live in `mallorca-trainer`.
 - Slow tests are `#[ignore]` and run with `cargo test --release -- --include-ignored`.
 - `mallorca-wasm` is the only crate the browser loads: a `cdylib` with a plain `extern "C"` ABI over `mallorca-core::bot`,
-  no wasm-bindgen. `web/tools/wasm.ts` builds it and copies it to `web/src/cfr/mallorca.wasm`.
+  no wasm-bindgen. `web/scripts/wasm.ts` builds it and copies it to `web/src/cfr/mallorca.wasm`.
 - Artefacts (checkpoints, strategy files) go to `solver/data/`, which is gitignored.
 - Cards are `u8` 0..51, `rank * 4 + suit`; text form is two characters, rank `23456789TJQKA`, suit `cdhs`.
 - Git: commit scope `solver` (`feat(solver): ...`). Run `git branch --show-current` before committing.

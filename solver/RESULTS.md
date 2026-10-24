@@ -32,6 +32,24 @@ at a time (see "How to improve").
 - Next run: lever 2 (256 buckets) or lever 3 (better buckets), measured against the 1M-hand figure of checkpoint
   18.
 
+## Arena against the math bot (2026-10-24)
+
+The play file of checkpoint 18 (`export --streets play`, 7.37 MB raw, 3.61 MB gzipped) in the web arena, through
+`mallorca-wasm` with off-tree translation, 100 bb, blinds 10/20, duplicate pairs:
+
+| opponent | hands | bb/100 (95% interval) |
+| --- | --- | --- |
+| math | 40,000 | +32.8 ± 9.2 |
+| always-call | 10,000 | +165.3 ± 24.8 |
+| always-raise (minimum raise) | 10,000 | +250.7 ± 48.9 |
+| random (minimum raise) | 10,000 | +57.2 ± 23.2 |
+
+- The blueprint beats the math bot with the interval above zero.
+- It exploits weak opponents far less than the math bot does (math: +905.8 ± 95.9 against always-raise,
+  +196.1 ± 45.0 against random, 4000 hands): it plays near equilibrium and does not adapt.
+- Against always-call it keeps most of the on-tree `match` figure (+190.1 ± 4.0), so translation costs little
+  there.
+
 ## How to improve
 
 The first run sets the baseline; no threshold is fixed before it. Each lever names the number it should move.
