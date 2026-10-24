@@ -8,6 +8,7 @@ import { memoryStore } from './records/store.ts';
 import type { HandStore } from './records/store.ts';
 import { createSession } from './session.ts';
 import type { Session } from './session.ts';
+import type { Opponent } from './opponent.ts';
 import { callingBot, scriptedBot, shovingBot } from './testBot.ts';
 
 function open(
@@ -530,5 +531,66 @@ describe('session recording', () => {
     const session = open(shovingBot());
     await session.getState().start();
     expect(session.getState().sessionId).toBeNull();
+  });
+});
+
+describe('session opponent', () => {
+  function selecting(answer: (opponent: Opponent) => Promise<Opponent>) {
+    const bot = shovingBot();
+    const asked: [Opponent, number][] = [];
+    bot.select = (opponent, seed) => {
+      asked.push([opponent, seed]);
+      return answer(opponent);
+    };
+    return { bot, asked };
+  }
+
+  it('plays the math bot by default without asking', async () => {
+    const { bot, asked } = selecting((o) => Promise.resolve(o));
+    const session = open(bot);
+    await session.getState().start(CASH);
+    expect(session.getState().opponent).toBe('math');
+    expect(asked).toEqual([]);
+  });
+
+  it('asks again only when the opponent changes', async () => {
+    const { bot, asked } = selecting((o) => Promise.resolve(o));
+    const session = open(bot);
+    await session.getState().start(CASH, 'cfr');
+    await session.getState().start(CASH);
+    await session.getState().start(CASH, 'cfr');
+    await session.getState().start(CASH, 'math');
+    expect(asked).toEqual([
+      ['cfr', 7],
+      ['math', 7],
+    ]);
+  });
+
+  it('asks the bot for the chosen opponent before the first hand', async () => {
+    const { bot, asked } = selecting((o) => Promise.resolve(o));
+    const store = memoryStore();
+    const session = createSession({
+      bot,
+      seed: 7,
+      botDelayMs: 0,
+      humanSeat: 1,
+      names: ['Mallorca', 'You'],
+      mode: CASH,
+      records: { store, sessionId: 's1', now: () => '2026-10-24T18:00:00.000Z' },
+    });
+    await session.getState().start(CASH, 'cfr');
+    expect(asked).toEqual([['cfr', 7]]);
+    expect(session.getState().opponent).toBe('cfr');
+    await session.getState().act({ kind: 'fold' });
+    const records = await store.list();
+    expect(records[0]?.bot).toEqual({ id: 'cfr', version: 'v1-18' });
+  });
+
+  it('shows the math bot when the chosen opponent could not load', async () => {
+    const { bot } = selecting(() => Promise.resolve('math'));
+    const session = open(bot);
+    await session.getState().start(CASH, 'cfr');
+    expect(session.getState().opponent).toBe('math');
+    expect(session.getState().phase).toBe('humanToAct');
   });
 });

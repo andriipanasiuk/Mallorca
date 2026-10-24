@@ -1,7 +1,7 @@
 import type { Decision } from '../../brains/index.ts';
 import type { EngineEvent, SeatIndex, TableMode } from '../../engine/index.ts';
 import { handRecord, MATH_BOT, recordDecision } from './record.ts';
-import type { RecordedDecision } from './record.ts';
+import type { RecordedDecision, RecordMeta } from './record.ts';
 import type { HandStore } from './store.ts';
 
 export interface RecordsOptions {
@@ -19,7 +19,7 @@ export interface HandRecorder {
   begin(): void;
   observe(events: EngineEvent[]): void;
   decided(decision: Decision, events: EngineEvent[]): void;
-  save(mode: TableMode): void;
+  save(mode: TableMode, bot?: RecordMeta['bot']): void;
 }
 
 function store(records: RecordsOptions, saved: () => ReturnType<typeof handRecord>): void {
@@ -47,7 +47,7 @@ export function handRecorder(records: RecordsOptions | undefined, seating: Seati
         decisions = [...decisions, recordDecision(decision, events.length + index)];
       }
     },
-    save(mode) {
+    save(mode, bot = MATH_BOT) {
       if (records === undefined) {
         return;
       }
@@ -57,7 +57,7 @@ export function handRecorder(records: RecordsOptions | undefined, seating: Seati
           mode,
           names: seating.names,
           humanSeat: seating.humanSeat,
-          bot: MATH_BOT,
+          bot,
           playedAt: records.now(),
         }),
       );

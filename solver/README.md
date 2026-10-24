@@ -5,6 +5,8 @@ A Rust workspace for a CFR poker trainer.
 - `crates/core`: pure game logic, cards, RNG, the card abstraction, the CFR core, checkpoints, the strategy file and
   measurement. Builds for `wasm32-unknown-unknown`.
 - `crates/trainer`: the command line trainer that owns threads, files and clocks.
+- `crates/wasm`: the WebAssembly module the web arena and the browser bot load, a plain `extern "C"` ABI over
+  `mallorca-core::bot`.
 
 Start with `CLAUDE.md` for the working rules.
 
@@ -42,6 +44,9 @@ mkdir -p $D
      (preflop and flop only; its gzip size is printed and goes into `RESULTS.md`)
    - full file: `$T export --preset $P --data $D --checkpoint N --streets all --out $D/v1-N-all.bin`
      (all streets, needed by `lbr` and `match`)
+   - play file for the arena and the browser, version 2: `$T export --preset $P --data $D --checkpoint N --streets play --out $D/v1-N-play.mlcs`
+     (all streets, the flop table and turn and river thresholds; needs `river_hs.f32` from step 1 and checks the
+     thresholds against the tables)
    - exploitability: `$T lbr --strategy $D/v1-N-all.bin --hands 1000000`
 6. Strength against fixed opponents, on the last checkpoint:
    `$T match --strategy $D/v1-last-all.bin --opponent all --deals 200000`

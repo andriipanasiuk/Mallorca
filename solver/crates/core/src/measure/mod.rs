@@ -85,7 +85,10 @@ pub(crate) mod fixtures {
 mod tests {
     use super::fixtures::*;
     use crate::abstraction::Abstraction;
+    use crate::cards::Card;
+    use crate::rng::Rng;
     use crate::strategy::StrategyError;
+    use crate::strength::{bucket_of, river_hs, turn_value};
     use crate::tree::Street;
 
     #[test]
@@ -124,6 +127,55 @@ mod tests {
         assert_eq!(
             Abstraction::from_strategy(&file).err(),
             Some(StrategyError::BucketOutOfRange(Street::Flop))
+        );
+    }
+
+    fn play_file(flop_thresholds: bool) -> crate::strategy::StrategyFile {
+        let t: Vec<f32> = (1..8).map(|i| i as f32 / 8.0).collect();
+        let mut file = trained().clone();
+        let mut thresholds = vec![(Street::Turn, t.clone()), (Street::River, t)];
+        if flop_thresholds {
+            file.tables.clear();
+            thresholds.insert(0, (Street::Flop, thresholds[0].1.clone()));
+        } else {
+            file.tables.truncate(1);
+        }
+        file.with_thresholds(thresholds)
+    }
+
+    #[test]
+    fn abstraction_from_a_play_file_computes_turn_and_river() {
+        let file = play_file(false);
+        let t = file.thresholds_of(Street::Turn).unwrap().to_vec();
+        let live = Abstraction::from_strategy(&file).unwrap();
+        let tables = abstraction();
+        let mut rng = Rng::new(3);
+        for _ in 0..4 {
+            let mut deck: Vec<Card> = (0..52).collect();
+            rng.shuffle(&mut deck);
+            let hole = [deck[0], deck[1]];
+            assert_eq!(
+                live.bucket(Street::Flop, hole, &deck[2..5]),
+                tables.bucket(Street::Flop, hole, &deck[2..5])
+            );
+            let turn: [Card; 4] = deck[2..6].try_into().unwrap();
+            assert_eq!(
+                live.bucket(Street::Turn, hole, &turn),
+                bucket_of(&t, turn_value(hole, &turn))
+            );
+            let river: [Card; 5] = deck[2..7].try_into().unwrap();
+            assert_eq!(
+                live.bucket(Street::River, hole, &river),
+                bucket_of(&t, river_hs(hole, &river))
+            );
+        }
+    }
+
+    #[test]
+    fn abstraction_needs_a_flop_table() {
+        assert_eq!(
+            Abstraction::from_strategy(&play_file(true)).err(),
+            Some(StrategyError::MissingStreet(Street::Flop))
         );
     }
 

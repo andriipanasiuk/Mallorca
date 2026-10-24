@@ -1,9 +1,14 @@
 import type { Decision, Observation } from '../brains/index.ts';
 import type { LegalActions } from '../engine/index.ts';
+import type { Opponent } from './opponent.ts';
 
 export type WorkerRequest =
   | { kind: 'reset' }
   | { kind: 'observe'; observations: Observation[] }
-  | { kind: 'decide'; id: number; legal: LegalActions };
+  | { kind: 'decide'; id: number; legal: LegalActions }
+  | { kind: 'select'; id: number; opponent: Opponent; seed: number };
 
-export type WorkerReply = { id: number; decision: Decision } | { id: number; error: string };
+export type WorkerReply =
+  | { id: number; decision: Decision }
+  | { id: number; opponent: Opponent }
+  | { id: number; error: string };

@@ -89,3 +89,82 @@ describe('createWorkerHandler', () => {
     expect(replies).toEqual([]);
   });
 });
+
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+describe('createWorkerHandler select', () => {
+  it('swaps the brain once the opponent is ready and replays what came meanwhile', async () => {
+    const math = fakeBrain();
+    const aggressive: Decision = { ...decision, solverChoice: 'aggressive' };
+    const cfr = fakeBrain(() => aggressive);
+    const replies: WorkerReply[] = [];
+    let release = () => {};
+    const seeds: number[] = [];
+    const handle = createWorkerHandler(
+      () => math.brain,
+      (reply) => replies.push(reply),
+      (_opponent, seed) => {
+        seeds.push(seed);
+        return new Promise((resolve) => {
+          release = () => resolve(() => cfr.brain);
+        });
+      },
+    );
+    handle({ kind: 'select', id: 1, opponent: 'cfr', seed: 5 });
+    handle({ kind: 'observe', observations: [observation] });
+    handle({ kind: 'decide', id: 2, legal });
+    expect(replies).toEqual([]);
+    release();
+    await settle();
+    expect(seeds).toEqual([5]);
+    expect(replies).toEqual([
+      { id: 1, opponent: 'cfr' },
+      { id: 2, decision: aggressive },
+    ]);
+    expect(cfr.observed).toHaveLength(1);
+    expect(math.observed).toHaveLength(0);
+  });
+
+  it('keeps the current brain and reports the error when the opponent cannot load', async () => {
+    const math = fakeBrain();
+    const replies: WorkerReply[] = [];
+    const handle = createWorkerHandler(
+      () => math.brain,
+      (reply) => replies.push(reply),
+      () => Promise.reject(new Error('no wasm')),
+    );
+    handle({ kind: 'select', id: 1, opponent: 'cfr', seed: 5 });
+    handle({ kind: 'decide', id: 2, legal });
+    await settle();
+    expect(replies).toEqual([
+      { id: 1, error: 'no wasm' },
+      { id: 2, decision },
+    ]);
+  });
+
+  it('selects the math bot without a loader', async () => {
+    const replies: WorkerReply[] = [];
+    const handle = createWorkerHandler(
+      () => fakeBrain().brain,
+      (reply) => replies.push(reply),
+    );
+    handle({ kind: 'select', id: 3, opponent: 'math', seed: 1 });
+    handle({ kind: 'select', id: 4, opponent: 'cfr', seed: 1 });
+    await settle();
+    expect(replies).toEqual([
+      { id: 3, opponent: 'math' },
+      { id: 4, error: 'This worker plays the math bot only' },
+    ]);
+  });
+
+  it('disposes the brain it replaces', () => {
+    let disposed = 0;
+    const handle = createWorkerHandler(
+      () => ({ ...fakeBrain().brain, dispose: () => (disposed += 1) }),
+      () => undefined,
+    );
+    handle({ kind: 'reset' });
+    handle({ kind: 'reset' });
+    expect(disposed).toBe(2);
+  });
+});

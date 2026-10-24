@@ -4,7 +4,8 @@
   Development happens in `web/`, a TypeScript browser game, and in `solver/`, a Rust CFR trainer with its own
   rules in `solver/CLAUDE.md`. The npm rules below apply to `web/`.
 - Node: `source ~/.nvm/nvm.sh && nvm use` before any npm command; the version comes from `web/.nvmrc` (24).
-  Run npm commands from `web/`.
+  Run npm commands from `web/`. `npm test`, `build`, `dev` and `arena` first build `solver/crates/wasm` with cargo,
+  so the Rust toolchain of `solver/` must be installed.
 - Read `ARCHITECTURE.md` before adding a module, crossing a layer or changing a contract; it is the contract.
 - Before every commit: `npm run lint`, `npx tsc --noEmit`, `npm test`. When `src/brains` or `src/equity` changes,
   also `npm run test:golden` (674 decisions of the Java bot, about 40 s).

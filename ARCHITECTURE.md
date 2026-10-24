@@ -2,7 +2,8 @@
 
 One repository, two parts. The root holds the Java heads-up poker bot as an archive: it is not modified and it is
 the reference the TypeScript port is checked against. `web/` is the browser game: a heads-up No-Limit Hold'em
-cash game or tournament against a TypeScript port of the Mallorca math bot, built as a static site.
+cash game or tournament against a TypeScript port of the Mallorca math bot or the CFR blueprint trained in
+`solver/`, built as a static site.
 
 ## Repository layout
 
@@ -16,10 +17,13 @@ cash game or tournament against a TypeScript port of the Mallorca math bot, buil
 | `web/scripts/preflop-table.ts`                                      | Regenerates `src/brains/data/preflop-strength.json`                   |
 | `web/tools/golden/`                                                 | JVM harness that writes the golden fixtures, see its `README.md`      |
 | `web/tools/arena/`                                                  | Node duplicate matches between two bots, see "arena"                  |
+| `web/scripts/wasm.ts`                                               | Builds `solver/crates/wasm` and copies it to `src/cfr/mallorca.wasm`  |
+| `solver/`                                                           | Rust CFR trainer and the `mallorca-wasm` module, see its `README.md`  |
 | `.github/workflows/`                                                | `web-ci.yml` on pull requests, `web-deploy.yml` on `master`           |
 
 Generated and never committed: `web/dist`, `web/test-results`, `web/playwright-report`, `web/e2e/contact/`,
-`web/tools/golden/build` and `web/arena-out/`.
+`web/tools/golden/build`, `web/arena-out/` and `web/src/cfr/mallorca.wasm`, which `npm run wasm` builds with cargo
+(the toolchain pinned in `solver/`) before `dev`, `test`, `build` and `arena`.
 
 ## Stack
 
@@ -35,6 +39,7 @@ web/src/
   equity/   hand evaluation and equity
   engine/   heads-up NLHE rules as a pure reducer, table with a mode and its rules, hand history
   brains/   port of the Mallorca math bot
+  cfr/      the CFR bot: the WASM module, the strategy file and a Brain over them
   game/     session store, turn loop, bot worker client, view-model, hand records
   ui/       Preact components, layout, tokens, i18n
 ```
@@ -45,7 +50,8 @@ web/src/
 | `equity` | `cards`                               |
 | `engine` | `cards`, `equity`                     |
 | `brains` | `cards`, `equity`, `engine`           |
-| `game`   | `cards`, `equity`, `engine`, `brains` |
+| `cfr`    | `cards`, types from `engine`, `brains` |
+| `game`   | `cards`, `equity`, `engine`, `brains`, `cfr` |
 | `ui`     | `game`                                |
 
 `brains` takes only types from `engine`: `Action`, `LegalActions` and the events it turns into observations.
@@ -59,7 +65,7 @@ build events. `import-x/no-cycle` forbids import cycles inside `src`.
 
 ### Purity
 
-`cards`, `equity`, `engine` and `brains` use no DOM, no `Math.random`, no `Date` and no `performance`. ESLint
+`cards`, `equity`, `engine`, `brains` and `cfr` use no DOM, no `Math.random`, no `Date` and no `performance`. ESLint
 enforces it with `no-restricted-globals` and `no-restricted-properties`. Randomness enters as an `Rng` argument.
 
 ## cards
@@ -191,12 +197,31 @@ push/fold, neural opponent models, hand history parsers, the robot and the Swing
   the same action and each class's EV within 0.5 % of the pot plus half a chip. It is not part of `npm test`. A
   mismatch is a porting bug.
 
+## cfr
+
+- `v1.mlcs.gz` is the play file of `solver/` (`export --streets play`, strategy format 2, `v1` checkpoint 18),
+  gzipped: all four streets, the flop bucket table and the turn and river thresholds. `mallorca.wasm` is
+  `solver/crates/wasm`, a plain `extern "C"` ABI over `mallorca-core::bot`; it imports nothing.
+- `inflate(bytes)` gunzips with `DecompressionStream` when the bytes start with the gzip magic and returns other
+  bytes as they are. `createCfrModel(wasm, strategy)` instantiates the module and loads the strategy; a bad file
+  rejects with the reader's reason. `model.newBot()` returns a `CfrBot` handle, freed with `free()`.
+- `createCfrBrain(model, rng)` is a `Brain` with `dispose()`. It forwards every `Observation` to the bot and draws
+  one `rng.next()` per observed action (the off-tree raise mapping) and one per decision (sampling the strategy),
+  so a seed fixes its play. `solverChoice` is the kind of the action; `evByAction` is `NaN` for every class.
+- Translation lives in Rust (`mallorca-core::bot`): chips scale by the big blind, an opponent raise maps to one of
+  the two neighbouring tree sizes by the pseudo-harmonic mapping on pot fractions, the bot's own raise keeps the
+  tree's pot fraction and is clamped into `legal.raise`, and a hand that leaves the tree resyncs to the nearest
+  decision node of the same street, seat and facing-a-bet state.
+
 ## game
 
 - `createSession({ bot, seed, botDelayMs, humanSeat, names, mode, startingStacks?, records? })` returns a
-  zustand store with `SessionState` (its engine state is `table`) and the actions `start(mode?)`, `nextHand`,
-  `act(intent)`, `leave` and `dispose`. `start(mode)` replaces the session's mode for this and later starts;
-  `start()` keeps the current one. `seed` drives `mulberry32` for every shuffle. The actions are module functions
+  zustand store with `SessionState` (its engine state is `table`) and the actions `start(mode?, opponent?)`,
+  `nextHand`, `act(intent)`, `leave` and `dispose`. `start(mode)` replaces the session's mode for this and later
+  starts; `start()` keeps the current one. `opponent` (`math` or `cfr`, `OPPONENTS` in `opponent.ts`) works the
+  same way: when it differs from the current one, `start` first awaits `bot.select(opponent, seed)` and
+  `SessionState.opponent` becomes the opponent the bot answered with; hand records carry its id (`math` version
+  `1`, `cfr` version `v1-18`). `seed` drives `mulberry32` for every shuffle. The actions are module functions
   over one shared `Runtime` per session: the store accessors, the bot, the RNG, the timers, the hand recorder, the
   mode, the session tally and an epoch that `start` and `dispose` advance.
 - `phase` is one of `idle` (before `start`), `humanToAct`, `botThinking` (waiting for `decide`), `animating`
@@ -217,14 +242,20 @@ push/fold, neural opponent models, hand history parsers, the robot and the Swing
 - `result` is set when a hand completes: `winner` (null for a split), `category` of the shown hand or null,
   `showdown` and `amount`. `amount` is the pot collected, twice the smaller contribution, or each share for a
   split. It equals the `win` entry of the log; an uncalled bet is its own `returned` entry.
-- `BotClient` has `observe(observations)`, `decide(legal)`, `reset()` and an optional `dispose()`. `workerBot()`
-  runs the brain in `bot.worker.ts` over the `WorkerRequest` and `WorkerReply` messages in `workerProtocol.ts`;
-  `createWorkerHandler(newBrain, post)` in `workerHandler.ts` is the worker's message handling as a plain
-  function. `inProcessBot()` runs the brain on the main thread.
+- `BotClient` has `observe(observations)`, `decide(legal)`, `reset()`, an optional `select(opponent, seed)` and an
+  optional `dispose()`. `workerBot()` runs the brain in `bot.worker.ts` over the `WorkerRequest` and `WorkerReply`
+  messages in `workerProtocol.ts`; `createWorkerHandler(newBrain, post, load?)` in `workerHandler.ts` is the
+  worker's message handling as a plain function. A `select` request queues every later request until the
+  opponent's brain factory is ready, then replies `{ id, opponent }` or `{ id, error }` and keeps the old brain on
+  an error. The worker loads the CFR model once (`fetch` of the two `new URL(..., import.meta.url)` assets) and
+  seeds its brains with `mulberry32(seed)`. Replacing a brain disposes it. `inProcessBot()` runs the math brain on
+  the main thread and rejects `select('cfr')`.
 - `withFallback` wraps a client: when `decide` rejects or takes longer than 5 s, it disposes the primary, replays
   the observations of the hand into an in-process bot and uses it from then on. It falls back once, and a failure
   from before `reset` or `dispose` does not trigger it. The session drops a decision that arrives after `start`
   or `dispose`.
+  Its `select` answers `math` without asking a client that has no `select`; when the client's `select` rejects or
+  takes longer than 60 s, it falls back the same way and answers `math`.
 - `toViewModel(state, humanSeat)` returns the `ViewModel`: per seat the name, stack, street bet, button, whether
   it is to act, the cards (`'back'` for the bot's cards until a showdown) and the last action tag; the board, pot,
   blinds (from `rulesOf(mode).blinds`) and hand number; the `mode` (`cash` or `tournament`); `session` with
@@ -317,8 +348,9 @@ push/fold, neural opponent models, hand history parsers, the robot and the Swing
 imports `engine`, `brains`, `cards` and `game/records/record.ts` and nothing from `ui`; Node 24 runs the `.ts`
 files directly, including in workers. `tools/` may use the clock and Node APIs.
 
-- `bots.ts`: `BOTS`, the `BotFactory` (`(rng) => ArenaBot` with `observe` and `decide`) of each name: `math`
-  (`createMathBrain` with `randomVillainModel`), `always-call` (checks or calls), `always-raise` (raises to
+- `bots.ts`: `BOTS`, the `BotFactory` (`(rng) => ArenaBot` with `observe`, `decide` and an optional `dispose`)
+  of each name: `math` (`createMathBrain` with `randomVillainModel`), `cfr` (`createCfrBrain` over the model that
+  `prepareBots` loads from `src/cfr` once per process or worker; it throws before that), `always-call` (checks or calls), `always-raise` (raises to
   `legal.raise.min` when it can, else checks or calls) and `random` (uniform over the legal kinds, a raise to the
   minimum, from its seeded `Rng`).
 - `match.ts`: `playPair(a, b, seed, index)` plays one deck twice with the seats swapped: the deck is shuffled by
@@ -340,6 +372,8 @@ files directly, including in workers. `tools/` may use the clock and Node APIs.
   `--out <file>` (the JSON report) and `--save-hands <file>`. An unknown bot or a bad number exits with code 1.
   It prints one line: `a vs b: +12.3 ± 4.5 bb/100 over 10000 hands in 182 s`.
 - The tests in `tools/arena/*.test.ts` run under `npm test`.
+- `match.ts` calls `dispose` on both bots after each hand; `worker.ts` and the in-process path of `run.ts` await
+  `prepareBots([a, b])` first.
 
 ## Conventions
 

@@ -1,4 +1,4 @@
-# Strategy file format, version 1
+# Strategy file format, versions 1 and 2
 
 The contract between the trainer (`mallorca-trainer export`) and the browser bot. Everything is little-endian. The
 reference implementation is `crates/core/src/strategy.rs`; the bot reader is written from this file.
@@ -8,7 +8,7 @@ reference implementation is `crates/core/src/strategy.rs`; the bot reader is wri
 | Offset | Size | Field | Meaning |
 | --- | --- | --- | --- |
 | 0 | 4 | `magic` | ASCII `MLCS` |
-| 4 | 2 | `format_version` | u16, `1`. A reader rejects any other value |
+| 4 | 2 | `format_version` | u16, `1` or `2`. A reader rejects any other value |
 | 6 | 32 | `fingerprint` | SHA-256 over the abstraction part of the preset, the serialized tree and the bucket tables of the training run |
 | 38 | 4 | `small_blind` | u32 |
 | 42 | 4 | `big_blind` | u32 |
@@ -61,6 +61,25 @@ per class. Expected lengths: flop 1286792, turn 13960050, river 123156254. The s
 sum of `4 + length` over the tables. Preflop has no table: the bucket is the preflop class index, 0 to 168. The tables are
 the trainer's `.bkt` files without their 9 byte header.
 
+## Buckets in version 2
+
+Version 2 is the play file (`export --streets play`): all four streets, the flop table and percentile thresholds for
+the turn and river, so the browser never loads the 14 MB and 123 MB tables. Everything else is as in version 1. Each
+included postflop street, in street order, starts with a kind byte:
+
+```
+kind 0, table:       length u32, table length bytes
+kind 1, thresholds:  count u16, count x f32
+```
+
+`count` is the street's bucket count minus one; the thresholds are finite and non-decreasing. The bucket of a hand is
+the number of thresholds less than or equal to its value: on the river the hand strength against the 990 live
+opponent holes (wins plus half the ties, divided by 990, in `f32`), on the turn the mean of the squared river
+strength over the 46 river cards, summed in card order on the canonical representative of the turn class
+(`mallorca-core::strength`). Both are bit-identical to the values the bucket tables were built from, and `export`
+checks on every class that the thresholds reproduce the tables before it writes the file. The flop always uses a
+table. A file that holds no thresholds is written as version 1.
+
 ## Probabilities
 
 Walk the tree nodes in id order. For every decision node whose street is included in `streets`, write one block for
@@ -76,6 +95,7 @@ the node's action order. Decision nodes of excluded streets contribute nothing.
 
 ## Validity
 
-A reader rejects the file when: the magic differs, the version is not 1, the data ends inside the header, tree or
+A reader rejects the file when: the magic differs, the version is not 1 or 2, a version 2 bucket kind is not 0 or 1,
+a thresholds block has the wrong count or a value that is not finite or smaller than the one before, the data ends inside the header, tree or
 bucket section, `streets` lacks bit 0 or sets a bit above bit 3, the tree does not deserialize, a table has the
 wrong length or the bucket section has leftover bytes, or the probabilities length differs from the total above.

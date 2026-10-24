@@ -49,7 +49,7 @@ export function App(props: AppProps) {
         seed={state.seed}
         simple={preferences.simple}
         farewell={props.farewell ?? false}
-        onStart={(mode) => void session.getState().start(mode)}
+        onStart={(mode, opponent) => void session.getState().start(mode, opponent)}
       />
     );
   }

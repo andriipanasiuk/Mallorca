@@ -1,16 +1,19 @@
 import { createMathBrain, randomVillainModel } from '../brains/index.ts';
 import type { Decision, Observation } from '../brains/index.ts';
 import type { LegalActions } from '../engine/index.ts';
+import type { Opponent } from './opponent.ts';
 import type { WorkerReply, WorkerRequest } from './workerProtocol.ts';
 
 export interface BotClient {
   observe(o: Observation[]): void;
   decide(legal: LegalActions): Promise<Decision>;
   reset(): void;
+  select?(opponent: Opponent, seed: number): Promise<Opponent>;
   dispose?(): void;
 }
 
 export const BOT_TIMEOUT_MS = 5000;
+export const SELECT_TIMEOUT_MS = 60_000;
 
 function newBrain() {
   return createMathBrain({ villainModel: randomVillainModel });
@@ -30,6 +33,11 @@ export function inProcessBot(): BotClient {
     },
     reset() {
       brain = newBrain();
+    },
+    select(opponent) {
+      return opponent === 'math'
+        ? Promise.resolve('math')
+        : Promise.reject(new Error('The in-process bot plays the math bot only'));
     },
   };
 }
@@ -54,6 +62,19 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 
 const guarded = new WeakSet<BotClient>();
 
+function selectOrFallBack(
+  asked: Promise<Opponent> | undefined,
+  fallBack: () => void,
+): Promise<Opponent> {
+  if (asked === undefined) {
+    return Promise.resolve('math');
+  }
+  return withTimeout(asked, SELECT_TIMEOUT_MS).catch((): Opponent => {
+    fallBack();
+    return 'math';
+  });
+}
+
 export function withFallback(primary: BotClient, timeoutMs = BOT_TIMEOUT_MS): BotClient {
   if (guarded.has(primary)) {
     return primary;
@@ -62,6 +83,14 @@ export function withFallback(primary: BotClient, timeoutMs = BOT_TIMEOUT_MS): Bo
   let usedFallback = false;
   let seen: Observation[] = [];
   let generation = 0;
+  const fallBack = () => {
+    usedFallback = true;
+    primary.dispose?.();
+    const fallback = inProcessBot();
+    fallback.observe(seen);
+    active = fallback;
+    return fallback;
+  };
   const client: BotClient = {
     observe(observations) {
       seen.push(...observations);
@@ -83,14 +112,15 @@ export function withFallback(primary: BotClient, timeoutMs = BOT_TIMEOUT_MS): Bo
         if (usedFallback || mine !== generation) {
           throw error;
         }
-        usedFallback = true;
-        primary.dispose?.();
-        const fallback = inProcessBot();
-        fallback.observe(seen);
-        active = fallback;
-        return fallback.decide(legal);
+        return fallBack().decide(legal);
       }
     },
+    select: (opponent, seed) =>
+      selectOrFallBack(active.select?.(opponent, seed), () => {
+        if (!usedFallback) {
+          fallBack();
+        }
+      }),
     dispose() {
       generation += 1;
       active.dispose?.();
@@ -101,46 +131,81 @@ export function withFallback(primary: BotClient, timeoutMs = BOT_TIMEOUT_MS): Bo
   return client;
 }
 
-function rawWorkerBot(): BotClient {
-  const worker = new Worker(new URL('./bot.worker.ts', import.meta.url), { type: 'module' });
-  const pending = new Map<number, { resolve: (d: Decision) => void; reject: (e: Error) => void }>();
-  let nextId = 1;
-  const failAll = (message: string) => {
-    for (const { reject } of pending.values()) {
-      reject(new Error(message));
-    }
-    pending.clear();
-  };
-  worker.onmessage = (event: MessageEvent<WorkerReply>) => {
+type Pending = { resolve: (reply: WorkerReply) => void; reject: (e: Error) => void };
+
+type Ask = <T>(
+  build: (id: number) => WorkerRequest,
+  pick: (r: WorkerReply) => T | undefined,
+) => Promise<T>;
+
+function replyRouter(pending: Map<number, Pending>) {
+  return (event: MessageEvent<WorkerReply>) => {
     const reply = event.data;
     const entry = pending.get(reply.id);
     if (entry === undefined) {
       return;
     }
     pending.delete(reply.id);
-    if ('decision' in reply) {
-      entry.resolve(reply.decision);
-    } else {
+    if ('error' in reply) {
       entry.reject(new Error(reply.error));
+    } else {
+      entry.resolve(reply);
     }
   };
+}
+
+function asker(pending: Map<number, Pending>, send: (request: WorkerRequest) => void): Ask {
+  let nextId = 1;
+  return (build, pick) => {
+    const id = nextId;
+    nextId += 1;
+    return new Promise((resolve, reject) => {
+      const accept = (reply: WorkerReply) => {
+        const value = pick(reply);
+        if (value === undefined) {
+          reject(new Error('The bot worker sent an unexpected reply'));
+        } else {
+          resolve(value);
+        }
+      };
+      pending.set(id, { resolve: accept, reject });
+      send(build(id));
+    });
+  };
+}
+
+function rawWorkerBot(): BotClient {
+  const worker = new Worker(new URL('./bot.worker.ts', import.meta.url), { type: 'module' });
+  const pending = new Map<number, Pending>();
+  const failAll = (message: string) => {
+    for (const { reject } of pending.values()) {
+      reject(new Error(message));
+    }
+    pending.clear();
+  };
+  worker.onmessage = replyRouter(pending);
   worker.onerror = () => {
     failAll('The bot worker failed');
   };
   const send = (request: WorkerRequest) => {
     worker.postMessage(request);
   };
+  const ask = asker(pending, send);
   return {
     observe(observations) {
       send({ kind: 'observe', observations });
     },
     decide(legal) {
-      const id = nextId;
-      nextId += 1;
-      return new Promise<Decision>((resolve, reject) => {
-        pending.set(id, { resolve, reject });
-        send({ kind: 'decide', id, legal });
-      });
+      return ask(
+        (id) => ({ kind: 'decide', id, legal }),
+        (r) => ('decision' in r ? r.decision : undefined),
+      );
+    },
+    select(opponent, seed) {
+      return ask(
+        (id) => ({ kind: 'select', id, opponent, seed }),
+        (r) => ('opponent' in r ? r.opponent : undefined),
+      );
     },
     reset() {
       send({ kind: 'reset' });

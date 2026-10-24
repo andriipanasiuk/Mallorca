@@ -2,10 +2,14 @@ import type { Action, LegalActions } from '../../src/engine/index.ts';
 import type { Observation } from '../../src/brains/index.ts';
 import { createMathBrain, randomVillainModel } from '../../src/brains/index.ts';
 import type { Rng } from '../../src/cards/index.ts';
+import type { CfrModel } from '../../src/cfr/index.ts';
+import { createCfrBrain } from '../../src/cfr/index.ts';
+import { loadCfrModel } from './cfrModel.ts';
 
 export interface ArenaBot {
   observe(o: Observation): void;
   decide(legal: LegalActions): Action;
+  dispose?(): void;
 }
 
 export type BotFactory = (rng: Rng) => ArenaBot;
@@ -44,11 +48,33 @@ const random: BotFactory = (rng) => ({
   },
 });
 
-export const BOTS: Record<'math' | 'always-call' | 'always-raise' | 'random', BotFactory> = {
-  math,
-  'always-call': alwaysCall,
-  'always-raise': alwaysRaise,
-  random,
+let cfrModel: CfrModel | null = null;
+
+const cfr: BotFactory = (rng) => {
+  if (cfrModel === null) {
+    throw new Error('The cfr bot needs prepareBots before it plays');
+  }
+  const brain = createCfrBrain(cfrModel, rng);
+  return {
+    observe: (o) => brain.observe(o),
+    decide: (legal) => brain.decide(legal).action,
+    dispose: () => brain.dispose(),
+  };
 };
 
+export const BOTS: Record<'math' | 'cfr' | 'always-call' | 'always-raise' | 'random', BotFactory> =
+  {
+    math,
+    cfr,
+    'always-call': alwaysCall,
+    'always-raise': alwaysRaise,
+    random,
+  };
+
 export type BotName = keyof typeof BOTS;
+
+export async function prepareBots(names: readonly string[]): Promise<void> {
+  if (names.includes('cfr') && cfrModel === null) {
+    cfrModel = await loadCfrModel();
+  }
+}

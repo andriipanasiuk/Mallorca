@@ -20,3 +20,4 @@ web/e2e/contact/
 solver/target/
 solver/data/
 web/arena-out/
+web/src/cfr/mallorca.wasm

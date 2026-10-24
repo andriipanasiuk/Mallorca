@@ -35,3 +35,4 @@ jobs:
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test --release -- --include-ignored
       - run: cargo build -p mallorca-core --target wasm32-unknown-unknown
+      - run: cargo build --release -p mallorca-wasm --target wasm32-unknown-unknown
