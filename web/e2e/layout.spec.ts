@@ -74,3 +74,19 @@ test('the cash status bar keeps long values inside the viewport', async ({ page 
   await page.locator('summary.menu-summary').click();
   await expect(byId(page, 'clear-history')).toBeInViewport({ ratio: 1 });
 });
+
+test('the cash status bar stays on one line when the text runs wider', async ({ page }) => {
+  await page.goto(FAST_URL);
+  await byId(page, 'start-cash').click();
+  await expect(byId(page, 'passive')).toBeEnabled();
+  await page.addStyleTag({ content: '.status-bar { letter-spacing: 0.12em; }' });
+  const leave = await byId(page, 'leave').boundingBox();
+  const bar = await page.locator('.status-bar').boundingBox();
+  if (leave === null || bar === null) {
+    throw new Error('status bar is not rendered');
+  }
+  expect(bar.height).toBeLessThan(leave.height * 2);
+  for (const id of [...CONTROLS, 'session-result', 'leave']) {
+    await expect(byId(page, id)).toBeInViewport({ ratio: 1 });
+  }
+});

@@ -15,15 +15,17 @@ export function StatusBar({ vm, canLeave, onLeave, children }: StatusBarProps) {
   const net = signed(vm.session.netBb);
   return (
     <header class="status-bar">
-      <span data-testid="blinds">
-        {t('status.blinds', { small: vm.blinds.small, big: vm.blinds.big })}
-      </span>
-      {cash && (
-        <span data-testid="session-result">
-          {t('status.result', { sign: net.sign, bb: net.value })}
+      <div class="status-info">
+        <span data-testid="blinds">
+          {t('status.blinds', { small: vm.blinds.small, big: vm.blinds.big })}
         </span>
-      )}
-      <span data-testid="hand-number">{t('status.hand', { number: vm.handNumber })}</span>
+        {cash && (
+          <span data-testid="session-result">
+            {t('status.result', { sign: net.sign, bb: net.value })}
+          </span>
+        )}
+        <span data-testid="hand-number">{t('status.hand', { number: vm.handNumber })}</span>
+      </div>
       {cash && (
         <button
           type="button"
