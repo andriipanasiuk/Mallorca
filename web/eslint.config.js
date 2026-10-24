@@ -5,9 +5,9 @@ import { importX } from 'eslint-plugin-import-x';
 
 const typescriptSettings = importX.flatConfigs.typescript.settings;
 
-const pure = ['src/cards', 'src/equity', 'src/engine', 'src/brains'];
+const pure = ['src/cards', 'src/equity', 'src/engine', 'src/brains', 'src/cfr'];
 
-const LAYERS = ['cards', 'equity', 'engine', 'brains', 'game', 'ui'];
+const LAYERS = ['cards', 'equity', 'engine', 'brains', 'cfr', 'game', 'ui'];
 
 const layer = (
   dir,
@@ -67,7 +67,9 @@ export default tseslint.config(
   layer('engine', ['cards', 'equity']),
   layer('brains', ['cards', 'equity'], ['engine']),
   layer('brains', ['cards', 'equity', 'engine'], [], ['src/brains/**/*.test.ts']),
-  layer('game', ['cards', 'equity', 'engine', 'brains']),
+  layer('cfr', ['cards'], ['engine', 'brains']),
+  layer('cfr', ['cards', 'engine', 'brains'], [], ['src/cfr/**/*.test.ts']),
+  layer('game', ['cards', 'equity', 'engine', 'brains', 'cfr']),
   layer('ui', ['game']),
   ...pure.map((dir) => ({
     files: [`${dir}/**/*.ts`],
